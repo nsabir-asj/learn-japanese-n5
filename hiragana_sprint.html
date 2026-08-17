@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Hiragana Sprint — Adaptive Trainer</title>
 <style>
+  @font-face{font-family:"Hira Klee";src:url("./fonts/klee-one-hiragana.woff2") format("woff2");font-style:normal;font-weight:400;font-display:swap;unicode-range:U+3041-309F}
+  @font-face{font-family:"Hira Yuji Syuku";src:url("./fonts/yuji-syuku-hiragana.woff2") format("woff2");font-style:normal;font-weight:400;font-display:swap;unicode-range:U+3041-309F}
+  @font-face{font-family:"Hira Yuji Mai";src:url("./fonts/yuji-mai-hiragana.woff2") format("woff2");font-style:normal;font-weight:400;font-display:swap;unicode-range:U+3041-309F}
+  @font-face{font-family:"Hira Yuji Boku";src:url("./fonts/yuji-boku-hiragana.woff2") format("woff2");font-style:normal;font-weight:400;font-display:swap;unicode-range:U+3041-309F}
   :root{
     --bg:#0d1117; --panel:#161b22; --panel2:#1f2630; --panel3:#11171e;
     --text:#f0f6fc; --muted:#9da7b3; --line:#30363d;
@@ -93,7 +97,7 @@
   .kana-small{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;font-size:2rem;text-align:center}
   .meter{height:7px;background:#262d36;border-radius:999px;overflow:hidden;margin-top:6px}.meter span{display:block;height:100%;background:var(--accent)}
   .confusions{display:flex;gap:8px;flex-wrap:wrap}.confusion{border:1px solid var(--line);border-radius:999px;background:var(--panel3);padding:7px 10px}
-  .font-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.font-stat{border:1px solid var(--line);border-radius:12px;background:var(--panel3);padding:11px 12px}.font-stat strong{display:block}.font-stat span{color:var(--muted);font-size:.78rem}
+  .font-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.font-stat{border:1px solid var(--line);border-radius:12px;background:var(--panel3);padding:11px 12px}.font-stat strong{display:block}.font-stat span{color:var(--muted);font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-size:.78rem}.font-preview{font-size:1.7rem;line-height:1.2;margin:7px 0}
   .save-status{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:13px;background:var(--panel3);padding:12px 13px}.save-dot{width:9px;height:9px;border-radius:50%;background:var(--good)}
   .big-button{border:0;border-radius:13px;background:var(--accent);color:#07111d;font-weight:900;padding:12px 15px}
   .word-settings{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
@@ -310,10 +314,10 @@
 
   const FONT_PROFILES = [
     {id:"standard",label:"Standard",family:'"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif'},
-    {id:"serif",label:"Serif",family:'"Yu Mincho","Hiragino Mincho ProN","Noto Serif JP",serif'},
-    {id:"rounded",label:"Rounded",family:'Meiryo,"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif'},
-    {id:"textbook",label:"Textbook",family:'"UD Digi Kyokasho N-R","Yu Kyokasho","BIZ UDPGothic","Yu Gothic",sans-serif'},
-    {id:"print",label:"Print",family:'"MS PGothic","BIZ UDGothic","Noto Sans JP",sans-serif'}
+    {id:"klee",label:"Klee pen",family:'"Hira Klee",sans-serif'},
+    {id:"yuji-syuku",label:"Yuji brush",family:'"Hira Yuji Syuku",serif'},
+    {id:"yuji-mai",label:"Yuji flowing",family:'"Hira Yuji Mai",serif'},
+    {id:"yuji-boku",label:"Yuji rough",family:'"Hira Yuji Boku",sans-serif'}
   ];
   const STANDARD_FONT=FONT_PROFILES[0];
 
@@ -1109,7 +1113,7 @@
       allItems.forEach(item=>{const fs=itemState(item.k).fontStats[font.id];if(fs){seen+=fs.seen;correct+=fs.correct}});
       const result=seen?Math.round(correct/seen*100)+"%":"Not assessed";
       const safeFamily=font.family.replaceAll('"',"'");
-      return `<div class="font-stat" style="font-family:${safeFamily}"><strong>${font.label}</strong><span>${result}${seen?` • ${seen} answers`:""}</span></div>`;
+      return `<div class="font-stat" style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">あきさりふ</div><span>${result}${seen?` • ${seen} answers`:""}</span></div>`;
     }).join("");
   }
 
