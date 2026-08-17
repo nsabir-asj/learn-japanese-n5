@@ -44,6 +44,7 @@
   .tiny{font-size:.82rem;color:var(--muted)}
   .question{text-align:center;padding:30px 22px 16px}
   .question-label{color:var(--muted);font-size:.93rem}
+  .font-note{display:inline-flex;align-items:center;margin-left:7px;border:1px solid var(--line);border-radius:999px;padding:2px 7px;color:#b8c3cf;background:rgba(255,255,255,.025);font-size:.72rem;font-weight:700;vertical-align:middle}
   .prompt{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;font-size:clamp(5rem,15vw,9rem);line-height:1.05;margin:12px 0 14px;font-weight:600;letter-spacing:.03em}
   .prompt.word{font-size:clamp(3rem,10vw,6.2rem);letter-spacing:.08em}
   .typing{width:min(640px,calc(100% - 28px));margin:0 auto 20px}
@@ -53,6 +54,10 @@
   .feedback{width:min(830px,calc(100% - 28px));margin:0 auto 16px;border:1px solid var(--line);background:var(--panel3);border-radius:14px;padding:14px 16px;display:none}
   .feedback.show{display:block}.feedback.good{border-color:rgba(63,185,80,.55)}.feedback.bad{border-color:rgba(248,81,73,.6)}
   .feedback strong{display:block;margin-bottom:4px}.feedback .meta{color:var(--muted);font-size:.9rem;line-height:1.45}
+  .glyph-compare{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .glyph-sample{min-width:132px;border:1px solid var(--line);border-radius:12px;background:#0f141a;padding:9px 14px;text-align:center}
+  .glyph-sample span{display:block;color:var(--muted);font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.03em;margin-bottom:3px}
+  .glyph-sample strong{font-size:2.8rem;line-height:1.05;margin:0}
   .rescue-wrap{width:min(830px,calc(100% - 28px));margin:0 auto 20px;display:none}
   .rescue-wrap.show{display:block}
   .rescue-title{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:9px}
@@ -88,6 +93,7 @@
   .kana-small{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;font-size:2rem;text-align:center}
   .meter{height:7px;background:#262d36;border-radius:999px;overflow:hidden;margin-top:6px}.meter span{display:block;height:100%;background:var(--accent)}
   .confusions{display:flex;gap:8px;flex-wrap:wrap}.confusion{border:1px solid var(--line);border-radius:999px;background:var(--panel3);padding:7px 10px}
+  .font-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.font-stat{border:1px solid var(--line);border-radius:12px;background:var(--panel3);padding:11px 12px}.font-stat strong{display:block}.font-stat span{color:var(--muted);font-size:.78rem}
   .save-status{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:13px;background:var(--panel3);padding:12px 13px}.save-dot{width:9px;height:9px;border-radius:50%;background:var(--good)}
   .big-button{border:0;border-radius:13px;background:var(--accent);color:#07111d;font-weight:900;padding:12px 15px}
   .word-settings{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
@@ -106,7 +112,7 @@
   @media(max-width:760px){
     header{display:block}.pill{display:inline-block;margin-top:11px}.stats{grid-template-columns:repeat(2,1fr)}
     .grid2{grid-template-columns:1fr}.options{grid-template-columns:repeat(2,1fr)}.row-select{grid-template-columns:1fr}
-    .word-settings{grid-template-columns:1fr}.session-summary{grid-template-columns:1fr}.progressbar{width:125px}
+    .word-settings{grid-template-columns:1fr}.session-summary{grid-template-columns:1fr}.progressbar{width:125px}.font-stats{grid-template-columns:repeat(2,1fr)}
   }
 </style>
 </head>
@@ -141,7 +147,7 @@
         <div class="tiny" id="learnCount">Question 1</div>
       </div>
       <div class="question">
-        <div class="question-label">Type the romaji reading</div>
+        <div class="question-label">Type the romaji reading <span class="font-note" id="learnFontNote">Standard font</span></div>
         <div class="prompt" id="learnPrompt">あ</div>
       </div>
       <div class="typing">
@@ -165,7 +171,7 @@
         <div class="tiny" id="rehearseCount">Question 1</div>
       </div>
       <div class="question">
-        <div class="question-label">Type the romaji reading</div>
+        <div class="question-label">Type the romaji reading <span class="font-note" id="rehearseFontNote">Standard font</span></div>
         <div class="prompt" id="rehearsePrompt">あ</div>
       </div>
       <div class="typing">
@@ -288,6 +294,11 @@
         <div class="confusions" id="confusionList"></div>
       </div>
     </div>
+    <div class="card" style="margin-top:14px">
+      <h2>Font recognition</h2>
+      <p class="muted">Varied-font results are tracked separately. Learn introduces them after a kana is familiar; Rehearse mixes them immediately.</p>
+      <div class="font-stats" id="fontRecognition"></div>
+    </div>
   </section>
 </div>
 
@@ -296,6 +307,15 @@
   "use strict";
 
   const STORAGE_KEY = "hiragana-sprint-v3";
+
+  const FONT_PROFILES = [
+    {id:"standard",label:"Standard",family:'"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif'},
+    {id:"serif",label:"Serif",family:'"Yu Mincho","Hiragino Mincho ProN","Noto Serif JP",serif'},
+    {id:"rounded",label:"Rounded",family:'Meiryo,"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif'},
+    {id:"textbook",label:"Textbook",family:'"UD Digi Kyokasho N-R","Yu Kyokasho","BIZ UDPGothic","Yu Gothic",sans-serif'},
+    {id:"print",label:"Print",family:'"MS PGothic","BIZ UDGothic","Noto Sans JP",sans-serif'}
+  ];
+  const STANDARD_FONT=FONT_PROFILES[0];
 
   const GROUPS = [
     {id:"vowels", name:"Vowels", phase:"Basic", items:[["あ","a"],["い","i"],["う","u"],["え","e"],["お","o"]]},
@@ -423,7 +443,7 @@
   let currentTab="learn";
   const INACTIVITY_MS=2*60*1000;
   function newPracticeSession(){
-    return {n:0,current:null,rescue:false,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0};
+    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],rescue:false,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0};
   }
   const sessions={
     learn:newPracticeSession(),
@@ -471,8 +491,49 @@
   }
 
   function itemState(k){
-    if(!state.items[k]) state.items[k]={seen:0,correct:0,wrong:0,mastery:0,streak:0,lastSeen:0,dueAt:0,lastWasCorrect:null,confusions:{}};
+    if(!state.items[k]) state.items[k]={seen:0,correct:0,wrong:0,mastery:0,streak:0,lastSeen:0,dueAt:0,lastWasCorrect:null,confusions:{},fontStats:{}};
+    if(!state.items[k].fontStats)state.items[k].fontStats={};
     return state.items[k];
+  }
+
+  function fontState(item,fontId){
+    const s=itemState(item.k);
+    if(!s.fontStats[fontId])s.fontStats[fontId]={seen:0,correct:0,wrong:0};
+    return s.fontStats[fontId];
+  }
+
+  function chooseKanaFont(item,mode,session){
+    const s=itemState(item.k);
+    if(mode==="learn"&&s.mastery<55)return STANDARD_FONT;
+    const variedChance=mode==="rehearse"?.8:Math.min(.75,.35+(s.mastery-55)/112.5);
+    if(Math.random()>=variedChance)return STANDARD_FONT;
+    let candidates=FONT_PROFILES.slice(1);
+    const last=session.lastFonts[session.lastFonts.length-1];
+    if(candidates.length>1)candidates=candidates.filter(f=>f.id!==last);
+    return weightedPick(candidates,font=>{
+      const fs=s.fontStats[font.id];
+      if(!fs||!fs.seen)return 2.5;
+      return 1+(fs.wrong/fs.seen)*3;
+    });
+  }
+
+  function applyPromptFont(mode,font){
+    const prompt=$("#"+mode+"Prompt");
+    prompt.style.fontFamily=font.family;
+    $("#"+mode+"FontNote").textContent=font.label+" font";
+  }
+
+  function appendGlyphComparison(mode,item,font){
+    const host=$("#"+mode+"Feedback .meta");
+    if(!host)return;
+    const compare=document.createElement("div");compare.className="glyph-compare";
+    [[font.label+" question form",font],["Standard reference",STANDARD_FONT]].forEach(([label,profile])=>{
+      const sample=document.createElement("div");sample.className="glyph-sample";
+      const caption=document.createElement("span");caption.textContent=label;
+      const glyph=document.createElement("strong");glyph.textContent=item.k;glyph.style.fontFamily=profile.family;
+      sample.append(caption,glyph);compare.appendChild(sample);
+    });
+    host.appendChild(compare);
   }
 
   function rehearseItemState(k){
@@ -606,20 +667,23 @@
     s.dueAt=Date.now()+minutes*60000;
   }
 
-  function applyKanaResult(item,correct,typedWrongItem=null,mode="learn"){
+  function applyKanaResult(item,correct,typedWrongItem=null,mode="learn",font=STANDARD_FONT){
     const s=itemState(item.k);
+    const fs=fontState(item,font.id);fs.seen++;if(correct)fs.correct++;else fs.wrong++;
     s.seen++; s.lastSeen=Date.now();
     state.stats.answered++;
     if(correct){
       s.correct++; s.streak++;
       s.lastWasCorrect=true;
       s.errorStreak=0;
-      s.mastery=Math.min(100,s.mastery+masteryGain(s));
+      const gain=masteryGain(s)*(font.id==="standard"?1:.75);
+      s.mastery=Math.min(100,s.mastery+gain);
       scheduleCorrect(s);
       state.stats.correct++; state.stats.streak++;
       state.stats.bestStreak=Math.max(state.stats.bestStreak,state.stats.streak);
     }else{
-      s.wrong++; s.streak=0; s.lastWasCorrect=false; s.errorStreak=(s.errorStreak||0)+1; s.mastery=Math.max(0,s.mastery-13); s.dueAt=Date.now()+60000;
+      const penalty=font.id==="standard"?13:6;
+      s.wrong++; s.streak=0; s.lastWasCorrect=false; s.errorStreak=(s.errorStreak||0)+1; s.mastery=Math.max(0,s.mastery-penalty); s.dueAt=Date.now()+60000;
       state.stats.streak=0;
       if(typedWrongItem && typedWrongItem.k!==item.k){
         s.confusions[typedWrongItem.k]=(s.confusions[typedWrongItem.k]||0)+1;
@@ -773,8 +837,10 @@
     $("#"+mode+"DontKnow").classList.remove("hidden");
     const item=selectKana(pool,session,mode);
     session.current=item;session.last.push(item.k);if(session.last.length>12)session.last.shift();
+    session.currentFont=chooseKanaFont(item,mode,session);session.lastFonts.push(session.currentFont.id);if(session.lastFonts.length>5)session.lastFonts.shift();
     if(session.resumeGrace>0)session.resumeGrace--;
     $("#"+mode+"Prompt").textContent=item.k;
+    applyPromptFont(mode,session.currentFont);
     $("#"+mode+"Count").textContent="Question "+session.n;
     focusInput(mode);
     updateAllUI();
@@ -788,14 +854,14 @@
     const value=normalize(input.value);
     const correct=!forceWrong&&value===normalize(item.r);
     if(correct){
-      applyKanaResult(item,true,null,mode);
+      applyKanaResult(item,true,null,mode,session.currentFont);
       setFeedback(mode,true,`${item.k} = ${item.r}`,"Correct. Moving on.");
       if(mode==="learn")maybeAutoUnlockLearn();
       input.value="";
       setTimeout(()=>nextKanaQuestion(mode),180);
     }else{
       const wrongItem=value?allItems.find(x=>x.r===value)||null:null;
-      applyKanaResult(item,false,wrongItem,mode);
+      applyKanaResult(item,false,wrongItem,mode,session.currentFont);
       session.forced[item.k]=session.n+mistakeReviewOffset(itemState(item.k).errorStreak||1);
       session.rescue=true;
       input.value=""; input.blur();
@@ -820,6 +886,7 @@
     session.rescue=false;
     $("#"+mode+"Next").classList.remove("hidden");
     setFeedback(mode,true,`${target.k} = ${target.r}`,"Correction reinforced. Press Enter or Next.");
+    appendGlyphComparison(mode,target,session.currentFont||STANDARD_FONT);
     focusInput(mode);
     updateAllUI();
   }
@@ -1036,6 +1103,14 @@
     allItems.forEach(item=>Object.entries(itemState(item.k).confusions||{}).forEach(([b,count])=>{if(count>0&&byKana[b])pairs.push({a:item.k,b,count})}));
     pairs.sort((a,b)=>b.count-a.count);
     $("#confusionList").innerHTML=pairs.length?pairs.slice(0,16).map(p=>`<span class="confusion">${p.a} ↔ ${p.b} <strong>×${p.count}</strong></span>`).join(""):`<span class="muted">No confusion pairs recorded yet.</span>`;
+
+    $("#fontRecognition").innerHTML=FONT_PROFILES.map(font=>{
+      let seen=0,correct=0;
+      allItems.forEach(item=>{const fs=itemState(item.k).fontStats[font.id];if(fs){seen+=fs.seen;correct+=fs.correct}});
+      const result=seen?Math.round(correct/seen*100)+"%":"Not assessed";
+      const safeFamily=font.family.replaceAll('"',"'");
+      return `<div class="font-stat" style="font-family:${safeFamily}"><strong>${font.label}</strong><span>${result}${seen?` • ${seen} answers`:""}</span></div>`;
+    }).join("");
   }
 
   function updateRehearseSummary(){
