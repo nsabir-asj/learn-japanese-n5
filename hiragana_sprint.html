@@ -1,0 +1,1230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Hiragana Sprint — Adaptive Trainer</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1f2630; --panel3:#11171e;
+    --text:#f0f6fc; --muted:#9da7b3; --line:#30363d;
+    --good:#3fb950; --bad:#f85149; --warn:#d29922;
+    --accent:#58a6ff; --accent2:#a371f7; --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; min-height:100vh;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(88,166,255,.11), transparent 30rem),
+      radial-gradient(circle at 100% 5%, rgba(163,113,247,.09), transparent 25rem),
+      var(--bg);
+    color:var(--text);
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+  button,input{font:inherit}
+  button{cursor:pointer}
+  .wrap{width:min(1120px,calc(100% - 28px));margin:0 auto;padding:28px 0 56px}
+  header{display:flex;gap:22px;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+  h1{font-size:clamp(1.9rem,4vw,3rem);margin:0;letter-spacing:-.04em}
+  h2,h3{margin-top:0}
+  .subtitle{margin:.45rem 0 0;color:var(--muted);line-height:1.5;max-width:780px}
+  .pill{border:1px solid var(--line);border-radius:999px;padding:8px 12px;color:var(--muted);font-size:.85rem;white-space:nowrap;background:rgba(255,255,255,.025)}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+  .stat{background:rgba(22,27,34,.9);border:1px solid var(--line);border-radius:14px;padding:13px 14px}
+  .stat strong{display:block;font-size:1.25rem}.stat span{color:var(--muted);font-size:.8rem}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+  .tab{border:1px solid var(--line);background:var(--panel);color:var(--muted);padding:10px 15px;border-radius:12px;font-weight:700}
+  .tab.active{color:var(--text);background:var(--panel2);border-color:#566171}
+  .panel{display:none}.panel.active{display:block}
+  .trainer{background:rgba(22,27,34,.94);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 18px 70px rgba(0,0,0,.25)}
+  .trainer-top{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+  .mode-tag{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.9rem}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .tiny{font-size:.82rem;color:var(--muted)}
+  .question{text-align:center;padding:30px 22px 16px}
+  .question-label{color:var(--muted);font-size:.93rem}
+  .prompt{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;font-size:clamp(5rem,15vw,9rem);line-height:1.05;margin:12px 0 14px;font-weight:600;letter-spacing:.03em}
+  .prompt.word{font-size:clamp(3rem,10vw,6.2rem);letter-spacing:.08em}
+  .typing{width:min(640px,calc(100% - 28px));margin:0 auto 20px}
+  .answer-input{width:100%;background:#0f141a;color:var(--text);border:1px solid #414b58;border-radius:14px;padding:16px 18px;font-size:1.15rem;text-align:center;outline:none}
+  .answer-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(88,166,255,.13)}
+  .typing-hint{text-align:center;color:var(--muted);font-size:.8rem;margin-top:8px}
+  .feedback{width:min(830px,calc(100% - 28px));margin:0 auto 16px;border:1px solid var(--line);background:var(--panel3);border-radius:14px;padding:14px 16px;display:none}
+  .feedback.show{display:block}.feedback.good{border-color:rgba(63,185,80,.55)}.feedback.bad{border-color:rgba(248,81,73,.6)}
+  .feedback strong{display:block;margin-bottom:4px}.feedback .meta{color:var(--muted);font-size:.9rem;line-height:1.45}
+  .rescue-wrap{width:min(830px,calc(100% - 28px));margin:0 auto 20px;display:none}
+  .rescue-wrap.show{display:block}
+  .rescue-title{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:9px}
+  .options{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .choice{min-height:61px;border:1px solid #3c4653;border-radius:13px;background:var(--panel2);color:var(--text);font-weight:800;font-size:1.05rem;position:relative;transition:.12s ease}
+  .choice:hover{transform:translateY(-1px);border-color:#647083;background:#252d38}
+  .choice .num{position:absolute;left:9px;top:7px;color:#748091;font-size:.67rem}
+  .choice.correct{border-color:var(--good);background:rgba(63,185,80,.13)}.choice.wrong{border-color:var(--bad);background:rgba(248,81,73,.12)}
+  .footer-actions{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 18px;border-top:1px solid var(--line)}
+  .ghost{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:11px;padding:9px 12px}
+  .ghost:hover{color:var(--text);border-color:#5d6878}.danger{color:#ff9894;border-color:rgba(248,81,73,.45)}
+  kbd{border:1px solid #3b4552;background:#1d242d;border-radius:6px;padding:1px 5px;color:#c8d1dc}
+  .progressbar{height:7px;background:#0f141a;border:1px solid #222a34;border-radius:999px;overflow:hidden;width:190px}.progressbar span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .grid2{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .muted{color:var(--muted);line-height:1.5}
+  .row-select{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .check{display:flex;gap:9px;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--panel3);padding:10px 12px}
+  .check input{accent-color:var(--accent)}
+  .phase-title{margin:18px 0 8px;color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.08em}
+  .rows{display:grid;gap:8px}
+  .row-chip{display:flex;justify-content:space-between;align-items:center;gap:14px;border:1px solid var(--line);border-radius:13px;background:var(--panel3);padding:11px 13px}
+  .row-chip.locked{opacity:.54}.row-name strong{display:block}.row-name span{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
+  .row-heading{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .unlock-tag{display:inline-flex!important;align-items:center;border:1px solid rgba(88,166,255,.45);border-radius:999px;background:rgba(88,166,255,.09);color:#9ccbff!important;padding:3px 7px;font-size:.66rem!important;font-weight:800;line-height:1;margin:0!important}
+  .unlock-tag.rehearsal{border-color:rgba(163,113,247,.5);background:rgba(163,113,247,.11);color:#c8a9ff!important}
+  .kana-line{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;font-size:1.15rem;letter-spacing:.12em;white-space:nowrap}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .callout{border-left:3px solid var(--accent);background:rgba(88,166,255,.06);color:var(--muted);padding:10px 12px;margin-top:14px;line-height:1.5;font-size:.9rem}
+  .settings-row{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:12px 0;border-bottom:1px solid var(--line)}.settings-row:last-child{border-bottom:0}
+  input[type="range"]{width:min(260px,42vw)}
+  .trouble-list{display:grid;gap:8px}.trouble{display:grid;grid-template-columns:58px 1fr auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--panel3);padding:10px 12px}
+  .kana-small{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;font-size:2rem;text-align:center}
+  .meter{height:7px;background:#262d36;border-radius:999px;overflow:hidden;margin-top:6px}.meter span{display:block;height:100%;background:var(--accent)}
+  .confusions{display:flex;gap:8px;flex-wrap:wrap}.confusion{border:1px solid var(--line);border-radius:999px;background:var(--panel3);padding:7px 10px}
+  .save-status{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:13px;background:var(--panel3);padding:12px 13px}.save-dot{width:9px;height:9px;border-radius:50%;background:var(--good)}
+  .big-button{border:0;border-radius:13px;background:var(--accent);color:#07111d;font-weight:900;padding:12px 15px}
+  .word-settings{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  .seg{border:1px solid var(--line);border-radius:11px;background:var(--panel3);color:var(--muted);padding:10px 11px;font-weight:700}.seg.active{color:var(--text);border-color:#5c6878;background:var(--panel2)}
+  .session-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.mini{border:1px solid var(--line);border-radius:11px;background:var(--panel3);padding:10px}.mini strong{display:block}
+  .rehearse-status{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:14px 0;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:11px 14px}
+  .rehearse-status-main{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.rehearse-status-main strong{font-size:.95rem}.rehearse-status-main span{color:var(--muted);font-size:.84rem}
+  .details-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .details-card summary{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;cursor:pointer;padding:16px 18px;font-weight:800}
+  .details-card summary::-webkit-details-marker{display:none}
+  .details-card summary::after{content:"+";color:var(--muted);font-size:1.25rem;font-weight:500}
+  .details-card[open] summary::after{content:"−"}
+  .details-card[open] summary{border-bottom:1px solid var(--line)}
+  .details-body{padding:0 18px 18px}
+  .hidden{display:none!important}
+  @media(max-width:760px){
+    header{display:block}.pill{display:inline-block;margin-top:11px}.stats{grid-template-columns:repeat(2,1fr)}
+    .grid2{grid-template-columns:1fr}.options{grid-template-columns:repeat(2,1fr)}.row-select{grid-template-columns:1fr}
+    .word-settings{grid-template-columns:1fr}.session-summary{grid-template-columns:1fr}.progressbar{width:125px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Hiragana Sprint</h1>
+      <p class="subtitle">Type-first adaptive hiragana practice. Correct answers move instantly; mistakes trigger an 8-choice rescue quiz and get scheduled for earlier review.</p>
+    </div>
+    <div class="pill">Standalone • offline • auto-saved</div>
+  </header>
+
+  <section class="stats">
+    <div class="stat"><strong id="sMastered">0</strong><span>mastered kana</span></div>
+    <div class="stat"><strong id="sAccuracy">—</strong><span>overall accuracy</span></div>
+    <div class="stat"><strong id="sStreak">0</strong><span>current streak</span></div>
+    <div class="stat"><strong id="sWeak">0</strong><span>weak / due kana</span></div>
+  </section>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="learn">Learn</button>
+    <button class="tab" data-tab="rehearse">Rehearse</button>
+    <button class="tab" data-tab="words">Words</button>
+    <button class="tab" data-tab="progress">Progress</button>
+  </nav>
+
+  <section class="panel active" id="panel-learn">
+    <div class="trainer" data-trainer="learn">
+      <div class="trainer-top">
+        <div class="mode-tag"><span class="dot"></span><span id="learnMode">Learn • adaptive rows</span></div>
+        <div class="tiny" id="learnCount">Question 1</div>
+      </div>
+      <div class="question">
+        <div class="question-label">Type the romaji reading</div>
+        <div class="prompt" id="learnPrompt">あ</div>
+      </div>
+      <div class="typing">
+        <input id="learnInput" class="answer-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type the reading and press Enter" />
+        <div class="typing-hint">The cursor stays here. Correct → next question. Wrong → rescue choices.</div>
+      </div>
+      <div class="feedback" id="learnFeedback"></div>
+      <div class="rescue-wrap" id="learnRescue"><div class="rescue-title">Choose the correct reading to reinforce the mistake</div><div class="options" id="learnOptions"></div></div>
+      <div class="footer-actions">
+        <div class="actions"><button class="ghost" id="learnDontKnow">I don't know</button><button class="ghost hidden" id="learnNext">Next <kbd>Enter</kbd></button></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="tiny" id="learnProgressText">Unlocked mastery</span><div class="progressbar"><span id="learnProgress"></span></div></div>
+      </div>
+    </div>
+    <div class="callout">Learn mode unlocks rows gradually. Rows can also unlock independently when Rehearse demonstrates that you already know every kana in that row.</div>
+  </section>
+
+  <section class="panel" id="panel-rehearse">
+    <div class="trainer" data-trainer="rehearse">
+      <div class="trainer-top">
+        <div class="mode-tag"><span class="dot"></span><span>Rehearse • selected rows</span></div>
+        <div class="tiny" id="rehearseCount">Question 1</div>
+      </div>
+      <div class="question">
+        <div class="question-label">Type the romaji reading</div>
+        <div class="prompt" id="rehearsePrompt">あ</div>
+      </div>
+      <div class="typing">
+        <input id="rehearseInput" class="answer-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type the reading and press Enter" />
+        <div class="typing-hint">Mistakes trigger an 8-choice rescue and are repeated sooner.</div>
+      </div>
+      <div class="feedback" id="rehearseFeedback"></div>
+      <div class="rescue-wrap" id="rehearseRescue"><div class="rescue-title">Choose the correct reading</div><div class="options" id="rehearseOptions"></div></div>
+      <div class="footer-actions">
+        <div class="actions"><button class="ghost" id="rehearseDontKnow">I don't know</button><button class="ghost hidden" id="rehearseNext">Next <kbd>Enter</kbd></button></div>
+        <span class="tiny">Keyboard: <kbd>1</kbd>–<kbd>8</kbd> for rescue choices</span>
+      </div>
+    </div>
+
+    <div class="rehearse-status">
+      <div class="rehearse-status-main"><strong id="rehearseSetName">All basic</strong><span id="rehearseSetSummary">0 kana selected</span></div>
+      <div class="tiny"><span id="assessedCount">0</span> assessed · <span id="rehearseWeakCount">0</span> weak</div>
+    </div>
+
+    <div class="grid2">
+      <details class="details-card" id="rehearseSetPanel">
+        <summary><span id="rehearseSetHeading">Change rehearsal set</span></summary>
+        <div class="details-body">
+        <p class="muted">For material you have already studied. Selected rows are available immediately—no unlocking required.</p>
+        <div class="actions" style="margin-bottom:10px">
+          <button class="ghost" id="selectBasic">Select all basic</button>
+          <button class="ghost" id="selectAll">Select everything</button>
+          <button class="ghost" id="clearRows">Clear</button>
+        </div>
+        <div id="rehearseSelectors"></div>
+        </div>
+      </details>
+      <details class="details-card" id="rehearseHelpPanel">
+        <summary>How rehearsal adapts</summary>
+        <div class="details-body">
+        <p class="muted">Until every selected kana is assessed, 65% of normal questions introduce unseen kana and one is guaranteed after four review questions. After full coverage, review becomes fully adaptive. Recent difficulty can increase a sound category up to 2×.</p>
+        <div class="session-summary">
+          <div class="mini"><strong id="selectedCount">0</strong><span class="tiny">selected kana</span></div>
+          <div class="mini"><strong id="assessedCountDetail">0</strong><span class="tiny">already assessed</span></div>
+          <div class="mini"><strong id="rehearseWeakCountDetail">0</strong><span class="tiny">weak in selection</span></div>
+        </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-words">
+    <div class="grid2" style="margin-bottom:14px">
+      <div class="card">
+        <h2>Word reading</h2>
+        <p class="muted">Read whole hiragana words instead of isolated characters. The vocabulary here is supplemental beginner practice.</p>
+        <div class="word-settings">
+          <button class="seg active" data-wordset="learned">Learned kana only</button>
+          <button class="seg" data-wordset="basic">All basic</button>
+          <button class="seg" data-wordset="all">All available words</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Word scheduling</h2>
+        <p class="muted">Unseen words are introduced frequently. Mistaken words return after a wider review gap, and recent difficulty with advanced sound categories increases their share without taking over the session.</p>
+        <div class="session-summary">
+          <div class="mini"><strong id="wordPoolCount">0</strong><span class="tiny">words in pool</span></div>
+          <div class="mini"><strong id="wordCorrect">0</strong><span class="tiny">word answers correct</span></div>
+          <div class="mini"><strong id="wordSeen">0</strong><span class="tiny">word questions seen</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="trainer" data-trainer="words">
+      <div class="trainer-top">
+        <div class="mode-tag"><span class="dot"></span><span>Words • typed reading</span></div>
+        <div class="tiny" id="wordsCount">Question 1</div>
+      </div>
+      <div class="question">
+        <div class="question-label">Read this word in romaji</div>
+        <div class="prompt word" id="wordsPrompt">ねこ</div>
+      </div>
+      <div class="typing">
+        <input id="wordsInput" class="answer-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type the word in romaji and press Enter" />
+        <div class="typing-hint">Example: ねこ → neko</div>
+      </div>
+      <div class="feedback" id="wordsFeedback"></div>
+      <div class="rescue-wrap" id="wordsRescue"><div class="rescue-title">Choose the correct reading</div><div class="options" id="wordsOptions"></div></div>
+      <div class="footer-actions">
+        <div class="actions"><button class="ghost" id="wordsDontKnow">I don't know</button><button class="ghost hidden" id="wordsNext">Next <kbd>Enter</kbd></button></div>
+        <span class="tiny">Correct word answers give a small amount of supporting evidence to their kana.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-progress">
+    <div class="grid2">
+      <div class="card">
+        <h2>Progress & backup</h2>
+        <div class="save-status"><span class="save-dot"></span><div><strong>Progress is auto-saved locally</strong><div class="tiny" id="lastSaved">Not saved yet</div></div></div>
+        <p class="muted">Export a portable JSON backup whenever you want. Importing restores mastery, mistakes, confusion pairs, settings, and rehearsal selections.</p>
+        <div class="actions">
+          <button class="big-button" id="exportProgress">Export progress</button>
+          <button class="ghost" id="importProgressBtn">Import progress</button>
+          <input id="importProgressFile" type="file" accept=".json,application/json" class="hidden" />
+          <button class="ghost danger" id="resetProgress">Reset everything</button>
+        </div>
+        <div class="callout" id="importStatus">Tip: keep the exported JSON next to this HTML if you want an easy manual backup between computers or browsers.</div>
+      </div>
+      <div class="card">
+        <h2>Learn curriculum</h2>
+        <p class="muted">Learn unlocks rows in sequence, while Rehearse can unlock any row by demonstrating prior knowledge. The tags show which path unlocked each row.</p>
+        <div class="rows" id="curriculumRows"></div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:14px">
+      <div class="card">
+        <h2>Weak kana</h2>
+        <div class="trouble-list" id="troubleList"></div>
+      </div>
+      <div class="card">
+        <h2>Common confusions</h2>
+        <p class="muted">Wrong typed answers and wrong rescue selections build these pairs.</p>
+        <div class="confusions" id="confusionList"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const STORAGE_KEY = "hiragana-sprint-v3";
+
+  const GROUPS = [
+    {id:"vowels", name:"Vowels", phase:"Basic", items:[["あ","a"],["い","i"],["う","u"],["え","e"],["お","o"]]},
+    {id:"k", name:"K-row", phase:"Basic", items:[["か","ka"],["き","ki"],["く","ku"],["け","ke"],["こ","ko"]]},
+    {id:"s", name:"S-row", phase:"Basic", items:[["さ","sa"],["し","shi"],["す","su"],["せ","se"],["そ","so"]]},
+    {id:"t", name:"T-row", phase:"Basic", items:[["た","ta"],["ち","chi"],["つ","tsu"],["て","te"],["と","to"]]},
+    {id:"n", name:"N-row", phase:"Basic", items:[["な","na"],["に","ni"],["ぬ","nu"],["ね","ne"],["の","no"]]},
+    {id:"h", name:"H-row", phase:"Basic", items:[["は","ha"],["ひ","hi"],["ふ","fu"],["へ","he"],["ほ","ho"]]},
+    {id:"m", name:"M-row", phase:"Basic", items:[["ま","ma"],["み","mi"],["む","mu"],["め","me"],["も","mo"]]},
+    {id:"y", name:"Y-row", phase:"Basic", items:[["や","ya"],["ゆ","yu"],["よ","yo"]]},
+    {id:"r", name:"R-row", phase:"Basic", items:[["ら","ra"],["り","ri"],["る","ru"],["れ","re"],["ろ","ro"]]},
+    {id:"w", name:"W-row + ん", phase:"Basic", items:[["わ","wa"],["を","wo"],["ん","n"]]},
+    {id:"g", name:"G-row", phase:"Voiced", items:[["が","ga"],["ぎ","gi"],["ぐ","gu"],["げ","ge"],["ご","go"]]},
+    {id:"z", name:"Z-row", phase:"Voiced", items:[["ざ","za"],["じ","ji"],["ず","zu"],["ぜ","ze"],["ぞ","zo"]]},
+    {id:"d", name:"D-row", phase:"Voiced", items:[["だ","da"],["ぢ","ji"],["づ","zu"],["で","de"],["ど","do"]]},
+    {id:"b", name:"B-row", phase:"Voiced", items:[["ば","ba"],["び","bi"],["ぶ","bu"],["べ","be"],["ぼ","bo"]]},
+    {id:"p", name:"P-row", phase:"Semi-voiced", items:[["ぱ","pa"],["ぴ","pi"],["ぷ","pu"],["ぺ","pe"],["ぽ","po"]]},
+    {id:"kya", name:"K-combos", phase:"Combinations", items:[["きゃ","kya"],["きゅ","kyu"],["きょ","kyo"]]},
+    {id:"sha", name:"SH-combos", phase:"Combinations", items:[["しゃ","sha"],["しゅ","shu"],["しょ","sho"]]},
+    {id:"cha", name:"CH-combos", phase:"Combinations", items:[["ちゃ","cha"],["ちゅ","chu"],["ちょ","cho"]]},
+    {id:"nya", name:"N-combos", phase:"Combinations", items:[["にゃ","nya"],["にゅ","nyu"],["にょ","nyo"]]},
+    {id:"hya", name:"H-combos", phase:"Combinations", items:[["ひゃ","hya"],["ひゅ","hyu"],["ひょ","hyo"]]},
+    {id:"mya", name:"M-combos", phase:"Combinations", items:[["みゃ","mya"],["みゅ","myu"],["みょ","myo"]]},
+    {id:"rya", name:"R-combos", phase:"Combinations", items:[["りゃ","rya"],["りゅ","ryu"],["りょ","ryo"]]},
+    {id:"gya", name:"G-combos", phase:"Combinations", items:[["ぎゃ","gya"],["ぎゅ","gyu"],["ぎょ","gyo"]]},
+    {id:"ja", name:"J-combos", phase:"Combinations", items:[["じゃ","ja"],["じゅ","ju"],["じょ","jo"]]},
+    {id:"bya", name:"B-combos", phase:"Combinations", items:[["びゃ","bya"],["びゅ","byu"],["びょ","byo"]]},
+    {id:"pya", name:"P-combos", phase:"Combinations", items:[["ぴゃ","pya"],["ぴゅ","pyu"],["ぴょ","pyo"]]}
+  ];
+
+  const VISUAL = {
+    "あ":["お","め"],"い":["り"],"う":["ら","つ"],"え":["ん"],"お":["あ","む"],
+    "か":["や","ち"],"き":["さ"],"く":["へ","し"],"け":["は"],"こ":["に"],
+    "さ":["き","ち"],"し":["つ","い","ひ"],"す":["む"],"せ":["そ"],"そ":["て","ん","せ"],
+    "た":["な"],"ち":["さ","ら"],"つ":["し","う"],"て":["そ"],"と":["て"],
+    "な":["た"],"に":["こ"],"ぬ":["め","ね"],"ね":["れ","わ","ぬ"],"の":["め"],
+    "は":["ほ","け"],"ひ":["し","い"],"ふ":["う"],"へ":["く"],"ほ":["は","ま"],
+    "ま":["ほ","よ"],"み":["ゆ"],"む":["す","お"],"め":["ぬ","の"],"も":["し"],
+    "や":["か"],"ゆ":["み"],"よ":["ま"],"ら":["う","ち"],"り":["い"],
+    "る":["ろ"],"れ":["ね","わ"],"ろ":["る"],"わ":["れ","ね"],"を":["お"],"ん":["そ"],
+    "が":["か","ぎ"],"ぎ":["き","が"],"ぐ":["く","げ"],"げ":["け","ぐ"],"ご":["こ","げ"],
+    "ざ":["さ","じ"],"じ":["し","ぢ"],"ず":["す","づ"],"ぜ":["せ"],"ぞ":["そ"],
+    "だ":["た"],"ぢ":["ち","じ"],"づ":["つ","ず"],"で":["て"],"ど":["と"],
+    "ば":["は","ぱ"],"び":["ひ","ぴ"],"ぶ":["ふ","ぷ"],"べ":["へ","ぺ"],"ぼ":["ほ","ぽ"],
+    "ぱ":["は","ば"],"ぴ":["ひ","び"],"ぷ":["ふ","ぶ"],"ぺ":["へ","べ"],"ぽ":["ほ","ぼ"],
+    "きゃ":["きゅ","きょ","ぎゃ"],"きゅ":["きゃ","きょ","ぎゅ"],"きょ":["きゃ","きゅ","ぎょ"],
+    "しゃ":["しゅ","しょ","じゃ"],"しゅ":["しゃ","しょ","じゅ"],"しょ":["しゃ","しゅ","じょ"],
+    "ちゃ":["ちゅ","ちょ"],"ちゅ":["ちゃ","ちょ"],"ちょ":["ちゃ","ちゅ"],
+    "にゃ":["にゅ","にょ"],"にゅ":["にゃ","にょ"],"にょ":["にゃ","にゅ"],
+    "ひゃ":["ひゅ","ひょ","びゃ","ぴゃ"],"ひゅ":["ひゃ","ひょ","びゅ","ぴゅ"],"ひょ":["ひゃ","ひゅ","びょ","ぴょ"],
+    "みゃ":["みゅ","みょ"],"みゅ":["みゃ","みょ"],"みょ":["みゃ","みゅ"],
+    "りゃ":["りゅ","りょ"],"りゅ":["りゃ","りょ"],"りょ":["りゃ","りゅ"],
+    "ぎゃ":["きゃ","ぎゅ","ぎょ"],"ぎゅ":["きゅ","ぎゃ","ぎょ"],"ぎょ":["きょ","ぎゃ","ぎゅ"],
+    "じゃ":["しゃ","じゅ","じょ"],"じゅ":["しゅ","じゃ","じょ"],"じょ":["しょ","じゃ","じゅ"],
+    "びゃ":["ひゃ","ぴゃ","びゅ","びょ"],"びゅ":["ひゅ","ぴゅ","びゃ","びょ"],"びょ":["ひょ","ぴょ","びゃ","びゅ"],
+    "ぴゃ":["ひゃ","びゃ","ぴゅ","ぴょ"],"ぴゅ":["ひゅ","びゅ","ぴゃ","ぴょ"],"ぴょ":["ひょ","びょ","ぴゃ","ぴゅ"]
+  };
+
+  const WORDS = [
+    {k:"あさ",r:"asa",m:"morning",u:["あ","さ"]},{k:"いえ",r:"ie",m:"house",u:["い","え"]},
+    {k:"うえ",r:"ue",m:"above / on top",u:["う","え"]},{k:"あお",r:"ao",m:"blue",u:["あ","お"]},
+    {k:"かお",r:"kao",m:"face",u:["か","お"]},{k:"ここ",r:"koko",m:"here",u:["こ"]},
+    {k:"かさ",r:"kasa",m:"umbrella",u:["か","さ"]},{k:"すし",r:"sushi",m:"sushi",u:["す","し"]},
+    {k:"そこ",r:"soko",m:"there",u:["そ","こ"]},{k:"せかい",r:"sekai",m:"world",u:["せ","か","い"]},
+    {k:"たこ",r:"tako",m:"octopus",u:["た","こ"]},{k:"した",r:"shita",m:"below / under",u:["し","た"]},
+    {k:"つき",r:"tsuki",m:"moon",u:["つ","き"]},{k:"とけい",r:"tokei",m:"clock / watch",u:["と","け","い"]},
+    {k:"いぬ",r:"inu",m:"dog",u:["い","ぬ"]},{k:"ねこ",r:"neko",m:"cat",u:["ね","こ"]},
+    {k:"なつ",r:"natsu",m:"summer",u:["な","つ"]},{k:"にく",r:"niku",m:"meat",u:["に","く"]},
+    {k:"はな",r:"hana",m:"flower",u:["は","な"]},{k:"ひと",r:"hito",m:"person",u:["ひ","と"]},
+    {k:"ふね",r:"fune",m:"boat",u:["ふ","ね"]},{k:"へや",r:"heya",m:"room",u:["へ","や"]},
+    {k:"ほし",r:"hoshi",m:"star",u:["ほ","し"]},{k:"まち",r:"machi",m:"town",u:["ま","ち"]},
+    {k:"みみ",r:"mimi",m:"ear",u:["み"]},{k:"むし",r:"mushi",m:"insect",u:["む","し"]},
+    {k:"め",r:"me",m:"eye",u:["め"]},{k:"もも",r:"momo",m:"peach",u:["も"]},
+    {k:"やま",r:"yama",m:"mountain",u:["や","ま"]},{k:"ゆめ",r:"yume",m:"dream",u:["ゆ","め"]},
+    {k:"よる",r:"yoru",m:"night",u:["よ","る"]},{k:"そら",r:"sora",m:"sky",u:["そ","ら"]},
+    {k:"りす",r:"risu",m:"squirrel",u:["り","す"]},{k:"くるま",r:"kuruma",m:"car",u:["く","る","ま"]},
+    {k:"わに",r:"wani",m:"crocodile",u:["わ","に"]},{k:"わたし",r:"watashi",m:"I / me",u:["わ","た","し"]},
+    {k:"かわ",r:"kawa",m:"river",u:["か","わ"]},{k:"しろ",r:"shiro",m:"white",u:["し","ろ"]},
+    {k:"いろ",r:"iro",m:"color",u:["い","ろ"]},{k:"かぎ",r:"kagi",m:"key",u:["か","ぎ"]},
+    {k:"みず",r:"mizu",m:"water",u:["み","ず"]},{k:"かぜ",r:"kaze",m:"wind",u:["か","ぜ"]},
+    {k:"えいが",r:"eiga",m:"movie",u:["え","い","が"]},{k:"ごご",r:"gogo",m:"afternoon",u:["ご"]},
+    {k:"でんわ",r:"denwa",m:"telephone",u:["で","ん","わ"]},{k:"げんき",r:"genki",m:"well / healthy",u:["げ","ん","き"]},
+    {k:"だいがく",r:"daigaku",m:"university",u:["だ","い","が","く"]},{k:"ぞう",r:"zou",m:"elephant",u:["ぞ","う"]},
+    {k:"ぶた",r:"buta",m:"pig",u:["ぶ","た"]},{k:"へび",r:"hebi",m:"snake",u:["へ","び"]},
+    {k:"ぼうし",r:"boushi",m:"hat",u:["ぼ","う","し"]},{k:"さんぽ",r:"sanpo",m:"walk / stroll",u:["さ","ん","ぽ"]},
+    {k:"しんぱい",r:"shinpai",m:"worry",u:["し","ん","ぱ","い"]},{k:"えんぴつ",r:"enpitsu",m:"pencil",u:["え","ん","ぴ","つ"]},
+    {k:"きょう",r:"kyou",m:"today",u:["きょ","う"]},{k:"しゃしん",r:"shashin",m:"photo",u:["しゃ","し","ん"]},
+    {k:"しゅみ",r:"shumi",m:"hobby",u:["しゅ","み"]},{k:"ちょきん",r:"chokin",m:"savings",u:["ちょ","き","ん"]},
+    {k:"にゅうがく",r:"nyuugaku",m:"school enrollment",u:["にゅ","う","が","く"]},{k:"ひゃく",r:"hyaku",m:"one hundred",u:["ひゃ","く"]},
+    {k:"みょうじ",r:"myouji",m:"surname",u:["みょ","う","じ"]},{k:"りょこう",r:"ryokou",m:"travel",u:["りょ","こ","う"]},
+    {k:"ぎゅうにく",r:"gyuuniku",m:"beef",u:["ぎゅ","う","に","く"]},{k:"じゅぎょう",r:"jugyou",m:"class / lesson",u:["じゅ","ぎょ","う"]},
+    {k:"びょういん",r:"byouin",m:"hospital",u:["びょ","う","い","ん"]}
+  ];
+
+  const allItems=[], byKana={}, groupByKana={};
+  GROUPS.forEach((g,gi)=>g.items.forEach(([k,r])=>{
+    const item={k,r,group:g.id,groupIndex:gi};
+    allItems.push(item); byKana[k]=item; groupByKana[k]=gi;
+  }));
+
+  function defaultRehearseGroups(){
+    const ids={}; GROUPS.forEach(g=>ids[g.id]=g.phase==="Basic"); return ids;
+  }
+
+  function defaultState(){
+    return {
+      version:3,
+      learnUnlockedCount:5,
+      stats:{answered:0,correct:0,streak:0,bestStreak:0},
+      wordStats:{seen:0,correct:0},
+      wordItems:{},
+      phaseHistory:{Basic:[],Voiced:[],"Semi-voiced":[],Combinations:[]},
+      items:{},
+      rehearseItems:{},
+      groupUnlockSource:{},
+      rehearseGroups:defaultRehearseGroups(),
+      rehearseSetOpen:false,
+      rehearseHelpOpen:false,
+      wordSet:"learned",
+      savedAt:0
+    };
+  }
+
+  let state=loadState();
+  let currentTab="learn";
+  const INACTIVITY_MS=2*60*1000;
+  function newPracticeSession(){
+    return {n:0,current:null,rescue:false,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0};
+  }
+  const sessions={
+    learn:newPracticeSession(),
+    rehearse:newPracticeSession(),
+    words:newPracticeSession()
+  };
+
+  const $=s=>document.querySelector(s);
+
+  function loadState(){
+    try{
+      const raw=localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const x=JSON.parse(raw);
+        if(x && x.version===3) return x;
+      }
+    }catch(e){}
+    return defaultState();
+  }
+
+  function ensureStateShape(){
+    if(!state.stats) state.stats={answered:0,correct:0,streak:0,bestStreak:0};
+    if(!state.wordStats) state.wordStats={seen:0,correct:0};
+    if(!state.wordItems) state.wordItems={};
+    if(!state.phaseHistory) state.phaseHistory={};
+    ["Basic","Voiced","Semi-voiced","Combinations"].forEach(phase=>{
+      if(!Array.isArray(state.phaseHistory[phase])) state.phaseHistory[phase]=[];
+      state.phaseHistory[phase]=state.phaseHistory[phase].slice(-30);
+    });
+    if(!state.items) state.items={};
+    if(!state.rehearseItems) state.rehearseItems={};
+    if(!state.groupUnlockSource) state.groupUnlockSource={};
+    if(!state.rehearseGroups) state.rehearseGroups=defaultRehearseGroups();
+    if(typeof state.rehearseSetOpen!=="boolean") state.rehearseSetOpen=false;
+    if(typeof state.rehearseHelpOpen!=="boolean") state.rehearseHelpOpen=false;
+    if(!state.wordSet) state.wordSet="learned";
+    if(!Number.isFinite(state.learnUnlockedCount)) state.learnUnlockedCount=5;
+  }
+  ensureStateShape();
+
+  function saveState(){
+    state.savedAt=Date.now();
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+    updateLastSaved();
+  }
+
+  function itemState(k){
+    if(!state.items[k]) state.items[k]={seen:0,correct:0,wrong:0,mastery:0,streak:0,lastSeen:0,dueAt:0,lastWasCorrect:null,confusions:{}};
+    return state.items[k];
+  }
+
+  function rehearseItemState(k){
+    if(!state.rehearseItems[k])state.rehearseItems[k]={seen:0,correct:0,wrong:0,lastWasCorrect:null};
+    return state.rehearseItems[k];
+  }
+
+  function isGroupUnlocked(groupIndex){
+    const group=GROUPS[groupIndex];
+    return groupIndex<state.learnUnlockedCount || state.groupUnlockSource[group.id]==="rehearsal";
+  }
+
+  function advancePastRehearsalUnlocks(){
+    while(state.learnUnlockedCount<GROUPS.length&&state.groupUnlockSource[GROUPS[state.learnUnlockedCount].id]==="rehearsal"){
+      state.learnUnlockedCount++;
+    }
+  }
+
+  function maybeUnlockFromRehearsal(groupId){
+    const group=GROUPS.find(g=>g.id===groupId);
+    if(!group)return false;
+    const groupIndex=GROUPS.indexOf(group);
+    const results=group.items.map(([k])=>rehearseItemState(k));
+    const demonstrated=results.every(s=>s.correct>=1);
+    const seen=results.reduce((sum,s)=>sum+s.seen,0);
+    const correct=results.reduce((sum,s)=>sum+s.correct,0);
+    if(!demonstrated||!seen||correct/seen<.8)return false;
+    if(!isGroupUnlocked(groupIndex))state.groupUnlockSource[group.id]="rehearsal";
+    advancePastRehearsalUnlocks();
+    return true;
+  }
+
+  function wordItemState(k){
+    if(!state.wordItems[k]) state.wordItems[k]={seen:0,correct:0,wrong:0,lastSeen:0,lastWasCorrect:null,errorStreak:0};
+    return state.wordItems[k];
+  }
+
+  function randomInt(min,max){
+    return Math.floor(Math.random()*(max-min+1))+min;
+  }
+
+  function mistakeReviewOffset(errorStreak){
+    return errorStreak>1?randomInt(5,8):randomInt(7,11);
+  }
+
+  function noteSessionActivity(session){
+    const now=Date.now();
+    if(session.lastActivityAt&&now-session.lastActivityAt>=INACTIVITY_MS)session.resumeGrace=10;
+    session.lastActivityAt=now;
+  }
+
+  function recordPhaseResult(phases,correct){
+    [...new Set(phases)].forEach(phase=>{
+      if(!state.phaseHistory[phase])state.phaseHistory[phase]=[];
+      state.phaseHistory[phase].push(correct?1:0);
+      if(state.phaseHistory[phase].length>30)state.phaseHistory[phase].shift();
+    });
+  }
+
+  function phaseBoost(phase){
+    const recent=state.phaseHistory[phase]||[];
+    if(!recent.length)return 1;
+    const wrong=recent.filter(x=>x===0).length;
+    if(!wrong)return 1;
+    return 1+Math.min(1,(wrong/recent.length)*2);
+  }
+
+  function itemPhase(item){
+    return GROUPS[item.groupIndex].phase;
+  }
+
+  function wordPhases(word){
+    return [...new Set(word.u.map(k=>byKana[k]).filter(Boolean).map(itemPhase))];
+  }
+
+  function wordPhaseBoost(word){
+    return Math.max(1,...wordPhases(word).map(phaseBoost));
+  }
+
+  function isWeakKanaState(s){
+    if(!s.seen || !s.wrong) return false;
+    const accuracy=s.correct/s.seen;
+    return s.lastWasCorrect===false || s.mastery<55 || accuracy<.8;
+  }
+
+  function normalize(s){
+    return String(s||"").toLowerCase().trim().replace(/\s+/g,"").replace(/ō/g,"ou").replace(/ū/g,"uu");
+  }
+
+  function shuffle(arr){
+    const a=[...arr];
+    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+    return a;
+  }
+
+  function weightedPick(items,scoreFn){
+    const weights=items.map(x=>Math.max(.01,scoreFn(x)));
+    const total=weights.reduce((a,b)=>a+b,0);
+    let r=Math.random()*total;
+    for(let i=0;i<items.length;i++){r-=weights[i];if(r<=0)return items[i]}
+    return items[items.length-1];
+  }
+
+  function learnPool(){return allItems.filter(x=>isGroupUnlocked(x.groupIndex))}
+  function rehearsalPool(){
+    return allItems.filter(x=>!!state.rehearseGroups[x.group]);
+  }
+
+  function maybeAutoUnlockLearn(){
+    if(state.learnUnlockedCount>=GROUPS.length) return;
+    const gi=state.learnUnlockedCount-1;
+    const ss=GROUPS[gi].items.map(([k])=>itemState(k));
+    const allSeen=ss.every(s=>s.seen>=2);
+    const avg=ss.reduce((a,s)=>a+s.mastery,0)/ss.length;
+    const acc=state.stats.answered?state.stats.correct/state.stats.answered:0;
+    if(allSeen && avg>=62 && acc>=.72){
+      state.learnUnlockedCount++;
+      advancePastRehearsalUnlocks();
+      saveState();
+      renderCurriculum();
+    }
+  }
+
+  function masteryGain(s){
+    return Math.max(4,14*(1-s.mastery/150));
+  }
+
+  function scheduleCorrect(s){
+    const m=s.mastery;
+    const minutes=m<20?4:m<40?15:m<60?60:m<75?360:m<88?1440:m<95?4320:10080;
+    s.dueAt=Date.now()+minutes*60000;
+  }
+
+  function applyKanaResult(item,correct,typedWrongItem=null,mode="learn"){
+    const s=itemState(item.k);
+    s.seen++; s.lastSeen=Date.now();
+    state.stats.answered++;
+    if(correct){
+      s.correct++; s.streak++;
+      s.lastWasCorrect=true;
+      s.errorStreak=0;
+      s.mastery=Math.min(100,s.mastery+masteryGain(s));
+      scheduleCorrect(s);
+      state.stats.correct++; state.stats.streak++;
+      state.stats.bestStreak=Math.max(state.stats.bestStreak,state.stats.streak);
+    }else{
+      s.wrong++; s.streak=0; s.lastWasCorrect=false; s.errorStreak=(s.errorStreak||0)+1; s.mastery=Math.max(0,s.mastery-13); s.dueAt=Date.now()+60000;
+      state.stats.streak=0;
+      if(typedWrongItem && typedWrongItem.k!==item.k){
+        s.confusions[typedWrongItem.k]=(s.confusions[typedWrongItem.k]||0)+1;
+      }
+    }
+    if(mode==="rehearse"){
+      const rs=rehearseItemState(item.k);
+      rs.seen++;rs.lastWasCorrect=correct;
+      if(correct)rs.correct++;else rs.wrong++;
+      maybeUnlockFromRehearsal(item.group);
+    }
+    recordPhaseResult([itemPhase(item)],correct);
+    saveState();
+  }
+
+  function recordRescueConfusion(target,wrongItem){
+    if(!wrongItem || wrongItem.k===target.k) return;
+    const s=itemState(target.k);
+    s.confusions[wrongItem.k]=(s.confusions[wrongItem.k]||0)+1;
+    saveState();
+  }
+
+  function kanaDiversityWindow(mode,poolSize){
+    if(mode==="rehearse")return Math.min(6,Math.max(2,poolSize-1));
+    return poolSize<=6?2:poolSize<=12?3:poolSize<=24?4:6;
+  }
+
+  function selectKana(pool,session,mode){
+    if(!pool.length) return null;
+    const dueForced=Object.entries(session.forced||{}).filter(([,at])=>at<=session.n).map(([k])=>byKana[k]).filter(x=>x&&pool.includes(x));
+    if(dueForced.length){
+      const chosen=dueForced[Math.floor(Math.random()*dueForced.length)];
+      delete session.forced[chosen.k];
+      if(pool.some(x=>!itemState(x.k).seen))session.sinceUnseen=(session.sinceUnseen||0)+1;
+      return chosen;
+    }
+    const waiting=new Set(Object.entries(session.forced||{}).filter(([,at])=>at>session.n).map(([k])=>k));
+    const guard=kanaDiversityWindow(mode,pool.length);
+    let candidates=[];
+    for(let size=guard;size>=0;size--){
+      const recent=size?new Set(session.last.slice(-size)):new Set();
+      candidates=pool.filter(x=>!waiting.has(x.k)&&!recent.has(x.k));
+      if(candidates.length>=Math.min(4,pool.length)||size===0)break;
+    }
+    if(!candidates.length)candidates=pool;
+    const unseen=pool.filter(x=>!waiting.has(x.k)&&!itemState(x.k).seen);
+    let bucket=candidates;
+    if(unseen.length){
+      const newShare=mode==="rehearse"?.65:.45;
+      const chooseUnseen=(session.sinceUnseen||0)>=4||Math.random()<newShare;
+      const review=candidates.filter(x=>itemState(x.k).seen);
+      bucket=chooseUnseen||!review.length?unseen:review;
+    }
+    const now=Date.now();
+    const chosen=weightedPick(bucket,x=>{
+      const s=itemState(x.k);
+      let w=1;
+      w+=(100-s.mastery)/12;
+      if(s.dueAt<=now)w+=session.resumeGrace>0?1:3;
+      if(s.wrong>s.correct)w+=2;
+      return w*phaseBoost(itemPhase(x));
+    });
+    session.sinceUnseen=itemState(chosen.k).seen?((session.sinceUnseen||0)+1):0;
+    return chosen;
+  }
+
+  function sameVowelCandidates(target){
+    const r=target.r;
+    const vowel=r.endsWith("a")?"a":r.endsWith("i")?"i":r.endsWith("u")?"u":r.endsWith("e")?"e":r.endsWith("o")?"o":"";
+    return vowel?allItems.filter(x=>x.k!==target.k&&x.r.endsWith(vowel)):[];
+  }
+
+  function distractorItems(target,pool){
+    const poolSet=new Set(pool.map(x=>x.k));
+    const ranked=[];
+    const usedRomaji=new Set([target.r]);
+    const add=(item,score)=>{
+      if(!item||item.k===target.k||!poolSet.has(item.k)||item.r===target.r)return;
+      const found=ranked.find(x=>x.item.k===item.k);
+      if(found)found.score=Math.max(found.score,score);else ranked.push({item,score});
+    };
+    const s=itemState(target.k);
+    Object.entries(s.confusions||{}).forEach(([k,c])=>add(byKana[k],25+c*2));
+    (VISUAL[target.k]||[]).forEach(k=>add(byKana[k],18));
+    GROUPS[target.groupIndex].items.forEach(([k])=>add(byKana[k],12));
+    sameVowelCandidates(target).forEach(x=>add(x,7));
+    pool.forEach(x=>add(x,1+Math.random()*2));
+    ranked.sort((a,b)=>b.score-a.score);
+    const out=[];
+    for(const x of ranked){
+      if(out.length>=7)break;
+      if(usedRomaji.has(x.item.r))continue;
+      out.push(x.item); usedRomaji.add(x.item.r);
+    }
+    for(const x of allItems){
+      if(out.length>=7)break;
+      if(x.k===target.k||usedRomaji.has(x.r))continue;
+      out.push(x);usedRomaji.add(x.r);
+    }
+    return out.slice(0,7);
+  }
+
+  function focusInput(mode){
+    const input=$("#"+mode+"Input");
+    if(!input)return;
+    input.disabled=false; input.readOnly=false; input.value="";
+    requestAnimationFrame(()=>{try{input.focus({preventScroll:true})}catch(e){input.focus()}});
+  }
+
+  function setFeedback(mode,good,title,meta){
+    const el=$("#"+mode+"Feedback");
+    el.className="feedback show "+(good?"good":"bad");
+    el.innerHTML=`<strong>${good?"✓ ":"✗ "}${title}</strong><div class="meta">${meta}</div>`;
+  }
+
+  function clearFeedback(mode){
+    const el=$("#"+mode+"Feedback"); el.className="feedback"; el.innerHTML="";
+  }
+
+  function renderRescue(mode,target,pool){
+    const wrap=$("#"+mode+"Rescue"), box=$("#"+mode+"Options");
+    box.innerHTML="";
+    const opts=shuffle([{item:target,correct:true},...distractorItems(target,pool).map(item=>({item,correct:false}))]);
+    opts.forEach((o,i)=>{
+      const b=document.createElement("button");
+      b.className="choice"; b.dataset.correct=o.correct?"1":"0";
+      b.innerHTML=`<span class="num">${i+1}</span>${o.item.r}`;
+      b.addEventListener("click",()=>handleKanaRescueChoice(mode,b,o,target,pool));
+      box.appendChild(b);
+    });
+    wrap.classList.add("show");
+  }
+
+  function hideRescue(mode){
+    $("#"+mode+"Rescue").classList.remove("show");
+    $("#"+mode+"Options").innerHTML="";
+  }
+
+  function nextKanaQuestion(mode){
+    const session=sessions[mode];
+    if(mode==="learn")maybeAutoUnlockLearn();
+    const pool=mode==="learn"?learnPool():rehearsalPool();
+    if(!pool.length){
+      $("#"+mode+"Prompt").textContent="—";
+      setFeedback(mode,false,"No kana selected","Choose at least one rehearsal row above.");
+      return;
+    }
+    session.n++;session.rescue=false;
+    clearFeedback(mode);hideRescue(mode);
+    $("#"+mode+"Next").classList.add("hidden");
+    $("#"+mode+"DontKnow").classList.remove("hidden");
+    const item=selectKana(pool,session,mode);
+    session.current=item;session.last.push(item.k);if(session.last.length>12)session.last.shift();
+    if(session.resumeGrace>0)session.resumeGrace--;
+    $("#"+mode+"Prompt").textContent=item.k;
+    $("#"+mode+"Count").textContent="Question "+session.n;
+    focusInput(mode);
+    updateAllUI();
+  }
+
+  function handleKanaTyped(mode,forceWrong=false){
+    const session=sessions[mode], item=session.current;
+    if(!item||session.rescue)return;
+    noteSessionActivity(session);
+    const input=$("#"+mode+"Input");
+    const value=normalize(input.value);
+    const correct=!forceWrong&&value===normalize(item.r);
+    if(correct){
+      applyKanaResult(item,true,null,mode);
+      setFeedback(mode,true,`${item.k} = ${item.r}`,"Correct. Moving on.");
+      if(mode==="learn")maybeAutoUnlockLearn();
+      input.value="";
+      setTimeout(()=>nextKanaQuestion(mode),180);
+    }else{
+      const wrongItem=value?allItems.find(x=>x.r===value)||null:null;
+      applyKanaResult(item,false,wrongItem,mode);
+      session.forced[item.k]=session.n+mistakeReviewOffset(itemState(item.k).errorStreak||1);
+      session.rescue=true;
+      input.value=""; input.blur();
+      const typedNote=value?`You typed “${value}”.`:"Marked as unknown.";
+      setFeedback(mode,false,"Not quite",`${typedNote} Choose the correct reading below. The answer will be shown after you identify it.`);
+      renderRescue(mode,item,mode==="learn"?learnPool():rehearsalPool());
+      $("#"+mode+"DontKnow").classList.add("hidden");
+      updateAllUI();
+    }
+  }
+
+  function handleKanaRescueChoice(mode,button,opt,target,pool){
+    const session=sessions[mode];
+    if(!session.rescue)return;
+    noteSessionActivity(session);
+    if(!opt.correct){
+      button.classList.add("wrong");button.disabled=true;
+      recordRescueConfusion(target,opt.item);
+      return;
+    }
+    [...$("#"+mode+"Options").children].forEach(b=>{b.disabled=true;if(b.dataset.correct==="1")b.classList.add("correct")});
+    session.rescue=false;
+    $("#"+mode+"Next").classList.remove("hidden");
+    setFeedback(mode,true,`${target.k} = ${target.r}`,"Correction reinforced. Press Enter or Next.");
+    focusInput(mode);
+    updateAllUI();
+  }
+
+  function wordPool(){
+    if(state.wordSet==="all") return WORDS;
+    if(state.wordSet==="basic"){
+      return WORDS.filter(w=>w.u.every(k=>byKana[k]&&GROUPS[byKana[k].groupIndex].phase==="Basic"));
+    }
+    return WORDS.filter(w=>w.u.every(k=>byKana[k]&&isGroupUnlocked(byKana[k].groupIndex)));
+  }
+
+  function isWeakWordState(s){
+    if(!s.seen||!s.wrong)return false;
+    return s.lastWasCorrect===false || s.correct/s.seen<.8;
+  }
+
+  function selectWord(){
+    const pool=wordPool();
+    if(!pool.length)return null;
+    const session=sessions.words;
+    const dueForced=Object.entries(session.forced||{}).filter(([,at])=>at<=session.n).map(([k])=>WORDS.find(w=>w.k===k)).filter(w=>w&&pool.includes(w));
+    if(dueForced.length){
+      const chosen=dueForced[Math.floor(Math.random()*dueForced.length)];
+      delete session.forced[chosen.k];return chosen;
+    }
+    const waiting=new Set(Object.entries(session.forced||{}).filter(([,at])=>at>session.n).map(([k])=>k));
+    let candidates=pool.filter(w=>!waiting.has(w.k)&&!session.last.slice(-6).includes(w.k));
+    if(candidates.length<4)candidates=pool.filter(w=>!waiting.has(w.k)&&!session.last.slice(-2).includes(w.k));
+    if(candidates.length<4)candidates=pool.filter(w=>!waiting.has(w.k));
+    if(!candidates.length)candidates=pool;
+    const unseen=candidates.filter(w=>!wordItemState(w.k).seen);
+    const seen=candidates.filter(w=>wordItemState(w.k).seen);
+    const weak=seen.filter(w=>isWeakWordState(wordItemState(w.k)));
+    const coverage=pool.filter(w=>wordItemState(w.k).seen).length/pool.length;
+    const newShare=coverage<.8?.60:.20;
+    const weakShare=coverage<.8?.25:.45;
+    const roll=Math.random();
+    let bucket;
+    if(unseen.length&&roll<newShare)bucket=unseen;
+    else if(weak.length&&roll<newShare+weakShare)bucket=weak;
+    else bucket=seen.length?seen:candidates;
+    return weightedPick(bucket,w=>{
+      const ss=w.u.map(k=>itemState(k));
+      const avg=ss.reduce((a,s)=>a+s.mastery,0)/ss.length;
+      const ws=wordItemState(w.k);
+      let weight=1+(100-avg)/30;
+      if(ws.lastWasCorrect===false)weight+=3;
+      return weight*wordPhaseBoost(w);
+    });
+  }
+
+  function nextWordQuestion(){
+    const s=sessions.words;
+    s.n++;s.rescue=false;
+    clearFeedback("words");hideRescue("words");
+    $("#wordsNext").classList.add("hidden");$("#wordsDontKnow").classList.remove("hidden");
+    const w=selectWord();
+    if(!w){
+      $("#wordsPrompt").textContent="—";
+      setFeedback("words",false,"No words available","Change the word set above.");
+      return;
+    }
+    s.current=w;s.last.push(w.k);if(s.last.length>8)s.last.shift();
+    if(s.resumeGrace>0)s.resumeGrace--;
+    $("#wordsPrompt").textContent=w.k;$("#wordsCount").textContent="Question "+s.n;
+    focusInput("words");updateAllUI();
+  }
+
+  function applyWordResult(w,correct){
+    const ws=wordItemState(w.k);
+    ws.seen++;ws.lastSeen=Date.now();ws.lastWasCorrect=correct;
+    state.wordStats.seen++;
+    if(correct){
+      ws.correct++;ws.errorStreak=0;
+      state.wordStats.correct++;
+      state.stats.answered++;state.stats.correct++;state.stats.streak++;
+      w.u.forEach(k=>{const s=itemState(k);s.mastery=Math.min(100,s.mastery+2)});
+    }else{
+      ws.wrong++;ws.errorStreak=(ws.errorStreak||0)+1;
+      state.stats.answered++;state.stats.streak=0;
+      w.u.forEach(k=>{
+        const s=itemState(k);s.mastery=Math.max(0,s.mastery-2);s.dueAt=Date.now()+60000;
+      });
+    }
+    recordPhaseResult(wordPhases(w),correct);
+    saveState();
+  }
+
+  function makeWordDistractors(word){
+    const pool=wordPool();
+    const romans=new Set([word.r]);
+    const out=[];
+    const push=r=>{if(r&&r!==word.r&&!romans.has(r)&&out.length<7){romans.add(r);out.push(r)}};
+
+    pool.filter(w=>w.k!==word.k).sort((a,b)=>{
+      const la=Math.abs(a.r.length-word.r.length),lb=Math.abs(b.r.length-word.r.length);
+      return la-lb+(.5-Math.random());
+    }).forEach(w=>push(w.r));
+
+    const substitutions={"shi":"chi","chi":"shi","tsu":"su","fu":"hu","hi":"he","he":"hi","ki":"shi","ne":"nu","nu":"ne"};
+    Object.entries(substitutions).forEach(([a,b])=>{if(word.r.includes(a))push(word.r.replace(a,b))});
+    while(out.length<7){
+      const fake=word.r.replace(/[aeiou]/,m=>({a:"o",e:"i",i:"e",o:"a",u:"o"}[m]||m));
+      if(!romans.has(fake))push(fake); else push(word.r+"u");
+    }
+    return out.slice(0,7);
+  }
+
+  function renderWordRescue(word){
+    const wrap=$("#wordsRescue"),box=$("#wordsOptions");box.innerHTML="";
+    const opts=shuffle([{r:word.r,correct:true},...makeWordDistractors(word).map(r=>({r,correct:false}))]);
+    opts.forEach((o,i)=>{
+      const b=document.createElement("button");
+      b.className="choice";b.dataset.correct=o.correct?"1":"0";
+      b.innerHTML=`<span class="num">${i+1}</span>${o.r}`;
+      b.addEventListener("click",()=>handleWordRescueChoice(b,o,word));
+      box.appendChild(b);
+    });
+    wrap.classList.add("show");
+  }
+
+  function handleWordTyped(forceWrong=false){
+    const s=sessions.words,w=s.current;
+    if(!w||s.rescue)return;
+    noteSessionActivity(s);
+    const input=$("#wordsInput"), value=normalize(input.value);
+    const correct=!forceWrong&&value===normalize(w.r);
+    if(correct){
+      applyWordResult(w,true);
+      setFeedback("words",true,`${w.k} → ${w.r}`,w.m);
+      input.value="";
+      setTimeout(nextWordQuestion,180);
+    }else{
+      applyWordResult(w,false);
+      s.forced[w.k]=s.n+mistakeReviewOffset(wordItemState(w.k).errorStreak||1);
+      s.rescue=true;input.value="";input.blur();
+      const typedNote=value?`You typed “${value}”.`:"Marked as unknown.";
+      setFeedback("words",false,"Not quite",`${typedNote} Choose the correct reading below. The answer and meaning will be shown after you identify it.`);
+      renderWordRescue(w);$("#wordsDontKnow").classList.add("hidden");updateAllUI();
+    }
+  }
+
+  function handleWordRescueChoice(button,opt,word){
+    const s=sessions.words;if(!s.rescue)return;
+    noteSessionActivity(s);
+    if(!opt.correct){button.classList.add("wrong");button.disabled=true;return}
+    [...$("#wordsOptions").children].forEach(b=>{b.disabled=true;if(b.dataset.correct==="1")b.classList.add("correct")});
+    s.rescue=false;$("#wordsNext").classList.remove("hidden");
+    setFeedback("words",true,`${word.k} → ${word.r}`,word.m+" • correction reinforced");
+    focusInput("words");
+  }
+
+  function updateTopStats(){
+    const all=allItems.map(x=>itemState(x.k));
+    const mastered=all.filter(s=>s.mastery>=80).length;
+    $("#sMastered").textContent=mastered;
+    $("#sAccuracy").textContent=state.stats.answered?Math.round(state.stats.correct/state.stats.answered*100)+"%":"—";
+    $("#sStreak").textContent=state.stats.streak;
+    $("#sWeak").textContent=all.filter(s=>s.seen&&(isWeakKanaState(s)||s.dueAt<=Date.now())).length;
+    const lp=learnPool(),avg=lp.length?lp.reduce((a,x)=>a+itemState(x.k).mastery,0)/lp.length:0;
+    $("#learnProgress").style.width=Math.round(avg)+"%";
+    $("#learnProgressText").textContent="Unlocked mastery "+Math.round(avg)+"%";
+  }
+
+  function renderCurriculum(){
+    $("#curriculumRows").innerHTML=GROUPS.map((g,gi)=>{
+      const unlocked=isGroupUnlocked(gi);
+      const rehearsalUnlock=state.groupUnlockSource[g.id]==="rehearsal";
+      const ss=g.items.map(([k])=>itemState(k));
+      const avg=Math.round(ss.reduce((a,s)=>a+s.mastery,0)/ss.length);
+      const rehearsalResults=g.items.map(([k])=>rehearseItemState(k));
+      const demonstrated=rehearsalResults.filter(s=>s.correct>=1).length;
+      const rehearsalSeen=rehearsalResults.reduce((sum,s)=>sum+s.seen,0);
+      const rehearsalCorrect=rehearsalResults.reduce((sum,s)=>sum+s.correct,0);
+      const rehearsalAccuracy=rehearsalSeen?Math.round(rehearsalCorrect/rehearsalSeen*100):0;
+      const status=unlocked?`${avg}% mastery`:rehearsalSeen?`${demonstrated}/${g.items.length} kana demonstrated • ${rehearsalAccuracy}% rehearsal accuracy`:"locked in Learn";
+      const tag=unlocked?`<span class="unlock-tag ${rehearsalUnlock?"rehearsal":""}">Unlocked through ${rehearsalUnlock?"Rehearsal":"Learn"}</span>`:"";
+      return `<div class="row-chip ${unlocked?"":"locked"}">
+        <div class="row-name"><div class="row-heading"><strong>${g.name}</strong>${tag}</div><span>${g.phase} • ${status}</span></div>
+        <div class="kana-line">${g.items.map(x=>x[0]).join(" ")}</div>
+      </div>`;
+    }).join("");
+  }
+
+  function renderRehearseSelectors(){
+    const host=$("#rehearseSelectors");host.innerHTML="";
+    let lastPhase="";
+    GROUPS.forEach(g=>{
+      if(g.phase!==lastPhase){
+        const h=document.createElement("div");h.className="phase-title";h.textContent=g.phase;host.appendChild(h);lastPhase=g.phase;
+      }
+      const label=document.createElement("label");label.className="check";
+      label.innerHTML=`<input type="checkbox" data-group="${g.id}" ${state.rehearseGroups[g.id]?"checked":""}><span><strong>${g.name}</strong><br><span class="tiny">${g.items.map(x=>x[0]).join(" ")}</span></span>`;
+      label.querySelector("input").addEventListener("change",e=>{
+        state.rehearseGroups[g.id]=e.target.checked;saveState();updateAllUI();
+        if(currentTab==="rehearse")nextKanaQuestion("rehearse");
+      });
+      host.appendChild(label);
+    });
+  }
+
+  function renderProgress(){
+    const weak=allItems.map(item=>({item,s:itemState(item.k)})).filter(x=>isWeakKanaState(x.s))
+      .sort((a,b)=>((100-b.s.mastery)+b.s.wrong*3)-((100-a.s.mastery)+a.s.wrong*3)).slice(0,12);
+    $("#troubleList").innerHTML=weak.length?weak.map(({item,s})=>`
+      <div class="trouble">
+        <div class="kana-small">${item.k}</div>
+        <div><strong>${item.r}</strong><div class="tiny">${s.correct}/${s.seen} correct</div><div class="meter"><span style="width:${Math.round(s.mastery)}%"></span></div></div>
+        <strong>${Math.round(s.mastery)}%</strong>
+      </div>`).join(""):`<span class="muted">No weak kana yet.</span>`;
+
+    const pairs=[];
+    allItems.forEach(item=>Object.entries(itemState(item.k).confusions||{}).forEach(([b,count])=>{if(count>0&&byKana[b])pairs.push({a:item.k,b,count})}));
+    pairs.sort((a,b)=>b.count-a.count);
+    $("#confusionList").innerHTML=pairs.length?pairs.slice(0,16).map(p=>`<span class="confusion">${p.a} ↔ ${p.b} <strong>×${p.count}</strong></span>`).join(""):`<span class="muted">No confusion pairs recorded yet.</span>`;
+  }
+
+  function updateRehearseSummary(){
+    const p=rehearsalPool();
+    const assessed=p.filter(x=>itemState(x.k).seen>0).length;
+    const weak=p.filter(x=>isWeakKanaState(itemState(x.k))).length;
+    const basic=GROUPS.filter(g=>g.phase==="Basic");
+    const selectedGroups=GROUPS.filter(g=>state.rehearseGroups[g.id]);
+    const allBasic=basic.every(g=>state.rehearseGroups[g.id])&&selectedGroups.length===basic.length;
+    const allGroups=selectedGroups.length===GROUPS.length;
+    const setName=!p.length?"No rehearsal set":allGroups?"Everything":allBasic?"All basic":"Custom set";
+    $("#selectedCount").textContent=p.length;
+    $("#assessedCount").textContent=assessed;
+    $("#assessedCountDetail").textContent=assessed;
+    $("#rehearseWeakCount").textContent=weak;
+    $("#rehearseWeakCountDetail").textContent=weak;
+    $("#rehearseSetName").textContent=setName;
+    $("#rehearseSetSummary").textContent=`${p.length} kana selected`;
+    $("#rehearseSetHeading").textContent=p.length?"Change rehearsal set":"Choose a rehearsal set";
+    if(!p.length) state.rehearseSetOpen=true;
+    $("#rehearseSetPanel").open=state.rehearseSetOpen;
+    $("#rehearseHelpPanel").open=state.rehearseHelpOpen;
+  }
+
+  function updateWordSummary(){
+    $("#wordPoolCount").textContent=wordPool().length;
+    $("#wordCorrect").textContent=state.wordStats.correct;
+    $("#wordSeen").textContent=state.wordStats.seen;
+    document.querySelectorAll("[data-wordset]").forEach(b=>b.classList.toggle("active",b.dataset.wordset===state.wordSet));
+  }
+
+  function updateLastSaved(){
+    const el=$("#lastSaved");
+    if(!state.savedAt){el.textContent="Not saved yet";return}
+    const d=new Date(state.savedAt);
+    el.textContent="Last saved: "+d.toLocaleString();
+  }
+
+  function updateAllUI(){
+    updateTopStats();updateRehearseSummary();updateWordSummary();renderProgress();renderCurriculum();updateLastSaved();
+  }
+
+  function switchTab(tab){
+    currentTab=tab;
+    document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    $("#panel-"+tab).classList.add("active");
+    if(tab==="learn"){if(!sessions.learn.current)nextKanaQuestion("learn");else focusInput("learn")}
+    if(tab==="rehearse"){if(!sessions.rehearse.current)nextKanaQuestion("rehearse");else focusInput("rehearse")}
+    if(tab==="words"){if(!sessions.words.current)nextWordQuestion();else focusInput("words")}
+    if(tab==="progress")updateAllUI();
+  }
+
+  function exportProgress(){
+    saveState();
+    const payload={
+      app:"Hiragana Sprint",
+      formatVersion:3,
+      exportedAt:new Date().toISOString(),
+      state
+    };
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+    const a=document.createElement("a");
+    const stamp=new Date().toISOString().slice(0,10);
+    a.href=URL.createObjectURL(blob);a.download=`hiragana-sprint-progress-${stamp}.json`;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    $("#importStatus").textContent="Progress exported successfully.";
+  }
+
+  function importProgressFile(file){
+    const reader=new FileReader();
+    reader.onload=()=>{
+      try{
+        const data=JSON.parse(reader.result);
+        const incoming=data&&data.state?data.state:data;
+        if(!incoming||incoming.version!==3)throw new Error("This does not look like a Hiragana Sprint v3 progress file.");
+        state=incoming;ensureStateShape();saveState();
+        sessions.learn=newPracticeSession();
+        sessions.rehearse=newPracticeSession();
+        sessions.words=newPracticeSession();
+        renderRehearseSelectors();updateAllUI();
+        $("#importStatus").textContent="Progress imported successfully. Your mastery and settings have been restored.";
+        if(currentTab==="learn")nextKanaQuestion("learn");
+        if(currentTab==="rehearse")nextKanaQuestion("rehearse");
+        if(currentTab==="words")nextWordQuestion();
+      }catch(err){
+        $("#importStatus").textContent="Import failed: "+err.message;
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
+
+  $("#rehearseSetPanel").addEventListener("toggle",e=>{
+    state.rehearseSetOpen=e.currentTarget.open;
+    saveState();
+    if(!e.currentTarget.open&&currentTab==="rehearse"&&!sessions.rehearse.rescue)focusInput("rehearse");
+  });
+  $("#rehearseHelpPanel").addEventListener("toggle",e=>{
+    state.rehearseHelpOpen=e.currentTarget.open;
+    saveState();
+    if(!e.currentTarget.open&&currentTab==="rehearse"&&!sessions.rehearse.rescue)focusInput("rehearse");
+  });
+
+  ["learn","rehearse"].forEach(mode=>{
+    $("#"+mode+"Input").addEventListener("keydown",e=>{
+      if(e.key==="Enter"){
+        e.preventDefault();
+        const s=sessions[mode];
+        if(s.rescue)return;
+        if(!$("#"+mode+"Next").classList.contains("hidden"))nextKanaQuestion(mode);
+        else handleKanaTyped(mode,false);
+      }
+    });
+    $("#"+mode+"DontKnow").addEventListener("click",()=>handleKanaTyped(mode,true));
+    $("#"+mode+"Next").addEventListener("click",()=>nextKanaQuestion(mode));
+  });
+
+  $("#wordsInput").addEventListener("keydown",e=>{
+    if(e.key==="Enter"){
+      e.preventDefault();
+      if(sessions.words.rescue)return;
+      if(!$("#wordsNext").classList.contains("hidden"))nextWordQuestion();
+      else handleWordTyped(false);
+    }
+  });
+  $("#wordsDontKnow").addEventListener("click",()=>handleWordTyped(true));
+  $("#wordsNext").addEventListener("click",nextWordQuestion);
+
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Enter"&&!e.defaultPrevented){
+      const next=$("#"+currentTab+"Next");
+      if(next&&!next.classList.contains("hidden")){
+        e.preventDefault();
+        if(currentTab==="words")nextWordQuestion();
+        else if(currentTab==="learn"||currentTab==="rehearse")nextKanaQuestion(currentTab);
+      }
+      return;
+    }
+    if(!/^[1-8]$/.test(e.key))return;
+    const mode=currentTab;
+    if(mode==="learn"&&sessions.learn.rescue){const b=$("#learnOptions").children[Number(e.key)-1];if(b)b.click()}
+    if(mode==="rehearse"&&sessions.rehearse.rescue){const b=$("#rehearseOptions").children[Number(e.key)-1];if(b)b.click()}
+    if(mode==="words"&&sessions.words.rescue){const b=$("#wordsOptions").children[Number(e.key)-1];if(b)b.click()}
+  });
+
+  $("#selectBasic").addEventListener("click",()=>{
+    GROUPS.forEach(g=>state.rehearseGroups[g.id]=g.phase==="Basic");saveState();renderRehearseSelectors();updateAllUI();nextKanaQuestion("rehearse");
+  });
+  $("#selectAll").addEventListener("click",()=>{
+    GROUPS.forEach(g=>state.rehearseGroups[g.id]=true);saveState();renderRehearseSelectors();updateAllUI();nextKanaQuestion("rehearse");
+  });
+  $("#clearRows").addEventListener("click",()=>{
+    GROUPS.forEach(g=>state.rehearseGroups[g.id]=false);saveState();renderRehearseSelectors();updateAllUI();
+    sessions.rehearse.current=null;$("#rehearsePrompt").textContent="—";
+    setFeedback("rehearse",false,"No kana selected","Choose at least one row above.");
+  });
+
+  document.querySelectorAll("[data-wordset]").forEach(b=>b.addEventListener("click",()=>{
+    state.wordSet=b.dataset.wordset;saveState();updateWordSummary();nextWordQuestion();
+  }));
+
+  $("#exportProgress").addEventListener("click",exportProgress);
+  $("#importProgressBtn").addEventListener("click",()=>$("#importProgressFile").click());
+  $("#importProgressFile").addEventListener("change",e=>{
+    const file=e.target.files&&e.target.files[0];if(file)importProgressFile(file);e.target.value="";
+  });
+
+  $("#resetProgress").addEventListener("click",()=>{
+    if(!confirm("Reset all mastery, mistakes, word stats, and selections? This cannot be undone."))return;
+    localStorage.removeItem(STORAGE_KEY);state=defaultState();saveState();
+    sessions.learn=newPracticeSession();
+    sessions.rehearse=newPracticeSession();
+    sessions.words=newPracticeSession();
+    renderRehearseSelectors();updateAllUI();switchTab("learn");nextKanaQuestion("learn");
+  });
+
+  window.addEventListener("focus",()=>{
+    if(currentTab==="learn"&&!sessions.learn.rescue)focusInput("learn");
+    if(currentTab==="rehearse"&&!sessions.rehearse.rescue)focusInput("rehearse");
+    if(currentTab==="words"&&!sessions.words.rescue)focusInput("words");
+  });
+
+  renderRehearseSelectors();
+  updateAllUI();
+  nextKanaQuestion("learn");
+})();
+</script>
+</body>
+</html>
