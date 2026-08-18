@@ -156,7 +156,7 @@
       </div>
       <div class="typing">
         <input id="learnInput" class="answer-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type the reading and press Enter" />
-        <div class="typing-hint">The cursor stays here. Correct → next question. Wrong → rescue choices.</div>
+        <div class="typing-hint">A hard-font mistake shows the standard form for one retry. Another mistake opens rescue choices.</div>
       </div>
       <div class="feedback" id="learnFeedback"></div>
       <div class="rescue-wrap" id="learnRescue"><div class="rescue-title">Choose the correct reading to reinforce the mistake</div><div class="options" id="learnOptions"></div></div>
@@ -180,7 +180,7 @@
       </div>
       <div class="typing">
         <input id="rehearseInput" class="answer-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type the reading and press Enter" />
-        <div class="typing-hint">Mistakes trigger an 8-choice rescue and are repeated sooner.</div>
+        <div class="typing-hint">Hard font mistake → compare with standard → retry once → rescue choices if still wrong.</div>
       </div>
       <div class="feedback" id="rehearseFeedback"></div>
       <div class="rescue-wrap" id="rehearseRescue"><div class="rescue-title">Choose the correct reading</div><div class="options" id="rehearseOptions"></div></div>
@@ -211,7 +211,7 @@
       <details class="details-card" id="rehearseHelpPanel">
         <summary>How rehearsal adapts</summary>
         <div class="details-body">
-        <p class="muted">Until every selected kana is assessed, 65% of normal questions introduce unseen kana and one is guaranteed after four review questions. After full coverage, review becomes fully adaptive. Recent difficulty can increase a sound category up to 2×.</p>
+        <p class="muted">Until every selected kana is assessed, 65% of normal questions introduce unseen kana and one is guaranteed after four review questions. After full coverage, review becomes fully adaptive. Recent difficulty can increase a sound category up to 2×. A hard-font mistake gives you one standard-form retry before the rescue choices appear.</p>
         <div class="session-summary">
           <div class="mini"><strong id="selectedCount">0</strong><span class="tiny">selected kana</span></div>
           <div class="mini"><strong id="assessedCountDetail">0</strong><span class="tiny">already assessed</span></div>
@@ -447,7 +447,7 @@
   let currentTab="learn";
   const INACTIVITY_MS=2*60*1000;
   function newPracticeSession(){
-    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],rescue:false,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0};
+    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],fontRetry:false,rescue:false,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0};
   }
   const sessions={
     learn:newPracticeSession(),
@@ -835,7 +835,7 @@
       setFeedback(mode,false,"No kana selected","Choose at least one rehearsal row above.");
       return;
     }
-    session.n++;session.rescue=false;
+    session.n++;session.rescue=false;session.fontRetry=false;
     clearFeedback(mode);hideRescue(mode);
     $("#"+mode+"Next").classList.add("hidden");
     $("#"+mode+"DontKnow").classList.remove("hidden");
@@ -857,6 +857,27 @@
     const input=$("#"+mode+"Input");
     const value=normalize(input.value);
     const correct=!forceWrong&&value===normalize(item.r);
+    if(session.fontRetry){
+      if(correct){
+        session.fontRetry=false;
+        input.value="";input.disabled=true;
+        setFeedback(mode,true,`${item.k} = ${item.r}`,"Recognized with the standard reference. The original font mistake remains scheduled for review.");
+        appendGlyphComparison(mode,item,session.currentFont||STANDARD_FONT);
+        setTimeout(()=>nextKanaQuestion(mode),450);
+      }else{
+        const wrongItem=value?allItems.find(x=>x.r===value)||null:null;
+        if(wrongItem)recordRescueConfusion(item,wrongItem);
+        session.fontRetry=false;session.rescue=true;
+        input.value="";input.blur();
+        const typedNote=value?`You typed “${value}” again.`:"Still marked as unknown.";
+        setFeedback(mode,false,"Still not quite",`${typedNote} Choose the correct reading below.`);
+        appendGlyphComparison(mode,item,session.currentFont||STANDARD_FONT);
+        renderRescue(mode,item,mode==="learn"?learnPool():rehearsalPool());
+        $("#"+mode+"DontKnow").classList.add("hidden");
+        updateAllUI();
+      }
+      return;
+    }
     if(correct){
       applyKanaResult(item,true,null,mode,session.currentFont);
       setFeedback(mode,true,`${item.k} = ${item.r}`,"Correct. Moving on.");
@@ -867,12 +888,20 @@
       const wrongItem=value?allItems.find(x=>x.r===value)||null:null;
       applyKanaResult(item,false,wrongItem,mode,session.currentFont);
       session.forced[item.k]=session.n+mistakeReviewOffset(itemState(item.k).errorStreak||1);
-      session.rescue=true;
-      input.value=""; input.blur();
       const typedNote=value?`You typed “${value}”.`:"Marked as unknown.";
-      setFeedback(mode,false,"Not quite",`${typedNote} Choose the correct reading below. The answer will be shown after you identify it.`);
-      renderRescue(mode,item,mode==="learn"?learnPool():rehearsalPool());
-      $("#"+mode+"DontKnow").classList.add("hidden");
+      if((session.currentFont||STANDARD_FONT).id!=="standard"){
+        session.fontRetry=true;
+        input.value="";
+        setFeedback(mode,false,"Compare the two forms",`${typedNote} Look at the standard form, then type the reading once more.`);
+        appendGlyphComparison(mode,item,session.currentFont||STANDARD_FONT);
+        focusInput(mode);
+      }else{
+        session.rescue=true;
+        input.value="";input.blur();
+        setFeedback(mode,false,"Not quite",`${typedNote} Choose the correct reading below. The answer will be shown after you identify it.`);
+        renderRescue(mode,item,mode==="learn"?learnPool():rehearsalPool());
+        $("#"+mode+"DontKnow").classList.add("hidden");
+      }
       updateAllUI();
     }
   }
