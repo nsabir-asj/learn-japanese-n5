@@ -254,7 +254,7 @@
           <select id="japaneseVoice"></select>
           <label class="tiny" for="englishVoice">English voice</label>
           <select id="englishVoice"></select>
-          <div class="actions"><button class="ghost" id="testJapaneseSpeech">Test Japanese voice</button></div>
+          <div class="actions"><button class="ghost" id="testJapaneseSpeech">Test Japanese voice</button><button class="ghost" id="testEnglishSpeech">Test English voice</button></div>
         </div>
       </div>
     </div>
@@ -676,13 +676,14 @@
     if(!speechSupported){
       status.classList.add("unavailable");$("#speechStatusTitle").textContent="Speech is not supported";
       $("#speechStatusDetail").textContent="This browser cannot use built-in pronunciation.";
-      ["#speechAuto","#speechMeaning","#speechRate","#japaneseVoice","#englishVoice","#testJapaneseSpeech"].forEach(id=>$(id).disabled=true);
+      ["#speechAuto","#speechMeaning","#speechRate","#japaneseVoice","#englishVoice","#testJapaneseSpeech","#testEnglishSpeech"].forEach(id=>$(id).disabled=true);
       return;
     }
     const japanese=voicesFor("ja"),english=voicesFor("en");
     state.speech.jaVoice=fillVoiceSelect("#japaneseVoice",japanese,state.speech.jaVoice,"No Japanese voice found");
     state.speech.enVoice=fillVoiceSelect("#englishVoice",english,state.speech.enVoice,"No English voice found");
     $("#testJapaneseSpeech").disabled=!japanese.length;
+    $("#testEnglishSpeech").disabled=!english.length;
     if(japanese.length){
       const chosen=japanese.find(voice=>voice.name===state.speech.jaVoice)||japanese[0];
       status.classList.add("ready");$("#speechStatusTitle").textContent="Japanese speech is ready";
@@ -1706,6 +1707,10 @@
   $("#testJapaneseSpeech").addEventListener("click",()=>{
     if(!speechSupported||!voicesFor("ja").length)return;
     stopSpeech();window.speechSynthesis.speak(makeUtterance("こんにちは。ひらがなの練習をしましょう。","ja"));
+  });
+  $("#testEnglishSpeech").addEventListener("click",()=>{
+    if(!speechSupported||!voicesFor("en").length)return;
+    stopSpeech();window.speechSynthesis.speak(makeUtterance("Meaning: school.","en"));
   });
 
   document.addEventListener("keydown",e=>{
