@@ -211,7 +211,7 @@
       <details class="details-card" id="rehearseHelpPanel">
         <summary>How rehearsal adapts</summary>
         <div class="details-body">
-        <p class="muted">Until every selected kana is assessed, 65% of normal questions introduce unseen kana and one is guaranteed after four review questions. After full coverage, review becomes fully adaptive. Recent difficulty can increase a sound category up to 2×. A hard-font mistake gives you one standard-form retry before the rescue choices appear.</p>
+        <p class="muted">Until every selected kana is assessed, 65% of normal questions introduce unseen kana and one is guaranteed after four review questions. After full coverage, review becomes fully adaptive. Recent difficulty can increase a sound category up to 2×. Harder fonts award up to 1.35× mastery for a correct first attempt. A hard-font mistake gives you one standard-form retry before the rescue choices appear.</p>
         <div class="session-summary">
           <div class="mini"><strong id="selectedCount">0</strong><span class="tiny">selected kana</span></div>
           <div class="mini"><strong id="assessedCountDetail">0</strong><span class="tiny">already assessed</span></div>
@@ -313,11 +313,11 @@
   const STORAGE_KEY = "hiragana-sprint-v3";
 
   const FONT_PROFILES = [
-    {id:"standard",label:"Standard",family:'"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif'},
-    {id:"klee",label:"Klee pen",family:'"Hira Klee",sans-serif'},
-    {id:"yuji-syuku",label:"Yuji brush",family:'"Hira Yuji Syuku",serif'},
-    {id:"yuji-mai",label:"Yuji flowing",family:'"Hira Yuji Mai",serif'},
-    {id:"yuji-boku",label:"Yuji rough",family:'"Hira Yuji Boku",sans-serif'}
+    {id:"standard",label:"Standard",difficulty:"Standard",gainMultiplier:1,penalty:13,family:'"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif'},
+    {id:"klee",label:"Klee pen",difficulty:"Medium",gainMultiplier:1.1,penalty:9,family:'"Hira Klee",sans-serif'},
+    {id:"yuji-boku",label:"Yuji rough",difficulty:"Hard",gainMultiplier:1.2,penalty:7,family:'"Hira Yuji Boku",sans-serif'},
+    {id:"yuji-syuku",label:"Yuji brush",difficulty:"Very hard",gainMultiplier:1.3,penalty:5,family:'"Hira Yuji Syuku",serif'},
+    {id:"yuji-mai",label:"Yuji flowing",difficulty:"Very hard+",gainMultiplier:1.35,penalty:5,family:'"Hira Yuji Mai",serif'}
   ];
   const STANDARD_FONT=FONT_PROFILES[0];
 
@@ -524,7 +524,7 @@
   function applyPromptFont(mode,font){
     const prompt=$("#"+mode+"Prompt");
     prompt.style.fontFamily=font.family;
-    $("#"+mode+"FontNote").textContent=font.label+" font";
+    $("#"+mode+"FontNote").textContent=`${font.label} • ${font.gainMultiplier.toFixed(2)}× mastery`;
   }
 
   function appendGlyphComparison(mode,item,font){
@@ -680,13 +680,13 @@
       s.correct++; s.streak++;
       s.lastWasCorrect=true;
       s.errorStreak=0;
-      const gain=masteryGain(s)*(font.id==="standard"?1:.75);
+      const gain=Math.min(17,masteryGain(s)*font.gainMultiplier);
       s.mastery=Math.min(100,s.mastery+gain);
       scheduleCorrect(s);
       state.stats.correct++; state.stats.streak++;
       state.stats.bestStreak=Math.max(state.stats.bestStreak,state.stats.streak);
     }else{
-      const penalty=font.id==="standard"?13:6;
+      const penalty=font.penalty;
       s.wrong++; s.streak=0; s.lastWasCorrect=false; s.errorStreak=(s.errorStreak||0)+1; s.mastery=Math.max(0,s.mastery-penalty); s.dueAt=Date.now()+60000;
       state.stats.streak=0;
       if(typedWrongItem && typedWrongItem.k!==item.k){
@@ -1142,7 +1142,7 @@
       allItems.forEach(item=>{const fs=itemState(item.k).fontStats[font.id];if(fs){seen+=fs.seen;correct+=fs.correct}});
       const result=seen?Math.round(correct/seen*100)+"%":"Not assessed";
       const safeFamily=font.family.replaceAll('"',"'");
-      return `<div class="font-stat" style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">あきさりふ</div><span>${result}${seen?` • ${seen} answers`:""}</span></div>`;
+      return `<div class="font-stat" style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">あきさりふ</div><span>${font.difficulty} • ${font.gainMultiplier.toFixed(2)}× mastery<br>${result}${seen?` • ${seen} answers`:""}</span></div>`;
     }).join("");
   }
 
