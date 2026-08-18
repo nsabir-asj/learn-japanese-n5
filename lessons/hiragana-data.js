@@ -164,6 +164,7 @@
     storageKey: STORAGE_KEY,
     progressFileStem: "hiragana-sprint",
     progressVersion: 3,
+    initialLearnUnlockedCount: 5,
     sampleKana: "あ",
     sampleWord: "ねこ",
     fontPreview: "あきさりふ",

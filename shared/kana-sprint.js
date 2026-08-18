@@ -63,7 +63,7 @@
   function defaultState(){
     return {
       version:LESSON.progressVersion,
-      learnUnlockedCount:5,
+      learnUnlockedCount:LESSON.initialLearnUnlockedCount,
       stats:{answered:0,correct:0,streak:0,bestStreak:0},
       wordStats:{seen:0,correct:0},
       wordItems:{},
