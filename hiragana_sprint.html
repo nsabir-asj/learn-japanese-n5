@@ -95,6 +95,7 @@
   input[type="range"]{width:min(260px,42vw)}
   .trouble-list{display:grid;gap:8px}.trouble{display:grid;grid-template-columns:58px 1fr auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--panel3);padding:10px 12px}
   .kana-small{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;font-size:2rem;text-align:center}
+  .word-trouble{grid-template-columns:minmax(100px,160px) 1fr auto}.word-small{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;font-size:1.35rem;text-align:center}
   .meter{height:7px;background:#262d36;border-radius:999px;overflow:hidden;margin-top:6px}.meter span{display:block;height:100%;background:var(--accent)}
   .confusions{display:flex;gap:8px;flex-wrap:wrap}.confusion{border:1px solid var(--line);border-radius:999px;background:var(--panel3);padding:7px 10px}
   .font-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.font-stat{border:1px solid var(--line);border-radius:12px;background:var(--panel3);padding:11px 12px}.font-stat strong{display:block}.font-stat span{color:var(--muted);font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-size:.78rem}.font-preview{font-size:1.7rem;line-height:1.2;margin:7px 0}
@@ -127,7 +128,7 @@
   <header>
     <div>
       <h1>Hiragana Sprint</h1>
-      <p class="subtitle">Type-first adaptive hiragana practice. Correct answers move instantly; mistakes trigger an 8-choice rescue quiz and get scheduled for earlier review.</p>
+      <p class="subtitle">Type-first adaptive hiragana practice with varied fonts, targeted review, and word-meaning reinforcement.</p>
     </div>
     <div class="pill">Standalone • offline • auto-saved</div>
   </header>
@@ -238,12 +239,16 @@
       </div>
       <div class="card">
         <h2>Word scheduling</h2>
-        <p class="muted">Unseen words are introduced frequently. Mistaken words return after a wider review gap, and recent difficulty with advanced sound categories increases their share without taking over the session.</p>
+        <p class="muted">Unseen words are introduced frequently. Word mastery, length, small っ, long vowels, and difficult sound categories all influence adaptive review.</p>
         <div class="session-summary">
           <div class="mini"><strong id="wordPoolCount">0</strong><span class="tiny">words in pool</span></div>
-          <div class="mini"><strong id="wordCorrect">0</strong><span class="tiny">word answers correct</span></div>
-          <div class="mini"><strong id="wordSeen">0</strong><span class="tiny">word questions seen</span></div>
+          <div class="mini"><strong id="wordSeen">0</strong><span class="tiny">total word answers</span></div>
+          <div class="mini"><strong id="wordUnique">0</strong><span class="tiny">unique words assessed</span></div>
+          <div class="mini"><strong id="wordUnseen">0</strong><span class="tiny">unseen in this pool</span></div>
+          <div class="mini"><strong id="wordWeak">0</strong><span class="tiny">weak words</span></div>
+          <div class="mini"><strong id="wordMastered">0</strong><span class="tiny">mastered words</span></div>
         </div>
+        <div class="tiny" id="wordAccuracy" style="margin-top:9px">Word accuracy: —</div>
       </div>
     </div>
 
@@ -258,7 +263,7 @@
       </div>
       <div class="typing">
         <input id="wordsInput" class="answer-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type the word in romaji and press Enter" />
-        <div class="typing-hint">Example: ねこ → neko</div>
+        <div class="typing-hint">Correct recognition reveals the meaning. Press Enter again for the next word.</div>
       </div>
       <div class="feedback" id="wordsFeedback"></div>
       <div class="rescue-wrap" id="wordsRescue"><div class="rescue-title">Choose the correct reading</div><div class="options" id="wordsOptions"></div></div>
@@ -266,6 +271,11 @@
         <div class="actions"><button class="ghost" id="wordsDontKnow">I don't know</button><button class="ghost hidden" id="wordsNext">Next <kbd>Enter</kbd></button></div>
         <span class="tiny">Correct word answers give a small amount of supporting evidence to their kana.</span>
       </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h2>Weak words</h2>
+      <p class="muted">These words are ranked by low mastery, recent mistakes, and accuracy within the current word set.</p>
+      <div class="trouble-list" id="weakWordList"></div>
     </div>
   </section>
 
@@ -430,11 +440,88 @@
     {k:"びょういん",r:"byouin",m:"hospital",u:["びょ","う","い","ん"]}
   ];
 
+  const EXTRA_WORDS = [
+    ["あき","aki","autumn"],["あめ","ame","rain"],["いけ","ike","pond"],["いす","isu","chair"],
+    ["うし","ushi","cow"],["うた","uta","song"],["うみ","umi","sea"],["えき","eki","station"],
+    ["おか","oka","hill"],["おと","oto","sound"],["おなか","onaka","stomach"],["かみ","kami","paper"],
+    ["かめ","kame","turtle"],["きた","kita","north"],["くち","kuchi","mouth"],["くも","kumo","cloud"],
+    ["けさ","kesa","this morning"],["こえ","koe","voice"],["こめ","kome","uncooked rice"],["さかな","sakana","fish"],
+    ["しお","shio","salt"],["しか","shika","deer"],["しま","shima","island"],["すな","suna","sand"],
+    ["せなか","senaka","back"],["たま","tama","ball"],["ちず","chizu","map"],["つくえ","tsukue","desk"],
+    ["て","te","hand"],["とり","tori","bird"],["なか","naka","inside"],["なまえ","namae","name"],
+    ["にわ","niwa","garden"],["ぬの","nuno","cloth"],["のど","nodo","throat"],["はこ","hako","box"],
+    ["はし","hashi","chopsticks"],["はる","haru","spring"],["ひる","hiru","noon"],["ふゆ","fuyu","winter"],
+    ["ほね","hone","bone"],["まど","mado","window"],["みせ","mise","shop"],["みち","michi","road"],
+    ["むら","mura","village"],["もの","mono","thing"],["もり","mori","forest"],["やさい","yasai","vegetables"],
+    ["ゆき","yuki","snow"],["よこ","yoko","side"],["らいねん","rainen","next year"],["りんご","ringo","apple"],
+    ["れきし","rekishi","history"],["ろく","roku","six"],["わかめ","wakame","seaweed"],["あたま","atama","head"],
+    ["あに","ani","older brother"],["あね","ane","older sister"],["いもうと","imouto","younger sister"],["おとうと","otouto","younger brother"],
+    ["おかあさん","okaasan","mother"],["おとうさん","otousan","father"],["かぞく","kazoku","family"],["ともだち","tomodachi","friend"],
+    ["こども","kodomo","child"],["おとこ","otoko","man"],["おんな","onna","woman"],["おとな","otona","adult"],
+    ["せんせい","sensei","teacher"],["がくせい","gakusei","student"],["がっこう","gakkou","school"],["きょうしつ","kyoushitsu","classroom"],
+    ["としょかん","toshokan","library"],["ぎんこう","ginkou","bank"],["ゆうびんきょく","yuubinkyoku","post office"],["かいしゃ","kaisha","company"],
+    ["しごと","shigoto","work"],["やすみ","yasumi","rest / holiday"],["じかん","jikan","time"],["いま","ima","now"],
+    ["きのう","kinou","yesterday"],["まいにち","mainichi","every day"],["まいあさ","maiasa","every morning"],["まいばん","maiban","every night"],
+    ["げつようび","getsuyoubi","Monday"],["かようび","kayoubi","Tuesday"],["すいようび","suiyoubi","Wednesday"],["もくようび","mokuyoubi","Thursday"],
+    ["きんようび","kinyoubi","Friday"],["どようび","doyoubi","Saturday"],["にちようび","nichiyoubi","Sunday"],["いち","ichi","one"],
+    ["に","ni","two"],["さん","san","three"],["よん","yon","four"],["ご","go","five"],
+    ["なな","nana","seven"],["はち","hachi","eight"],["きゅう","kyuu","nine"],["じゅう","juu","ten"],
+    ["ごはん","gohan","cooked rice / meal"],["あさごはん","asagohan","breakfast"],["ひるごはん","hirugohan","lunch"],["ばんごはん","bangohan","dinner"],
+    ["たべもの","tabemono","food"],["のみもの","nomimono","drink / beverage"],["くだもの","kudamono","fruit"],["たまご","tamago","egg"],
+    ["ぎゅうにゅう","gyuunyuu","milk"],["おちゃ","ocha","tea"],["こうちゃ","koucha","black tea"],["さとう","satou","sugar"],
+    ["みそ","miso","miso"],["ぱん","pan","bread"],["うどん","udon","udon noodles"],["そば","soba","soba noodles"],
+    ["りょうり","ryouri","cooking / cuisine"],["いく","iku","to go"],["くる","kuru","to come"],["かえる","kaeru","to return"],
+    ["みる","miru","to see"],["きく","kiku","to listen / ask"],["よむ","yomu","to read"],["かく","kaku","to write"],
+    ["はなす","hanasu","to speak"],["たべる","taberu","to eat"],["のむ","nomu","to drink"],["ねる","neru","to sleep"],
+    ["おきる","okiru","to wake up"],["あう","au","to meet"],["かう","kau","to buy"],["まつ","matsu","to wait"],
+    ["もつ","motsu","to hold"],["とる","toru","to take"],["つかう","tsukau","to use"],["つくる","tsukuru","to make"],
+    ["およぐ","oyogu","to swim"],["ある","aru","to exist (thing)"],["いる","iru","to exist (living thing)"],["わかる","wakaru","to understand"],
+    ["おおきい","ookii","big"],["ちいさい","chiisai","small"],["あたらしい","atarashii","new"],["ふるい","furui","old"],
+    ["あつい","atsui","hot"],["さむい","samui","cold"],["たかい","takai","high / expensive"],["やすい","yasui","inexpensive"],
+    ["おもしろい","omoshiroi","interesting"],["たのしい","tanoshii","fun"],["いそがしい","isogashii","busy"],["むずかしい","muzukashii","difficult"],
+    ["やさしい","yasashii","kind / easy"],["かわいい","kawaii","cute"],["きれい","kirei","pretty / clean"],["しずか","shizuka","quiet"],
+    ["ほん","hon","book"],["かばん","kaban","bag"],["くつ","kutsu","shoes"],["ふく","fuku","clothes"],
+    ["じしょ","jisho","dictionary"],["てがみ","tegami","letter"],["てんき","tenki","weather"],["くもり","kumori","cloudy weather"],
+    ["はれ","hare","clear weather"],["たいよう","taiyou","sun"],["こうえん","kouen","park"],["くうこう","kuukou","airport"],
+    ["ほてる","hoteru","hotel"],["うち","uchi","home"],["くに","kuni","country"],["きって","kitte","postage stamp"],
+    ["きっぷ","kippu","ticket"],["ざっし","zasshi","magazine"],["けっこん","kekkon","marriage"],["いっしょ","issho","together"],
+    ["ちょっと","chotto","a little"],["ゆっくり","yukkuri","slowly"],["まっすぐ","massugu","straight ahead"],["きっさてん","kissaten","coffee shop"],
+    ["いっぱい","ippai","full / one cup"],["りっぱ","rippa","splendid"],["せっけん","sekken","soap"],["きょうだい","kyoudai","siblings"],
+    ["きゅうり","kyuuri","cucumber"],["しゅくだい","shukudai","homework"],["しょうゆ","shouyu","soy sauce"],["しょうが","shouga","ginger"],
+    ["ちゅうごく","chuugoku","China"],["じてんしゃ","jitensha","bicycle"]
+  ].map(([k,r,m,a])=>({k,r,m,a:a||[],u:[]}));
+  WORDS.push(...EXTRA_WORDS);
+
   const allItems=[], byKana={}, groupByKana={};
   GROUPS.forEach((g,gi)=>g.items.forEach(([k,r])=>{
     const item={k,r,group:g.id,groupIndex:gi};
     allItems.push(item); byKana[k]=item; groupByKana[k]=gi;
   }));
+
+  function splitWordKana(kana){
+    const chars=[...kana],units=[];
+    for(let i=0;i<chars.length;i++){
+      const combo=chars[i]+(chars[i+1]||"");
+      if(byKana[combo]){units.push(combo);i++}else units.push(chars[i]);
+    }
+    return units;
+  }
+
+  function wordFeatureLabels(word){
+    const labels=[...new Set(word.u.map(k=>byKana[k]).filter(Boolean).map(itemPhase))];
+    if(word.units.includes("っ"))labels.push("Small っ");
+    if(/ou|uu|oo|aa|ii/.test(word.r))labels.push("Long vowels");
+    if(word.units.length>=5)labels.push("Long words");
+    return [...new Set(labels)];
+  }
+
+  WORDS.forEach(word=>{
+    word.units=splitWordKana(word.k);
+    word.u=[...new Set(word.units.filter(k=>byKana[k]))];
+    word.a=Array.isArray(word.a)?word.a:[];
+    word.features=wordFeatureLabels(word);
+    word.difficulty=Math.min(5,1+(word.units.length>=4?1:0)+(word.features.includes("Voiced")||word.features.includes("Semi-voiced")?1:0)+(word.features.includes("Combinations")?1:0)+(word.features.includes("Small っ")||word.features.includes("Long vowels")?1:0));
+  });
 
   function defaultRehearseGroups(){
     const ids={}; GROUPS.forEach(g=>ids[g.id]=g.phase==="Basic"); return ids;
@@ -451,6 +538,7 @@
       stats:{answered:0,correct:0,streak:0,bestStreak:0},
       wordStats:{seen:0,correct:0},
       wordItems:{},
+      wordFeatureHistory:{},
       phaseHistory:{Basic:[],Voiced:[],"Semi-voiced":[],Combinations:[]},
       items:{},
       rehearseItems:{},
@@ -493,6 +581,7 @@
     if(!state.stats) state.stats={answered:0,correct:0,streak:0,bestStreak:0};
     if(!state.wordStats) state.wordStats={seen:0,correct:0};
     if(!state.wordItems) state.wordItems={};
+    if(!state.wordFeatureHistory)state.wordFeatureHistory={};
     if(!state.phaseHistory) state.phaseHistory={};
     ["Basic","Voiced","Semi-voiced","Combinations"].forEach(phase=>{
       if(!Array.isArray(state.phaseHistory[phase])) state.phaseHistory[phase]=[];
@@ -615,8 +704,12 @@
   }
 
   function wordItemState(k){
-    if(!state.wordItems[k]) state.wordItems[k]={seen:0,correct:0,wrong:0,lastSeen:0,lastWasCorrect:null,errorStreak:0};
-    return state.wordItems[k];
+    if(!state.wordItems[k]) state.wordItems[k]={seen:0,correct:0,wrong:0,mastery:0,streak:0,dueAt:0,lastSeen:0,lastWasCorrect:null,errorStreak:0};
+    const s=state.wordItems[k];
+    if(!Number.isFinite(s.mastery))s.mastery=Math.max(0,Math.min(100,(s.correct||0)*12-(s.wrong||0)*8));
+    if(!Number.isFinite(s.streak))s.streak=0;
+    if(!Number.isFinite(s.dueAt))s.dueAt=0;
+    return s;
   }
 
   function randomInt(min,max){
@@ -641,12 +734,23 @@
     });
   }
 
+  function recordWordFeatureResult(word,correct){
+    word.features.forEach(feature=>{
+      if(!state.wordFeatureHistory[feature])state.wordFeatureHistory[feature]=[];
+      state.wordFeatureHistory[feature].push(correct?1:0);
+      if(state.wordFeatureHistory[feature].length>30)state.wordFeatureHistory[feature].shift();
+    });
+  }
+
+  function historyBoost(recent){
+    if(!recent||!recent.length)return 1;
+    const wrong=recent.filter(x=>x===0).length;
+    return wrong?1+Math.min(1,(wrong/recent.length)*2):1;
+  }
+
   function phaseBoost(phase){
     const recent=state.phaseHistory[phase]||[];
-    if(!recent.length)return 1;
-    const wrong=recent.filter(x=>x===0).length;
-    if(!wrong)return 1;
-    return 1+Math.min(1,(wrong/recent.length)*2);
+    return historyBoost(recent);
   }
 
   function itemPhase(item){
@@ -659,6 +763,10 @@
 
   function wordPhaseBoost(word){
     return Math.max(1,...wordPhases(word).map(phaseBoost));
+  }
+
+  function wordFeatureBoost(word){
+    return Math.max(wordPhaseBoost(word),...word.features.map(feature=>historyBoost(state.wordFeatureHistory[feature])));
   }
 
   function isWeakKanaState(s){
@@ -973,12 +1081,23 @@
     if(state.wordSet==="basic"){
       return WORDS.filter(w=>w.u.every(k=>byKana[k]&&GROUPS[byKana[k].groupIndex].phase==="Basic"));
     }
-    return WORDS.filter(w=>w.u.every(k=>byKana[k]&&isGroupUnlocked(byKana[k].groupIndex)));
+    const allBasicUnlocked=GROUPS.filter(g=>g.phase==="Basic").every((g,i)=>isGroupUnlocked(GROUPS.indexOf(g)));
+    return WORDS.filter(w=>w.u.every(k=>byKana[k]&&isGroupUnlocked(byKana[k].groupIndex))&&(!w.features.includes("Small っ")||allBasicUnlocked));
   }
 
   function isWeakWordState(s){
     if(!s.seen||!s.wrong)return false;
-    return s.lastWasCorrect===false || s.correct/s.seen<.8;
+    return s.lastWasCorrect===false || s.mastery<55 || s.correct/s.seen<.8;
+  }
+
+  function wordMasteryGain(s){
+    return Math.max(4,16*(1-s.mastery/150));
+  }
+
+  function scheduleWordCorrect(s){
+    const m=s.mastery;
+    const minutes=m<20?5:m<40?20:m<60?90:m<75?360:m<88?1440:m<95?4320:10080;
+    s.dueAt=Date.now()+minutes*60000;
   }
 
   function selectWord(){
@@ -1006,19 +1125,20 @@
     if(unseen.length&&roll<newShare)bucket=unseen;
     else if(weak.length&&roll<newShare+weakShare)bucket=weak;
     else bucket=seen.length?seen:candidates;
+    const now=Date.now();
     return weightedPick(bucket,w=>{
-      const ss=w.u.map(k=>itemState(k));
-      const avg=ss.reduce((a,s)=>a+s.mastery,0)/ss.length;
       const ws=wordItemState(w.k);
-      let weight=1+(100-avg)/30;
+      let weight=1+(100-ws.mastery)/15;
       if(ws.lastWasCorrect===false)weight+=3;
-      return weight*wordPhaseBoost(w);
+      if(ws.seen&&ws.dueAt<=now)weight+=2;
+      if(!ws.seen)weight*=Math.max(.7,1.5-(w.difficulty-1)*.16);
+      return weight*wordFeatureBoost(w);
     });
   }
 
   function nextWordQuestion(){
     const s=sessions.words;
-    s.n++;s.rescue=false;
+    s.n++;s.rescue=false;s.fontRetry=false;
     clearFeedback("words");hideRescue("words");
     $("#wordsNext").classList.add("hidden");$("#wordsDontKnow").classList.remove("hidden");
     const w=selectWord();
@@ -1039,18 +1159,20 @@
     ws.seen++;ws.lastSeen=Date.now();ws.lastWasCorrect=correct;
     state.wordStats.seen++;
     if(correct){
-      ws.correct++;ws.errorStreak=0;
+      ws.correct++;ws.streak++;ws.errorStreak=0;
+      ws.mastery=Math.min(100,ws.mastery+wordMasteryGain(ws));scheduleWordCorrect(ws);
       state.wordStats.correct++;
       state.stats.answered++;state.stats.correct++;state.stats.streak++;
       w.u.forEach(k=>{const s=itemState(k);s.mastery=Math.min(100,s.mastery+2)});
     }else{
-      ws.wrong++;ws.errorStreak=(ws.errorStreak||0)+1;
+      ws.wrong++;ws.streak=0;ws.errorStreak=(ws.errorStreak||0)+1;ws.mastery=Math.max(0,ws.mastery-14);ws.dueAt=Date.now()+60000;
       state.stats.answered++;state.stats.streak=0;
       w.u.forEach(k=>{
         const s=itemState(k);s.mastery=Math.max(0,s.mastery-2);s.dueAt=Date.now()+60000;
       });
     }
     recordPhaseResult(wordPhases(w),correct);
+    recordWordFeatureResult(w,correct);
     saveState();
   }
 
@@ -1074,6 +1196,35 @@
     return out.slice(0,7);
   }
 
+  function isCorrectWordReading(word,value){
+    return [word.r,...word.a].some(answer=>normalize(answer)===value);
+  }
+
+  function recordWordKanaConfusions(word,value){
+    if(!value||word.units.includes("っ"))return;
+    const expected=word.units.map(k=>byKana[k]&&byKana[k].r);
+    if(expected.some(x=>!x)||expected.join("").length!==value.length)return;
+    let offset=0,changed=false;
+    word.units.forEach((targetKana,index)=>{
+      const expectedReading=expected[index],typedReading=value.slice(offset,offset+expectedReading.length);offset+=expectedReading.length;
+      if(normalize(typedReading)===normalize(expectedReading))return;
+      const typedItem=allItems.find(item=>normalize(item.r)===normalize(typedReading));
+      if(!typedItem||typedItem.k===targetKana)return;
+      const target=itemState(targetKana);
+      target.confusions[typedItem.k]=(target.confusions[typedItem.k]||0)+1;changed=true;
+    });
+    if(changed)saveState();
+  }
+
+  function finishWordRecognition(word,meta,showComparison=false){
+    const s=sessions.words;
+    s.fontRetry=false;s.rescue=false;
+    $("#wordsNext").classList.remove("hidden");$("#wordsDontKnow").classList.add("hidden");
+    setFeedback("words",true,`${word.k} → ${word.r}`,`${word.m} • ${meta}`);
+    if(showComparison)appendGlyphComparison("words",word,s.currentFont||STANDARD_FONT);
+    updateAllUI();focusInput("words");
+  }
+
   function renderWordRescue(word){
     const wrap=$("#wordsRescue"),box=$("#wordsOptions");box.innerHTML="";
     const opts=shuffle([{r:word.r,correct:true},...makeWordDistractors(word).map(r=>({r,correct:false}))]);
@@ -1092,19 +1243,40 @@
     if(!w||s.rescue)return;
     noteSessionActivity(s);
     const input=$("#wordsInput"), value=normalize(input.value);
-    const correct=!forceWrong&&value===normalize(w.r);
+    const correct=!forceWrong&&isCorrectWordReading(w,value);
+    if(s.fontRetry){
+      if(correct){
+        input.value="";
+        finishWordRecognition(w,"recognized with the standard reference • press Enter for the next word",true);
+      }else{
+        recordWordKanaConfusions(w,value);
+        s.fontRetry=false;s.rescue=true;input.value="";input.blur();
+        const typedNote=value?`You typed “${value}” again.`:"Still marked as unknown.";
+        setFeedback("words",false,"Still not quite",`${typedNote} Choose the correct reading below.`);
+        appendGlyphComparison("words",w,s.currentFont||STANDARD_FONT);
+        renderWordRescue(w);$("#wordsDontKnow").classList.add("hidden");updateAllUI();
+      }
+      return;
+    }
     if(correct){
       applyWordResult(w,true);
-      setFeedback("words",true,`${w.k} → ${w.r}`,w.m);
       input.value="";
-      setTimeout(nextWordQuestion,180);
+      finishWordRecognition(w,"press Enter for the next word");
     }else{
+      recordWordKanaConfusions(w,value);
       applyWordResult(w,false);
       s.forced[w.k]=s.n+mistakeReviewOffset(wordItemState(w.k).errorStreak||1);
-      s.rescue=true;input.value="";input.blur();
       const typedNote=value?`You typed “${value}”.`:"Marked as unknown.";
-      setFeedback("words",false,"Not quite",`${typedNote} Choose the correct reading below. The answer and meaning will be shown after you identify it.`);
-      renderWordRescue(w);$("#wordsDontKnow").classList.add("hidden");updateAllUI();
+      if((s.currentFont||STANDARD_FONT).id!=="standard"){
+        s.fontRetry=true;input.value="";
+        setFeedback("words",false,"Compare the two forms",`${typedNote} Look at the standard word, then type the reading once more.`);
+        appendGlyphComparison("words",w,s.currentFont||STANDARD_FONT);focusInput("words");
+      }else{
+        s.rescue=true;input.value="";input.blur();
+        setFeedback("words",false,"Not quite",`${typedNote} Choose the correct reading below. The answer and meaning will be shown after you identify it.`);
+        renderWordRescue(w);$("#wordsDontKnow").classList.add("hidden");
+      }
+      updateAllUI();
     }
   }
 
@@ -1113,9 +1285,7 @@
     noteSessionActivity(s);
     if(!opt.correct){button.classList.add("wrong");button.disabled=true;return}
     [...$("#wordsOptions").children].forEach(b=>{b.disabled=true;if(b.dataset.correct==="1")b.classList.add("correct")});
-    s.rescue=false;$("#wordsNext").classList.remove("hidden");
-    setFeedback("words",true,`${word.k} → ${word.r}`,word.m+" • correction reinforced");
-    focusInput("words");
+    finishWordRecognition(word,"correction reinforced • press Enter for the next word",(s.currentFont||STANDARD_FONT).id!=="standard");
   }
 
   function updateTopStats(){
@@ -1250,9 +1420,22 @@
   }
 
   function updateWordSummary(){
-    $("#wordPoolCount").textContent=wordPool().length;
-    $("#wordCorrect").textContent=state.wordStats.correct;
+    const pool=wordPool(),states=pool.map(w=>wordItemState(w.k));
+    const unique=states.filter(s=>s.seen>0).length;
     $("#wordSeen").textContent=state.wordStats.seen;
+    $("#wordPoolCount").textContent=pool.length;
+    $("#wordUnique").textContent=unique;
+    $("#wordUnseen").textContent=Math.max(0,pool.length-unique);
+    $("#wordWeak").textContent=states.filter(isWeakWordState).length;
+    $("#wordMastered").textContent=states.filter(s=>s.mastery>=80).length;
+    $("#wordAccuracy").textContent="Word accuracy: "+(state.wordStats.seen?Math.round(state.wordStats.correct/state.wordStats.seen*100)+"%":"—");
+    const weak=pool.map(word=>({word,s:wordItemState(word.k)})).filter(x=>isWeakWordState(x.s))
+      .sort((a,b)=>((100-b.s.mastery)+b.s.wrong*4)-((100-a.s.mastery)+a.s.wrong*4)).slice(0,12);
+    $("#weakWordList").innerHTML=weak.length?weak.map(({word,s})=>`<div class="trouble word-trouble">
+      <div class="word-small">${word.k}</div>
+      <div><strong>${word.r}</strong><div class="tiny">${word.m} • ${s.correct}/${s.seen} correct</div><div class="meter"><span style="width:${Math.round(s.mastery)}%"></span></div></div>
+      <strong>${Math.round(s.mastery)}%</strong>
+    </div>`).join(""):`<span class="muted">No weak words in this set yet.</span>`;
     document.querySelectorAll("[data-wordset]").forEach(b=>b.classList.toggle("active",b.dataset.wordset===state.wordSet));
   }
 
