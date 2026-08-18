@@ -339,11 +339,11 @@
   const STORAGE_KEY = "hiragana-sprint-v3";
 
   const FONT_PROFILES = [
-    {id:"standard",label:"Standard",difficulty:"Standard",gainMultiplier:1,penalty:13,family:'"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif'},
-    {id:"klee",label:"Klee pen",difficulty:"Medium",gainMultiplier:1.1,penalty:9,family:'"Hira Klee",sans-serif'},
-    {id:"yuji-boku",label:"Yuji rough",difficulty:"Hard",gainMultiplier:1.2,penalty:7,family:'"Hira Yuji Boku",sans-serif'},
-    {id:"yuji-syuku",label:"Yuji brush",difficulty:"Very hard",gainMultiplier:1.3,penalty:5,family:'"Hira Yuji Syuku",serif'},
-    {id:"yuji-mai",label:"Yuji flowing",difficulty:"Very hard+",gainMultiplier:1.35,penalty:5,family:'"Hira Yuji Mai",serif'}
+    {id:"standard",label:"Standard",difficulty:"Standard",gainMultiplier:1,wordGainMultiplier:1,penalty:13,family:'"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif'},
+    {id:"klee",label:"Klee pen",difficulty:"Medium",gainMultiplier:1.1,wordGainMultiplier:1.05,penalty:9,family:'"Hira Klee",sans-serif'},
+    {id:"yuji-boku",label:"Yuji rough",difficulty:"Hard",gainMultiplier:1.2,wordGainMultiplier:1.1,penalty:7,family:'"Hira Yuji Boku",sans-serif'},
+    {id:"yuji-syuku",label:"Yuji brush",difficulty:"Very hard",gainMultiplier:1.3,wordGainMultiplier:1.15,penalty:5,family:'"Hira Yuji Syuku",serif'},
+    {id:"yuji-mai",label:"Yuji flowing",difficulty:"Very hard+",gainMultiplier:1.35,wordGainMultiplier:1.2,penalty:5,family:'"Hira Yuji Mai",serif'}
   ];
   const STANDARD_FONT=FONT_PROFILES[0];
 
@@ -657,7 +657,7 @@
   function applyPromptFont(mode,font){
     const prompt=$("#"+mode+"Prompt");
     prompt.style.fontFamily=font.family;
-    $("#"+mode+"FontNote").textContent=mode==="words"?`${font.label} • selected globally`:`${font.label} • ${font.gainMultiplier.toFixed(2)}× mastery`;
+    $("#"+mode+"FontNote").textContent=mode==="words"?`${font.label} • ${font.wordGainMultiplier.toFixed(2)}× word mastery`:`${font.label} • ${font.gainMultiplier.toFixed(2)}× mastery`;
   }
 
   function appendGlyphComparison(mode,item,font){
@@ -1154,13 +1154,13 @@
     focusInput("words");updateAllUI();
   }
 
-  function applyWordResult(w,correct){
+  function applyWordResult(w,correct,font=STANDARD_FONT){
     const ws=wordItemState(w.k);
     ws.seen++;ws.lastSeen=Date.now();ws.lastWasCorrect=correct;
     state.wordStats.seen++;
     if(correct){
       ws.correct++;ws.streak++;ws.errorStreak=0;
-      ws.mastery=Math.min(100,ws.mastery+wordMasteryGain(ws));scheduleWordCorrect(ws);
+      ws.mastery=Math.min(100,ws.mastery+wordMasteryGain(ws)*font.wordGainMultiplier);scheduleWordCorrect(ws);
       state.wordStats.correct++;
       state.stats.answered++;state.stats.correct++;state.stats.streak++;
       w.u.forEach(k=>{const s=itemState(k);s.mastery=Math.min(100,s.mastery+2)});
@@ -1259,7 +1259,7 @@
       return;
     }
     if(correct){
-      applyWordResult(w,true);
+      applyWordResult(w,true,s.currentFont||STANDARD_FONT);
       input.value="";
       finishWordRecognition(w,"press Enter for the next word");
     }else{
@@ -1357,7 +1357,7 @@
       allItems.forEach(item=>{const fs=itemState(item.k).fontStats[font.id];if(fs){seen+=fs.seen;correct+=fs.correct}});
       const result=seen?Math.round(correct/seen*100)+"%":"Not assessed";
       const safeFamily=font.family.replaceAll('"',"'");
-      return `<div class="font-stat" style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">あきさりふ</div><span>${font.difficulty} • ${font.gainMultiplier.toFixed(2)}× mastery<br>${result}${seen?` • ${seen} answers`:""}</span></div>`;
+      return `<div class="font-stat" style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">あきさりふ</div><span>${font.difficulty} • ${font.gainMultiplier.toFixed(2)}× kana • ${font.wordGainMultiplier.toFixed(2)}× word<br>${result}${seen?` • ${seen} answers`:""}</span></div>`;
     }).join("");
   }
 
@@ -1373,7 +1373,7 @@
       const summary=fontSummary(font),safeFamily=font.family.replaceAll('"',"'");
       const accuracy=summary.seen?`${summary.accuracy}% • ${summary.seen} answers`:"Not assessed";
       if(font.id==="standard")return `<div class="font-select-card fixed"><div style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">あきさりふ</div><span class="tiny">Always enabled • ${accuracy}</span></div></div>`;
-      return `<label class="font-select-card"><input type="checkbox" data-font-select="${font.id}" ${isFontEnabled(font)?"checked":""}><div style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">あきさりふ</div><span class="tiny">${font.difficulty} • ${font.gainMultiplier.toFixed(2)}×<br>${accuracy}</span></div></label>`;
+      return `<label class="font-select-card"><input type="checkbox" data-font-select="${font.id}" ${isFontEnabled(font)?"checked":""}><div style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">あきさりふ</div><span class="tiny">${font.difficulty}<br>${font.gainMultiplier.toFixed(2)}× kana • ${font.wordGainMultiplier.toFixed(2)}× word<br>${accuracy}</span></div></label>`;
     }).join("");
     selectors.querySelectorAll("[data-font-select]").forEach(input=>input.addEventListener("change",e=>{
       state.selectedFonts[e.target.dataset.fontSelect]=e.target.checked;state.selectedFonts.standard=true;saveState();renderFontTab();
