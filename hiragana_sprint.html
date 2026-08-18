@@ -102,6 +102,10 @@
   .font-picker{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:14px}.font-select-card{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:13px;background:var(--panel3);padding:11px 12px}.font-select-card input{margin-top:3px;accent-color:var(--accent)}.font-select-card.fixed{border-color:rgba(88,166,255,.45);background:rgba(88,166,255,.06)}
   .font-table-wrap{overflow:auto;max-height:72vh;border:1px solid var(--line);border-radius:14px;margin-top:14px}.font-table{width:100%;min-width:790px;border-collapse:separate;border-spacing:0;background:var(--panel3)}.font-table th,.font-table td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:9px 10px;text-align:center}.font-table th:last-child,.font-table td:last-child{border-right:0}.font-table thead th{position:sticky;top:0;z-index:3;background:#1b222b}.font-table .reading{position:sticky;left:0;z-index:2;width:110px;background:#171e26;text-align:left}.font-table thead .reading{z-index:4}.font-table .group-row th{background:#111820;color:var(--muted);font-size:.72rem;text-align:left;text-transform:uppercase;letter-spacing:.08em}.font-glyph{font-size:2rem;line-height:1.15}.font-table .inactive-font{opacity:.38}
   .save-status{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:13px;background:var(--panel3);padding:12px 13px}.save-dot{width:9px;height:9px;border-radius:50%;background:var(--good)}
+  .speech-status{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:13px;background:var(--panel3);padding:11px 12px;margin-bottom:10px}.speech-dot{width:9px;height:9px;border-radius:50%;background:var(--warn);margin-top:5px;flex:0 0 auto}.speech-status.ready .speech-dot{background:var(--good)}.speech-status.unavailable .speech-dot{background:var(--bad)}
+  .speech-controls{display:grid;gap:8px}.speech-controls select{width:100%;min-width:0;background:#0f141a;color:var(--text);border:1px solid #414b58;border-radius:10px;padding:8px 10px}.toggle-line{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.86rem}.toggle-line input{accent-color:var(--accent)}
+  .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.feature-stat{border:1px solid var(--line);border-radius:12px;background:var(--panel3);padding:11px 12px}.feature-stat strong,.feature-stat span{display:block}.feature-stat span{color:var(--muted);font-size:.78rem;margin-top:3px}
+  .speak-again{display:block;margin-top:11px}
   .big-button{border:0;border-radius:13px;background:var(--accent);color:#07111d;font-weight:900;padding:12px 15px}
   .word-settings{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
   .seg{border:1px solid var(--line);border-radius:11px;background:var(--panel3);color:var(--muted);padding:10px 11px;font-weight:700}.seg.active{color:var(--text);border-color:#5c6878;background:var(--panel2)}
@@ -119,7 +123,7 @@
   @media(max-width:760px){
     header{display:block}.pill{display:inline-block;margin-top:11px}.stats{grid-template-columns:repeat(2,1fr)}
     .grid2{grid-template-columns:1fr}.options{grid-template-columns:repeat(2,1fr)}.row-select{grid-template-columns:1fr}
-    .word-settings{grid-template-columns:1fr}.session-summary{grid-template-columns:1fr}.progressbar{width:125px}.font-stats,.font-picker{grid-template-columns:repeat(2,1fr)}
+    .word-settings{grid-template-columns:1fr}.session-summary,.feature-grid{grid-template-columns:1fr}.progressbar{width:125px}.font-stats,.font-picker{grid-template-columns:repeat(2,1fr)}
   }
 </style>
 </head>
@@ -145,7 +149,8 @@
     <button class="tab" data-tab="rehearse">Rehearse</button>
     <button class="tab" data-tab="words">Words</button>
     <button class="tab" data-tab="fonts">Fonts</button>
-    <button class="tab" data-tab="progress">Progress</button>
+    <button class="tab" data-tab="kanaprogress">Kana Progress</button>
+    <button class="tab" data-tab="wordprogress">Word Progress</button>
   </nav>
 
   <section class="panel active" id="panel-learn">
@@ -238,17 +243,19 @@
         </div>
       </div>
       <div class="card">
-        <h2>Word scheduling</h2>
-        <p class="muted">Unseen words are introduced frequently. Word mastery, length, small っ, long vowels, and difficult sound categories all influence adaptive review.</p>
-        <div class="session-summary">
-          <div class="mini"><strong id="wordPoolCount">0</strong><span class="tiny">words in pool</span></div>
-          <div class="mini"><strong id="wordSeen">0</strong><span class="tiny">total word answers</span></div>
-          <div class="mini"><strong id="wordUnique">0</strong><span class="tiny">unique words assessed</span></div>
-          <div class="mini"><strong id="wordUnseen">0</strong><span class="tiny">unseen in this pool</span></div>
-          <div class="mini"><strong id="wordWeak">0</strong><span class="tiny">weak words</span></div>
-          <div class="mini"><strong id="wordMastered">0</strong><span class="tiny">mastered words</span></div>
+        <h2>Speech</h2>
+        <div class="speech-status" id="speechStatus"><span class="speech-dot"></span><div><strong id="speechStatusTitle">Checking speech voices…</strong><div class="tiny" id="speechStatusDetail">Your browser will report whether Japanese pronunciation is available.</div></div></div>
+        <div class="speech-controls">
+          <label class="toggle-line"><input type="checkbox" id="speechAuto"> Automatically pronounce recognized words</label>
+          <label class="toggle-line"><input type="checkbox" id="speechMeaning"> Also pronounce the English meaning</label>
+          <label class="tiny" for="speechRate">Speed</label>
+          <select id="speechRate"><option value="0.75">Slow</option><option value="0.85">Clear</option><option value="1">Normal</option></select>
+          <label class="tiny" for="japaneseVoice">Japanese voice</label>
+          <select id="japaneseVoice"></select>
+          <label class="tiny" for="englishVoice">English voice</label>
+          <select id="englishVoice"></select>
+          <div class="actions"><button class="ghost" id="testJapaneseSpeech">Test Japanese voice</button></div>
         </div>
-        <div class="tiny" id="wordAccuracy" style="margin-top:9px">Word accuracy: —</div>
       </div>
     </div>
 
@@ -272,11 +279,6 @@
         <span class="tiny">Correct word answers give a small amount of supporting evidence to their kana.</span>
       </div>
     </div>
-    <div class="card" style="margin-top:14px">
-      <h2>Weak words</h2>
-      <p class="muted">These words are ranked by low mastery, recent mistakes, and accuracy within the current word set.</p>
-      <div class="trouble-list" id="weakWordList"></div>
-    </div>
   </section>
 
   <section class="panel" id="panel-fonts">
@@ -292,7 +294,7 @@
     </div>
   </section>
 
-  <section class="panel" id="panel-progress">
+  <section class="panel" id="panel-kanaprogress">
     <div class="grid2">
       <div class="card">
         <h2>Progress & backup</h2>
@@ -328,6 +330,41 @@
       <h2>Font recognition</h2>
       <p class="muted">Varied-font results are tracked separately. Learn introduces them after a kana is familiar; Rehearse mixes them immediately.</p>
       <div class="font-stats" id="fontRecognition"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-wordprogress">
+    <div class="grid2">
+      <div class="card">
+        <h2>Word progress</h2>
+        <p class="muted">These totals use the word set currently selected in Word mode. Detailed answers stay here, away from the active question.</p>
+        <div class="session-summary">
+          <div class="mini"><strong id="wordPoolCount">0</strong><span class="tiny">words in pool</span></div>
+          <div class="mini"><strong id="wordSeen">0</strong><span class="tiny">total word answers</span></div>
+          <div class="mini"><strong id="wordUnique">0</strong><span class="tiny">unique words assessed</span></div>
+          <div class="mini"><strong id="wordUnseen">0</strong><span class="tiny">unseen in this pool</span></div>
+          <div class="mini"><strong id="wordWeak">0</strong><span class="tiny">weak words</span></div>
+          <div class="mini"><strong id="wordMastered">0</strong><span class="tiny">mastered words</span></div>
+        </div>
+        <div class="tiny" id="wordAccuracy" style="margin-top:9px">Word accuracy: —</div>
+      </div>
+      <div class="card">
+        <h2>Recent feature performance</h2>
+        <p class="muted">Accuracy over the latest 30 answers in each feature. Lower accuracy makes that feature appear more often.</p>
+        <div class="feature-grid" id="wordFeatureProgress"></div>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card">
+        <h2>Weak words</h2>
+        <p class="muted">Ranked by low mastery, recent mistakes, and accuracy within the current word set.</p>
+        <div class="trouble-list" id="weakWordList"></div>
+      </div>
+      <div class="card">
+        <h2>Strongest words</h2>
+        <p class="muted">The most secure words in the current set.</p>
+        <div class="trouble-list" id="strongWordList"></div>
+      </div>
     </div>
   </section>
 </div>
@@ -548,6 +585,7 @@
       rehearseSetOpen:false,
       rehearseHelpOpen:false,
       wordSet:"learned",
+      speech:{autoPlay:true,speakMeaning:true,rate:.85,jaVoice:"",enVoice:""},
       savedAt:0
     };
   }
@@ -597,9 +635,107 @@
     if(typeof state.rehearseSetOpen!=="boolean") state.rehearseSetOpen=false;
     if(typeof state.rehearseHelpOpen!=="boolean") state.rehearseHelpOpen=false;
     if(!state.wordSet) state.wordSet="learned";
+    if(!state.speech)state.speech={autoPlay:true,speakMeaning:true,rate:.85,jaVoice:"",enVoice:""};
+    if(typeof state.speech.autoPlay!=="boolean")state.speech.autoPlay=true;
+    if(typeof state.speech.speakMeaning!=="boolean")state.speech.speakMeaning=true;
+    if(![.75,.85,1].includes(Number(state.speech.rate)))state.speech.rate=.85;
+    if(typeof state.speech.jaVoice!=="string")state.speech.jaVoice="";
+    if(typeof state.speech.enVoice!=="string")state.speech.enVoice="";
     if(!Number.isFinite(state.learnUnlockedCount)) state.learnUnlockedCount=5;
   }
   ensureStateShape();
+
+  const speechSupported="speechSynthesis" in window&&"SpeechSynthesisUtterance" in window;
+  let speechVoices=[];
+  let speechRun=0;
+
+  function voicesFor(language){
+    return speechVoices.filter(voice=>String(voice.lang||"").toLowerCase().startsWith(language));
+  }
+
+  function fillVoiceSelect(selector,voices,chosen,emptyLabel){
+    const select=$(selector);select.innerHTML="";
+    if(!voices.length){
+      const option=document.createElement("option");option.textContent=emptyLabel;option.value="";select.appendChild(option);select.disabled=true;return "";
+    }
+    select.disabled=false;
+    voices.forEach(voice=>{
+      const option=document.createElement("option");option.value=voice.name;
+      option.textContent=`${voice.name} (${voice.localService?"local":"online"})`;
+      select.appendChild(option);
+    });
+    const selected=voices.some(voice=>voice.name===chosen)?chosen:(voices.find(voice=>voice.default)||voices.find(voice=>voice.localService)||voices[0]).name;
+    select.value=selected;return selected;
+  }
+
+  function renderSpeechControls(){
+    $("#speechAuto").checked=state.speech.autoPlay;
+    $("#speechMeaning").checked=state.speech.speakMeaning;
+    $("#speechRate").value=String(state.speech.rate);
+    const status=$("#speechStatus");status.classList.remove("ready","unavailable");
+    if(!speechSupported){
+      status.classList.add("unavailable");$("#speechStatusTitle").textContent="Speech is not supported";
+      $("#speechStatusDetail").textContent="This browser cannot use built-in pronunciation.";
+      ["#speechAuto","#speechMeaning","#speechRate","#japaneseVoice","#englishVoice","#testJapaneseSpeech"].forEach(id=>$(id).disabled=true);
+      return;
+    }
+    const japanese=voicesFor("ja"),english=voicesFor("en");
+    state.speech.jaVoice=fillVoiceSelect("#japaneseVoice",japanese,state.speech.jaVoice,"No Japanese voice found");
+    state.speech.enVoice=fillVoiceSelect("#englishVoice",english,state.speech.enVoice,"No English voice found");
+    $("#testJapaneseSpeech").disabled=!japanese.length;
+    if(japanese.length){
+      const chosen=japanese.find(voice=>voice.name===state.speech.jaVoice)||japanese[0];
+      status.classList.add("ready");$("#speechStatusTitle").textContent="Japanese speech is ready";
+      $("#speechStatusDetail").textContent=chosen.localService?"The selected Japanese voice works locally and should work offline.":"The selected Japanese voice may require an internet connection.";
+    }else if(speechVoices.length){
+      status.classList.add("unavailable");$("#speechStatusTitle").textContent="No Japanese voice found";
+      $("#speechStatusDetail").textContent="Install a Japanese speech voice in your system, then reopen the app.";
+    }else{
+      $("#speechStatusTitle").textContent="Checking speech voices…";
+      $("#speechStatusDetail").textContent="Your browser has not reported its available voices yet.";
+    }
+  }
+
+  function refreshSpeechVoices(){
+    if(!speechSupported){renderSpeechControls();return}
+    speechVoices=window.speechSynthesis.getVoices();renderSpeechControls();
+  }
+
+  function selectedSpeechVoice(language){
+    const name=language==="ja"?state.speech.jaVoice:state.speech.enVoice;
+    return speechVoices.find(voice=>voice.name===name)||voicesFor(language)[0]||null;
+  }
+
+  function stopSpeech(){
+    speechRun++;
+    if(speechSupported)window.speechSynthesis.cancel();
+  }
+
+  function makeUtterance(text,language){
+    const utterance=new SpeechSynthesisUtterance(text);
+    utterance.lang=language==="ja"?"ja-JP":"en-US";
+    utterance.rate=Number(state.speech.rate)||.85;
+    const voice=selectedSpeechVoice(language);if(voice)utterance.voice=voice;
+    return utterance;
+  }
+
+  function cleanMeaningForSpeech(meaning){
+    return String(meaning||"").replace(/\//g," or ").replace(/[()]/g,", ").replace(/\s+/g," ").trim();
+  }
+
+  function speakWordSequence(word){
+    if(!speechSupported||!voicesFor("ja").length)return;
+    stopSpeech();const run=speechRun;
+    const japanese=makeUtterance(word.k,"ja");
+    japanese.onend=()=>{
+      if(run!==speechRun||!state.speech.speakMeaning)return;
+      setTimeout(()=>{
+        if(run!==speechRun)return;
+        window.speechSynthesis.speak(makeUtterance(`Meaning: ${cleanMeaningForSpeech(word.m)}`,"en"));
+      },220);
+    };
+    window.speechSynthesis.speak(japanese);
+  }
 
   function saveState(){
     state.savedAt=Date.now();
@@ -1138,6 +1274,7 @@
 
   function nextWordQuestion(){
     const s=sessions.words;
+    stopSpeech();
     s.n++;s.rescue=false;s.fontRetry=false;
     clearFeedback("words");hideRescue("words");
     $("#wordsNext").classList.add("hidden");$("#wordsDontKnow").classList.remove("hidden");
@@ -1222,6 +1359,11 @@
     $("#wordsNext").classList.remove("hidden");$("#wordsDontKnow").classList.add("hidden");
     setFeedback("words",true,`${word.k} → ${word.r}`,`${word.m} • ${meta}`);
     if(showComparison)appendGlyphComparison("words",word,s.currentFont||STANDARD_FONT);
+    const replay=document.createElement("button");replay.className="ghost speak-again";replay.type="button";replay.textContent="🔊 Replay word and meaning";
+    replay.disabled=!speechSupported||!voicesFor("ja").length;
+    replay.addEventListener("click",()=>speakWordSequence(word));
+    $("#wordsFeedback .meta").appendChild(replay);
+    if(state.speech.autoPlay)speakWordSequence(word);
     updateAllUI();focusInput("words");
   }
 
@@ -1436,6 +1578,20 @@
       <div><strong>${word.r}</strong><div class="tiny">${word.m} • ${s.correct}/${s.seen} correct</div><div class="meter"><span style="width:${Math.round(s.mastery)}%"></span></div></div>
       <strong>${Math.round(s.mastery)}%</strong>
     </div>`).join(""):`<span class="muted">No weak words in this set yet.</span>`;
+    const strong=pool.map(word=>({word,s:wordItemState(word.k)})).filter(x=>x.s.seen>0)
+      .sort((a,b)=>b.s.mastery-a.s.mastery||(b.s.correct/b.s.seen)-(a.s.correct/a.s.seen)).slice(0,10);
+    $("#strongWordList").innerHTML=strong.length?strong.map(({word,s})=>`<div class="trouble word-trouble">
+      <div class="word-small">${word.k}</div>
+      <div><strong>${word.r}</strong><div class="tiny">${word.m} • ${s.correct}/${s.seen} correct</div><div class="meter"><span style="width:${Math.round(s.mastery)}%"></span></div></div>
+      <strong>${Math.round(s.mastery)}%</strong>
+    </div>`).join(""):`<span class="muted">No words assessed in this set yet.</span>`;
+    const features=["Basic","Voiced","Semi-voiced","Combinations","Small っ","Long vowels","Long words"];
+    $("#wordFeatureProgress").innerHTML=features.map(feature=>{
+      const history=state.wordFeatureHistory[feature]||[],correct=history.reduce((sum,result)=>sum+result,0);
+      const accuracy=history.length?Math.round(correct/history.length*100)+"%":"Not assessed";
+      const boost=historyBoost(history);
+      return `<div class="feature-stat"><strong>${feature}</strong><span>${accuracy}${history.length?` • ${history.length} recent`:""}</span><span>Scheduling ${boost.toFixed(2)}×</span></div>`;
+    }).join("");
     document.querySelectorAll("[data-wordset]").forEach(b=>b.classList.toggle("active",b.dataset.wordset===state.wordSet));
   }
 
@@ -1452,6 +1608,7 @@
   }
 
   function switchTab(tab){
+    if(tab!=="words")stopSpeech();
     currentTab=tab;
     document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
     document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
@@ -1460,7 +1617,7 @@
     if(tab==="rehearse"){if(!sessions.rehearse.current)nextKanaQuestion("rehearse");else focusInput("rehearse")}
     if(tab==="words"){if(!sessions.words.current)nextWordQuestion();else focusInput("words")}
     if(tab==="fonts")renderFontTab();
-    if(tab==="progress")updateAllUI();
+    if(tab==="kanaprogress"||tab==="wordprogress")updateAllUI();
   }
 
   function exportProgress(){
@@ -1491,7 +1648,7 @@
         sessions.learn=newPracticeSession();
         sessions.rehearse=newPracticeSession();
         sessions.words=newPracticeSession();
-        renderRehearseSelectors();updateAllUI();
+        renderRehearseSelectors();renderSpeechControls();updateAllUI();
         $("#importStatus").textContent="Progress imported successfully. Your mastery and settings have been restored.";
         if(currentTab==="learn")nextKanaQuestion("learn");
         if(currentTab==="rehearse")nextKanaQuestion("rehearse");
@@ -1541,6 +1698,16 @@
   $("#wordsDontKnow").addEventListener("click",()=>handleWordTyped(true));
   $("#wordsNext").addEventListener("click",nextWordQuestion);
 
+  $("#speechAuto").addEventListener("change",e=>{state.speech.autoPlay=e.target.checked;saveState()});
+  $("#speechMeaning").addEventListener("change",e=>{state.speech.speakMeaning=e.target.checked;saveState()});
+  $("#speechRate").addEventListener("change",e=>{state.speech.rate=Number(e.target.value);saveState()});
+  $("#japaneseVoice").addEventListener("change",e=>{state.speech.jaVoice=e.target.value;saveState();renderSpeechControls()});
+  $("#englishVoice").addEventListener("change",e=>{state.speech.enVoice=e.target.value;saveState();renderSpeechControls()});
+  $("#testJapaneseSpeech").addEventListener("click",()=>{
+    if(!speechSupported||!voicesFor("ja").length)return;
+    stopSpeech();window.speechSynthesis.speak(makeUtterance("こんにちは。ひらがなの練習をしましょう。","ja"));
+  });
+
   document.addEventListener("keydown",e=>{
     if(e.key==="Enter"&&!e.defaultPrevented){
       const next=$("#"+currentTab+"Next");
@@ -1586,7 +1753,7 @@
     sessions.learn=newPracticeSession();
     sessions.rehearse=newPracticeSession();
     sessions.words=newPracticeSession();
-    renderRehearseSelectors();updateAllUI();switchTab("learn");nextKanaQuestion("learn");
+    renderRehearseSelectors();renderSpeechControls();updateAllUI();switchTab("learn");nextKanaQuestion("learn");
   });
 
   window.addEventListener("focus",()=>{
@@ -1596,6 +1763,9 @@
   });
 
   renderRehearseSelectors();
+  renderSpeechControls();
+  refreshSpeechVoices();
+  if(speechSupported)window.speechSynthesis.addEventListener("voiceschanged",refreshSpeechVoices);
   updateAllUI();
   nextKanaQuestion("learn");
 })();
