@@ -38,8 +38,8 @@
   .question{text-align:center;padding:30px 22px 16px}
   .question-label{color:var(--muted);font-size:.93rem}
   .font-note{display:inline-flex;align-items:center;margin-left:7px;border:1px solid var(--line);border-radius:999px;padding:2px 7px;color:#b8c3cf;background:rgba(255,255,255,.025);font-size:.72rem;font-weight:700;vertical-align:middle}
-  .prompt{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;font-size:clamp(5rem,15vw,9rem);line-height:1.05;margin:12px 0 14px;font-weight:600;letter-spacing:.03em}
-  .prompt.word{font-size:clamp(3rem,10vw,6.2rem);letter-spacing:.08em}
+  .prompt{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;font-size:clamp(6.5rem,18vw,11rem);line-height:1.05;margin:12px 0 14px;font-weight:600;letter-spacing:.03em}
+  .prompt.word{font-size:clamp(4rem,13vw,8rem);letter-spacing:.08em}
   .typing{width:min(830px,calc(100% - 28px));margin:0 auto 20px}
   .answer-input{width:100%;min-height:clamp(108px,15vw,150px);background:#0f141a;color:var(--text);caret-color:var(--accent);border:2px solid #414b58;border-radius:18px;padding:18px 24px;font-family:ui-monospace,"Cascadia Mono","Segoe UI Mono",monospace;font-size:clamp(3.5rem,11.25vw,6.75rem);font-weight:750;line-height:1;letter-spacing:.06em;text-align:center;outline:none}
   .answer-input::placeholder{font-family:inherit;font-size:clamp(.9rem,2.5vw,1.05rem);font-weight:500;letter-spacing:0;color:#788493}
