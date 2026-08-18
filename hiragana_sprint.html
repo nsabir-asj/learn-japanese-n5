@@ -98,6 +98,8 @@
   .meter{height:7px;background:#262d36;border-radius:999px;overflow:hidden;margin-top:6px}.meter span{display:block;height:100%;background:var(--accent)}
   .confusions{display:flex;gap:8px;flex-wrap:wrap}.confusion{border:1px solid var(--line);border-radius:999px;background:var(--panel3);padding:7px 10px}
   .font-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.font-stat{border:1px solid var(--line);border-radius:12px;background:var(--panel3);padding:11px 12px}.font-stat strong{display:block}.font-stat span{color:var(--muted);font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-size:.78rem}.font-preview{font-size:1.7rem;line-height:1.2;margin:7px 0}
+  .font-picker{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:14px}.font-select-card{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:13px;background:var(--panel3);padding:11px 12px}.font-select-card input{margin-top:3px;accent-color:var(--accent)}.font-select-card.fixed{border-color:rgba(88,166,255,.45);background:rgba(88,166,255,.06)}
+  .font-table-wrap{overflow:auto;max-height:72vh;border:1px solid var(--line);border-radius:14px;margin-top:14px}.font-table{width:100%;min-width:790px;border-collapse:separate;border-spacing:0;background:var(--panel3)}.font-table th,.font-table td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:9px 10px;text-align:center}.font-table th:last-child,.font-table td:last-child{border-right:0}.font-table thead th{position:sticky;top:0;z-index:3;background:#1b222b}.font-table .reading{position:sticky;left:0;z-index:2;width:110px;background:#171e26;text-align:left}.font-table thead .reading{z-index:4}.font-table .group-row th{background:#111820;color:var(--muted);font-size:.72rem;text-align:left;text-transform:uppercase;letter-spacing:.08em}.font-glyph{font-size:2rem;line-height:1.15}.font-table .inactive-font{opacity:.38}
   .save-status{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:13px;background:var(--panel3);padding:12px 13px}.save-dot{width:9px;height:9px;border-radius:50%;background:var(--good)}
   .big-button{border:0;border-radius:13px;background:var(--accent);color:#07111d;font-weight:900;padding:12px 15px}
   .word-settings{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
@@ -116,7 +118,7 @@
   @media(max-width:760px){
     header{display:block}.pill{display:inline-block;margin-top:11px}.stats{grid-template-columns:repeat(2,1fr)}
     .grid2{grid-template-columns:1fr}.options{grid-template-columns:repeat(2,1fr)}.row-select{grid-template-columns:1fr}
-    .word-settings{grid-template-columns:1fr}.session-summary{grid-template-columns:1fr}.progressbar{width:125px}.font-stats{grid-template-columns:repeat(2,1fr)}
+    .word-settings{grid-template-columns:1fr}.session-summary{grid-template-columns:1fr}.progressbar{width:125px}.font-stats,.font-picker{grid-template-columns:repeat(2,1fr)}
   }
 </style>
 </head>
@@ -141,6 +143,7 @@
     <button class="tab active" data-tab="learn">Learn</button>
     <button class="tab" data-tab="rehearse">Rehearse</button>
     <button class="tab" data-tab="words">Words</button>
+    <button class="tab" data-tab="fonts">Fonts</button>
     <button class="tab" data-tab="progress">Progress</button>
   </nav>
 
@@ -192,7 +195,7 @@
 
     <div class="rehearse-status">
       <div class="rehearse-status-main"><strong id="rehearseSetName">All basic</strong><span id="rehearseSetSummary">0 kana selected</span></div>
-      <div class="tiny"><span id="assessedCount">0</span> assessed · <span id="rehearseWeakCount">0</span> weak</div>
+      <div><div class="tiny"><span id="assessedCount">0</span> assessed · <span id="rehearseWeakCount">0</span> weak in this set</div><div class="tiny"><span id="rehearseAnswerTotal">0</span> total rehearsal answers · <span id="rehearseUniqueTotal">0</span> unique kana overall</div></div>
     </div>
 
     <div class="grid2">
@@ -250,7 +253,7 @@
         <div class="tiny" id="wordsCount">Question 1</div>
       </div>
       <div class="question">
-        <div class="question-label">Read this word in romaji</div>
+        <div class="question-label">Read this word in romaji <span class="font-note" id="wordsFontNote">Standard • selected globally</span></div>
         <div class="prompt word" id="wordsPrompt">ねこ</div>
       </div>
       <div class="typing">
@@ -263,6 +266,19 @@
         <div class="actions"><button class="ghost" id="wordsDontKnow">I don't know</button><button class="ghost hidden" id="wordsNext">Next <kbd>Enter</kbd></button></div>
         <span class="tiny">Correct word answers give a small amount of supporting evidence to their kana.</span>
       </div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-fonts">
+    <div class="card">
+      <h2>Practice fonts</h2>
+      <p class="muted">Standard is always enabled and remains the correction reference. Select any additional fonts to use across Learn, Rehearse, and Words. All difficult fonts are selected by default.</p>
+      <div class="font-picker" id="fontSelectors"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h2>Full kana comparison</h2>
+      <p class="muted">Each row shows the same kana across every font. Dimmed columns are available for comparison but will not appear in practice.</p>
+      <div class="font-table-wrap"><table class="font-table" id="fontComparison"></table></div>
     </div>
   </section>
 
@@ -424,6 +440,10 @@
     const ids={}; GROUPS.forEach(g=>ids[g.id]=g.phase==="Basic"); return ids;
   }
 
+  function defaultFontSelections(){
+    const selected={};FONT_PROFILES.forEach(font=>selected[font.id]=true);return selected;
+  }
+
   function defaultState(){
     return {
       version:3,
@@ -436,6 +456,7 @@
       rehearseItems:{},
       groupUnlockSource:{},
       rehearseGroups:defaultRehearseGroups(),
+      selectedFonts:defaultFontSelections(),
       rehearseSetOpen:false,
       rehearseHelpOpen:false,
       wordSet:"learned",
@@ -481,6 +502,9 @@
     if(!state.rehearseItems) state.rehearseItems={};
     if(!state.groupUnlockSource) state.groupUnlockSource={};
     if(!state.rehearseGroups) state.rehearseGroups=defaultRehearseGroups();
+    if(!state.selectedFonts)state.selectedFonts=defaultFontSelections();
+    FONT_PROFILES.forEach(font=>{if(typeof state.selectedFonts[font.id]!=="boolean")state.selectedFonts[font.id]=true});
+    state.selectedFonts.standard=true;
     if(typeof state.rehearseSetOpen!=="boolean") state.rehearseSetOpen=false;
     if(typeof state.rehearseHelpOpen!=="boolean") state.rehearseHelpOpen=false;
     if(!state.wordSet) state.wordSet="learned";
@@ -506,12 +530,18 @@
     return s.fontStats[fontId];
   }
 
+  function isFontEnabled(font){
+    return font.id==="standard"||state.selectedFonts[font.id]!==false;
+  }
+
   function chooseKanaFont(item,mode,session){
     const s=itemState(item.k);
     if(mode==="learn"&&s.mastery<55)return STANDARD_FONT;
+    const enabledVariants=FONT_PROFILES.slice(1).filter(isFontEnabled);
+    if(!enabledVariants.length)return STANDARD_FONT;
     const variedChance=mode==="rehearse"?.8:Math.min(.75,.35+(s.mastery-55)/112.5);
     if(Math.random()>=variedChance)return STANDARD_FONT;
-    let candidates=FONT_PROFILES.slice(1);
+    let candidates=enabledVariants;
     const last=session.lastFonts[session.lastFonts.length-1];
     if(candidates.length>1)candidates=candidates.filter(f=>f.id!==last);
     return weightedPick(candidates,font=>{
@@ -521,10 +551,24 @@
     });
   }
 
+  function chooseWordFont(word,session){
+    const enabledVariants=FONT_PROFILES.slice(1).filter(isFontEnabled);
+    if(!enabledVariants.length||Math.random()>=.8)return STANDARD_FONT;
+    let candidates=enabledVariants;
+    const last=session.lastFonts[session.lastFonts.length-1];
+    if(candidates.length>1)candidates=candidates.filter(font=>font.id!==last);
+    return weightedPick(candidates,font=>{
+      const results=word.u.map(k=>itemState(k).fontStats[font.id]).filter(Boolean);
+      if(!results.length)return 2.5;
+      const seen=results.reduce((sum,x)=>sum+x.seen,0),wrong=results.reduce((sum,x)=>sum+x.wrong,0);
+      return seen?1+(wrong/seen)*3:2.5;
+    });
+  }
+
   function applyPromptFont(mode,font){
     const prompt=$("#"+mode+"Prompt");
     prompt.style.fontFamily=font.family;
-    $("#"+mode+"FontNote").textContent=`${font.label} • ${font.gainMultiplier.toFixed(2)}× mastery`;
+    $("#"+mode+"FontNote").textContent=mode==="words"?`${font.label} • selected globally`:`${font.label} • ${font.gainMultiplier.toFixed(2)}× mastery`;
   }
 
   function appendGlyphComparison(mode,item,font){
@@ -984,8 +1028,9 @@
       return;
     }
     s.current=w;s.last.push(w.k);if(s.last.length>8)s.last.shift();
+    s.currentFont=chooseWordFont(w,s);s.lastFonts.push(s.currentFont.id);if(s.lastFonts.length>5)s.lastFonts.shift();
     if(s.resumeGrace>0)s.resumeGrace--;
-    $("#wordsPrompt").textContent=w.k;$("#wordsCount").textContent="Question "+s.n;
+    $("#wordsPrompt").textContent=w.k;applyPromptFont("words",s.currentFont);$("#wordsCount").textContent="Question "+s.n;
     focusInput("words");updateAllUI();
   }
 
@@ -1146,6 +1191,39 @@
     }).join("");
   }
 
+  function fontSummary(font){
+    let seen=0,correct=0;
+    allItems.forEach(item=>{const fs=itemState(item.k).fontStats[font.id];if(fs){seen+=fs.seen;correct+=fs.correct}});
+    return {seen,correct,accuracy:seen?Math.round(correct/seen*100):null};
+  }
+
+  function renderFontTab(){
+    const selectors=$("#fontSelectors");
+    selectors.innerHTML=FONT_PROFILES.map(font=>{
+      const summary=fontSummary(font),safeFamily=font.family.replaceAll('"',"'");
+      const accuracy=summary.seen?`${summary.accuracy}% • ${summary.seen} answers`:"Not assessed";
+      if(font.id==="standard")return `<div class="font-select-card fixed"><div style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">あきさりふ</div><span class="tiny">Always enabled • ${accuracy}</span></div></div>`;
+      return `<label class="font-select-card"><input type="checkbox" data-font-select="${font.id}" ${isFontEnabled(font)?"checked":""}><div style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">あきさりふ</div><span class="tiny">${font.difficulty} • ${font.gainMultiplier.toFixed(2)}×<br>${accuracy}</span></div></label>`;
+    }).join("");
+    selectors.querySelectorAll("[data-font-select]").forEach(input=>input.addEventListener("change",e=>{
+      state.selectedFonts[e.target.dataset.fontSelect]=e.target.checked;state.selectedFonts.standard=true;saveState();renderFontTab();
+    }));
+
+    const header=FONT_PROFILES.map(font=>{
+      const active=isFontEnabled(font),safeFamily=font.family.replaceAll('"',"'");
+      return `<th class="${active?"":"inactive-font"}" style="font-family:${safeFamily}">${font.label}<div class="tiny">${font.id==="standard"?"Always enabled":active?"Selected":"Not selected"}</div></th>`;
+    }).join("");
+    const rows=GROUPS.map(group=>{
+      const groupHead=`<tr class="group-row"><th colspan="${FONT_PROFILES.length+1}">${group.phase} • ${group.name}</th></tr>`;
+      const items=group.items.map(([kana,reading])=>`<tr><td class="reading"><strong>${reading}</strong><div class="tiny">${kana}</div></td>${FONT_PROFILES.map(font=>{
+        const safeFamily=font.family.replaceAll('"',"'");
+        return `<td class="font-glyph ${isFontEnabled(font)?"":"inactive-font"}" style="font-family:${safeFamily}">${kana}</td>`;
+      }).join("")}</tr>`).join("");
+      return groupHead+items;
+    }).join("");
+    $("#fontComparison").innerHTML=`<thead><tr><th class="reading">Reading</th>${header}</tr></thead><tbody>${rows}</tbody>`;
+  }
+
   function updateRehearseSummary(){
     const p=rehearsalPool();
     const assessed=p.filter(x=>itemState(x.k).seen>0).length;
@@ -1160,6 +1238,9 @@
     $("#assessedCountDetail").textContent=assessed;
     $("#rehearseWeakCount").textContent=weak;
     $("#rehearseWeakCountDetail").textContent=weak;
+    const rehearsalResults=Object.values(state.rehearseItems||{});
+    $("#rehearseAnswerTotal").textContent=rehearsalResults.reduce((sum,x)=>sum+(x.seen||0),0);
+    $("#rehearseUniqueTotal").textContent=rehearsalResults.filter(x=>(x.seen||0)>0).length;
     $("#rehearseSetName").textContent=setName;
     $("#rehearseSetSummary").textContent=`${p.length} kana selected`;
     $("#rehearseSetHeading").textContent=p.length?"Change rehearsal set":"Choose a rehearsal set";
@@ -1184,6 +1265,7 @@
 
   function updateAllUI(){
     updateTopStats();updateRehearseSummary();updateWordSummary();renderProgress();renderCurriculum();updateLastSaved();
+    if(currentTab==="fonts")renderFontTab();
   }
 
   function switchTab(tab){
@@ -1194,6 +1276,7 @@
     if(tab==="learn"){if(!sessions.learn.current)nextKanaQuestion("learn");else focusInput("learn")}
     if(tab==="rehearse"){if(!sessions.rehearse.current)nextKanaQuestion("rehearse");else focusInput("rehearse")}
     if(tab==="words"){if(!sessions.words.current)nextWordQuestion();else focusInput("words")}
+    if(tab==="fonts")renderFontTab();
     if(tab==="progress")updateAllUI();
   }
 
