@@ -97,7 +97,7 @@
   let currentTab="learn";
   const INACTIVITY_MS=2*60*1000;
   function newPracticeSession(){
-    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],lastScripts:[],fontRetry:false,rescue:false,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0};
+    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],lastScripts:[],fontRetry:false,rescue:false,typingRetryOffered:false,typingRetryTimer:null,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0};
   }
   const sessions={
     learn:newPracticeSession(),
@@ -641,6 +641,60 @@
     const el=$("#"+mode+"Feedback"); el.className="feedback"; el.innerHTML="";
   }
 
+  function clearTypingRetry(mode,expired=false){
+    const session=sessions[mode];
+    if(session.typingRetryTimer){
+      clearTimeout(session.typingRetryTimer);
+      session.typingRetryTimer=null;
+    }
+    const button=$("#"+mode+"Feedback .typing-retry");
+    if(!button)return;
+    if(expired){
+      button.disabled=true;
+      button.classList.add("expired");
+      const label=button.querySelector(".typing-retry-label");
+      if(label)label.textContent="Retry expired";
+      button.setAttribute("aria-label","Typing mistake retry expired");
+    }else{
+      const wrap=button.closest(".typing-retry-wrap");
+      if(wrap)wrap.remove();
+    }
+  }
+
+  function retryTypingMistake(mode){
+    const session=sessions[mode];
+    if(!session.current||!session.typingRetryTimer)return;
+    clearTypingRetry(mode);
+    session.fontRetry=false;
+    session.rescue=false;
+    hideRescue(mode);
+    clearFeedback(mode);
+    $("#"+mode+"Next").classList.add("hidden");
+    $("#"+mode+"DontKnow").classList.remove("hidden");
+    $("#"+mode+"Prompt").textContent=session.current.k;
+    applyPromptFont(mode,session.currentFont||STANDARD_FONT);
+    focusInput(mode);
+  }
+
+  function offerTypingRetry(mode){
+    const session=sessions[mode];
+    if(session.typingRetryOffered)return;
+    const host=$("#"+mode+"Feedback .meta");
+    if(!host)return;
+    session.typingRetryOffered=true;
+    const wrap=document.createElement("div");
+    wrap.className="typing-retry-wrap";
+    const button=document.createElement("button");
+    button.className="typing-retry";
+    button.type="button";
+    button.setAttribute("aria-label","Typing mistake? Retry this question. Shortcut: Escape");
+    button.innerHTML='<span class="typing-retry-label">Typing mistake? Retry</span><kbd>Esc</kbd><span class="typing-retry-bar" aria-hidden="true"></span>';
+    button.addEventListener("click",()=>retryTypingMistake(mode));
+    wrap.appendChild(button);
+    host.appendChild(wrap);
+    session.typingRetryTimer=setTimeout(()=>clearTypingRetry(mode,true),3000);
+  }
+
   function renderRescue(mode,target,pool){
     const wrap=$("#"+mode+"Rescue"), box=$("#"+mode+"Options");
     box.innerHTML="";
@@ -662,6 +716,7 @@
 
   function nextKanaQuestion(mode){
     const session=sessions[mode];
+    clearTypingRetry(mode);
     if(mode==="learn")maybeAutoUnlockLearn();
     const pool=mode==="learn"?learnPool():rehearsalPool();
     if(!pool.length){
@@ -669,7 +724,7 @@
       setFeedback(mode,false,"No kana selected","Choose at least one rehearsal row above.");
       return;
     }
-    session.n++;session.rescue=false;session.fontRetry=false;
+    session.n++;session.rescue=false;session.fontRetry=false;session.typingRetryOffered=false;
     clearFeedback(mode);hideRescue(mode);
     $("#"+mode+"Next").classList.add("hidden");
     $("#"+mode+"DontKnow").classList.remove("hidden");
@@ -688,6 +743,7 @@
   function handleKanaTyped(mode,forceWrong=false){
     const session=sessions[mode], item=session.current;
     if(!item||session.rescue)return;
+    clearTypingRetry(mode);
     noteSessionActivity(session);
     const input=$("#"+mode+"Input");
     const value=normalize(input.value);
@@ -711,6 +767,7 @@
         $("#"+mode+"DontKnow").classList.add("hidden");
         updateAllUI();
       }
+      if(!forceWrong&&value)offerTypingRetry(mode);
       return;
     }
     if(correct){
@@ -738,12 +795,14 @@
         $("#"+mode+"DontKnow").classList.add("hidden");
       }
       updateAllUI();
+      if(!forceWrong&&value)offerTypingRetry(mode);
     }
   }
 
   function handleKanaRescueChoice(mode,button,opt,target,pool){
     const session=sessions[mode];
     if(!session.rescue)return;
+    clearTypingRetry(mode);
     noteSessionActivity(session);
     if(!opt.correct){
       button.classList.add("wrong");button.disabled=true;
@@ -821,8 +880,9 @@
 
   function nextWordQuestion(){
     const s=sessions.words;
+    clearTypingRetry("words");
     stopSpeech();
-    s.n++;s.rescue=false;s.fontRetry=false;
+    s.n++;s.rescue=false;s.fontRetry=false;s.typingRetryOffered=false;
     clearFeedback("words");hideRescue("words");
     $("#wordsNext").classList.add("hidden");$("#wordsDontKnow").classList.remove("hidden");
     const w=selectWord();
@@ -903,6 +963,7 @@
 
   function finishWordRecognition(word,meta,showComparison=false){
     const s=sessions.words;
+    clearTypingRetry("words");
     s.fontRetry=false;s.rescue=false;
     $("#wordsNext").classList.remove("hidden");$("#wordsDontKnow").classList.add("hidden");
     setFeedback("words",true,`${word.k} → ${word.r}`,`${word.m} • ${meta}`);
@@ -931,6 +992,7 @@
   function handleWordTyped(forceWrong=false){
     const s=sessions.words,w=s.current;
     if(!w||s.rescue)return;
+    clearTypingRetry("words");
     noteSessionActivity(s);
     const input=$("#wordsInput"), value=normalize(input.value);
     const correct=!forceWrong&&isCorrectWordReading(w,value);
@@ -946,6 +1008,7 @@
         appendGlyphComparison("words",w,s.currentFont||STANDARD_FONT);
         renderWordRescue(w);$("#wordsDontKnow").classList.add("hidden");updateAllUI();
       }
+      if(!forceWrong&&value)offerTypingRetry("words");
       return;
     }
     if(correct){
@@ -967,11 +1030,13 @@
         renderWordRescue(w);$("#wordsDontKnow").classList.add("hidden");
       }
       updateAllUI();
+      if(!forceWrong&&value)offerTypingRetry("words");
     }
   }
 
   function handleWordRescueChoice(button,opt,word){
     const s=sessions.words;if(!s.rescue)return;
+    clearTypingRetry("words");
     noteSessionActivity(s);
     if(!opt.correct){button.classList.add("wrong");button.disabled=true;return}
     [...$("#wordsOptions").children].forEach(b=>{b.disabled=true;if(b.dataset.correct==="1")b.classList.add("correct")});
@@ -1181,6 +1246,7 @@
 
   function switchTab(tab){
     if(tab!=="words")stopSpeech();
+    ["learn","rehearse","words"].forEach(mode=>clearTypingRetry(mode));
     currentTab=tab;
     document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
     document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
@@ -1285,6 +1351,14 @@
   });
 
   document.addEventListener("keydown",e=>{
+    if(e.key==="Escape"&&(currentTab==="learn"||currentTab==="rehearse"||currentTab==="words")){
+      const session=sessions[currentTab];
+      if(session.typingRetryTimer){
+        e.preventDefault();
+        retryTypingMistake(currentTab);
+        return;
+      }
+    }
     if(e.key==="Enter"&&!e.defaultPrevented){
       const next=$("#"+currentTab+"Next");
       if(next&&!next.classList.contains("hidden")){

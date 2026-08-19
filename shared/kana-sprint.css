@@ -48,6 +48,15 @@
   .feedback{width:min(830px,calc(100% - 28px));margin:0 auto 16px;border:1px solid var(--line);background:var(--panel3);border-radius:14px;padding:14px 16px;display:none}
   .feedback.show{display:block}.feedback.good{border-color:rgba(63,185,80,.55)}.feedback.bad{border-color:rgba(248,81,73,.6)}
   .feedback strong{display:block;margin-bottom:4px}.feedback .meta{color:var(--muted);font-size:.9rem;line-height:1.45}
+  .typing-retry-wrap{display:flex;justify-content:center;margin-top:13px}
+  .typing-retry{position:relative;display:inline-flex;align-items:center;gap:9px;overflow:hidden;border:1px solid rgba(88,166,255,.72);border-radius:11px;background:rgba(88,166,255,.12);color:#dcecff;padding:9px 13px 12px;font-weight:800;box-shadow:0 5px 18px rgba(0,0,0,.16)}
+  .typing-retry:hover{border-color:#8cc4ff;background:rgba(88,166,255,.2)}
+  .typing-retry:focus-visible{outline:3px solid rgba(88,166,255,.32);outline-offset:2px}
+  .typing-retry-bar{position:absolute;left:0;bottom:0;width:100%;height:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transform-origin:left center;animation:typing-retry-timeout 3s linear forwards}
+  .typing-retry.expired{cursor:default;opacity:.55;border-color:var(--line);background:rgba(255,255,255,.035);color:var(--muted);box-shadow:none}
+  .typing-retry.expired .typing-retry-bar{display:none}
+  @keyframes typing-retry-timeout{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+  @media(prefers-reduced-motion:reduce){.typing-retry-bar{animation-timing-function:steps(3,end)}}
   .glyph-compare{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:12px}
   .glyph-sample{min-width:132px;border:1px solid var(--line);border-radius:12px;background:#0f141a;padding:9px 14px;text-align:center}
   .glyph-sample span{display:block;color:var(--muted);font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.03em;margin-bottom:3px}
