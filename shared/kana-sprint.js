@@ -641,12 +641,27 @@
     const el=$("#"+mode+"Feedback"); el.className="feedback"; el.innerHTML="";
   }
 
+  function setStandardReferencePending(mode,pending){
+    const samples=document.querySelectorAll("#"+mode+"Feedback .glyph-sample");
+    const standard=samples[samples.length-1];
+    if(!standard)return;
+    standard.classList.toggle("standard-pending",pending);
+    const caption=standard.querySelector("span");
+    const glyph=standard.querySelector("strong");
+    if(caption)caption.textContent=pending?"Standard reference • available shortly":"Standard reference";
+    if(glyph){
+      if(pending)glyph.setAttribute("aria-hidden","true");
+      else glyph.removeAttribute("aria-hidden");
+    }
+  }
+
   function clearTypingRetry(mode,expired=false){
     const session=sessions[mode];
     if(session.typingRetryTimer){
       clearTimeout(session.typingRetryTimer);
       session.typingRetryTimer=null;
     }
+    setStandardReferencePending(mode,false);
     const button=$("#"+mode+"Feedback .typing-retry");
     if(!button)return;
     if(expired){
@@ -692,6 +707,7 @@
     button.addEventListener("click",()=>retryTypingMistake(mode));
     wrap.appendChild(button);
     host.appendChild(wrap);
+    if((session.currentFont||STANDARD_FONT).id!=="standard")setStandardReferencePending(mode,true);
     session.typingRetryTimer=setTimeout(()=>clearTypingRetry(mode,true),3000);
   }
 

@@ -52,7 +52,7 @@ The **Kana Progress** and **Word Progress** tabs show mastery, weak items, commo
 
 - Type the romaji reading and press **Enter**.
 - After a correct word, press **Enter** again to move on.
-- After a typed wrong answer, **Typing mistake? Retry** is available for three seconds. Click it or press **Esc** to restore the same prompt and original font. The first result remains recorded, and the retry is offered only once for that question.
+- After a typed wrong answer, **Typing mistake? Retry** is available for three seconds. Click it or press **Esc** to restore the same prompt and original font. On difficult-font questions, the standard reference stays blurred until this window expires. The first result remains recorded, and the retry is offered only once for that question.
 - If rescue choices appear, click one or press **1–8**.
 - Use **I don't know** when you cannot recall the answer.
 
