@@ -1,11 +1,12 @@
 # Japanese Kana Sprint
 
-Two offline, adaptive reading trainers for Japanese kana:
+Three offline, adaptive reading trainers for Japanese kana:
 
 - **Hiragana Sprint** — hiragana characters, combinations, and beginner words.
 - **Katakana Sprint** — katakana characters, practical combinations, and beginner words.
+- **Kana Mix** — interleaved hiragana and katakana practice with adaptive script balancing.
 
-Both trainers share the same interface and learning system while keeping their progress separate.
+All three trainers share the same interface and learning system. Hiragana and Katakana keep their own mastery records; Kana Mix reads and updates both sets.
 
 ## Start the trainers
 
@@ -13,6 +14,7 @@ No installation or web server is needed. Open either file directly in a modern b
 
 - `hiragana_sprint.html`
 - `katakana_sprint.html`
+- `kana_sprint.html`
 
 Keep the `shared`, `lessons`, and `fonts` folders beside the HTML files. Moving only an HTML file will prevent the trainer from loading.
 
@@ -27,6 +29,8 @@ Introduces rows gradually. Weak kana return more often, while successful practic
 Lets you select any rows immediately. While unassessed kana remain, the trainer favors coverage so the last few unseen kana do not get starved by reviews. Once the selected set has been fully assessed, practice becomes fully adaptive.
 
 Recent mistakes increase the share of difficult sound categories, including voiced, semi-voiced, and combination kana. Mistake reviews are delayed enough to test recall instead of immediate repetition.
+
+In Kana Mix, the Script balance panel offers adaptive, even, focused, and custom Hiragana/Katakana ratios. Adaptive balance favors the weaker script while continuing to practise both.
 
 ### Words
 
@@ -59,6 +63,9 @@ Progress is automatically saved after answers and setting changes using the brow
 
 - Hiragana key: `hiragana-sprint-v3`
 - Katakana key: `katakana-sprint-v1`
+- Kana Mix settings key: `kana-sprint-mix-v1`
+
+Kana Mix merges the two script records when it opens. Every mixed answer is then written back to the appropriate Hiragana or Katakana record, so practising in Kana Mix also updates the corresponding individual trainer.
 
 This data belongs to that browser and computer. It is **not** saved as a file in this project folder. Clearing browser data, using another browser, or changing how the files are opened can make the saved progress unavailable.
 
@@ -80,6 +87,7 @@ Pronunciation uses the browser's built-in Web Speech API and does not require an
 Japanese-N5-lessons/
 ├── hiragana_sprint.html       Hiragana launcher
 ├── katakana_sprint.html       Katakana launcher
+├── kana_sprint.html           Combined Kana Mix launcher
 ├── shared/
 │   ├── kana-sprint.js         Shared trainer and adaptive logic
 │   └── kana-sprint.css        Shared interface styles
@@ -87,6 +95,7 @@ Japanese-N5-lessons/
 │   ├── hiragana-data.js       Hiragana curriculum and vocabulary
 │   ├── hiragana-fonts.css     Hiragana font definitions
 │   ├── katakana-data.js       Katakana curriculum and vocabulary
+│   ├── kana-mix-data.js       Combined curriculum and progress bridge
 │   └── katakana-fonts.css     Katakana font definitions
 └── fonts/                     Offline font files and licences
 ```
@@ -98,6 +107,7 @@ The launchers deliberately use ordinary deferred scripts rather than JavaScript 
 - To start over, use **Reset everything** in Kana Progress.
 - To move progress to another computer or browser, export the JSON backup, open the same trainer there, and import it.
 - Hiragana and Katakana backups are intentionally separate.
+- Resetting everything from Kana Mix resets the linked Hiragana and Katakana progress as well.
 
 ## Font licences
 

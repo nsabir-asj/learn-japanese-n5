@@ -101,6 +101,7 @@
   .seg{border:1px solid var(--line);border-radius:11px;background:var(--panel3);color:var(--muted);padding:10px 11px;font-weight:700}.seg.active{color:var(--text);border-color:#5c6878;background:var(--panel2)}
   .session-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.mini{border:1px solid var(--line);border-radius:11px;background:var(--panel3);padding:10px}.mini strong{display:block}
   .rehearse-status{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:14px 0;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:11px 14px}
+  .mix-balance{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(360px,1.2fr);align-items:center;gap:18px;margin:14px 0}.mix-balance h2{margin-bottom:4px}.mix-balance p{margin:0}.mix-balance .word-settings{margin:0}.mix-range{display:grid;gap:7px;margin-top:11px;color:var(--muted);font-size:.84rem}.mix-range input{width:100%;max-width:none;accent-color:var(--accent)}
   .rehearse-status-main{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.rehearse-status-main strong{font-size:.95rem}.rehearse-status-main span{color:var(--muted);font-size:.84rem}
   .details-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
   .details-card summary{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;cursor:pointer;padding:16px 18px;font-weight:800}
@@ -112,6 +113,6 @@
   .hidden{display:none!important}
   @media(max-width:760px){
     header{display:block}.pill{display:inline-block;margin-top:11px}.stats{grid-template-columns:repeat(2,1fr)}
-    .grid2{grid-template-columns:1fr}.options{grid-template-columns:repeat(2,1fr)}.row-select{grid-template-columns:1fr}
+    .grid2,.mix-balance{grid-template-columns:1fr}.options{grid-template-columns:repeat(2,1fr)}.row-select{grid-template-columns:1fr}
     .word-settings{grid-template-columns:1fr}.session-summary,.feature-grid{grid-template-columns:1fr}.progressbar{width:125px}.font-stats,.font-picker{grid-template-columns:repeat(2,1fr)}
   }

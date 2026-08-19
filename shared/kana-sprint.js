@@ -12,6 +12,12 @@
     .replaceAll("あ", LESSON.sampleKana)
     .replaceAll("ねこ", LESSON.sampleWord);
 
+  if(Array.isArray(LESSON.scriptBalanceProfiles)&&LESSON.scriptBalanceProfiles.length){
+    const balance=document.createElement("div");balance.className="card mix-balance";balance.id="scriptBalancePanel";
+    balance.innerHTML=`<div><h2>Script balance</h2><p class="muted">Control how often each script appears across Learn, Rehearse, and Words.</p></div><div class="mix-balance-controls"><div class="word-settings" id="scriptBalanceButtons"></div><label class="mix-range hidden" id="scriptBalanceRange"><span><strong id="hiraganaShareLabel">50%</strong> Hiragana · <strong id="katakanaShareLabel">50%</strong> Katakana</span><input id="hiraganaShare" type="range" min="10" max="90" step="5" value="50"></label></div>`;
+    document.querySelector(".rehearse-status").before(balance);
+  }
+
   const STORAGE_KEY = LESSON.storageKey;
   const FONT_PROFILES = LESSON.fontProfiles;
   const STANDARD_FONT=FONT_PROFILES[0];
@@ -23,9 +29,11 @@
 
   const allItems=[], byKana={}, groupByKana={};
   GROUPS.forEach((g,gi)=>g.items.forEach(([k,r])=>{
-    const item={k,r,group:g.id,groupIndex:gi};
+    const item={k,r,group:g.id,groupIndex:gi,script:LESSON.scriptForKana?LESSON.scriptForKana(k):LESSON.scriptNameLower};
     allItems.push(item); byKana[k]=item; groupByKana[k]=gi;
   }));
+
+  const SMALL_TSU=Array.isArray(LESSON.smallTsuList)?LESSON.smallTsuList:[LESSON.smallTsu];
 
   function splitWordKana(kana){
     const chars=[...kana],units=[];
@@ -38,7 +46,7 @@
 
   function wordFeatureLabels(word){
     const labels=[...new Set(word.u.map(k=>byKana[k]).filter(Boolean).map(itemPhase))];
-    if(word.units.includes(LESSON.smallTsu))labels.push(LESSON.smallTsuFeature);
+    if(SMALL_TSU.some(k=>word.units.includes(k)))labels.push(LESSON.smallTsuFeature);
     if(/ou|uu|oo|aa|ii/.test(word.r))labels.push("Long vowels");
     if(word.units.length>=5)labels.push("Long words");
     return [...new Set(labels)];
@@ -47,6 +55,7 @@
   WORDS.forEach(word=>{
     word.units=splitWordKana(word.k);
     word.u=[...new Set(word.units.filter(k=>byKana[k]))];
+    word.script=LESSON.scriptForKana?LESSON.scriptForKana(word.k):LESSON.scriptNameLower;
     word.a=Array.isArray(word.a)?word.a:[];
     word.features=wordFeatureLabels(word);
     word.difficulty=Math.min(5,1+(word.units.length>=4?1:0)+(word.features.includes("Voiced")||word.features.includes("Semi-voiced")?1:0)+(word.features.includes("Combinations")?1:0)+(word.features.includes(LESSON.smallTsuFeature)||word.features.includes("Long vowels")?1:0));
@@ -78,6 +87,8 @@
       rehearseHelpOpen:false,
       wordSet:"learned",
       speech:{autoPlay:true,speakMeaning:true,rate:.85,jaVoice:"",enVoice:""},
+      scriptBalance:LESSON.defaultScriptBalance||"adaptive",
+      hiraganaShare:50,
       savedAt:0
     };
   }
@@ -86,7 +97,7 @@
   let currentTab="learn";
   const INACTIVITY_MS=2*60*1000;
   function newPracticeSession(){
-    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],fontRetry:false,rescue:false,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0};
+    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],lastScripts:[],fontRetry:false,rescue:false,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0};
   }
   const sessions={
     learn:newPracticeSession(),
@@ -97,6 +108,10 @@
   const $=s=>document.querySelector(s);
 
   function loadState(){
+    const fallback=defaultState();
+    if(typeof LESSON.loadProgress==="function"){
+      try{return LESSON.loadProgress(fallback)||fallback}catch(e){console.warn("Could not load shared kana progress.",e);return fallback}
+    }
     try{
       const raw=localStorage.getItem(STORAGE_KEY);
       if(raw){
@@ -104,7 +119,7 @@
         if(x && x.version===LESSON.progressVersion) return x;
       }
     }catch(e){}
-    return defaultState();
+    return fallback;
   }
 
   function ensureStateShape(){
@@ -133,6 +148,8 @@
     if(![.75,.85,1].includes(Number(state.speech.rate)))state.speech.rate=.85;
     if(typeof state.speech.jaVoice!=="string")state.speech.jaVoice="";
     if(typeof state.speech.enVoice!=="string")state.speech.enVoice="";
+    if(!state.scriptBalance)state.scriptBalance=LESSON.defaultScriptBalance||"adaptive";
+    if(!Number.isFinite(Number(state.hiraganaShare)))state.hiraganaShare=50;
     if(!Number.isFinite(state.learnUnlockedCount)) state.learnUnlockedCount=5;
   }
   ensureStateShape();
@@ -233,6 +250,9 @@
   function saveState(){
     state.savedAt=Date.now();
     localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+    if(typeof LESSON.saveProgress==="function"){
+      try{LESSON.saveProgress(state)}catch(e){console.warn("Could not synchronize shared kana progress.",e)}
+    }
     updateLastSaved();
   }
 
@@ -382,6 +402,34 @@
     return historyBoost(recent);
   }
 
+  function scriptBalanceWeight(entry,pool,session,stateFor){
+    if(!Array.isArray(LESSON.scriptBalanceProfiles)||LESSON.scriptBalanceProfiles.length<2)return 1;
+    const scripts=[...new Set(pool.map(x=>x.script).filter(Boolean))];
+    if(scripts.length<2||!entry.script)return 1;
+    const profile=LESSON.scriptBalanceProfiles.find(x=>x.id===state.scriptBalance)||LESSON.scriptBalanceProfiles[0];
+    let shares={...(profile.shares||{})};
+    if(profile.adaptive){
+      const needs={};
+      scripts.forEach(script=>{
+        const entries=pool.filter(x=>x.script===script);
+        needs[script]=entries.reduce((sum,x)=>{
+          const s=stateFor(x);return sum+(100-(s.mastery||0))+(!s.seen?30:0)+(s.lastWasCorrect===false?25:0);
+        },0)/Math.max(1,entries.length);
+      });
+      const total=scripts.reduce((sum,script)=>sum+needs[script],0)||scripts.length;
+      scripts.forEach(script=>shares[script]=Math.max(.25,Math.min(.75,needs[script]/total)));
+      const normalized=scripts.reduce((sum,script)=>sum+shares[script],0);
+      scripts.forEach(script=>shares[script]/=normalized);
+    }else if(profile.custom){
+      shares.hiragana=Number(state.hiraganaShare)/100;
+      shares.katakana=1-shares.hiragana;
+    }
+    const fallback=1/scripts.length;
+    const recent=session.lastScripts||[];
+    const observed=(recent.filter(script=>script===entry.script).length+1)/(recent.length+scripts.length);
+    return Math.max(.35,Math.min(3,(shares[entry.script]||fallback)/observed));
+  }
+
   function itemPhase(item){
     return GROUPS[item.groupIndex].phase;
   }
@@ -529,7 +577,7 @@
       w+=(100-s.mastery)/12;
       if(s.dueAt<=now)w+=session.resumeGrace>0?1:3;
       if(s.wrong>s.correct)w+=2;
-      return w*phaseBoost(itemPhase(x));
+      return w*phaseBoost(itemPhase(x))*scriptBalanceWeight(x,pool,session,item=>itemState(item.k));
     });
     session.sinceUnseen=itemState(chosen.k).seen?((session.sinceUnseen||0)+1):0;
     return chosen;
@@ -539,6 +587,11 @@
     const r=target.r;
     const vowel=r.endsWith("a")?"a":r.endsWith("i")?"i":r.endsWith("u")?"u":r.endsWith("e")?"e":r.endsWith("o")?"o":"";
     return vowel?allItems.filter(x=>x.k!==target.k&&x.r.endsWith(vowel)):[];
+  }
+
+  function itemForReading(reading,preferredScript=""){
+    const normalized=normalize(reading);
+    return allItems.find(item=>item.script===preferredScript&&normalize(item.r)===normalized)||allItems.find(item=>normalize(item.r)===normalized)||null;
   }
 
   function distractorItems(target,pool){
@@ -622,6 +675,7 @@
     $("#"+mode+"DontKnow").classList.remove("hidden");
     const item=selectKana(pool,session,mode);
     session.current=item;session.last.push(item.k);if(session.last.length>12)session.last.shift();
+    session.lastScripts.push(item.script);if(session.lastScripts.length>12)session.lastScripts.shift();
     session.currentFont=chooseKanaFont(item,mode,session);session.lastFonts.push(session.currentFont.id);if(session.lastFonts.length>5)session.lastFonts.shift();
     if(session.resumeGrace>0)session.resumeGrace--;
     $("#"+mode+"Prompt").textContent=item.k;
@@ -646,7 +700,7 @@
         appendGlyphComparison(mode,item,session.currentFont||STANDARD_FONT);
         setTimeout(()=>nextKanaQuestion(mode),450);
       }else{
-        const wrongItem=value?allItems.find(x=>x.r===value)||null:null;
+        const wrongItem=value?itemForReading(value,item.script):null;
         if(wrongItem)recordRescueConfusion(item,wrongItem);
         session.fontRetry=false;session.rescue=true;
         input.value="";input.blur();
@@ -666,7 +720,7 @@
       input.value="";
       setTimeout(()=>nextKanaQuestion(mode),180);
     }else{
-      const wrongItem=value?allItems.find(x=>x.r===value)||null:null;
+      const wrongItem=value?itemForReading(value,item.script):null;
       applyKanaResult(item,false,wrongItem,mode,session.currentFont);
       session.forced[item.k]=session.n+mistakeReviewOffset(itemState(item.k).errorStreak||1);
       const typedNote=value?`You typed “${value}”.`:"Marked as unknown.";
@@ -761,7 +815,7 @@
       if(ws.lastWasCorrect===false)weight+=3;
       if(ws.seen&&ws.dueAt<=now)weight+=2;
       if(!ws.seen)weight*=Math.max(.7,1.5-(w.difficulty-1)*.16);
-      return weight*wordFeatureBoost(w);
+      return weight*wordFeatureBoost(w)*scriptBalanceWeight(w,pool,session,word=>wordItemState(word.k));
     });
   }
 
@@ -778,6 +832,7 @@
       return;
     }
     s.current=w;s.last.push(w.k);if(s.last.length>8)s.last.shift();
+    s.lastScripts.push(w.script);if(s.lastScripts.length>12)s.lastScripts.shift();
     s.currentFont=chooseWordFont(w,s);s.lastFonts.push(s.currentFont.id);if(s.lastFonts.length>5)s.lastFonts.shift();
     if(s.resumeGrace>0)s.resumeGrace--;
     $("#wordsPrompt").textContent=w.k;applyPromptFont("words",s.currentFont);$("#wordsCount").textContent="Question "+s.n;
@@ -831,14 +886,14 @@
   }
 
   function recordWordKanaConfusions(word,value){
-    if(!value||word.units.includes(LESSON.smallTsu))return;
+    if(!value||SMALL_TSU.some(k=>word.units.includes(k)))return;
     const expected=word.units.map(k=>byKana[k]&&byKana[k].r);
     if(expected.some(x=>!x)||expected.join("").length!==value.length)return;
     let offset=0,changed=false;
     word.units.forEach((targetKana,index)=>{
       const expectedReading=expected[index],typedReading=value.slice(offset,offset+expectedReading.length);offset+=expectedReading.length;
       if(normalize(typedReading)===normalize(expectedReading))return;
-      const typedItem=allItems.find(item=>normalize(item.r)===normalize(typedReading));
+      const typedItem=itemForReading(typedReading,byKana[targetKana]&&byKana[targetKana].script);
       if(!typedItem||typedItem.k===targetKana)return;
       const target=itemState(targetKana);
       target.confusions[typedItem.k]=(target.confusions[typedItem.k]||0)+1;changed=true;
@@ -1088,6 +1143,29 @@
     document.querySelectorAll("[data-wordset]").forEach(b=>b.classList.toggle("active",b.dataset.wordset===state.wordSet));
   }
 
+  function renderScriptBalance(){
+    const panel=$("#scriptBalancePanel");if(!panel)return;
+    panel.querySelectorAll("[data-script-balance]").forEach(button=>button.classList.toggle("active",button.dataset.scriptBalance===state.scriptBalance));
+    const profile=LESSON.scriptBalanceProfiles.find(x=>x.id===state.scriptBalance);
+    const range=$("#scriptBalanceRange");range.classList.toggle("hidden",!profile||!profile.custom);
+    $("#hiraganaShare").value=String(state.hiraganaShare);
+    $("#hiraganaShareLabel").textContent=state.hiraganaShare+"%";
+    $("#katakanaShareLabel").textContent=(100-state.hiraganaShare)+"%";
+  }
+
+  function setupScriptBalance(){
+    const host=$("#scriptBalanceButtons");if(!host)return;
+    host.innerHTML=LESSON.scriptBalanceProfiles.map(profile=>`<button class="seg" data-script-balance="${profile.id}">${profile.label}</button>`).join("");
+    host.querySelectorAll("[data-script-balance]").forEach(button=>button.addEventListener("click",()=>{
+      state.scriptBalance=button.dataset.scriptBalance;saveState();renderScriptBalance();
+    }));
+    $("#hiraganaShare").addEventListener("input",event=>{
+      state.hiraganaShare=Number(event.target.value);renderScriptBalance();
+    });
+    $("#hiraganaShare").addEventListener("change",saveState);
+    renderScriptBalance();
+  }
+
   function updateLastSaved(){
     const el=$("#lastSaved");
     if(!state.savedAt){el.textContent="Not saved yet";return}
@@ -1097,6 +1175,7 @@
 
   function updateAllUI(){
     updateTopStats();updateRehearseSummary();updateWordSummary();renderProgress();renderCurriculum();updateLastSaved();
+    renderScriptBalance();
     if(currentTab==="fonts")renderFontTab();
   }
 
@@ -1246,7 +1325,8 @@
 
   $("#resetProgress").addEventListener("click",()=>{
     if(!confirm("Reset all mastery, mistakes, word stats, and selections? This cannot be undone."))return;
-    localStorage.removeItem(STORAGE_KEY);state=defaultState();saveState();
+    if(typeof LESSON.resetProgress==="function")LESSON.resetProgress();else localStorage.removeItem(STORAGE_KEY);
+    state=defaultState();saveState();
     sessions.learn=newPracticeSession();
     sessions.rehearse=newPracticeSession();
     sessions.words=newPracticeSession();
@@ -1259,6 +1339,7 @@
     if(currentTab==="words"&&!sessions.words.rescue)focusInput("words");
   });
 
+  setupScriptBalance();
   renderRehearseSelectors();
   renderSpeechControls();
   refreshSpeechVoices();

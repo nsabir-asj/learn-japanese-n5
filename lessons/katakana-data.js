@@ -155,4 +155,6 @@
     extraWords:EXTRA_WORDS,
     testSpeech:{ja:"こんにちは。カタカナの練習をしましょう。",en:"Meaning: hotel."}
   };
+  window.KANA_SPRINT_LESSONS = window.KANA_SPRINT_LESSONS || {};
+  window.KANA_SPRINT_LESSONS.katakana = window.KANA_SPRINT_LESSON;
 })();

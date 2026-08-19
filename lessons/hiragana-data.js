@@ -180,4 +180,6 @@
       en: "Meaning: school."
     }
   };
+  window.KANA_SPRINT_LESSONS = window.KANA_SPRINT_LESSONS || {};
+  window.KANA_SPRINT_LESSONS.hiragana = window.KANA_SPRINT_LESSON;
 })();
