@@ -50,9 +50,13 @@ When a difficult-font answer is wrong, the standard form appears beside it for o
 
 ### Mnemonics
 
-Learn and Rehearse include an optional **Need a mnemonic?** hint for individual kana. A hinted correct answer receives 40% of the usual mastery gain and does not increase the unaided streak. After a rescue correction, the relevant memory hook is shown automatically.
+Learn and Rehearse include an optional **Need a mnemonic?** hint for individual kana. When the local chart crops are present, the first click shows a visual-only card and a correct answer receives about 70% of the usual mastery gain. A second click reveals the full answer mnemonic and a correct answer receives 40%. Assisted answers do not increase the unaided streak. After a rescue correction, the relevant full visual mnemonic is shown automatically.
 
-The **Mnemonics** tab contains built-in shape-and-sound stories for the basic hiragana and katakana. Voiced kana and combinations derive a memory hook from their base form and sound marks. You can edit any hook, restore its built-in version, and filter the list to weak, mistaken, assisted, or customized kana. Custom mnemonics and hint statistics are included in automatic saves and exported progress.
+The **Mnemonics** tab contains built-in shape-and-sound stories for the basic hiragana and katakana, with lazy-loaded chart art when available. Voiced kana and combinations derive a memory hook from their base form and sound marks. You can edit any hook, restore its built-in version, and filter the list to weak, mistaken, assisted, or customized kana. Custom mnemonics and hint statistics are included in automatic saves and exported progress. If local artwork is absent, every hint falls back to the text mnemonic.
+
+### Local mnemonic artwork
+
+The supplied Tofugu charts are third-party artwork. The generated crops belong under `assets/local-mnemonics/` and are intentionally ignored by Git. Keep them on the local machine unless you have redistribution permission. To regenerate them from the two source JPEGs, run `scripts/crop_tofugu_mnemonics.py` with `--hiragana`, `--katakana`, and (optionally) `--output assets/local-mnemonics`. The utility validates the 3300×2550 source size, the 46-panel Hiragana/Katakana layouts, duplicate/missing assignments, and writes a manifest with the crop coordinates. The application code and mapping remain usable without those files.
 
 ### Progress
 
@@ -103,7 +107,12 @@ Japanese-N5-lessons/
 ├── kana_sprint.html           Combined Kana Mix launcher
 ├── shared/
 │   ├── kana-sprint.js         Shared trainer and adaptive logic
-│   └── kana-sprint.css        Shared interface styles
+│   ├── kana-sprint.css        Shared interface styles
+│   └── kana-mnemonic-assets.js  Local-art mapping with text fallback
+├── scripts/
+│   └── crop_tofugu_mnemonics.py  Deterministic crop/validation utility
+├── assets/
+│   └── local-mnemonics/       Ignored user-supplied chart crops
 ├── lessons/
 │   ├── hiragana-data.js       Hiragana curriculum and vocabulary
 │   ├── hiragana-fonts.css     Hiragana font definitions

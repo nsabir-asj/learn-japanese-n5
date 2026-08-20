@@ -89,6 +89,7 @@
   .mnemonic-hint{border-color:rgba(163,113,247,.48);color:#c9aeff}.mnemonic-hint:hover{border-color:#b98cff;background:rgba(163,113,247,.09)}.mnemonic-hint:disabled{opacity:.5;cursor:default}
   .mnemonic-card{display:grid;grid-template-columns:74px minmax(0,1fr);align-items:center;gap:13px;margin-top:12px;border:1px solid rgba(163,113,247,.42);border-radius:13px;background:linear-gradient(135deg,rgba(163,113,247,.11),rgba(88,166,255,.055));padding:12px 14px;color:var(--text)}
   .mnemonic-glyph{font-size:3.25rem;line-height:1;text-align:center}.mnemonic-card-label{display:block;color:#d2baff;font-size:.75rem;font-weight:850;letter-spacing:.03em;margin-bottom:4px}.mnemonic-card p{margin:0;color:#c9d2dc;line-height:1.5}
+  .mnemonic-card.has-art{grid-template-columns:minmax(170px,245px) minmax(0,1fr);align-items:start}.mnemonic-card-art,.mnemonic-library-art{overflow:hidden;border:1px solid rgba(163,113,247,.34);border-radius:10px;background:#fff}.mnemonic-card-art img,.mnemonic-library-art img{display:block;width:100%;height:auto}.mnemonic-card.is-visual .mnemonic-card-art{border-color:rgba(88,166,255,.42)}.mnemonic-library-art{margin-top:1px}.mnemonic-library-art:empty{display:none}
   .rescue-wrap{width:min(830px,calc(100% - 28px));margin:0 auto 20px;display:none}
   .rescue-wrap.show{display:block}
   .rescue-title{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:9px}
@@ -158,5 +159,5 @@
     .grid2,.mix-balance,.pace-control{grid-template-columns:1fr}.options{grid-template-columns:repeat(2,1fr)}.row-select{grid-template-columns:1fr}
     .pace-range{grid-template-columns:auto 1fr}.pace-range>span:first-child{text-align:left}
     .word-settings{grid-template-columns:1fr}.session-summary,.feature-grid{grid-template-columns:1fr}.progressbar{width:125px}.font-stats,.font-picker{grid-template-columns:repeat(2,1fr)}
-    .streak-progress-heading,.mnemonic-heading{display:block}.streak-record,.mnemonic-filter{margin-top:12px}.streak-tier-guide{grid-template-columns:repeat(auto-fit,minmax(104px,1fr))}.mnemonic-card{grid-template-columns:58px 1fr}.mnemonic-glyph{font-size:2.7rem}
+    .streak-progress-heading,.mnemonic-heading{display:block}.streak-record,.mnemonic-filter{margin-top:12px}.streak-tier-guide{grid-template-columns:repeat(auto-fit,minmax(104px,1fr))}.mnemonic-card{grid-template-columns:58px 1fr}.mnemonic-card.has-art{grid-template-columns:1fr}.mnemonic-glyph{font-size:2.7rem}
   }

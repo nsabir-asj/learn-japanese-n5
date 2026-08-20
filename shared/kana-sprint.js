@@ -3,6 +3,7 @@
 
   const LESSON = window.KANA_SPRINT_LESSON;
   if (!LESSON) throw new Error("Kana Sprint lesson data was not loaded.");
+  const MNEMONIC_ASSETS = window.KANA_SPRINT_MNEMONIC_ASSETS || {};
 
   document.title = LESSON.appName + " — Adaptive Trainer";
   const APP_MARKUP = "<div class=\"wrap\">\n  <header>\n    <div>\n      <h1>{{APP_NAME}}</h1>\n      <p class=\"subtitle\">Type-first adaptive {{SCRIPT_LOWER}} practice with varied fonts, targeted review, and word-meaning reinforcement.</p>\n    </div>\n    <div class=\"pill\">Standalone • offline • auto-saved</div>\n  </header>\n\n  <section class=\"stats\">\n    <div class=\"stat\"><strong id=\"sMastered\">0</strong><span>mastered kana</span></div>\n    <div class=\"stat\"><strong id=\"sAccuracy\">—</strong><span>overall accuracy</span></div>\n    <div class=\"stat\"><strong id=\"sStreak\">0</strong><span>current streak</span></div>\n    <div class=\"stat\"><strong id=\"sWeak\">0</strong><span>weak / due kana</span></div>\n  </section>\n\n  <nav class=\"tabs\">\n    <button class=\"tab active\" data-tab=\"learn\">Learn</button>\n    <button class=\"tab\" data-tab=\"rehearse\">Rehearse</button>\n    <button class=\"tab\" data-tab=\"words\">Words</button>\n    <button class=\"tab\" data-tab=\"fonts\">Fonts</button>\n    <button class=\"tab\" data-tab=\"kanaprogress\">Kana Progress</button>\n    <button class=\"tab\" data-tab=\"wordprogress\">Word Progress</button>\n  </nav>\n\n  <section class=\"panel active\" id=\"panel-learn\">\n    <div class=\"trainer\" data-trainer=\"learn\">\n      <div class=\"trainer-top\">\n        <div class=\"mode-tag\"><span class=\"dot\"></span><span id=\"learnMode\">Learn • adaptive rows</span></div>\n        <div class=\"tiny\" id=\"learnCount\">Question 1</div>\n      </div>\n      <div class=\"question\">\n        <div class=\"question-label\">Type the romaji reading <span class=\"font-note\" id=\"learnFontNote\">Standard font</span></div>\n        <div class=\"prompt\" id=\"learnPrompt\">あ</div>\n      </div>\n      <div class=\"typing\">\n        <input id=\"learnInput\" class=\"answer-input\" autocomplete=\"off\" autocapitalize=\"off\" spellcheck=\"false\" placeholder=\"Type the reading and press Enter\" />\n        <div class=\"typing-hint\">A hard-font mistake shows the standard form for one retry. Another mistake opens rescue choices.</div>\n      </div>\n      <div class=\"feedback\" id=\"learnFeedback\"></div>\n      <div class=\"rescue-wrap\" id=\"learnRescue\"><div class=\"rescue-title\">Choose the correct reading to reinforce the mistake</div><div class=\"options\" id=\"learnOptions\"></div></div>\n      <div class=\"footer-actions\">\n        <div class=\"actions\"><button class=\"ghost\" id=\"learnDontKnow\">I don't know</button><button class=\"ghost hidden\" id=\"learnNext\">Next <kbd>Enter</kbd></button></div>\n        <div style=\"display:flex;align-items:center;gap:10px\"><span class=\"tiny\" id=\"learnProgressText\">Unlocked mastery</span><div class=\"progressbar\"><span id=\"learnProgress\"></span></div></div>\n      </div>\n    </div>\n    <div class=\"callout\">Learn mode unlocks rows gradually. Rows can also unlock independently when Rehearse demonstrates that you already know every kana in that row.</div>\n  </section>\n\n  <section class=\"panel\" id=\"panel-rehearse\">\n    <div class=\"trainer\" data-trainer=\"rehearse\">\n      <div class=\"trainer-top\">\n        <div class=\"mode-tag\"><span class=\"dot\"></span><span>Rehearse • selected rows</span></div>\n        <div class=\"tiny\" id=\"rehearseCount\">Question 1</div>\n      </div>\n      <div class=\"question\">\n        <div class=\"question-label\">Type the romaji reading <span class=\"font-note\" id=\"rehearseFontNote\">Standard font</span></div>\n        <div class=\"prompt\" id=\"rehearsePrompt\">あ</div>\n      </div>\n      <div class=\"typing\">\n        <input id=\"rehearseInput\" class=\"answer-input\" autocomplete=\"off\" autocapitalize=\"off\" spellcheck=\"false\" placeholder=\"Type the reading and press Enter\" />\n        <div class=\"typing-hint\">Hard font mistake → compare with standard → retry once → rescue choices if still wrong.</div>\n      </div>\n      <div class=\"feedback\" id=\"rehearseFeedback\"></div>\n      <div class=\"rescue-wrap\" id=\"rehearseRescue\"><div class=\"rescue-title\">Choose the correct reading</div><div class=\"options\" id=\"rehearseOptions\"></div></div>\n      <div class=\"footer-actions\">\n        <div class=\"actions\"><button class=\"ghost\" id=\"rehearseDontKnow\">I don't know</button><button class=\"ghost hidden\" id=\"rehearseNext\">Next <kbd>Enter</kbd></button></div>\n        <span class=\"tiny\">Keyboard: <kbd>1</kbd>–<kbd>8</kbd> for rescue choices</span>\n      </div>\n    </div>\n\n    <div class=\"rehearse-status\">\n      <div class=\"rehearse-status-main\"><strong id=\"rehearseSetName\">All basic</strong><span id=\"rehearseSetSummary\">0 kana selected</span></div>\n      <div><div class=\"tiny\"><span id=\"assessedCount\">0</span> assessed · <span id=\"rehearseWeakCount\">0</span> weak in this set</div><div class=\"tiny\"><span id=\"rehearseAnswerTotal\">0</span> total rehearsal answers · <span id=\"rehearseUniqueTotal\">0</span> unique kana overall</div></div>\n    </div>\n\n    <div class=\"grid2\">\n      <details class=\"details-card\" id=\"rehearseSetPanel\">\n        <summary><span id=\"rehearseSetHeading\">Change rehearsal set</span></summary>\n        <div class=\"details-body\">\n        <p class=\"muted\">For material you have already studied. Selected rows are available immediately—no unlocking required.</p>\n        <div class=\"actions\" style=\"margin-bottom:10px\">\n          <button class=\"ghost\" id=\"selectBasic\">Select all basic</button>\n          <button class=\"ghost\" id=\"selectAll\">Select everything</button>\n          <button class=\"ghost\" id=\"clearRows\">Clear</button>\n        </div>\n        <div id=\"rehearseSelectors\"></div>\n        </div>\n      </details>\n      <details class=\"details-card\" id=\"rehearseHelpPanel\">\n        <summary>How rehearsal adapts</summary>\n        <div class=\"details-body\">\n        <p class=\"muted\">Until every selected kana is assessed, 65% of normal questions introduce unseen kana and one is guaranteed after four review questions. After full coverage, review becomes fully adaptive. Recent difficulty can increase a sound category up to 2×. Harder fonts award up to 1.35× mastery for a correct first attempt. A hard-font mistake gives you one standard-form retry before the rescue choices appear.</p>\n        <div class=\"session-summary\">\n          <div class=\"mini\"><strong id=\"selectedCount\">0</strong><span class=\"tiny\">selected kana</span></div>\n          <div class=\"mini\"><strong id=\"assessedCountDetail\">0</strong><span class=\"tiny\">already assessed</span></div>\n          <div class=\"mini\"><strong id=\"rehearseWeakCountDetail\">0</strong><span class=\"tiny\">weak in selection</span></div>\n        </div>\n        </div>\n      </details>\n    </div>\n  </section>\n\n  <section class=\"panel\" id=\"panel-words\">\n    <div class=\"grid2\" style=\"margin-bottom:14px\">\n      <div class=\"card\">\n        <h2>Word reading</h2>\n        <p class=\"muted\">Read whole {{SCRIPT_LOWER}} words instead of isolated characters. The vocabulary here is supplemental beginner practice.</p>\n        <div class=\"word-settings\">\n          <button class=\"seg active\" data-wordset=\"learned\">Learned kana only</button>\n          <button class=\"seg\" data-wordset=\"basic\">All basic</button>\n          <button class=\"seg\" data-wordset=\"all\">All available words</button>\n        </div>\n      </div>\n      <div class=\"card\">\n        <h2>Speech</h2>\n        <div class=\"speech-status\" id=\"speechStatus\"><span class=\"speech-dot\"></span><div><strong id=\"speechStatusTitle\">Checking speech voices…</strong><div class=\"tiny\" id=\"speechStatusDetail\">Your browser will report whether Japanese pronunciation is available.</div></div></div>\n        <div class=\"speech-controls\">\n          <label class=\"toggle-line\"><input type=\"checkbox\" id=\"speechAuto\"> Automatically pronounce recognized words</label>\n          <label class=\"toggle-line\"><input type=\"checkbox\" id=\"speechMeaning\"> Also pronounce the English meaning</label>\n          <label class=\"tiny\" for=\"speechRate\">Speed</label>\n          <select id=\"speechRate\"><option value=\"0.75\">Slow</option><option value=\"0.85\">Clear</option><option value=\"1\">Normal</option></select>\n          <label class=\"tiny\" for=\"japaneseVoice\">Japanese voice</label>\n          <select id=\"japaneseVoice\"></select>\n          <label class=\"tiny\" for=\"englishVoice\">English voice</label>\n          <select id=\"englishVoice\"></select>\n          <div class=\"actions\"><button class=\"ghost\" id=\"testJapaneseSpeech\">Test Japanese voice</button><button class=\"ghost\" id=\"testEnglishSpeech\">Test English voice</button></div>\n        </div>\n      </div>\n    </div>\n\n    <div class=\"trainer\" data-trainer=\"words\">\n      <div class=\"trainer-top\">\n        <div class=\"mode-tag\"><span class=\"dot\"></span><span>Words • typed reading</span></div>\n        <div class=\"tiny\" id=\"wordsCount\">Question 1</div>\n      </div>\n      <div class=\"question\">\n        <div class=\"question-label\">Read this word in romaji <span class=\"font-note\" id=\"wordsFontNote\">Standard • selected globally</span></div>\n        <div class=\"prompt word\" id=\"wordsPrompt\">ねこ</div>\n      </div>\n      <div class=\"typing\">\n        <input id=\"wordsInput\" class=\"answer-input\" autocomplete=\"off\" autocapitalize=\"off\" spellcheck=\"false\" placeholder=\"Type the word in romaji and press Enter\" />\n        <div class=\"typing-hint\">Correct recognition reveals the meaning. Press Enter again for the next word.</div>\n      </div>\n      <div class=\"feedback\" id=\"wordsFeedback\"></div>\n      <div class=\"rescue-wrap\" id=\"wordsRescue\"><div class=\"rescue-title\">Choose the correct reading</div><div class=\"options\" id=\"wordsOptions\"></div></div>\n      <div class=\"footer-actions\">\n        <div class=\"actions\"><button class=\"ghost\" id=\"wordsDontKnow\">I don't know</button><button class=\"ghost hidden\" id=\"wordsNext\">Next <kbd>Enter</kbd></button></div>\n        <span class=\"tiny\">Correct word answers give a small amount of supporting evidence to their kana.</span>\n      </div>\n    </div>\n  </section>\n\n  <section class=\"panel\" id=\"panel-fonts\">\n    <div class=\"card\">\n      <h2>Practice fonts</h2>\n      <p class=\"muted\">Standard is always enabled and remains the correction reference. Select any additional fonts to use across Learn, Rehearse, and Words. All difficult fonts are selected by default.</p>\n      <div class=\"font-picker\" id=\"fontSelectors\"></div>\n    </div>\n    <div class=\"card\" style=\"margin-top:14px\">\n      <h2>Full kana comparison</h2>\n      <p class=\"muted\">Each row shows the same kana across every font. Dimmed columns are available for comparison but will not appear in practice.</p>\n      <div class=\"font-table-wrap\"><table class=\"font-table\" id=\"fontComparison\"></table></div>\n    </div>\n  </section>\n\n  <section class=\"panel\" id=\"panel-kanaprogress\">\n    <div class=\"grid2\">\n      <div class=\"card\">\n        <h2>Progress & backup</h2>\n        <div class=\"save-status\"><span class=\"save-dot\"></span><div><strong>Progress is auto-saved locally</strong><div class=\"tiny\" id=\"lastSaved\">Not saved yet</div></div></div>\n        <p class=\"muted\">Export a portable JSON backup whenever you want. Importing restores mastery, mistakes, confusion pairs, settings, and rehearsal selections.</p>\n        <div class=\"actions\">\n          <button class=\"big-button\" id=\"exportProgress\">Export progress</button>\n          <button class=\"ghost\" id=\"importProgressBtn\">Import progress</button>\n          <input id=\"importProgressFile\" type=\"file\" accept=\".json,application/json\" class=\"hidden\" />\n          <button class=\"ghost danger\" id=\"resetProgress\">Reset everything</button>\n        </div>\n        <div class=\"callout\" id=\"importStatus\">Tip: keep the exported JSON next to this HTML if you want an easy manual backup between computers or browsers.</div>\n      </div>\n      <div class=\"card\">\n        <h2>Learn curriculum</h2>\n        <p class=\"muted\">Learn unlocks rows in sequence, while Rehearse can unlock any row by demonstrating prior knowledge. The tags show which path unlocked each row.</p>\n        <div class=\"rows\" id=\"curriculumRows\"></div>\n      </div>\n    </div>\n\n    <div class=\"grid2\" style=\"margin-top:14px\">\n      <div class=\"card\">\n        <h2>Weak kana</h2>\n        <div class=\"trouble-list\" id=\"troubleList\"></div>\n      </div>\n      <div class=\"card\">\n        <h2>Common confusions</h2>\n        <p class=\"muted\">Wrong typed answers and wrong rescue selections build these pairs.</p>\n        <div class=\"confusions\" id=\"confusionList\"></div>\n      </div>\n    </div>\n    <div class=\"card\" style=\"margin-top:14px\">\n      <h2>Font recognition</h2>\n      <p class=\"muted\">Varied-font results are tracked separately. Learn introduces them after a kana is familiar; Rehearse mixes them immediately.</p>\n      <div class=\"font-stats\" id=\"fontRecognition\"></div>\n    </div>\n  </section>\n\n  <section class=\"panel\" id=\"panel-wordprogress\">\n    <div class=\"grid2\">\n      <div class=\"card\">\n        <h2>Word progress</h2>\n        <p class=\"muted\">These totals use the word set currently selected in Word mode. Detailed answers stay here, away from the active question.</p>\n        <div class=\"session-summary\">\n          <div class=\"mini\"><strong id=\"wordPoolCount\">0</strong><span class=\"tiny\">words in pool</span></div>\n          <div class=\"mini\"><strong id=\"wordSeen\">0</strong><span class=\"tiny\">total word answers</span></div>\n          <div class=\"mini\"><strong id=\"wordUnique\">0</strong><span class=\"tiny\">unique words assessed</span></div>\n          <div class=\"mini\"><strong id=\"wordUnseen\">0</strong><span class=\"tiny\">unseen in this pool</span></div>\n          <div class=\"mini\"><strong id=\"wordWeak\">0</strong><span class=\"tiny\">weak words</span></div>\n          <div class=\"mini\"><strong id=\"wordMastered\">0</strong><span class=\"tiny\">mastered words</span></div>\n        </div>\n        <div class=\"tiny\" id=\"wordAccuracy\" style=\"margin-top:9px\">Word accuracy: —</div>\n      </div>\n      <div class=\"card\">\n        <h2>Recent feature performance</h2>\n        <p class=\"muted\">Accuracy over the latest 30 answers in each feature. Lower accuracy makes that feature appear more often.</p>\n        <div class=\"feature-grid\" id=\"wordFeatureProgress\"></div>\n      </div>\n    </div>\n    <div class=\"grid2\" style=\"margin-top:14px\">\n      <div class=\"card\">\n        <h2>Weak words</h2>\n        <p class=\"muted\">Ranked by low mastery, recent mistakes, and accuracy within the current word set.</p>\n        <div class=\"trouble-list\" id=\"weakWordList\"></div>\n      </div>\n      <div class=\"card\">\n        <h2>Strongest words</h2>\n        <p class=\"muted\">The most secure words in the current set.</p>\n        <div class=\"trouble-list\" id=\"strongWordList\"></div>\n      </div>\n    </div>\n  </section>\n</div>";
@@ -28,7 +29,7 @@
   document.querySelector('.tab[data-tab="fonts"]').before(mnemonicTab);
   const mnemonicPanel=document.createElement("section");
   mnemonicPanel.className="panel";mnemonicPanel.id="panel-mnemonics";
-  mnemonicPanel.innerHTML=`<div class="card"><div class="mnemonic-heading"><div><h2>Kana mnemonics</h2><p class="muted">Use these shape-and-sound stories when a kana will not stick. You can replace any built-in mnemonic with one that is more memorable to you.</p></div><label class="mnemonic-filter"><span>Show</span><select id="mnemonicFilter"><option value="all">All kana</option><option value="weak">Weak kana</option><option value="assisted">Used a hint</option><option value="mistakes">Mistaken kana</option><option value="custom">My custom mnemonics</option></select></label></div><div class="callout">A requested hint gives 40% of the normal mastery gain. It counts as correct if you then type it correctly, but it does not increase your unaided streak.</div><div class="mnemonic-grid" id="mnemonicGrid"></div></div>`;
+  mnemonicPanel.innerHTML=`<div class="card"><div class="mnemonic-heading"><div><h2>Kana mnemonics</h2><p class="muted">Use these shape-and-sound stories when a kana will not stick. You can replace any built-in mnemonic with one that is more memorable to you.</p></div><label class="mnemonic-filter"><span>Show</span><select id="mnemonicFilter"><option value="all">All kana</option><option value="weak">Weak kana</option><option value="assisted">Used a hint</option><option value="mistakes">Mistaken kana</option><option value="custom">My custom mnemonics</option></select></label></div><div class="callout">When local chart art is available, the first hint is visual-only and awards about 70% of normal mastery. A second hint reveals the full answer mnemonic and awards 40%. Neither assisted result increases the unaided streak; rescue corrections show the full visual mnemonic automatically.</div><div class="mnemonic-grid" id="mnemonicGrid"></div></div>`;
   document.querySelector("#panel-fonts").before(mnemonicPanel);
   ["learn","rehearse"].forEach(mode=>{
     const button=document.createElement("button");
@@ -153,7 +154,7 @@
   let currentTab="learn";
   const INACTIVITY_MS=2*60*1000;
   function newPracticeSession(){
-    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],lastScripts:[],fontRetry:false,rescue:false,mnemonicUsed:false,typingRetryOffered:false,typingRetryTimer:null,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0};
+    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],lastScripts:[],fontRetry:false,rescue:false,mnemonicUsed:false,mnemonicStage:0,typingRetryOffered:false,typingRetryTimer:null,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0};
   }
   const sessions={
     learn:newPracticeSession(),
@@ -415,24 +416,55 @@
     return typeof custom==="string"&&custom.trim()?custom.trim():builtInMnemonic(item);
   }
 
-  function appendMnemonicCard(mode,item,label="Memory hook"){
+  function mnemonicAsset(item){
+    const asset=MNEMONIC_ASSETS[item.k];
+    return asset&&typeof asset==="object"?asset:null;
+  }
+
+  function appendMnemonicCard(mode,item,label="Memory hook",kind="full"){
     const host=$("#"+mode+"Feedback .meta");if(!host)return;
     const card=document.createElement("div");card.className="mnemonic-card";
+    const asset=mnemonicAsset(item),source=asset&&(kind==="visual"?asset.visual:asset.full);
     const glyph=document.createElement("strong");glyph.className="mnemonic-glyph";glyph.textContent=item.k;glyph.style.fontFamily=STANDARD_FONT.family;
     const copy=document.createElement("div");
-    const heading=document.createElement("span");heading.className="mnemonic-card-label";heading.textContent=`${label} • ${item.k} = ${item.r}`;
-    const text=document.createElement("p");text.textContent=mnemonicText(item);
-    copy.append(heading,text);card.append(glyph,copy);host.appendChild(card);
+    const heading=document.createElement("span");heading.className="mnemonic-card-label";heading.textContent=kind==="visual"?`${label} • ${item.k}`:`${label} • ${item.k} = ${item.r}`;
+    const text=document.createElement("p");text.textContent=kind==="visual"&&source?"Study the shape and illustration, then type the reading you remember.":mnemonicText(item);
+    copy.append(heading,text);
+    if(source){
+      const art=document.createElement("div");art.className="mnemonic-card-art";
+      const image=document.createElement("img");image.src=source;image.loading="lazy";image.decoding="async";image.alt=kind==="visual"?`Visual mnemonic for ${item.k}`:`Full mnemonic for ${item.k} (${item.r})`;
+      image.addEventListener("error",()=>{
+        art.remove();card.classList.remove("has-art",`is-${kind}`);text.textContent=mnemonicText(item);card.prepend(glyph);
+        const fallbackSession=sessions[mode];
+        if(kind==="visual"&&fallbackSession&&fallbackSession.current===item&&fallbackSession.mnemonicStage===1){
+          fallbackSession.mnemonicStage=2;
+          const button=$("#"+mode+"Mnemonic");button.textContent="Answer mnemonic shown";button.disabled=true;
+          const meta=$("#"+mode+"Feedback .meta");if(meta)meta.firstChild.textContent="The visual asset was unavailable, so the text mnemonic is shown. This answer will earn 40% of its usual mastery gain and will not increase the unaided streak.";
+        }
+      });
+      art.appendChild(image);
+      card.replaceChildren(art,copy);card.classList.add("has-art",`is-${kind}`);
+    }else card.append(glyph,copy);
+    host.appendChild(card);
   }
 
   function showMnemonicHint(mode){
     const session=sessions[mode],item=session.current;
-    if(!item||session.rescue||session.fontRetry||session.mnemonicUsed)return;
+    if(!item||session.rescue||session.fontRetry||session.mnemonicStage>=2)return;
     session.mnemonicUsed=true;
     const s=itemState(item.k);s.mnemonicViews++;
-    const feedback=$("#"+mode+"Feedback");feedback.className="feedback show hint";feedback.innerHTML='<strong>💡 Mnemonic hint</strong><div class="meta">This answer will earn 40% of its usual mastery gain and will not increase the unaided streak.</div>';
-    appendMnemonicCard(mode,item,"Hint");
-    $("#"+mode+"Mnemonic").disabled=true;
+    const hasVisual=Boolean(mnemonicAsset(item)?.visual);
+    if(session.mnemonicStage===0&&hasVisual){
+      session.mnemonicStage=1;
+      const feedback=$("#"+mode+"Feedback");feedback.className="feedback show hint";feedback.innerHTML='<strong>💡 Visual mnemonic hint</strong><div class="meta">This answer will earn about 70% of its usual mastery gain and will not increase the unaided streak. Need the answer text? Ask again.</div>';
+      appendMnemonicCard(mode,item,"Visual clue","visual");
+      const button=$("#"+mode+"Mnemonic");button.textContent="Show answer mnemonic";button.disabled=false;
+    }else{
+      session.mnemonicStage=2;
+      const feedback=$("#"+mode+"Feedback");feedback.className="feedback show hint";feedback.innerHTML='<strong>💡 Answer mnemonic</strong><div class="meta">This answer will earn 40% of its usual mastery gain and will not increase the unaided streak.</div>';
+      appendMnemonicCard(mode,item,"Answer mnemonic","full");
+      $("#"+mode+"Mnemonic").textContent="Answer mnemonic shown";$("#"+mode+"Mnemonic").disabled=true;
+    }
     saveState();const input=$("#"+mode+"Input");requestAnimationFrame(()=>input.focus({preventScroll:true}));
   }
 
@@ -864,7 +896,7 @@
       setFeedback(mode,false,"No kana selected","Choose at least one rehearsal row above.");
       return;
     }
-    session.n++;session.rescue=false;session.fontRetry=false;session.mnemonicUsed=false;session.typingRetryOffered=false;
+    session.n++;session.rescue=false;session.fontRetry=false;session.mnemonicUsed=false;session.mnemonicStage=0;session.typingRetryOffered=false;
     clearFeedback(mode);hideRescue(mode);
     $("#"+mode+"Next").classList.add("hidden");
     $("#"+mode+"DontKnow").classList.remove("hidden");
@@ -913,13 +945,15 @@
     }
     if(correct){
       const assisted=session.mnemonicUsed;
-      applyKanaResult(item,true,null,mode,session.currentFont,assisted?.4:1);
-      setFeedback(mode,true,`${item.k} = ${item.r}`,assisted?"Correct with a mnemonic. Press Enter or Next when the memory hook is clear.":"Correct. Moving on.");
+      const mnemonicMultiplier=session.mnemonicStage===1?.7:.4;
+      applyKanaResult(item,true,null,mode,session.currentFont,assisted?mnemonicMultiplier:1);
+      const assistedLabel=session.mnemonicStage===1?"Correct with the visual hint. Press Enter or Next when the image is clear.":"Correct with the answer mnemonic. Press Enter or Next when the memory hook is clear.";
+      setFeedback(mode,true,`${item.k} = ${item.r}`,assisted?assistedLabel:"Correct. Moving on.");
       if(mode==="learn")maybeAutoUnlockLearn();
       input.value="";
       if(assisted){
         input.disabled=true;$("#"+mode+"Next").classList.remove("hidden");$("#"+mode+"DontKnow").classList.add("hidden");
-        appendMnemonicCard(mode,item,"Used for this answer");
+        appendMnemonicCard(mode,item,session.mnemonicStage===1?"Visual hint used":"Answer mnemonic used",session.mnemonicStage===1?"visual":"full");
         updateAllUI();
       }else setTimeout(()=>nextKanaQuestion(mode),180);
     }else{
@@ -962,7 +996,7 @@
     $("#"+mode+"Next").classList.remove("hidden");
     setFeedback(mode,true,`${target.k} = ${target.r}`,"Correction reinforced. Press Enter or Next.");
     appendGlyphComparison(mode,target,session.currentFont||STANDARD_FONT);
-    appendMnemonicCard(mode,target,"Remember after this correction");
+    appendMnemonicCard(mode,target,"Remember after this correction","full");
     focusInput(mode);
     updateAllUI();
   }
@@ -1285,10 +1319,15 @@
     host.innerHTML="";
     if(!items.length){host.innerHTML='<div class="muted mnemonic-empty">No kana match this filter yet.</div>';return}
     items.forEach(item=>{
-      const s=itemState(item.k),builtIn=builtInMnemonic(item),custom=state.customMnemonics[item.k]||"";
+      const s=itemState(item.k),builtIn=builtInMnemonic(item),custom=state.customMnemonics[item.k]||"",asset=mnemonicAsset(item);
       const card=document.createElement("article");card.className="mnemonic-library-card";
-      card.innerHTML=`<div class="mnemonic-library-top"><strong class="mnemonic-library-glyph"></strong><div><strong>${item.r}</strong><span>${GROUPS[item.groupIndex].name} • ${custom.trim()?"Custom":"Built in"}</span></div></div><label>Memory hook<textarea rows="4"></textarea></label><div class="tiny mnemonic-stats">${s.mnemonicViews} hint view${s.mnemonicViews===1?"":"s"} • ${s.assistedCorrect} assisted correct • ${s.wrong} mistake${s.wrong===1?"":"s"}</div><div class="actions"><button class="ghost" data-save-mnemonic>Save</button><button class="ghost" data-restore-mnemonic ${custom.trim()?"":"disabled"}>Restore built-in</button></div>`;
+      card.innerHTML=`<div class="mnemonic-library-top"><strong class="mnemonic-library-glyph"></strong><div><strong>${item.r}</strong><span>${GROUPS[item.groupIndex].name} • ${custom.trim()?"Custom":"Built in"}</span></div></div><div class="mnemonic-library-art" aria-label="Full visual mnemonic"></div><label>Memory hook<textarea rows="4"></textarea></label><div class="tiny mnemonic-stats">${s.mnemonicViews} hint view${s.mnemonicViews===1?"":"s"} • ${s.assistedCorrect} assisted correct • ${s.wrong} mistake${s.wrong===1?"":"s"}</div><div class="actions"><button class="ghost" data-save-mnemonic>Save</button><button class="ghost" data-restore-mnemonic ${custom.trim()?"":"disabled"}>Restore built-in</button></div>`;
       const glyph=card.querySelector(".mnemonic-library-glyph");glyph.textContent=item.k;glyph.style.fontFamily=STANDARD_FONT.family;
+      const art=card.querySelector(".mnemonic-library-art");
+      if(asset&&asset.full){
+        const image=document.createElement("img");image.src=asset.full;image.loading="lazy";image.decoding="async";image.alt=`Full mnemonic for ${item.k} (${item.r})`;
+        image.addEventListener("error",()=>art.remove());art.appendChild(image);
+      }else art.remove();
       const textarea=card.querySelector("textarea");textarea.value=custom.trim()?custom:builtIn;
       card.querySelector("[data-save-mnemonic]").addEventListener("click",()=>{
         const value=textarea.value.trim();

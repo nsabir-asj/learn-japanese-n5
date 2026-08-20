@@ -1,0 +1,5 @@
+assets/local-mnemonics/*
+!assets/local-mnemonics/README.md
+!assets/local-mnemonics/.gitkeep
+scripts/__pycache__/
+work-*.jpg
