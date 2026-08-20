@@ -38,6 +38,10 @@ Practises whole words in romaji. A correct answer reveals the English meaning; p
 
 If Japanese speech is available in the browser, the trainer can pronounce the word and optionally its English meaning. The Speech panel reports whether suitable voices were found and includes test buttons.
 
+### Learning pace
+
+Learn, Rehearse, and Words each have a saved five-position pace control. Learn adjusts how often unassessed kana appear within unlocked rows, Rehearse adjusts coverage of the selected set, and Words adjusts new vocabulary frequency. Scheduled mistake reviews always take priority, and a pace control stops affecting selection once its current pool is fully assessed.
+
 ### Fonts
 
 Standard print is always enabled. Additional handwriting-style fonts can be selected for all practice modes. Harder fonts award slightly more mastery for a correct first attempt.

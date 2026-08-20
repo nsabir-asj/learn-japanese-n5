@@ -12,6 +12,18 @@
     .replaceAll("あ", LESSON.sampleKana)
     .replaceAll("ねこ", LESSON.sampleWord);
 
+  [
+    {mode:"learn",title:"New kana pace",label:"How often Learn introduces an unassessed kana from the unlocked rows."},
+    {mode:"rehearse",title:"Coverage pace",label:"How quickly Rehearse assesses unseen kana from the selected rows."},
+    {mode:"words",title:"New word pace",label:"How often Word mode introduces a word you have not assessed yet."}
+  ].forEach(config=>{
+    const control=document.createElement("div");
+    control.className="pace-control";
+    control.innerHTML=`<div class="pace-copy"><strong>${config.title}</strong><span>${config.label}</span><span class="pace-description" id="${config.mode}PaceDescription"></span></div><label class="pace-range" for="${config.mode}Pace"><span id="${config.mode}PaceValue">Balanced</span><input id="${config.mode}Pace" type="range" min="0" max="4" step="1" value="2" aria-label="${config.title}"><span class="pace-scale"><span>More review</span><span>More new</span></span></label>`;
+    document.querySelector(`#panel-${config.mode} .trainer`).before(control);
+  });
+  document.querySelector("#rehearseHelpPanel .muted").textContent="Until every selected kana is assessed, the Coverage pace setting controls how often unseen kana appear and guarantees that they cannot be starved by ordinary reviews. After full coverage, review becomes fully adaptive. Scheduled mistake reviews always take priority. Recent difficulty can increase a sound category up to 2×, and harder fonts award more mastery for correct first attempts.";
+
   if(Array.isArray(LESSON.scriptBalanceProfiles)&&LESSON.scriptBalanceProfiles.length){
     const balance=document.createElement("div");balance.className="card mix-balance";balance.id="scriptBalancePanel";
     balance.innerHTML=`<div><h2>Script balance</h2><p class="muted">Control how often each script appears across Learn, Rehearse, and Words.</p></div><div class="mix-balance-controls"><div class="word-settings" id="scriptBalanceButtons"></div><label class="mix-range hidden" id="scriptBalanceRange"><span><strong id="hiraganaShareLabel">50%</strong> Hiragana · <strong id="katakanaShareLabel">50%</strong> Katakana</span><input id="hiraganaShare" type="range" min="10" max="90" step="5" value="50"></label></div>`;
@@ -34,6 +46,20 @@
   }));
 
   const SMALL_TSU=Array.isArray(LESSON.smallTsuList)?LESSON.smallTsuList:[LESSON.smallTsu];
+  const KANA_PACE_PROFILES=[
+    {label:"Review-heavy",share:.15,guarantee:10},
+    {label:"Gentle",share:.30,guarantee:7},
+    {label:"Balanced",share:.45,guarantee:5},
+    {label:"Fast",share:.65,guarantee:4},
+    {label:"Rapid coverage",share:.80,guarantee:2}
+  ];
+  const WORD_PACE_PROFILES=[
+    {label:"Review-heavy",early:.25,late:.10,guarantee:10},
+    {label:"Gentle",early:.40,late:.15,guarantee:7},
+    {label:"Balanced",early:.60,late:.20,guarantee:5},
+    {label:"Fast",early:.75,late:.30,guarantee:4},
+    {label:"Rapid coverage",early:.85,late:.40,guarantee:2}
+  ];
 
   function splitWordKana(kana){
     const chars=[...kana],units=[];
@@ -89,6 +115,7 @@
       speech:{autoPlay:true,speakMeaning:true,rate:.85,jaVoice:"",enVoice:""},
       scriptBalance:LESSON.defaultScriptBalance||"adaptive",
       hiraganaShare:50,
+      pace:{learn:2,rehearse:3,words:2},
       savedAt:0
     };
   }
@@ -150,6 +177,11 @@
     if(typeof state.speech.enVoice!=="string")state.speech.enVoice="";
     if(!state.scriptBalance)state.scriptBalance=LESSON.defaultScriptBalance||"adaptive";
     if(!Number.isFinite(Number(state.hiraganaShare)))state.hiraganaShare=50;
+    if(!state.pace)state.pace={learn:2,rehearse:3,words:2};
+    [["learn",2],["rehearse",3],["words",2]].forEach(([mode,fallback])=>{
+      const value=Number(state.pace[mode]);
+      state.pace[mode]=Number.isFinite(value)?Math.max(0,Math.min(4,Math.round(value))):fallback;
+    });
     if(!Number.isFinite(state.learnUnlockedCount)) state.learnUnlockedCount=5;
   }
   ensureStateShape();
@@ -565,8 +597,8 @@
     const unseen=pool.filter(x=>!waiting.has(x.k)&&!itemState(x.k).seen);
     let bucket=candidates;
     if(unseen.length){
-      const newShare=mode==="rehearse"?.65:.45;
-      const chooseUnseen=(session.sinceUnseen||0)>=4||Math.random()<newShare;
+      const pace=KANA_PACE_PROFILES[state.pace[mode]]||KANA_PACE_PROFILES[2];
+      const chooseUnseen=(session.sinceUnseen||0)>=pace.guarantee||Math.random()<pace.share;
       const review=candidates.filter(x=>itemState(x.k).seen);
       bucket=chooseUnseen||!review.length?unseen:review;
     }
@@ -865,7 +897,9 @@
     const dueForced=Object.entries(session.forced||{}).filter(([,at])=>at<=session.n).map(([k])=>WORDS.find(w=>w.k===k)).filter(w=>w&&pool.includes(w));
     if(dueForced.length){
       const chosen=dueForced[Math.floor(Math.random()*dueForced.length)];
-      delete session.forced[chosen.k];return chosen;
+      delete session.forced[chosen.k];
+      if(pool.some(w=>!wordItemState(w.k).seen))session.sinceUnseen=(session.sinceUnseen||0)+1;
+      return chosen;
     }
     const waiting=new Set(Object.entries(session.forced||{}).filter(([,at])=>at>session.n).map(([k])=>k));
     let candidates=pool.filter(w=>!waiting.has(w.k)&&!session.last.slice(-6).includes(w.k));
@@ -876,15 +910,16 @@
     const seen=candidates.filter(w=>wordItemState(w.k).seen);
     const weak=seen.filter(w=>isWeakWordState(wordItemState(w.k)));
     const coverage=pool.filter(w=>wordItemState(w.k).seen).length/pool.length;
-    const newShare=coverage<.8?.60:.20;
+    const pace=WORD_PACE_PROFILES[state.pace.words]||WORD_PACE_PROFILES[2];
+    const newShare=coverage<.8?pace.early:pace.late;
     const weakShare=coverage<.8?.25:.45;
     const roll=Math.random();
     let bucket;
-    if(unseen.length&&roll<newShare)bucket=unseen;
-    else if(weak.length&&roll<newShare+weakShare)bucket=weak;
+    if(unseen.length&&((session.sinceUnseen||0)>=pace.guarantee||roll<newShare))bucket=unseen;
+    else if(weak.length&&roll<(unseen.length?newShare+weakShare:.55))bucket=weak;
     else bucket=seen.length?seen:candidates;
     const now=Date.now();
-    return weightedPick(bucket,w=>{
+    const chosen=weightedPick(bucket,w=>{
       const ws=wordItemState(w.k);
       let weight=1+(100-ws.mastery)/15;
       if(ws.lastWasCorrect===false)weight+=3;
@@ -892,6 +927,8 @@
       if(!ws.seen)weight*=Math.max(.7,1.5-(w.difficulty-1)*.16);
       return weight*wordFeatureBoost(w)*scriptBalanceWeight(w,pool,session,word=>wordItemState(word.k));
     });
+    session.sinceUnseen=wordItemState(chosen.k).seen?((session.sinceUnseen||0)+1):0;
+    return chosen;
   }
 
   function nextWordQuestion(){
@@ -1234,6 +1271,35 @@
     $("#katakanaShareLabel").textContent=(100-state.hiraganaShare)+"%";
   }
 
+  function renderPaceControls(){
+    ["learn","rehearse"].forEach(mode=>{
+      const profile=KANA_PACE_PROFILES[state.pace[mode]]||KANA_PACE_PROFILES[2];
+      const input=$("#"+mode+"Pace"),value=$("#"+mode+"PaceValue"),description=$("#"+mode+"PaceDescription");
+      input.value=String(state.pace[mode]);value.textContent=profile.label;
+      const pool=mode==="learn"?learnPool():rehearsalPool();
+      const unseen=pool.filter(item=>!itemState(item.k).seen).length;
+      description.textContent=unseen?`${Math.round(profile.share*100)}% new kana • guaranteed after ${profile.guarantee} review questions • ${unseen} currently unseen`:(pool.length?"All available kana are assessed; review is currently fully adaptive.":"No kana are currently available in this mode.");
+    });
+    const profile=WORD_PACE_PROFILES[state.pace.words]||WORD_PACE_PROFILES[2];
+    const input=$("#wordsPace"),value=$("#wordsPaceValue"),description=$("#wordsPaceDescription");
+    input.value=String(state.pace.words);value.textContent=profile.label;
+    const pool=wordPool(),seen=pool.filter(word=>wordItemState(word.k).seen).length,unseen=pool.length-seen,coverage=pool.length?seen/pool.length:0;
+    const share=coverage<.8?profile.early:profile.late;
+    description.textContent=unseen?`${Math.round(share*100)}% new words at current coverage • guaranteed after ${profile.guarantee} review questions • ${unseen} currently unseen`:(pool.length?"All words in this set are assessed; review is currently fully adaptive.":"No words are currently available in this set.");
+  }
+
+  function setupPaceControls(){
+    ["learn","rehearse","words"].forEach(mode=>{
+      const input=$("#"+mode+"Pace");
+      input.addEventListener("input",event=>{
+        state.pace[mode]=Number(event.target.value);
+        renderPaceControls();
+      });
+      input.addEventListener("change",saveState);
+    });
+    renderPaceControls();
+  }
+
   function setupScriptBalance(){
     const host=$("#scriptBalanceButtons");if(!host)return;
     host.innerHTML=LESSON.scriptBalanceProfiles.map(profile=>`<button class="seg" data-script-balance="${profile.id}">${profile.label}</button>`).join("");
@@ -1256,7 +1322,7 @@
 
   function updateAllUI(){
     updateTopStats();updateRehearseSummary();updateWordSummary();renderProgress();renderCurriculum();updateLastSaved();
-    renderScriptBalance();
+    renderScriptBalance();renderPaceControls();
     if(currentTab==="fonts")renderFontTab();
   }
 
@@ -1430,6 +1496,7 @@
   });
 
   setupScriptBalance();
+  setupPaceControls();
   renderRehearseSelectors();
   renderSpeechControls();
   refreshSpeechVoices();
