@@ -17,7 +17,7 @@
   streakStat.classList.add("streak-stat");
   const streakGuide=(scope,description)=>`<div class="card streak-progress-card" style="margin-top:14px">
     <div class="streak-progress-heading"><div><h2>Streak milestones</h2><p class="muted">${description}</p></div><div class="streak-record"><strong id="${scope}StreakCurrent">0</strong><span>current</span><strong id="${scope}StreakBest">0</strong><span>best</span></div></div>
-    <div class="streak-tier-guide" aria-label="Streak highlight levels"><span>0–24<br><small>Standard</small></span><span class="tier-1">25–74<br><small>Warm glow</small></span><span class="tier-2">75–99<br><small>Golden</small></span><span class="tier-3">100–199<br><small>On fire</small></span><span class="tier-4">200+<br><small>Legendary</small></span></div>
+    <div class="streak-tier-guide" aria-label="Streak highlight levels"><span>0–24<br><small>Standard</small></span><span class="tier-1">25–49<br><small>Soft amber</small></span><span class="tier-2">50–74<br><small>Amber glow</small></span><span class="tier-3">75–99<br><small>Bright gold</small></span><span class="tier-4">100–149<br><small>Orange fire</small></span><span class="tier-5">150–199<br><small>Fiery glow</small></span><span class="tier-6">200+<br><small>Legendary</small></span></div>
   </div>`;
   document.querySelector("#panel-kanaprogress > .grid2").insertAdjacentHTML("afterend",streakGuide("kana","The streak box gains a stronger highlight as consecutive correct answers build up. A mistake resets the current streak without a negative animation."));
   document.querySelector("#panel-wordprogress > .grid2").insertAdjacentHTML("afterend",streakGuide("word","Word answers and kana answers share one live streak. Keep recognizing correctly to strengthen the highlight."));
@@ -1120,9 +1120,11 @@
 
   let lastRenderedStreak=null;
   function streakTier(streak){
-    if(streak>=200)return 4;
-    if(streak>=100)return 3;
-    if(streak>=75)return 2;
+    if(streak>=200)return 6;
+    if(streak>=150)return 5;
+    if(streak>=100)return 4;
+    if(streak>=75)return 3;
+    if(streak>=50)return 2;
     if(streak>=25)return 1;
     return 0;
   }
@@ -1135,7 +1137,7 @@
     const streak=Math.max(0,state.stats.streak||0),best=Math.max(streak,state.stats.bestStreak||0);
     const streakBox=$("#streakStat"),tier=streakTier(streak),previousTier=lastRenderedStreak===null?tier:streakTier(lastRenderedStreak);
     $("#sStreak").textContent=streak;
-    streakBox.classList.remove("streak-tier-1","streak-tier-2","streak-tier-3","streak-tier-4","streak-celebrate");
+    streakBox.classList.remove("streak-tier-1","streak-tier-2","streak-tier-3","streak-tier-4","streak-tier-5","streak-tier-6","streak-celebrate");
     if(tier)streakBox.classList.add(`streak-tier-${tier}`);
     if(lastRenderedStreak!==null&&tier>previousTier){
       void streakBox.offsetWidth;

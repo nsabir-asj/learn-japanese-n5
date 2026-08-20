@@ -52,7 +52,7 @@ When a difficult-font answer is wrong, the standard form appears beside it for o
 
 The **Kana Progress** and **Word Progress** tabs show mastery, weak items, common confusions, font recognition, curriculum status, and word statistics.
 
-The shared current-streak box becomes more prominent at 25, 75, 100, and 200 consecutive correct answers. Both progress tabs include the complete milestone guide and show the current and best streak.
+The shared current-streak box becomes more prominent at 25, 50, 75, 100, 150, and 200 consecutive correct answers. The 200+ tier uses the legendary purple-gold style. Both progress tabs include the complete milestone guide and show the current and best streak.
 
 ## Answering questions
 
