@@ -12,6 +12,16 @@
     .replaceAll("あ", LESSON.sampleKana)
     .replaceAll("ねこ", LESSON.sampleWord);
 
+  const streakStat=document.querySelector("#sStreak").closest(".stat");
+  streakStat.id="streakStat";
+  streakStat.classList.add("streak-stat");
+  const streakGuide=(scope,description)=>`<div class="card streak-progress-card" style="margin-top:14px">
+    <div class="streak-progress-heading"><div><h2>Streak milestones</h2><p class="muted">${description}</p></div><div class="streak-record"><strong id="${scope}StreakCurrent">0</strong><span>current</span><strong id="${scope}StreakBest">0</strong><span>best</span></div></div>
+    <div class="streak-tier-guide" aria-label="Streak highlight levels"><span>0–24<br><small>Standard</small></span><span class="tier-1">25–74<br><small>Warm glow</small></span><span class="tier-2">75–99<br><small>Golden</small></span><span class="tier-3">100–199<br><small>On fire</small></span><span class="tier-4">200+<br><small>Legendary</small></span></div>
+  </div>`;
+  document.querySelector("#panel-kanaprogress > .grid2").insertAdjacentHTML("afterend",streakGuide("kana","The streak box gains a stronger highlight as consecutive correct answers build up. A mistake resets the current streak without a negative animation."));
+  document.querySelector("#panel-wordprogress > .grid2").insertAdjacentHTML("afterend",streakGuide("word","Word answers and kana answers share one live streak. Keep recognizing correctly to strengthen the highlight."));
+
   [
     {mode:"learn",title:"New kana pace",label:"How often Learn introduces an unassessed kana from the unlocked rows."},
     {mode:"rehearse",title:"Coverage pace",label:"How quickly Rehearse assesses unseen kana from the selected rows."},
@@ -965,6 +975,7 @@
       ws.mastery=Math.min(100,ws.mastery+wordMasteryGain(ws)*font.wordGainMultiplier);scheduleWordCorrect(ws);
       state.wordStats.correct++;
       state.stats.answered++;state.stats.correct++;state.stats.streak++;
+      state.stats.bestStreak=Math.max(state.stats.bestStreak||0,state.stats.streak);
       w.u.forEach(k=>{const s=itemState(k);s.mastery=Math.min(100,s.mastery+2)});
     }else{
       ws.wrong++;ws.streak=0;ws.errorStreak=(ws.errorStreak||0)+1;ws.mastery=Math.max(0,ws.mastery-14);ws.dueAt=Date.now()+60000;
@@ -1100,12 +1111,33 @@
     finishWordRecognition(word,"correction reinforced • press Enter for the next word",(s.currentFont||STANDARD_FONT).id!=="standard");
   }
 
+  let lastRenderedStreak=null;
+  function streakTier(streak){
+    if(streak>=200)return 4;
+    if(streak>=100)return 3;
+    if(streak>=75)return 2;
+    if(streak>=25)return 1;
+    return 0;
+  }
+
   function updateTopStats(){
     const all=allItems.map(x=>itemState(x.k));
     const mastered=all.filter(s=>s.mastery>=80).length;
     $("#sMastered").textContent=mastered;
     $("#sAccuracy").textContent=state.stats.answered?Math.round(state.stats.correct/state.stats.answered*100)+"%":"—";
-    $("#sStreak").textContent=state.stats.streak;
+    const streak=Math.max(0,state.stats.streak||0),best=Math.max(streak,state.stats.bestStreak||0);
+    const streakBox=$("#streakStat"),tier=streakTier(streak),previousTier=lastRenderedStreak===null?tier:streakTier(lastRenderedStreak);
+    $("#sStreak").textContent=streak;
+    streakBox.classList.remove("streak-tier-1","streak-tier-2","streak-tier-3","streak-tier-4","streak-celebrate");
+    if(tier)streakBox.classList.add(`streak-tier-${tier}`);
+    if(lastRenderedStreak!==null&&tier>previousTier){
+      void streakBox.offsetWidth;
+      streakBox.classList.add("streak-celebrate");
+      setTimeout(()=>streakBox.classList.remove("streak-celebrate"),1100);
+    }
+    lastRenderedStreak=streak;
+    ["kanaStreakCurrent","wordStreakCurrent"].forEach(id=>$("#"+id).textContent=streak);
+    ["kanaStreakBest","wordStreakBest"].forEach(id=>$("#"+id).textContent=best);
     $("#sWeak").textContent=all.filter(s=>s.seen&&(isWeakKanaState(s)||s.dueAt<=Date.now())).length;
     const lp=learnPool(),avg=lp.length?lp.reduce((a,x)=>a+itemState(x.k).mastery,0)/lp.length:0;
     $("#learnProgress").style.width=Math.round(avg)+"%";
