@@ -36,7 +36,7 @@ In Kana Mix, the Script balance panel offers adaptive, even, focused, and custom
 
 Practises whole words in romaji. A correct answer reveals the English meaning; press Enter again to continue. The word scheduler mixes new vocabulary with adaptive review and increases features that have caused recent trouble.
 
-If Japanese speech is available in the browser, the trainer can pronounce the word and optionally its English meaning. The Speech panel reports whether suitable voices were found and includes test buttons.
+If Japanese speech is available in the browser, the trainer can pronounce the word and optionally its English meaning. The Speech panel reports whether suitable voices were found and includes test buttons. Voice selections and speech options are saved locally. An optional setting lets the current pronunciation finish after Enter moves to the next word.
 
 ### Learning pace
 

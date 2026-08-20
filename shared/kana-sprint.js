@@ -21,6 +21,7 @@
   </div>`;
   document.querySelector("#panel-kanaprogress > .grid2").insertAdjacentHTML("afterend",streakGuide("kana","The streak box gains a stronger highlight as consecutive correct answers build up. A mistake resets the current streak without a negative animation."));
   document.querySelector("#panel-wordprogress > .grid2").insertAdjacentHTML("afterend",streakGuide("word","Word answers and kana answers share one live streak. Keep recognizing correctly to strengthen the highlight."));
+  document.querySelector("#speechMeaning").closest("label").insertAdjacentHTML("afterend",`<label class="toggle-line"><input type="checkbox" id="speechContinue"> Let pronunciation finish after moving to the next word</label>`);
 
   [
     {mode:"learn",title:"New kana pace",label:"How often Learn introduces an unassessed kana from the unlocked rows."},
@@ -126,7 +127,7 @@
       rehearseSetOpen:false,
       rehearseHelpOpen:false,
       wordSet:"learned",
-      speech:{autoPlay:true,speakMeaning:true,rate:.85,jaVoice:"",enVoice:""},
+      speech:{autoPlay:true,speakMeaning:true,continueOnAdvance:false,rate:.85,jaVoice:"",enVoice:""},
       scriptBalance:LESSON.defaultScriptBalance||"adaptive",
       hiraganaShare:50,
       pace:{learn:2,rehearse:3,words:2},
@@ -183,9 +184,10 @@
     if(typeof state.rehearseSetOpen!=="boolean") state.rehearseSetOpen=false;
     if(typeof state.rehearseHelpOpen!=="boolean") state.rehearseHelpOpen=false;
     if(!state.wordSet) state.wordSet="learned";
-    if(!state.speech)state.speech={autoPlay:true,speakMeaning:true,rate:.85,jaVoice:"",enVoice:""};
+    if(!state.speech)state.speech={autoPlay:true,speakMeaning:true,continueOnAdvance:false,rate:.85,jaVoice:"",enVoice:""};
     if(typeof state.speech.autoPlay!=="boolean")state.speech.autoPlay=true;
     if(typeof state.speech.speakMeaning!=="boolean")state.speech.speakMeaning=true;
+    if(typeof state.speech.continueOnAdvance!=="boolean")state.speech.continueOnAdvance=false;
     if(![.75,.85,1].includes(Number(state.speech.rate)))state.speech.rate=.85;
     if(typeof state.speech.jaVoice!=="string")state.speech.jaVoice="";
     if(typeof state.speech.enVoice!=="string")state.speech.enVoice="";
@@ -208,30 +210,35 @@
     return speechVoices.filter(voice=>String(voice.lang||"").toLowerCase().startsWith(language));
   }
 
+  function voiceKey(voice){return voice.voiceURI||voice.name}
+  function matchesSavedVoice(voice,saved){return voiceKey(voice)===saved||voice.name===saved}
+
   function fillVoiceSelect(selector,voices,chosen,emptyLabel){
     const select=$(selector);select.innerHTML="";
     if(!voices.length){
-      const option=document.createElement("option");option.textContent=emptyLabel;option.value="";select.appendChild(option);select.disabled=true;return "";
+      const option=document.createElement("option");option.textContent=emptyLabel;option.value="";select.appendChild(option);select.disabled=true;return chosen;
     }
     select.disabled=false;
     voices.forEach(voice=>{
-      const option=document.createElement("option");option.value=voice.name;
+      const option=document.createElement("option");option.value=voiceKey(voice);
       option.textContent=`${voice.name} (${voice.localService?"local":"online"})`;
       select.appendChild(option);
     });
-    const selected=voices.some(voice=>voice.name===chosen)?chosen:(voices.find(voice=>voice.default)||voices.find(voice=>voice.localService)||voices[0]).name;
+    const savedVoice=voices.find(voice=>matchesSavedVoice(voice,chosen));
+    const selected=voiceKey(savedVoice||voices.find(voice=>voice.default)||voices.find(voice=>voice.localService)||voices[0]);
     select.value=selected;return selected;
   }
 
   function renderSpeechControls(){
     $("#speechAuto").checked=state.speech.autoPlay;
     $("#speechMeaning").checked=state.speech.speakMeaning;
+    $("#speechContinue").checked=state.speech.continueOnAdvance;
     $("#speechRate").value=String(state.speech.rate);
     const status=$("#speechStatus");status.classList.remove("ready","unavailable");
     if(!speechSupported){
       status.classList.add("unavailable");$("#speechStatusTitle").textContent="Speech is not supported";
       $("#speechStatusDetail").textContent="This browser cannot use built-in pronunciation.";
-      ["#speechAuto","#speechMeaning","#speechRate","#japaneseVoice","#englishVoice","#testJapaneseSpeech","#testEnglishSpeech"].forEach(id=>$(id).disabled=true);
+      ["#speechAuto","#speechMeaning","#speechContinue","#speechRate","#japaneseVoice","#englishVoice","#testJapaneseSpeech","#testEnglishSpeech"].forEach(id=>$(id).disabled=true);
       return;
     }
     const japanese=voicesFor("ja"),english=voicesFor("en");
@@ -240,7 +247,7 @@
     $("#testJapaneseSpeech").disabled=!japanese.length;
     $("#testEnglishSpeech").disabled=!english.length;
     if(japanese.length){
-      const chosen=japanese.find(voice=>voice.name===state.speech.jaVoice)||japanese[0];
+      const chosen=japanese.find(voice=>matchesSavedVoice(voice,state.speech.jaVoice))||japanese[0];
       status.classList.add("ready");$("#speechStatusTitle").textContent="Japanese speech is ready";
       $("#speechStatusDetail").textContent=chosen.localService?"The selected Japanese voice works locally and should work offline.":"The selected Japanese voice may require an internet connection.";
     }else if(speechVoices.length){
@@ -259,7 +266,7 @@
 
   function selectedSpeechVoice(language){
     const name=language==="ja"?state.speech.jaVoice:state.speech.enVoice;
-    return speechVoices.find(voice=>voice.name===name)||voicesFor(language)[0]||null;
+    return voicesFor(language).find(voice=>matchesSavedVoice(voice,name))||voicesFor(language)[0]||null;
   }
 
   function stopSpeech(){
@@ -948,7 +955,7 @@
   function nextWordQuestion(){
     const s=sessions.words;
     clearTypingRetry("words");
-    stopSpeech();
+    if(!state.speech.continueOnAdvance)stopSpeech();
     s.n++;s.rescue=false;s.fontRetry=false;s.typingRetryOffered=false;
     clearFeedback("words");hideRescue("words");
     $("#wordsNext").classList.add("hidden");$("#wordsDontKnow").classList.remove("hidden");
@@ -1458,6 +1465,7 @@
 
   $("#speechAuto").addEventListener("change",e=>{state.speech.autoPlay=e.target.checked;saveState()});
   $("#speechMeaning").addEventListener("change",e=>{state.speech.speakMeaning=e.target.checked;saveState()});
+  $("#speechContinue").addEventListener("change",e=>{state.speech.continueOnAdvance=e.target.checked;saveState()});
   $("#speechRate").addEventListener("change",e=>{state.speech.rate=Number(e.target.value);saveState()});
   $("#japaneseVoice").addEventListener("change",e=>{state.speech.jaVoice=e.target.value;saveState();renderSpeechControls()});
   $("#englishVoice").addEventListener("change",e=>{state.speech.enVoice=e.target.value;saveState();renderSpeechControls()});
