@@ -19,7 +19,7 @@
   ].forEach(config=>{
     const control=document.createElement("div");
     control.className="pace-control";
-    control.innerHTML=`<div class="pace-copy"><strong>${config.title}</strong><span>${config.label}</span><span class="pace-description" id="${config.mode}PaceDescription"></span></div><label class="pace-range" for="${config.mode}Pace"><span id="${config.mode}PaceValue">Balanced</span><input id="${config.mode}Pace" type="range" min="0" max="4" step="1" value="2" aria-label="${config.title}"><span class="pace-scale"><span>More review</span><span>More new</span></span></label>`;
+    control.innerHTML=`<div class="pace-copy"><strong>${config.title}</strong><span>${config.label}</span><span class="pace-description" id="${config.mode}PaceDescription"></span></div><label class="pace-range" for="${config.mode}Pace"><span id="${config.mode}PaceValue">Balanced</span><input id="${config.mode}Pace" type="range" min="0" max="6" step="1" value="2" aria-label="${config.title}"><span class="pace-scale"><span>More review</span><span>More new</span></span></label>`;
     document.querySelector(`#panel-${config.mode} .trainer`).before(control);
   });
   document.querySelector("#rehearseHelpPanel .muted").textContent="Until every selected kana is assessed, the Coverage pace setting controls how often unseen kana appear and guarantees that they cannot be starved by ordinary reviews. After full coverage, review becomes fully adaptive. Scheduled mistake reviews always take priority. Recent difficulty can increase a sound category up to 2×, and harder fonts award more mastery for correct first attempts.";
@@ -51,14 +51,18 @@
     {label:"Gentle",share:.30,guarantee:7},
     {label:"Balanced",share:.45,guarantee:5},
     {label:"Fast",share:.65,guarantee:4},
-    {label:"Rapid coverage",share:.80,guarantee:2}
+    {label:"Rapid coverage",share:.80,guarantee:2},
+    {label:"Very fast",share:.90,guarantee:1},
+    {label:"New-first",share:1,guarantee:0}
   ];
   const WORD_PACE_PROFILES=[
     {label:"Review-heavy",early:.25,late:.10,guarantee:10},
     {label:"Gentle",early:.40,late:.15,guarantee:7},
     {label:"Balanced",early:.60,late:.20,guarantee:5},
     {label:"Fast",early:.75,late:.30,guarantee:4},
-    {label:"Rapid coverage",early:.85,late:.40,guarantee:2}
+    {label:"Rapid coverage",early:.85,late:.40,guarantee:2},
+    {label:"Very fast",early:.92,late:.65,guarantee:1},
+    {label:"New-first",early:1,late:1,guarantee:0}
   ];
 
   function splitWordKana(kana){
@@ -180,7 +184,7 @@
     if(!state.pace)state.pace={learn:2,rehearse:3,words:2};
     [["learn",2],["rehearse",3],["words",2]].forEach(([mode,fallback])=>{
       const value=Number(state.pace[mode]);
-      state.pace[mode]=Number.isFinite(value)?Math.max(0,Math.min(4,Math.round(value))):fallback;
+      state.pace[mode]=Number.isFinite(value)?Math.max(0,Math.min(6,Math.round(value))):fallback;
     });
     if(!Number.isFinite(state.learnUnlockedCount)) state.learnUnlockedCount=5;
   }
@@ -1278,14 +1282,16 @@
       input.value=String(state.pace[mode]);value.textContent=profile.label;
       const pool=mode==="learn"?learnPool():rehearsalPool();
       const unseen=pool.filter(item=>!itemState(item.k).seen).length;
-      description.textContent=unseen?`${Math.round(profile.share*100)}% new kana • guaranteed after ${profile.guarantee} review questions • ${unseen} currently unseen`:(pool.length?"All available kana are assessed; review is currently fully adaptive.":"No kana are currently available in this mode.");
+      const timing=profile.guarantee===0?"unseen kana always chosen when possible":`guaranteed after ${profile.guarantee} review question${profile.guarantee===1?"":"s"}`;
+      description.textContent=unseen?`${Math.round(profile.share*100)}% new kana • ${timing} • ${unseen} currently unseen`:(pool.length?"All available kana are assessed; review is currently fully adaptive.":"No kana are currently available in this mode.");
     });
     const profile=WORD_PACE_PROFILES[state.pace.words]||WORD_PACE_PROFILES[2];
     const input=$("#wordsPace"),value=$("#wordsPaceValue"),description=$("#wordsPaceDescription");
     input.value=String(state.pace.words);value.textContent=profile.label;
     const pool=wordPool(),seen=pool.filter(word=>wordItemState(word.k).seen).length,unseen=pool.length-seen,coverage=pool.length?seen/pool.length:0;
     const share=coverage<.8?profile.early:profile.late;
-    description.textContent=unseen?`${Math.round(share*100)}% new words at current coverage • guaranteed after ${profile.guarantee} review questions • ${unseen} currently unseen`:(pool.length?"All words in this set are assessed; review is currently fully adaptive.":"No words are currently available in this set.");
+    const timing=profile.guarantee===0?"unseen words always chosen when possible":`guaranteed after ${profile.guarantee} review question${profile.guarantee===1?"":"s"}`;
+    description.textContent=unseen?`${Math.round(share*100)}% new words at current coverage • ${timing} • ${unseen} currently unseen`:(pool.length?"All words in this set are assessed; review is currently fully adaptive.":"No words are currently available in this set.");
   }
 
   function setupPaceControls(){

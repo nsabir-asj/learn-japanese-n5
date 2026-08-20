@@ -40,7 +40,7 @@ If Japanese speech is available in the browser, the trainer can pronounce the wo
 
 ### Learning pace
 
-Learn, Rehearse, and Words each have a saved five-position pace control. Learn adjusts how often unassessed kana appear within unlocked rows, Rehearse adjusts coverage of the selected set, and Words adjusts new vocabulary frequency. Scheduled mistake reviews always take priority, and a pace control stops affecting selection once its current pool is fully assessed.
+Learn, Rehearse, and Words each have a saved seven-position pace control. Learn adjusts how often unassessed kana appear within unlocked rows, Rehearse adjusts coverage of the selected set, and Words adjusts new vocabulary frequency. The fastest **New-first** setting chooses unseen material whenever possible. Scheduled mistake reviews always take priority, and a pace control stops affecting selection once its current pool is fully assessed.
 
 ### Fonts
 
