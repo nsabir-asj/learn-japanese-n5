@@ -48,6 +48,12 @@ Standard print is always enabled. Additional handwriting-style fonts can be sele
 
 When a difficult-font answer is wrong, the standard form appears beside it for one more attempt. Rescue choices appear only if that comparison attempt is also wrong.
 
+### Mnemonics
+
+Learn and Rehearse include an optional **Need a mnemonic?** hint for individual kana. A hinted correct answer receives 40% of the usual mastery gain and does not increase the unaided streak. After a rescue correction, the relevant memory hook is shown automatically.
+
+The **Mnemonics** tab contains built-in shape-and-sound stories for the basic hiragana and katakana. Voiced kana and combinations derive a memory hook from their base form and sound marks. You can edit any hook, restore its built-in version, and filter the list to weak, mistaken, assisted, or customized kana. Custom mnemonics and hint statistics are included in automatic saves and exported progress.
+
 ### Progress
 
 The **Kana Progress** and **Word Progress** tabs show mastery, weak items, common confusions, font recognition, curriculum status, and word statistics.

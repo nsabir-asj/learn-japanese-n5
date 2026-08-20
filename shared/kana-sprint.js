@@ -23,6 +23,19 @@
   document.querySelector("#panel-wordprogress > .grid2").insertAdjacentHTML("afterend",streakGuide("word","Word answers and kana answers share one live streak. Keep recognizing correctly to strengthen the highlight."));
   document.querySelector("#speechMeaning").closest("label").insertAdjacentHTML("afterend",`<label class="toggle-line"><input type="checkbox" id="speechContinue"> Let pronunciation finish after moving to the next word</label>`);
 
+  const mnemonicTab=document.createElement("button");
+  mnemonicTab.className="tab";mnemonicTab.dataset.tab="mnemonics";mnemonicTab.textContent="Mnemonics";
+  document.querySelector('.tab[data-tab="fonts"]').before(mnemonicTab);
+  const mnemonicPanel=document.createElement("section");
+  mnemonicPanel.className="panel";mnemonicPanel.id="panel-mnemonics";
+  mnemonicPanel.innerHTML=`<div class="card"><div class="mnemonic-heading"><div><h2>Kana mnemonics</h2><p class="muted">Use these shape-and-sound stories when a kana will not stick. You can replace any built-in mnemonic with one that is more memorable to you.</p></div><label class="mnemonic-filter"><span>Show</span><select id="mnemonicFilter"><option value="all">All kana</option><option value="weak">Weak kana</option><option value="assisted">Used a hint</option><option value="mistakes">Mistaken kana</option><option value="custom">My custom mnemonics</option></select></label></div><div class="callout">A requested hint gives 40% of the normal mastery gain. It counts as correct if you then type it correctly, but it does not increase your unaided streak.</div><div class="mnemonic-grid" id="mnemonicGrid"></div></div>`;
+  document.querySelector("#panel-fonts").before(mnemonicPanel);
+  ["learn","rehearse"].forEach(mode=>{
+    const button=document.createElement("button");
+    button.className="ghost mnemonic-hint";button.id=mode+"Mnemonic";button.textContent="Need a mnemonic?";
+    document.querySelector(`#panel-${mode} .footer-actions .actions`).appendChild(button);
+  });
+
   [
     {mode:"learn",title:"New kana pace",label:"How often Learn introduces an unassessed kana from the unlocked rows."},
     {mode:"rehearse",title:"Coverage pace",label:"How quickly Rehearse assesses unseen kana from the selected rows."},
@@ -131,6 +144,7 @@
       scriptBalance:LESSON.defaultScriptBalance||"adaptive",
       hiraganaShare:50,
       pace:{learn:2,rehearse:3,words:2},
+      customMnemonics:{},
       savedAt:0
     };
   }
@@ -139,7 +153,7 @@
   let currentTab="learn";
   const INACTIVITY_MS=2*60*1000;
   function newPracticeSession(){
-    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],lastScripts:[],fontRetry:false,rescue:false,typingRetryOffered:false,typingRetryTimer:null,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0};
+    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],lastScripts:[],fontRetry:false,rescue:false,mnemonicUsed:false,typingRetryOffered:false,typingRetryTimer:null,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0};
   }
   const sessions={
     learn:newPracticeSession(),
@@ -194,6 +208,7 @@
     if(!state.scriptBalance)state.scriptBalance=LESSON.defaultScriptBalance||"adaptive";
     if(!Number.isFinite(Number(state.hiraganaShare)))state.hiraganaShare=50;
     if(!state.pace)state.pace={learn:2,rehearse:3,words:2};
+    if(!state.customMnemonics||typeof state.customMnemonics!=="object")state.customMnemonics={};
     [["learn",2],["rehearse",3],["words",2]].forEach(([mode,fallback])=>{
       const value=Number(state.pace[mode]);
       state.pace[mode]=Number.isFinite(value)?Math.max(0,Math.min(6,Math.round(value))):fallback;
@@ -312,6 +327,8 @@
   function itemState(k){
     if(!state.items[k]) state.items[k]={seen:0,correct:0,wrong:0,mastery:0,streak:0,lastSeen:0,dueAt:0,lastWasCorrect:null,confusions:{},fontStats:{}};
     if(!state.items[k].fontStats)state.items[k].fontStats={};
+    if(!Number.isFinite(state.items[k].mnemonicViews))state.items[k].mnemonicViews=0;
+    if(!Number.isFinite(state.items[k].assistedCorrect))state.items[k].assistedCorrect=0;
     return state.items[k];
   }
 
@@ -373,6 +390,56 @@
       sample.append(caption,glyph);compare.appendChild(sample);
     });
     host.appendChild(compare);
+  }
+
+  function builtInMnemonic(item){
+    const direct=LESSON.mnemonics&&LESSON.mnemonics[item.k];
+    if(direct)return direct;
+    const characters=Array.from(item.k);
+    const first=characters[0]||item.k;
+    const plain=first.normalize("NFD").replace(/[\u3099\u309a]/g,"");
+    const baseMnemonic=LESSON.mnemonics&&LESSON.mnemonics[plain];
+    if(characters.length>1){
+      const tail=characters.slice(1).join("");
+      return `Start with ${first}${baseMnemonic?` — ${baseMnemonic}`:""} Add the small ${tail} and blend the sounds into “${item.r}.”`;
+    }
+    if(plain!==first){
+      const mark=itemPhase(item)==="Semi-voiced"?"small circle":"two-stroke voice mark";
+      return `${first} is ${plain} with a ${mark}. ${baseMnemonic||`Remember the shape of ${plain}.`} The mark changes the reading to “${item.r}.”`;
+    }
+    return `Trace the shape of ${item.k} while saying “${item.r}” aloud. Give the shape a personal image if this one keeps returning.`;
+  }
+
+  function mnemonicText(item){
+    const custom=state.customMnemonics[item.k];
+    return typeof custom==="string"&&custom.trim()?custom.trim():builtInMnemonic(item);
+  }
+
+  function appendMnemonicCard(mode,item,label="Memory hook"){
+    const host=$("#"+mode+"Feedback .meta");if(!host)return;
+    const card=document.createElement("div");card.className="mnemonic-card";
+    const glyph=document.createElement("strong");glyph.className="mnemonic-glyph";glyph.textContent=item.k;glyph.style.fontFamily=STANDARD_FONT.family;
+    const copy=document.createElement("div");
+    const heading=document.createElement("span");heading.className="mnemonic-card-label";heading.textContent=`${label} • ${item.k} = ${item.r}`;
+    const text=document.createElement("p");text.textContent=mnemonicText(item);
+    copy.append(heading,text);card.append(glyph,copy);host.appendChild(card);
+  }
+
+  function showMnemonicHint(mode){
+    const session=sessions[mode],item=session.current;
+    if(!item||session.rescue||session.fontRetry||session.mnemonicUsed)return;
+    session.mnemonicUsed=true;
+    const s=itemState(item.k);s.mnemonicViews++;
+    const feedback=$("#"+mode+"Feedback");feedback.className="feedback show hint";feedback.innerHTML='<strong>💡 Mnemonic hint</strong><div class="meta">This answer will earn 40% of its usual mastery gain and will not increase the unaided streak.</div>';
+    appendMnemonicCard(mode,item,"Hint");
+    $("#"+mode+"Mnemonic").disabled=true;
+    saveState();const input=$("#"+mode+"Input");requestAnimationFrame(()=>input.focus({preventScroll:true}));
+  }
+
+  function confusionComparison(target,wrong){
+    const voicedBase=target.k.normalize("NFD").replace(/[\u3099\u309a]/g,"");
+    if(voicedBase===wrong.k||wrong.k.normalize("NFD").replace(/[\u3099\u309a]/g,"")===target.k)return `Watch the sound mark: ${target.k} is “${target.r},” while ${wrong.k} is “${wrong.r}.”`;
+    return `Compare ${target.k} with ${wrong.k}. Trace the full shape and pay special attention to the final stroke and any loops.`;
   }
 
   function rehearseItemState(k){
@@ -553,19 +620,22 @@
     s.dueAt=Date.now()+minutes*60000;
   }
 
-  function applyKanaResult(item,correct,typedWrongItem=null,mode="learn",font=STANDARD_FONT){
+  function applyKanaResult(item,correct,typedWrongItem=null,mode="learn",font=STANDARD_FONT,masteryMultiplier=1){
     const s=itemState(item.k);
-    const fs=fontState(item,font.id);fs.seen++;if(correct)fs.correct++;else fs.wrong++;
+    const assisted=correct&&masteryMultiplier<1;
+    const fs=fontState(item,font.id);fs.seen++;if(assisted)fs.assisted=(fs.assisted||0)+1;else if(correct)fs.correct++;else fs.wrong++;
     s.seen++; s.lastSeen=Date.now();
     state.stats.answered++;
     if(correct){
-      s.correct++; s.streak++;
+      s.correct++;if(!assisted)s.streak++;
       s.lastWasCorrect=true;
       s.errorStreak=0;
-      const gain=Math.min(17,masteryGain(s)*font.gainMultiplier);
+      if(assisted)s.assistedCorrect++;
+      const gain=Math.min(17,masteryGain(s)*font.gainMultiplier*masteryMultiplier);
       s.mastery=Math.min(100,s.mastery+gain);
-      scheduleCorrect(s);
-      state.stats.correct++; state.stats.streak++;
+      if(assisted)s.dueAt=Date.now()+15*60000;else scheduleCorrect(s);
+      state.stats.correct++;
+      if(!assisted)state.stats.streak++;
       state.stats.bestStreak=Math.max(state.stats.bestStreak,state.stats.streak);
     }else{
       const penalty=font.penalty;
@@ -577,11 +647,11 @@
     }
     if(mode==="rehearse"){
       const rs=rehearseItemState(item.k);
-      rs.seen++;rs.lastWasCorrect=correct;
-      if(correct)rs.correct++;else rs.wrong++;
+      if(assisted){rs.assisted=(rs.assisted||0)+1;rs.lastWasCorrect=null}
+      else{rs.seen++;rs.lastWasCorrect=correct;if(correct)rs.correct++;else rs.wrong++}
       maybeUnlockFromRehearsal(item.group);
     }
-    recordPhaseResult([itemPhase(item)],correct);
+    recordPhaseResult([itemPhase(item)],correct&&!assisted);
     saveState();
   }
 
@@ -767,6 +837,7 @@
   function renderRescue(mode,target,pool){
     const wrap=$("#"+mode+"Rescue"), box=$("#"+mode+"Options");
     box.innerHTML="";
+    const title=wrap.querySelector(".rescue-title");if(title)title.textContent="Choose the correct reading to reinforce the mistake";
     const opts=shuffle([{item:target,correct:true},...distractorItems(target,pool).map(item=>({item,correct:false}))]);
     opts.forEach((o,i)=>{
       const b=document.createElement("button");
@@ -793,10 +864,11 @@
       setFeedback(mode,false,"No kana selected","Choose at least one rehearsal row above.");
       return;
     }
-    session.n++;session.rescue=false;session.fontRetry=false;session.typingRetryOffered=false;
+    session.n++;session.rescue=false;session.fontRetry=false;session.mnemonicUsed=false;session.typingRetryOffered=false;
     clearFeedback(mode);hideRescue(mode);
     $("#"+mode+"Next").classList.add("hidden");
     $("#"+mode+"DontKnow").classList.remove("hidden");
+    $("#"+mode+"Mnemonic").classList.remove("hidden");$("#"+mode+"Mnemonic").disabled=false;
     const item=selectKana(pool,session,mode);
     session.current=item;session.last.push(item.k);if(session.last.length>12)session.last.shift();
     session.lastScripts.push(item.script);if(session.lastScripts.length>12)session.lastScripts.shift();
@@ -840,16 +912,22 @@
       return;
     }
     if(correct){
-      applyKanaResult(item,true,null,mode,session.currentFont);
-      setFeedback(mode,true,`${item.k} = ${item.r}`,"Correct. Moving on.");
+      const assisted=session.mnemonicUsed;
+      applyKanaResult(item,true,null,mode,session.currentFont,assisted?.4:1);
+      setFeedback(mode,true,`${item.k} = ${item.r}`,assisted?"Correct with a mnemonic. Press Enter or Next when the memory hook is clear.":"Correct. Moving on.");
       if(mode==="learn")maybeAutoUnlockLearn();
       input.value="";
-      setTimeout(()=>nextKanaQuestion(mode),180);
+      if(assisted){
+        input.disabled=true;$("#"+mode+"Next").classList.remove("hidden");$("#"+mode+"DontKnow").classList.add("hidden");
+        appendMnemonicCard(mode,item,"Used for this answer");
+        updateAllUI();
+      }else setTimeout(()=>nextKanaQuestion(mode),180);
     }else{
       const wrongItem=value?itemForReading(value,item.script):null;
       applyKanaResult(item,false,wrongItem,mode,session.currentFont);
       session.forced[item.k]=session.n+mistakeReviewOffset(itemState(item.k).errorStreak||1);
       const typedNote=value?`You typed “${value}”.`:"Marked as unknown.";
+      $("#"+mode+"Mnemonic").classList.add("hidden");
       if((session.currentFont||STANDARD_FONT).id!=="standard"){
         session.fontRetry=true;
         input.value="";
@@ -876,6 +954,7 @@
     if(!opt.correct){
       button.classList.add("wrong");button.disabled=true;
       recordRescueConfusion(target,opt.item);
+      $("#"+mode+"Rescue .rescue-title").textContent=confusionComparison(target,opt.item);
       return;
     }
     [...$("#"+mode+"Options").children].forEach(b=>{b.disabled=true;if(b.dataset.correct==="1")b.classList.add("correct")});
@@ -883,6 +962,7 @@
     $("#"+mode+"Next").classList.remove("hidden");
     setFeedback(mode,true,`${target.k} = ${target.r}`,"Correction reinforced. Press Enter or Next.");
     appendGlyphComparison(mode,target,session.currentFont||STANDARD_FONT);
+    appendMnemonicCard(mode,target,"Remember after this correction");
     focusInput(mode);
     updateAllUI();
   }
@@ -1192,6 +1272,36 @@
     });
   }
 
+  function renderMnemonicTab(){
+    const host=$("#mnemonicGrid"),filter=$("#mnemonicFilter").value;
+    const items=allItems.filter(item=>{
+      const s=itemState(item.k),custom=typeof state.customMnemonics[item.k]==="string"&&state.customMnemonics[item.k].trim();
+      if(filter==="weak")return isWeakKanaState(s);
+      if(filter==="assisted")return s.mnemonicViews>0||s.assistedCorrect>0;
+      if(filter==="mistakes")return s.wrong>0;
+      if(filter==="custom")return custom;
+      return true;
+    });
+    host.innerHTML="";
+    if(!items.length){host.innerHTML='<div class="muted mnemonic-empty">No kana match this filter yet.</div>';return}
+    items.forEach(item=>{
+      const s=itemState(item.k),builtIn=builtInMnemonic(item),custom=state.customMnemonics[item.k]||"";
+      const card=document.createElement("article");card.className="mnemonic-library-card";
+      card.innerHTML=`<div class="mnemonic-library-top"><strong class="mnemonic-library-glyph"></strong><div><strong>${item.r}</strong><span>${GROUPS[item.groupIndex].name} • ${custom.trim()?"Custom":"Built in"}</span></div></div><label>Memory hook<textarea rows="4"></textarea></label><div class="tiny mnemonic-stats">${s.mnemonicViews} hint view${s.mnemonicViews===1?"":"s"} • ${s.assistedCorrect} assisted correct • ${s.wrong} mistake${s.wrong===1?"":"s"}</div><div class="actions"><button class="ghost" data-save-mnemonic>Save</button><button class="ghost" data-restore-mnemonic ${custom.trim()?"":"disabled"}>Restore built-in</button></div>`;
+      const glyph=card.querySelector(".mnemonic-library-glyph");glyph.textContent=item.k;glyph.style.fontFamily=STANDARD_FONT.family;
+      const textarea=card.querySelector("textarea");textarea.value=custom.trim()?custom:builtIn;
+      card.querySelector("[data-save-mnemonic]").addEventListener("click",()=>{
+        const value=textarea.value.trim();
+        if(value&&value!==builtIn)state.customMnemonics[item.k]=value;else delete state.customMnemonics[item.k];
+        saveState();renderMnemonicTab();
+      });
+      card.querySelector("[data-restore-mnemonic]").addEventListener("click",()=>{
+        delete state.customMnemonics[item.k];saveState();renderMnemonicTab();
+      });
+      host.appendChild(card);
+    });
+  }
+
   function renderProgress(){
     const weak=allItems.map(item=>({item,s:itemState(item.k)})).filter(x=>isWeakKanaState(x.s))
       .sort((a,b)=>((100-b.s.mastery)+b.s.wrong*3)-((100-a.s.mastery)+a.s.wrong*3)).slice(0,12);
@@ -1208,11 +1318,11 @@
     $("#confusionList").innerHTML=pairs.length?pairs.slice(0,16).map(p=>`<span class="confusion">${p.a} ↔ ${p.b} <strong>×${p.count}</strong></span>`).join(""):`<span class="muted">No confusion pairs recorded yet.</span>`;
 
     $("#fontRecognition").innerHTML=FONT_PROFILES.map(font=>{
-      let seen=0,correct=0;
-      allItems.forEach(item=>{const fs=itemState(item.k).fontStats[font.id];if(fs){seen+=fs.seen;correct+=fs.correct}});
+      let seen=0,correct=0,assisted=0;
+      allItems.forEach(item=>{const fs=itemState(item.k).fontStats[font.id];if(fs){seen+=fs.seen;correct+=fs.correct;assisted+=fs.assisted||0}});
       const result=seen?Math.round(correct/seen*100)+"%":"Not assessed";
       const safeFamily=font.family.replaceAll('"',"'");
-      return `<div class="font-stat" style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">${LESSON.fontPreview}</div><span>${font.difficulty} • ${font.gainMultiplier.toFixed(2)}× kana • ${font.wordGainMultiplier.toFixed(2)}× word<br>${result}${seen?` • ${seen} answers`:""}</span></div>`;
+      return `<div class="font-stat" style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">${LESSON.fontPreview}</div><span>${font.difficulty} • ${font.gainMultiplier.toFixed(2)}× kana • ${font.wordGainMultiplier.toFixed(2)}× word<br>${result}${seen?` • ${seen} answers`:""}${assisted?` • ${assisted} assisted`:""}</span></div>`;
     }).join("");
   }
 
@@ -1373,6 +1483,7 @@
     updateTopStats();updateRehearseSummary();updateWordSummary();renderProgress();renderCurriculum();updateLastSaved();
     renderScriptBalance();renderPaceControls();
     if(currentTab==="fonts")renderFontTab();
+    if(currentTab==="mnemonics")renderMnemonicTab();
   }
 
   function switchTab(tab){
@@ -1386,6 +1497,7 @@
     if(tab==="rehearse"){if(!sessions.rehearse.current)nextKanaQuestion("rehearse");else focusInput("rehearse")}
     if(tab==="words"){if(!sessions.words.current)nextWordQuestion();else focusInput("words")}
     if(tab==="fonts")renderFontTab();
+    if(tab==="mnemonics")renderMnemonicTab();
     if(tab==="kanaprogress"||tab==="wordprogress")updateAllUI();
   }
 
@@ -1454,7 +1566,10 @@
     });
     $("#"+mode+"DontKnow").addEventListener("click",()=>handleKanaTyped(mode,true));
     $("#"+mode+"Next").addEventListener("click",()=>nextKanaQuestion(mode));
+    $("#"+mode+"Mnemonic").addEventListener("click",()=>showMnemonicHint(mode));
   });
+
+  $("#mnemonicFilter").addEventListener("change",renderMnemonicTab);
 
   $("#wordsInput").addEventListener("keydown",e=>{
     if(e.key==="Enter"){

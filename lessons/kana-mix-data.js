@@ -36,6 +36,7 @@
 
   const GROUPS=interleaveGroups();
   const VISUAL={...clone(hiragana.visualConfusions),...clone(katakana.visualConfusions)};
+  const MNEMONICS={...clone(hiragana.mnemonics),...clone(katakana.mnemonics)};
   const FONT_PROFILES=hiragana.fontProfiles.map(hFont=>{
     const kFont=katakana.fontProfiles.find(font=>font.id===hFont.id)||hFont;
     return {...clone(hFont),family:`${firstFamily(hFont)},${firstFamily(kFont)},"Yu Gothic","Noto Sans JP",sans-serif`};
@@ -51,6 +52,7 @@
       wordStats:{seen:0,correct:0},wordItems:{},wordFeatureHistory:{},
       phaseHistory:{Basic:[],Voiced:[],"Semi-voiced":[],Combinations:[]},
       items:{},rehearseItems:{},groupUnlockSource:{},rehearseGroups,
+      customMnemonics:{},
       selectedFonts,rehearseSetOpen:false,rehearseHelpOpen:false,wordSet:"learned",
       speech:{autoPlay:true,speakMeaning:true,rate:.85,jaVoice:"",enVoice:""},savedAt:0
     };
@@ -139,6 +141,7 @@
       ["Basic","Voiced","Semi-voiced","Combinations"].forEach(phase=>state.phaseHistory[phase]=mergeRecent(sourceStates.hiragana.phaseHistory[phase],sourceStates.katakana.phaseHistory[phase]));
       state.wordFeatureHistory={};
     }
+    state.customMnemonics={...clone(sourceStates.hiragana.customMnemonics),...clone(sourceStates.katakana.customMnemonics),...clone(saved&&saved.customMnemonics)};
     snapshots={items:clone(state.items),wordItems:clone(state.wordItems),rehearseItems:clone(state.rehearseItems)};
     return state;
   }
@@ -195,6 +198,8 @@
       source.wordStats={seen:wordTotals.seen,correct:wordTotals.correct};
       source.selectedFonts=clone(mix.selectedFonts);
       source.speech=clone(mix.speech);
+      source.customMnemonics={};
+      Object.entries(mix.customMnemonics||{}).forEach(([kana,text])=>{if(owner.kana.has(kana))source.customMnemonics[kana]=text});
       syncCurriculum(mix,script,source);
       source.savedAt=Date.now();
       localStorage.setItem(owner.lesson.storageKey,JSON.stringify(source));
@@ -228,6 +233,7 @@
     fontProfiles:FONT_PROFILES,
     groups:GROUPS,
     visualConfusions:VISUAL,
+    mnemonics:MNEMONICS,
     words:[...hiragana.words.map(clone),...katakana.words.map(clone)],
     extraWords:[...hiragana.extraWords.map(clone),...katakana.extraWords.map(clone)],
     scriptForKana,
