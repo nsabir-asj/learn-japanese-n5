@@ -56,7 +56,9 @@ The **Mnemonics** tab contains built-in shape-and-sound stories for the basic hi
 
 ### Local mnemonic artwork
 
-The supplied Tofugu charts are third-party artwork. The generated crops belong under `assets/local-mnemonics/` and are intentionally ignored by Git. Keep them on the local machine unless you have redistribution permission. To regenerate them from the two source JPEGs, run `scripts/crop_tofugu_mnemonics.py` with `--hiragana`, `--katakana`, and (optionally) `--output assets/local-mnemonics`. The utility validates the 3300×2550 source size, the 46-panel Hiragana/Katakana layouts, duplicate/missing assignments, and writes a manifest with the crop coordinates. The application code and mapping remain usable without those files.
+The supplied Tofugu charts are third-party artwork. The generated crops belong under `assets/local-mnemonics/tofugu/` and are intentionally ignored by Git. Keep them on the local machine unless you have redistribution permission. To regenerate them from the two source JPEGs, run `scripts/crop_tofugu_mnemonics.py` with `--hiragana`, `--katakana`, and (optionally) `--output assets/local-mnemonics/tofugu`. The utility validates the 3300×2550 source size, the 46-panel Hiragana/Katakana layouts, duplicate/missing assignments, and writes a manifest with the crop coordinates. The application code and mapping remain usable without those files.
+
+The separate user-supplied LeafPiece chart is preserved under `assets/local-mnemonics/leafpiece/` when generated with `scripts/crop_leafpiece_mnemonics.py`, and the selected Pictografix panels are under `assets/local-mnemonics/pictografix/`. The selected alternatives are indexed in `shared/kana-mnemonic-preferences.json` and are the active artwork for the trainer; when a kana has multiple retained picks, the latest option is shown. The JavaScript bridge keeps this working when the launchers are opened directly through `file://`. The preference decision log remains in `docs/kana-mnemonic-preferences.md`.
 
 ### Progress
 
@@ -108,11 +110,15 @@ Japanese-N5-lessons/
 ├── shared/
 │   ├── kana-sprint.js         Shared trainer and adaptive logic
 │   ├── kana-sprint.css        Shared interface styles
+│   ├── kana-mnemonic-preferences.json  Selected mnemonic index
+│   ├── kana-mnemonic-preferences.js  Offline bridge for the JSON index
 │   └── kana-mnemonic-assets.js  Local-art mapping with text fallback
 ├── scripts/
-│   └── crop_tofugu_mnemonics.py  Deterministic crop/validation utility
+│   ├── crop_tofugu_mnemonics.py  Deterministic Tofugu crop/validation utility
+│   ├── crop_leafpiece_mnemonics.py  LeafPiece reference crop utility
+│   └── crop_pictografix_mnemonics.py  Selected Pictografix crop utility
 ├── assets/
-│   └── local-mnemonics/       Ignored user-supplied chart crops
+│   └── local-mnemonics/       Ignored source-organized chart crops
 ├── lessons/
 │   ├── hiragana-data.js       Hiragana curriculum and vocabulary
 │   ├── hiragana-fonts.css     Hiragana font definitions

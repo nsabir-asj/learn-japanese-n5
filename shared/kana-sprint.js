@@ -411,14 +411,20 @@
     return `Trace the shape of ${item.k} while saying “${item.r}” aloud. Give the shape a personal image if this one keeps returning.`;
   }
 
-  function mnemonicText(item){
-    const custom=state.customMnemonics[item.k];
-    return typeof custom==="string"&&custom.trim()?custom.trim():builtInMnemonic(item);
-  }
-
   function mnemonicAsset(item){
     const asset=MNEMONIC_ASSETS[item.k];
     return asset&&typeof asset==="object"?asset:null;
+  }
+
+  function mnemonicCopy(item){
+    const asset=mnemonicAsset(item);
+    if(asset&&typeof asset.cue==="string"&&asset.cue.trim())return asset.cue.trim();
+    return builtInMnemonic(item);
+  }
+
+  function mnemonicText(item){
+    const custom=state.customMnemonics[item.k];
+    return typeof custom==="string"&&custom.trim()?custom.trim():mnemonicCopy(item);
   }
 
   function appendMnemonicCard(mode,item,label="Memory hook",kind="full"){
@@ -1319,7 +1325,7 @@
     host.innerHTML="";
     if(!items.length){host.innerHTML='<div class="muted mnemonic-empty">No kana match this filter yet.</div>';return}
     items.forEach(item=>{
-      const s=itemState(item.k),builtIn=builtInMnemonic(item),custom=state.customMnemonics[item.k]||"",asset=mnemonicAsset(item);
+      const s=itemState(item.k),builtIn=mnemonicCopy(item),custom=state.customMnemonics[item.k]||"",asset=mnemonicAsset(item);
       const card=document.createElement("article");card.className="mnemonic-library-card";
       card.innerHTML=`<div class="mnemonic-library-top"><strong class="mnemonic-library-glyph"></strong><div><strong>${item.r}</strong><span>${GROUPS[item.groupIndex].name} • ${custom.trim()?"Custom":"Built in"}</span></div></div><div class="mnemonic-library-art" aria-label="Full visual mnemonic"></div><label>Memory hook<textarea rows="4"></textarea></label><div class="tiny mnemonic-stats">${s.mnemonicViews} hint view${s.mnemonicViews===1?"":"s"} • ${s.assistedCorrect} assisted correct • ${s.wrong} mistake${s.wrong===1?"":"s"}</div><div class="actions"><button class="ghost" data-save-mnemonic>Save</button><button class="ghost" data-restore-mnemonic ${custom.trim()?"":"disabled"}>Restore built-in</button></div>`;
       const glyph=card.querySelector(".mnemonic-library-glyph");glyph.textContent=item.k;glyph.style.fontFamily=STANDARD_FONT.family;
