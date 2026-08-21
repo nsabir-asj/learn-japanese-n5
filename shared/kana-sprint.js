@@ -82,6 +82,8 @@
     {label:"Very fast",share:.90,guarantee:1},
     {label:"New-first",share:1,guarantee:0}
   ];
+  const MAX_KANA_PACE_INDEX=KANA_PACE_PROFILES.length-1;
+  const P_ROW_INDEX=GROUPS.findIndex(group=>group.id==="p");
   const WORD_PACE_PROFILES=[
     {label:"Review-heavy",early:.25,late:.10,guarantee:10},
     {label:"Gentle",early:.40,late:.15,guarantee:7},
@@ -668,6 +670,17 @@
     return allItems.filter(x=>!!state.rehearseGroups[x.group]);
   }
 
+  function comboBoostActive(){
+    if(P_ROW_INDEX<0||state.learnUnlockedCount<=P_ROW_INDEX+1)return false;
+    const pStates=GROUPS[P_ROW_INDEX].items.map(([k])=>itemState(k));
+    const average=pStates.reduce((sum,s)=>sum+s.mastery,0)/Math.max(1,pStates.length);
+    return average>=72;
+  }
+
+  function comboSprintActive(groupIndex){
+    return comboBoostActive()&&state.pace.learn>=MAX_KANA_PACE_INDEX&&groupIndex>P_ROW_INDEX&&GROUPS[groupIndex].phase==="Combinations";
+  }
+
   function maybeAutoUnlockLearn(){
     if(state.learnUnlockedCount>=GROUPS.length) return;
     const gi=state.learnUnlockedCount-1;
@@ -678,7 +691,13 @@
     const history=(state.learnRowHistory[GROUPS[gi].id]||[]).slice(-20);
     const enoughHistory=history.length>=Math.min(20,GROUPS[gi].items.length*2);
     const accuracy=history.length?history.reduce((sum,x)=>sum+x,0)/history.length:0;
-    if(introduced&&allAssessed&&enoughHistory&&avg>=62&&accuracy>=.8){
+    const sprint=comboSprintActive(gi);
+    const sprintAssessed=ss.every(s=>s.unaidedSeen>=1);
+    const sprintRecognized=ss.filter(s=>s.unaidedCorrect>=1).length>=Math.ceil(ss.length*2/3);
+    const sprintHistory=history.length>=ss.length;
+    const normalReady=introduced&&allAssessed&&enoughHistory&&avg>=62&&accuracy>=.8;
+    const sprintReady=introduced&&sprintAssessed&&sprintRecognized&&sprintHistory&&accuracy>=.72;
+    if(sprint?sprintReady:normalReady){
       state.learnUnlockedCount++;
       advancePastRehearsalUnlocks();
       saveState();
@@ -779,7 +798,9 @@
     const unseen=pool.filter(x=>!waiting.has(x.k)&&(mode==="learn"?!itemState(x.k).introduced:itemState(x.k).unaidedSeen===0));
     let bucket=candidates;
     if(unseen.length){
-      const pace=KANA_PACE_PROFILES[state.pace[mode]]||KANA_PACE_PROFILES[2];
+      const selectedPace=Number.isFinite(state.pace[mode])?state.pace[mode]:2;
+      const effectivePace=mode==="learn"&&comboBoostActive()?Math.min(MAX_KANA_PACE_INDEX,selectedPace+1):selectedPace;
+      const pace=KANA_PACE_PROFILES[effectivePace]||KANA_PACE_PROFILES[2];
       const chooseUnseen=(session.sinceUnseen||0)>=pace.guarantee||Math.random()<pace.share;
        const review=candidates.filter(x=>mode==="learn"?itemState(x.k).introduced:itemState(x.k).unaidedSeen>0);
       bucket=chooseUnseen||!review.length?unseen:review;
@@ -1574,14 +1595,19 @@
   function renderPaceControls(){
     ["learn","rehearse"].forEach(mode=>{
       const profile=KANA_PACE_PROFILES[state.pace[mode]]||KANA_PACE_PROFILES[2];
+      const boosted=mode==="learn"&&comboBoostActive();
+      const effectiveIndex=boosted?Math.min(MAX_KANA_PACE_INDEX,state.pace[mode]+1):state.pace[mode];
+      const effectiveProfile=KANA_PACE_PROFILES[effectiveIndex]||profile;
       const input=$("#"+mode+"Pace"),value=$("#"+mode+"PaceValue"),description=$("#"+mode+"PaceDescription");
-      input.value=String(state.pace[mode]);value.textContent=profile.label;
+      input.value=String(state.pace[mode]);
+      value.textContent=boosted?(state.pace[mode]>=MAX_KANA_PACE_INDEX?`${profile.label} • combo sprint`:`${profile.label} → ${effectiveProfile.label}`):profile.label;
       const pool=mode==="learn"?learnPool():rehearsalPool();
       const unseen=pool.filter(item=>mode==="learn"?!itemState(item.k).introduced:itemState(item.k).unaidedSeen===0).length;
-      const timing=profile.guarantee===0?"unseen kana always chosen when possible":`guaranteed after ${profile.guarantee} review question${profile.guarantee===1?"":"s"}`;
+      const timing=effectiveProfile.guarantee===0?"unseen kana always chosen when possible":`guaranteed after ${effectiveProfile.guarantee} review question${effectiveProfile.guarantee===1?"":"s"}`;
       const remaining=mode==="learn"?`${unseen} not yet introduced`:`${unseen} not yet assessed`;
       const complete=mode==="learn"?"All available kana are introduced; selection is currently fully adaptive.":"All available kana are assessed; review is currently fully adaptive.";
-      description.textContent=unseen?`${Math.round(profile.share*100)}% new kana • ${timing} • ${remaining}`:(pool.length?complete:"No kana are currently available in this mode.");
+      const boostNote=boosted?(state.pace[mode]>=MAX_KANA_PACE_INDEX?"Combo sprint active • accelerated combo-row progression • ":"Combo boost active • "):"";
+      description.textContent=unseen?`${boostNote}${Math.round(effectiveProfile.share*100)}% new kana • ${timing} • ${remaining}`:(pool.length?`${boostNote}${complete}`:"No kana are currently available in this mode.");
     });
     const profile=WORD_PACE_PROFILES[state.pace.words]||WORD_PACE_PROFILES[2];
     const input=$("#wordsPace"),value=$("#wordsPaceValue"),description=$("#wordsPaceDescription");
