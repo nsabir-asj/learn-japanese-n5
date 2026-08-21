@@ -19,32 +19,24 @@ from PIL import Image, ImageDraw, ImageOps
 
 EXPECTED_SIZE = (7600, 4200)
 FULL_SIZE = (720, 380)
-VISUAL_SIZE = (720, 300)
-VISUAL_OFFSET = 80
+# LeafPiece captions are not in a consistent vertical band.  The visual hint
+# therefore keeps the complete normalized card and masks only the caption.
+VISUAL_SIZE = FULL_SIZE
+VISUAL_OFFSET = 0
 VISUAL_PADDING = 8
 INK_THRESHOLD = 150
-CLEANUP_THRESHOLD = 230
 COMPONENT_SCALE = 2
-TINY_COMPONENT_MAX_AREA = 20
-EDGE_MARGIN = 28
-KATAKANA_LEFT_MASK = 72
 
-# Some LeafPiece panels carry a small neighboring-page fragment or a cue line
-# that the component locator cannot separate cleanly.  These masks are
-# applied only to the visual hint, never to the full mnemonic crop.
-VISUAL_EDGE_MASKS = {
-    ("hiragana", "tsu"): ((260, -45, 500, VISUAL_SIZE[1]),),
-    ("hiragana", "ya"): ((300, 0, 460, 36),),
-    ("katakana", "a"): ((0, 0, 72, 58),),
-    ("katakana", "fu"): ((0, 0, 132, VISUAL_SIZE[1]),),
-    ("katakana", "i"): ((0, -12, VISUAL_SIZE[0], VISUAL_SIZE[1]),),
-    ("katakana", "ha"): ((0, 0, 112, VISUAL_SIZE[1]),),
-    ("katakana", "o"): ((0, 0, 112, VISUAL_SIZE[1]),),
-    ("katakana", "re"): ((0, 0, 220, VISUAL_SIZE[1]),),
-    ("katakana", "te"): ((0, 0, 124, VISUAL_SIZE[1]), (0, -65, VISUAL_SIZE[0], VISUAL_SIZE[1])),
-    ("katakana", "tsu"): ((0, 0, 112, VISUAL_SIZE[1]), (0, -45, VISUAL_SIZE[0], VISUAL_SIZE[1])),
-    ("katakana", "u"): ((480, -110, VISUAL_SIZE[0], VISUAL_SIZE[1]),),
-    ("katakana", "wa"): ((0, 0, 250, VISUAL_SIZE[1]),),
+# Caption detection handles the regular panels.  These are the small set of
+# panels whose cue line is easy to confuse with nearby drawing/text; the
+# coordinates are in the normalized full-crop space and are used only for the
+# visual copy.  Embedded labels in the artwork (for example KETCHUP or SPEED
+# LIMIT) are intentionally preserved.
+VISUAL_MASK_OVERRIDES = {
+    ("hiragana", "ya"): ((300, 78, 462, 120),),
+    ("hiragana", "ho"): ((196, 28, 368, 68),),
+    ("hiragana", "ke"): ((174, 64, 430, 112),),
+    ("katakana", "ro"): ((256, 48, 408, 94),),
 }
 
 READINGS = {
@@ -335,116 +327,51 @@ def visual_bounds_for(full: Image.Image, script: str, kana: str) -> tuple[int, i
     return (0, VISUAL_OFFSET, FULL_SIZE[0], FULL_SIZE[1])
 
 
-def _mask_tiny_components(
+def caption_mask_rects(
     image: Image.Image,
-    region: tuple[int, int, int, int],
-    max_area: int = TINY_COMPONENT_MAX_AREA,
-    threshold: int = INK_THRESHOLD,
-) -> Image.Image:
-    """Remove isolated specks in a small region without touching artwork."""
+    script: str,
+    kana: str,
+    band: tuple[int, int, int, int, tuple[tuple[int, int, int, int], ...]] | None,
+) -> tuple[tuple[int, int, int, int], ...]:
+    """Return deterministic white-mask rectangles in normalized full space."""
 
-    cleaned = image.convert("RGB")
-    gray = cleaned.convert("L")
-    width, height = cleaned.size
-    x0, y0, x1, y1 = (
-        max(0, region[0]),
-        max(0, region[1]),
-        min(width, region[2]),
-        min(height, region[3]),
-    )
-    pixels = list(gray.getdata())
-    visited: set[tuple[int, int]] = set()
-    draw = ImageDraw.Draw(cleaned)
-    for y in range(y0, y1):
-        for x in range(x0, x1):
-            if (x, y) in visited or pixels[y * width + x] >= threshold:
-                continue
-            stack = [(x, y)]
-            visited.add((x, y))
-            points: list[tuple[int, int]] = []
-            escaped = False
-            while stack:
-                current_x, current_y = stack.pop()
-                points.append((current_x, current_y))
-                for neighbor_y in range(current_y - 1, current_y + 2):
-                    for neighbor_x in range(current_x - 1, current_x + 2):
-                        if not (x0 <= neighbor_x < x1 and y0 <= neighbor_y < y1):
-                            if (
-                                0 <= neighbor_x < width
-                                and 0 <= neighbor_y < height
-                                and pixels[neighbor_y * width + neighbor_x] < threshold
-                            ):
-                                escaped = True
-                            continue
-                        if (neighbor_x, neighbor_y) in visited:
-                            continue
-                        if pixels[neighbor_y * width + neighbor_x] < threshold:
-                            visited.add((neighbor_x, neighbor_y))
-                            stack.append((neighbor_x, neighbor_y))
-            if not escaped and len(points) <= max_area:
-                xs = [point[0] for point in points]
-                ys = [point[1] for point in points]
-                draw.rectangle((min(xs), min(ys), max(xs), max(ys)), fill="white")
-    return cleaned
-
-
-def mask_caption_components(image: Image.Image, band: tuple[int, int, int, int, tuple[tuple[int, int, int, int], ...]] | None) -> Image.Image:
-    """White out only the localized cue letters, preserving nearby artwork."""
-
-    if band is None:
-        return image.convert("RGB")
-    cleaned = image.convert("RGB")
-    draw = ImageDraw.Draw(cleaned)
-    for x0, y0, x1, y1 in band[4]:
-        draw.rectangle(
-            (
-                max(0, x0 - VISUAL_PADDING // 2),
-                max(0, y0 - VISUAL_PADDING // 2),
-                min(cleaned.width, x1 + VISUAL_PADDING // 2),
-                min(cleaned.height, y1 + VISUAL_PADDING // 2),
-            ),
-            fill="white",
-        )
-    return _mask_tiny_components(
-        cleaned,
-        (
-            band[0] - VISUAL_PADDING * 2,
-            band[1] - VISUAL_PADDING * 2,
-            band[2] + VISUAL_PADDING * 2,
-            band[3] + VISUAL_PADDING * 2,
-        ),
-        threshold=CLEANUP_THRESHOLD,
-    )
-
-
-def clean_visual_edges(image: Image.Image, script: str, kana: str) -> Image.Image:
-    """Remove known neighboring-page spill from a visual-only crop."""
-
-    cleaned = image.convert("RGB")
-    draw = ImageDraw.Draw(cleaned)
-    reading = reading_for(kana)
-    for x0, y0, x1, y1 in VISUAL_EDGE_MASKS.get((script, reading), ()):
-        if y0 < 0:
-            y0 = max(0, cleaned.height + y0)
-        draw.rectangle(
+    override = VISUAL_MASK_OVERRIDES.get((script, reading_for(kana)))
+    if override:
+        return tuple(
             (
                 max(0, x0),
                 max(0, y0),
-                min(cleaned.width, x1),
-                min(cleaned.height, y1),
-            ),
-            fill="white",
+                min(image.width, x1),
+                min(image.height, y1),
+            )
+            for x0, y0, x1, y1 in override
         )
-    if script == "katakana":
-        draw.rectangle((0, 0, KATAKANA_LEFT_MASK, cleaned.height), fill="white")
-    for region in (
-        (0, 0, cleaned.width, EDGE_MARGIN),
-        (0, cleaned.height - EDGE_MARGIN, cleaned.width, cleaned.height),
-        (0, 0, EDGE_MARGIN, cleaned.height),
-        (cleaned.width - EDGE_MARGIN, 0, cleaned.width, cleaned.height),
-    ):
-        cleaned = _mask_tiny_components(cleaned, region, threshold=CLEANUP_THRESHOLD)
-    return cleaned
+    if band is None:
+        return ()
+    return (
+        (
+            max(0, band[0] - VISUAL_PADDING),
+            max(0, band[1] - VISUAL_PADDING),
+            min(image.width, band[2] + VISUAL_PADDING),
+            min(image.height, band[3] + VISUAL_PADDING),
+        ),
+    )
+
+
+def mask_caption_band(
+    image: Image.Image,
+    script: str,
+    kana: str,
+    band: tuple[int, int, int, int, tuple[tuple[int, int, int, int], ...]] | None,
+) -> tuple[Image.Image, tuple[tuple[int, int, int, int], ...]]:
+    """White out the cue line while retaining the complete artwork card."""
+
+    cleaned = image.convert("RGB")
+    masks = caption_mask_rects(cleaned, script, kana, band)
+    draw = ImageDraw.Draw(cleaned)
+    for rectangle in masks:
+        draw.rectangle(rectangle, fill="white")
+    return cleaned, masks
 
 
 def crop_chart(script: str, source: Image.Image, out_root: Path) -> list[dict]:
@@ -457,8 +384,13 @@ def crop_chart(script: str, source: Image.Image, out_root: Path) -> list[dict]:
         normalized_full = fit_on_white(full, FULL_SIZE)
         caption_band = _caption_band(normalized_full)
         visual_box = visual_bounds_for(normalized_full, script, record["kana"])
-        masked_full = mask_caption_components(normalized_full, caption_band)
-        visual = clean_visual_edges(masked_full.crop(visual_box), script, record["kana"])
+        masked_full, visual_masks = mask_caption_band(
+            normalized_full,
+            script,
+            record["kana"],
+            caption_band,
+        )
+        visual = masked_full.crop(visual_box)
         slug = reading_for(record["kana"])
         full_path = script_root / f"{slug}-full.webp"
         visual_path = script_root / f"{slug}-visual.webp"
@@ -471,6 +403,7 @@ def crop_chart(script: str, source: Image.Image, out_root: Path) -> list[dict]:
                 "visual": str(visual_path.relative_to(out_root)).replace("\\", "/"),
                 "visualBox": list(visual_box),
                 "visualCueBand": list(caption_band[:4]) if caption_band else None,
+                "visualMasks": [list(mask) for mask in visual_masks],
                 "fullSize": list(FULL_SIZE),
                 "visualSize": list(VISUAL_SIZE),
             }
@@ -505,13 +438,13 @@ def main() -> None:
         "crop": {
             "fullSize": list(FULL_SIZE),
             "visualSize": list(VISUAL_SIZE),
-            "visualMethod": "fixed normalized visual window with localized cue-letter masking",
+            "visualMethod": "complete normalized card with localized white caption masking",
             "visualBoxSpace": "normalized full crop",
             "visualOffset": VISUAL_OFFSET,
             "visualPadding": VISUAL_PADDING,
-            "visualEdgeMasks": {
+            "visualMaskOverrides": {
                 f"{script}:{reading}": [list(mask) for mask in masks]
-                for (script, reading), masks in VISUAL_EDGE_MASKS.items()
+                for (script, reading), masks in VISUAL_MASK_OVERRIDES.items()
             },
             "topPageLefts": TOP_PAGE_LEFTS,
             "bottomPageLefts": BOTTOM_PAGE_LEFTS,
