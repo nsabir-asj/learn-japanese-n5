@@ -7,7 +7,7 @@
   if(!hiragana||!katakana)throw new Error("Kana Mix needs both Hiragana and Katakana lesson data.");
 
   const MIX_STORAGE_KEY="kana-sprint-mix-v1";
-  const PAIR_COUNT=Math.min(hiragana.groups.length,26);
+  const PAIR_COUNT=Math.min(hiragana.groups.length,katakana.groups.length);
   const clone=value=>value==null?value:JSON.parse(JSON.stringify(value));
   const firstFamily=font=>(String(font.family).match(/"[^"]+"/)||["sans-serif"])[0];
 

@@ -37,13 +37,7 @@
     {id:"gya",name:"G-combos",phase:"Combinations",items:[["ギャ","gya"],["ギュ","gyu"],["ギョ","gyo"]]},
     {id:"ja",name:"J-combos",phase:"Combinations",items:[["ジャ","ja"],["ジュ","ju"],["ジョ","jo"]]},
     {id:"bya",name:"B-combos",phase:"Combinations",items:[["ビャ","bya"],["ビュ","byu"],["ビョ","byo"]]},
-    {id:"pya",name:"P-combos",phase:"Combinations",items:[["ピャ","pya"],["ピュ","pyu"],["ピョ","pyo"]]},
-    {id:"fa",name:"F foreign sounds",phase:"Combinations",items:[["ファ","fa"],["フィ","fi"],["フェ","fe"],["フォ","fo"]]},
-    {id:"ti",name:"T/D foreign sounds",phase:"Combinations",items:[["ティ","ti"],["ディ","di"],["トゥ","tu"],["ドゥ","du"]]},
-    {id:"wi",name:"W foreign sounds",phase:"Combinations",items:[["ウィ","wi"],["ウェ","we"],["ウォ","wo"]]},
-    {id:"she",name:"SH/J/CH foreign sounds",phase:"Combinations",items:[["シェ","she"],["ジェ","je"],["チェ","che"]]},
-    {id:"tsa",name:"TS foreign sounds",phase:"Combinations",items:[["ツァ","tsa"],["ツェ","tse"],["ツォ","tso"]]},
-    {id:"v",name:"V foreign sounds",phase:"Combinations",items:[["ヴァ","va"],["ヴィ","vi"],["ヴ","vu"],["ヴェ","ve"],["ヴォ","vo"]]}
+    {id:"pya",name:"P-combos",phase:"Combinations",items:[["ピャ","pya"],["ピュ","pyu"],["ピョ","pyo"]]}
   ];
 
   const VISUAL = {
