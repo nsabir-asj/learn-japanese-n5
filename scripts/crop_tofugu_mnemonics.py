@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Crop the supplied Tofugu mnemonic charts into local-only card assets.
 
-The chart files are intentionally not included in this repository.  Run this
+The chart files are intentionally not included in this repository. Run this
 script with the two source JPEGs available locally; it writes WebP crops and a
-validation manifest under assets/local-mnemonics/.
+validation manifest under assets/local-mnemonics/tofugu/.
 """
 
 from __future__ import annotations
@@ -151,7 +151,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--hiragana", type=Path, required=True, help="path to the supplied Hiragana chart JPEG")
     parser.add_argument("--katakana", type=Path, required=True, help="path to the supplied Katakana chart JPEG")
-    parser.add_argument("--output", type=Path, default=Path("assets/local-mnemonics"), help="local-only output directory")
+    parser.add_argument("--output", type=Path, default=Path("assets/local-mnemonics/tofugu"), help="local-only output directory")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     all_records = {}
