@@ -48,13 +48,13 @@
     return {
       version:lesson.progressVersion,
       learnUnlockedCount:lesson.initialLearnUnlockedCount,
-      stats:{answered:0,correct:0,streak:0,bestStreak:0},
+      stats:{answered:0,correct:0,assisted:0,streak:0,bestStreak:0},
       wordStats:{seen:0,correct:0},wordItems:{},wordFeatureHistory:{},
-      phaseHistory:{Basic:[],Voiced:[],"Semi-voiced":[],Combinations:[]},
+      phaseHistory:{Basic:[],Voiced:[],"Semi-voiced":[],Combinations:[]},learnRowHistory:{},
       items:{},rehearseItems:{},groupUnlockSource:{},rehearseGroups,
       customMnemonics:{},
       selectedFonts,rehearseSetOpen:false,rehearseHelpOpen:false,wordSet:"learned",
-      speech:{autoPlay:true,speakMeaning:true,rate:.85,jaVoice:"",enVoice:""},savedAt:0
+      speech:{autoPlay:true,speakMeaning:true,rate:.85,jaVoice:"",enVoice:""},assistedAccountingV2:true,savedAt:0
     };
   }
 
@@ -67,10 +67,18 @@
   }
 
   function ensureSource(state,lesson){
+    const needsAssistedMigration=!state.assistedAccountingV2;
     const fallback=defaultSourceState(lesson);
     Object.keys(fallback).forEach(key=>{if(state[key]==null)state[key]=clone(fallback[key])});
     if(!state.stats)state.stats=clone(fallback.stats);
     if(!state.wordStats)state.wordStats=clone(fallback.wordStats);
+    if(needsAssistedMigration){
+      const assisted=Object.values(state.items||{}).reduce((sum,item)=>sum+(Number(item&&item.assistedCorrect)||0),0);
+      state.stats.answered=Math.max(0,(state.stats.answered||0)-assisted);
+      state.stats.correct=Math.max(0,(state.stats.correct||0)-assisted);
+      state.stats.assisted=Math.max(state.stats.assisted||0,assisted);
+      state.assistedAccountingV2=true;
+    }
     return state;
   }
 
@@ -119,9 +127,11 @@
     state.stats={
       answered:(sourceStates.hiragana.stats.answered||0)+(sourceStates.katakana.stats.answered||0),
       correct:(sourceStates.hiragana.stats.correct||0)+(sourceStates.katakana.stats.correct||0),
+      assisted:(sourceStates.hiragana.stats.assisted||0)+(sourceStates.katakana.stats.assisted||0),
       streak:saved&&saved.stats?saved.stats.streak:0,
       bestStreak:Math.max(saved&&saved.stats?saved.stats.bestStreak||0:0,sourceStates.hiragana.stats.bestStreak||0,sourceStates.katakana.stats.bestStreak||0)
     };
+    state.assistedAccountingV2=true;
     state.wordStats={
       seen:(sourceStates.hiragana.wordStats.seen||0)+(sourceStates.katakana.wordStats.seen||0),
       correct:(sourceStates.hiragana.wordStats.correct||0)+(sourceStates.katakana.wordStats.correct||0)
@@ -152,6 +162,18 @@
     return result;
   };
 
+  const kanaTotals=(records,keys)=>{
+    const result={seen:0,correct:0,assisted:0};
+    keys.forEach(key=>{
+      const record=records[key];if(!record)return;
+      const assisted=Number(record.assistedCorrect)||0;
+      result.seen+=Number.isFinite(record.unaidedSeen)?record.unaidedSeen:Math.max(0,(record.seen||0)-assisted);
+      result.correct+=Number.isFinite(record.unaidedCorrect)?record.unaidedCorrect:Math.max(0,(record.correct||0)-assisted);
+      result.assisted+=assisted;
+    });
+    return result;
+  };
+
   function changed(current,previous){return JSON.stringify(current||null)!==JSON.stringify(previous||null)}
 
   function syncCurriculum(mix,script,source){
@@ -173,8 +195,13 @@
       owner.kana.forEach(key=>{
         if(changed(mix.items[key],snapshots.items[key])){
           const before=snapshots.items[key]||{};const after=mix.items[key]||{};
-          newAnswers+=Math.max(0,(after.seen||0)-(before.seen||0));
-          newCorrect+=Math.max(0,(after.correct||0)-(before.correct||0));
+          const beforeAssisted=before.assistedCorrect||0,afterAssisted=after.assistedCorrect||0;
+          const beforeSeen=Number.isFinite(before.unaidedSeen)?before.unaidedSeen:Math.max(0,(before.seen||0)-beforeAssisted);
+          const afterSeen=Number.isFinite(after.unaidedSeen)?after.unaidedSeen:Math.max(0,(after.seen||0)-afterAssisted);
+          const beforeCorrect=Number.isFinite(before.unaidedCorrect)?before.unaidedCorrect:Math.max(0,(before.correct||0)-beforeAssisted);
+          const afterCorrect=Number.isFinite(after.unaidedCorrect)?after.unaidedCorrect:Math.max(0,(after.correct||0)-afterAssisted);
+          newAnswers+=Math.max(0,afterSeen-beforeSeen);
+          newCorrect+=Math.max(0,afterCorrect-beforeCorrect);
           source.items[key]=clone(after);
         }
         if(changed(mix.rehearseItems[key],snapshots.rehearseItems[key]))source.rehearseItems[key]=clone(mix.rehearseItems[key]);
@@ -187,10 +214,12 @@
           source.wordItems[key]=clone(after);
         }
       });
-      const kanaTotals=totals(source.items,owner.kana);
+      const kanaResults=kanaTotals(source.items,owner.kana);
       const wordTotals=totals(source.wordItems,owner.words);
-      source.stats.answered=kanaTotals.seen+wordTotals.seen;
-      source.stats.correct=kanaTotals.correct+wordTotals.correct;
+      source.stats.answered=kanaResults.seen+wordTotals.seen;
+      source.stats.correct=kanaResults.correct+wordTotals.correct;
+      source.stats.assisted=kanaResults.assisted;
+      source.assistedAccountingV2=true;
       if(newAnswers){
         source.stats.streak=newCorrect===newAnswers?(source.stats.streak||0)+newAnswers:0;
         source.stats.bestStreak=Math.max(source.stats.bestStreak||0,source.stats.streak);

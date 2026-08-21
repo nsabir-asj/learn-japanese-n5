@@ -22,11 +22,11 @@ Keep the `shared`, `lessons`, and `fonts` folders beside the HTML files. Moving 
 
 ### Learn
 
-Introduces rows gradually. Weak kana return more often, while successful practice unlocks later rows. Rehearsal can also unlock a row when you demonstrate that you already know every kana in it.
+Introduces rows gradually. A completely new kana first appears in standard print with its reading and full mnemonic; this study step changes neither mastery, accuracy, nor streak. An unaided check follows after several intervening questions. Weak kana return more often, while successful unaided practice unlocks later rows. Rehearsal can also unlock a row when you demonstrate that you already know every kana in it.
 
 ### Rehearse
 
-Lets you select any rows immediately. While unassessed kana remain, the trainer favors coverage so the last few unseen kana do not get starved by reviews. Once the selected set has been fully assessed, practice becomes fully adaptive.
+Lets you select any rows immediately. An assessment means a graded recall attempt rather than merely viewing a mnemonic. While unassessed kana remain, the trainer favors coverage so the last few unseen kana do not get starved by reviews. A kana's first successful assessment uses standard print; varied fonts become eligible after that unaided recognition. Once the selected set has been fully assessed, practice becomes fully adaptive.
 
 Recent mistakes increase the share of difficult sound categories, including voiced, semi-voiced, and combination kana. Mistake reviews are delayed enough to test recall instead of immediate repetition.
 
@@ -40,7 +40,7 @@ If Japanese speech is available in the browser, the trainer can pronounce the wo
 
 ### Learning pace
 
-Learn, Rehearse, and Words each have a saved seven-position pace control. Learn adjusts how often unassessed kana appear within unlocked rows, Rehearse adjusts coverage of the selected set, and Words adjusts new vocabulary frequency. The fastest **New-first** setting chooses unseen material whenever possible. Scheduled mistake reviews always take priority, and a pace control stops affecting selection once its current pool is fully assessed.
+Learn, Rehearse, and Words each have a saved seven-position pace control. Learn adjusts how often a not-yet-introduced kana and mnemonic appear within unlocked rows, Rehearse adjusts assessment coverage of the selected set, and Words adjusts new vocabulary frequency. The fastest **New-first** setting chooses new material whenever possible. Scheduled mistake and mnemonic-recall checks always take priority, and a pace control stops affecting selection once its current pool is fully introduced or assessed.
 
 ### Fonts
 
@@ -50,7 +50,9 @@ When a difficult-font answer is wrong, the standard form appears beside it for o
 
 ### Mnemonics
 
-Learn and Rehearse include an optional **Need a mnemonic?** hint for individual kana. When the local chart crops are present, the first click shows a visual-only card and a correct answer receives about 70% of the usual mastery gain. A second click reveals the full answer mnemonic and a correct answer receives 40%. Assisted answers do not increase the unaided streak. After a rescue correction, the relevant full visual mnemonic is shown automatically.
+Learn and Rehearse include an optional **Need a mnemonic?** hint for individual kana. When local chart crops are present, the first click shows a visual-only card. A visual-assisted correct answer receives 40% of normal mastery in standard print or 25% when the mnemonic also supplies the standard form for a difficult-font question. A second click reveals the full answer mnemonic and awards no mastery. Assisted recognitions do not affect accuracy or streak. Introductions, assisted recognitions, and rescue corrections schedule guaranteed unaided checks after several intervening questions.
+
+Exposure and assessment are tracked separately. Seeing a difficult font still increases its exposure count, but font accuracy uses only unaided graded attempts. Kana Progress shows a simple assisted-recognition total.
 
 During the first Learn/Rehearse visual hint, Tofugu cards use a local CSS blur cover over their repeated Latin badge (with a wider cover for `HU / FU`). Full answer mnemonics, rescue corrections, and the Mnemonics tab remain unmasked.
 
