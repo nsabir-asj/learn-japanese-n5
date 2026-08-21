@@ -21,6 +21,24 @@ EXPECTED_SIZE = (3885, 2555)
 FULL_SIZE = (720, 430)
 VISUAL_SIZE = (720, 300)
 VISUAL_OFFSET = 90
+VISUAL_BOTTOM_PADDING = 8
+INK_THRESHOLD = 150
+INK_BAND_GAP = 4
+
+# The selected panels come from a fixed chart.  Their source boxes begin at
+# slightly different distances from the label bar, so one global offset clips
+# the top of some illustrations.  These are the first content rows after the
+# label bar, measured once from the supplied chart.  The fallback keeps the
+# crop utility usable if another panel is added later.
+VISUAL_TOPS_BY_SOURCE_Y = {
+    270: 360,
+    545: 614,
+    815: 870,
+    1545: 1622,
+    1570: 1622,
+    1840: 1877,
+    2315: 2388,
+}
 
 
 READINGS = {
@@ -168,6 +186,56 @@ def save_webp(image: Image.Image, path: Path, size: tuple[int, int]) -> None:
     fit_on_white(image, size).save(path, "WEBP", lossless=True, method=6)
 
 
+def _merge_ink_bands(rows: list[tuple[int, int]]) -> list[list[tuple[int, int]]]:
+    """Merge nearby dark-row runs so anti-aliased text stays one band."""
+
+    bands: list[list[tuple[int, int]]] = []
+    for row in rows:
+        if not bands or row[0] - bands[-1][-1][0] > INK_BAND_GAP + 1:
+            bands.append([])
+        bands[-1].append(row)
+    return bands
+
+
+def _caption_top(source: Image.Image, box: tuple[int, int, int, int]) -> int:
+    """Return the top of the lowest text band in a panel.
+
+    Pictografix puts the mnemonic sentence below the illustration in every
+    selected panel.  Looking only in the lower half avoids treating dark
+    illustration strokes as the caption; the bottom-most remaining band is
+    then the sentence that should be excluded from a visual-only crop.
+    """
+
+    x0, y0, x1, y1 = box
+    gray = source.crop(box).convert("L")
+    width, height = gray.size
+    rows: list[tuple[int, int]] = []
+    pixels = gray.load()
+    for offset in range(height):
+        ink = sum(1 for x in range(width) if pixels[x, offset] < INK_THRESHOLD)
+        # Full-width strokes are panel borders, not the mnemonic sentence.
+        if ink > max(6, int(width * 0.01)) and ink < int(width * 0.75):
+            rows.append((y0 + offset, ink))
+    lower_start = y0 + int(height * 0.5)
+    bands = _merge_ink_bands([row for row in rows if row[0] >= lower_start])
+    if not bands:
+        raise ValueError(f"could not locate lower mnemonic text for {box}")
+    return bands[-1][0][0]
+
+
+def visual_box_for(source: Image.Image, source_box: tuple[int, int, int, int]) -> tuple[int, int, int, int]:
+    """Build a visual-only box while leaving the full panel box untouched."""
+
+    x0, y0, x1, y1 = source_box
+    visual_top = VISUAL_TOPS_BY_SOURCE_Y.get(y0, y0 + VISUAL_OFFSET)
+    visual_bottom = _caption_top(source, source_box) - VISUAL_BOTTOM_PADDING
+    if not (y0 <= visual_top < visual_bottom <= y1):
+        raise ValueError(
+            f"invalid visual bounds for {source_box}: {(x0, visual_top, x1, visual_bottom)}"
+        )
+    return (x0, visual_top, x1, visual_bottom)
+
+
 def validate(source: Image.Image, records: list[dict]) -> None:
     if source.size != EXPECTED_SIZE:
         raise ValueError(f"expected {EXPECTED_SIZE[0]}x{EXPECTED_SIZE[1]}, found {source.size}")
@@ -190,8 +258,10 @@ def crop_chart(source: Image.Image, output: Path) -> list[dict]:
     for record in records:
         script_root = output / record["script"]
         script_root.mkdir(parents=True, exist_ok=True)
-        cropped = source.crop(tuple(record["sourceBox"]))
-        visual = cropped.crop((0, VISUAL_OFFSET, cropped.width, cropped.height))
+        source_box = tuple(record["sourceBox"])
+        cropped = source.crop(source_box)
+        visual_box = visual_box_for(source, source_box)
+        visual = source.crop(visual_box)
         stem = record["reading"]
         full_path = script_root / f"{stem}-full.webp"
         visual_path = script_root / f"{stem}-visual.webp"
@@ -210,6 +280,7 @@ def crop_chart(source: Image.Image, output: Path) -> list[dict]:
             {
                 "full": str(full_path.relative_to(output)).replace("\\", "/"),
                 "visual": str(visual_path.relative_to(output)).replace("\\", "/"),
+                "visualBox": list(visual_box),
                 "fullSize": list(FULL_SIZE),
                 "visualSize": list(VISUAL_SIZE),
             }
@@ -240,7 +311,8 @@ def main() -> None:
         "crop": {
             "fullSize": list(FULL_SIZE),
             "visualSize": list(VISUAL_SIZE),
-            "visualOffset": VISUAL_OFFSET,
+            "visualMethod": "label-aligned top plus lowest caption-band detection",
+            "visualBottomPadding": VISUAL_BOTTOM_PADDING,
         },
         "selectedPanels": records,
     }
