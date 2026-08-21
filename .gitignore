@@ -8,9 +8,10 @@
 !/assets/local-mnemonics/sources/README.md
 !/assets/local-mnemonics/sources/.gitkeep
 
-# Generated crops and manifests are derivative artwork and remain local-only.
-/assets/local-mnemonics/tofugu/
-/assets/local-mnemonics/leafpiece/
-/assets/local-mnemonics/pictografix/
+# Generated crops and manifests are committed so a private clone runs offline.
+# The original source charts under sources/ remain local-only and ignored.
+!/assets/local-mnemonics/tofugu/
+!/assets/local-mnemonics/leafpiece/
+!/assets/local-mnemonics/pictografix/
 scripts/__pycache__/
 work-*.jpg

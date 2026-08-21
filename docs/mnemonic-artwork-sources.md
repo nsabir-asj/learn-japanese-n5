@@ -1,8 +1,10 @@
 # Mnemonic artwork sources
 
 This is the provenance record for the mnemonic charts used to create the
-local-only crops under `assets/local-mnemonics/`. The URLs document where the
-source artwork came from; they do not grant redistribution rights.
+generated crops under `assets/local-mnemonics/`. The URLs document where the
+source artwork came from; they do not grant redistribution rights. The
+generated crops are committed for this private repository so a fresh clone
+works offline; the original source charts remain local-only.
 
 ## Source registry
 
@@ -15,13 +17,13 @@ source artwork came from; they do not grant redistribution rights.
 
 ## Usage and licensing notes
 
-- The source charts and generated crops are intentionally ignored by Git. The
-  repository stores only application code, mappings, crop tooling, and this
-  provenance record.
-- Keep the originals and generated artwork on the local machine unless written
-  redistribution permission or a clearly applicable license is available.
-- If permission is obtained, update this document with the exact license,
-  attribution text, and any required notice before changing the ignore rules.
+- The original source charts are intentionally ignored by Git. The generated
+  crops and manifests are tracked so the private repository is plug-and-run.
+- Keep the repository private unless written redistribution permission or a
+  clearly applicable license is available for every bundled artwork source.
+- If the repository becomes public or the artwork is redistributed, update this
+  document with the exact license, attribution text, and any required notice,
+  and review the bundled assets before publishing.
 - Runtime selection data belongs in
   `shared/kana-mnemonic-preferences.json`; source URLs and rights information
   belong here rather than in that lookup index.

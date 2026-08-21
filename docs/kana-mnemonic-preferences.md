@@ -61,12 +61,12 @@ live under `assets/local-mnemonics/tofugu/`.
 
 All 46 Hiragana and 46 Katakana panels from the supplied LeafPiece chart are
 extracted locally under `assets/local-mnemonics/leafpiece/`. The original
-chart is kept under `assets/local-mnemonics/sources/leafpiece/`. Those files
-and their manifest remain ignored by Git because the chart artwork is
-third-party and redistribution permission has not been provided.
+chart is kept under `assets/local-mnemonics/sources/leafpiece/`. The generated
+cards and manifest are tracked for the private, offline-ready repository; the
+original chart remains ignored.
 
 The selected Pictografix panels are extracted locally under
 `assets/local-mnemonics/pictografix/` (15 panels, each with full and visual
-WebP variants). The original chart is kept under
-`assets/local-mnemonics/sources/pictografix/`. Those files and their manifest
-are also ignored by Git.
+WebP variants). The generated panels and manifest are tracked for the private,
+offline-ready repository. The original chart is kept under
+`assets/local-mnemonics/sources/pictografix/` and remains ignored.

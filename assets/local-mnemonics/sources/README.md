@@ -10,12 +10,15 @@ charts are kept separate from generated per-kana assets:
 The source files are intentionally ignored by Git. They are user-supplied or
 third-party artwork, and the generated crops are derivative artwork. Keep
 them on the local machine unless written redistribution permission is
-available. The tracked crop scripts and application mappings remain usable
-without these files because the trainer falls back to text mnemonics.
+available. The generated crops and manifests are tracked for the private,
+offline-ready repository; the crop scripts and application mappings remain
+usable without these source files because the trainer falls back to text
+mnemonics.
 
 The source URLs, credits, and licensing notes are recorded in
 [`docs/mnemonic-artwork-sources.md`](../../../docs/mnemonic-artwork-sources.md).
 
 Run the crop utilities from the repository root and pass the source file from
-the matching subdirectory. Generated crops and manifests stay in the sibling
-source-specific directories under `assets/local-mnemonics/`.
+the matching subdirectory. Generated crops and manifests are committed in the
+sibling source-specific directories under `assets/local-mnemonics/`; the
+original charts remain ignored.

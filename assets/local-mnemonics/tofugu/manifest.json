@@ -1,0 +1,1963 @@
+{
+  "format": 1,
+  "sourceNote": "Local crops generated from user-supplied Tofugu chart images. Do not redistribute without permission.",
+  "crop": {
+    "cardSize": [
+      338,
+      316
+    ],
+    "visualHeight": 190
+  },
+  "charts": {
+    "hiragana": {
+      "source": "assets\\local-mnemonics\\sources\\tofugu\\hiragana-mnemonic-chart-by-tofugu.jpg",
+      "sourceSize": [
+        3300,
+        2550
+      ],
+      "panels": [
+        {
+          "kana": "あ",
+          "panelId": "hiragana-1-1",
+          "box": [
+            58,
+            420,
+            396,
+            736
+          ],
+          "reading": "a",
+          "full": "hiragana/a-full.webp",
+          "visual": "hiragana/a-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "か",
+          "panelId": "hiragana-1-2",
+          "box": [
+            412,
+            420,
+            750,
+            736
+          ],
+          "reading": "ka",
+          "full": "hiragana/ka-full.webp",
+          "visual": "hiragana/ka-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "さ",
+          "panelId": "hiragana-1-3",
+          "box": [
+            765,
+            420,
+            1103,
+            736
+          ],
+          "reading": "sa",
+          "full": "hiragana/sa-full.webp",
+          "visual": "hiragana/sa-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "た",
+          "panelId": "hiragana-1-4",
+          "box": [
+            1120,
+            420,
+            1458,
+            736
+          ],
+          "reading": "ta",
+          "full": "hiragana/ta-full.webp",
+          "visual": "hiragana/ta-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "な",
+          "panelId": "hiragana-1-5",
+          "box": [
+            1473,
+            420,
+            1811,
+            736
+          ],
+          "reading": "na",
+          "full": "hiragana/na-full.webp",
+          "visual": "hiragana/na-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "は",
+          "panelId": "hiragana-1-6",
+          "box": [
+            1831,
+            420,
+            2169,
+            736
+          ],
+          "reading": "ha",
+          "full": "hiragana/ha-full.webp",
+          "visual": "hiragana/ha-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ま",
+          "panelId": "hiragana-1-7",
+          "box": [
+            2188,
+            420,
+            2526,
+            736
+          ],
+          "reading": "ma",
+          "full": "hiragana/ma-full.webp",
+          "visual": "hiragana/ma-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ら",
+          "panelId": "hiragana-1-8",
+          "box": [
+            2546,
+            420,
+            2884,
+            736
+          ],
+          "reading": "ra",
+          "full": "hiragana/ra-full.webp",
+          "visual": "hiragana/ra-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "や",
+          "panelId": "hiragana-1-9",
+          "box": [
+            2902,
+            420,
+            3240,
+            736
+          ],
+          "reading": "ya",
+          "full": "hiragana/ya-full.webp",
+          "visual": "hiragana/ya-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "い",
+          "panelId": "hiragana-2-1",
+          "box": [
+            58,
+            763,
+            396,
+            1079
+          ],
+          "reading": "i",
+          "full": "hiragana/i-full.webp",
+          "visual": "hiragana/i-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "き",
+          "panelId": "hiragana-2-2",
+          "box": [
+            412,
+            763,
+            750,
+            1079
+          ],
+          "reading": "ki",
+          "full": "hiragana/ki-full.webp",
+          "visual": "hiragana/ki-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "し",
+          "panelId": "hiragana-2-3",
+          "box": [
+            765,
+            763,
+            1103,
+            1079
+          ],
+          "reading": "shi",
+          "full": "hiragana/shi-full.webp",
+          "visual": "hiragana/shi-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ち",
+          "panelId": "hiragana-2-4",
+          "box": [
+            1120,
+            763,
+            1458,
+            1079
+          ],
+          "reading": "chi",
+          "full": "hiragana/chi-full.webp",
+          "visual": "hiragana/chi-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "に",
+          "panelId": "hiragana-2-5",
+          "box": [
+            1473,
+            763,
+            1811,
+            1079
+          ],
+          "reading": "ni",
+          "full": "hiragana/ni-full.webp",
+          "visual": "hiragana/ni-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ひ",
+          "panelId": "hiragana-2-6",
+          "box": [
+            1831,
+            763,
+            2169,
+            1079
+          ],
+          "reading": "hi",
+          "full": "hiragana/hi-full.webp",
+          "visual": "hiragana/hi-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "み",
+          "panelId": "hiragana-2-7",
+          "box": [
+            2188,
+            763,
+            2526,
+            1079
+          ],
+          "reading": "mi",
+          "full": "hiragana/mi-full.webp",
+          "visual": "hiragana/mi-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "り",
+          "panelId": "hiragana-2-8",
+          "box": [
+            2546,
+            763,
+            2884,
+            1079
+          ],
+          "reading": "ri",
+          "full": "hiragana/ri-full.webp",
+          "visual": "hiragana/ri-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "う",
+          "panelId": "hiragana-3-1",
+          "box": [
+            58,
+            1105,
+            396,
+            1421
+          ],
+          "reading": "u",
+          "full": "hiragana/u-full.webp",
+          "visual": "hiragana/u-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "く",
+          "panelId": "hiragana-3-2",
+          "box": [
+            412,
+            1105,
+            750,
+            1421
+          ],
+          "reading": "ku",
+          "full": "hiragana/ku-full.webp",
+          "visual": "hiragana/ku-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "す",
+          "panelId": "hiragana-3-3",
+          "box": [
+            765,
+            1105,
+            1103,
+            1421
+          ],
+          "reading": "su",
+          "full": "hiragana/su-full.webp",
+          "visual": "hiragana/su-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "つ",
+          "panelId": "hiragana-3-4",
+          "box": [
+            1120,
+            1105,
+            1458,
+            1421
+          ],
+          "reading": "tsu",
+          "full": "hiragana/tsu-full.webp",
+          "visual": "hiragana/tsu-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ぬ",
+          "panelId": "hiragana-3-5",
+          "box": [
+            1473,
+            1105,
+            1811,
+            1421
+          ],
+          "reading": "nu",
+          "full": "hiragana/nu-full.webp",
+          "visual": "hiragana/nu-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ふ",
+          "panelId": "hiragana-3-6",
+          "box": [
+            1831,
+            1105,
+            2169,
+            1421
+          ],
+          "reading": "fu",
+          "full": "hiragana/fu-full.webp",
+          "visual": "hiragana/fu-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "む",
+          "panelId": "hiragana-3-7",
+          "box": [
+            2188,
+            1105,
+            2526,
+            1421
+          ],
+          "reading": "mu",
+          "full": "hiragana/mu-full.webp",
+          "visual": "hiragana/mu-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "る",
+          "panelId": "hiragana-3-8",
+          "box": [
+            2546,
+            1105,
+            2884,
+            1421
+          ],
+          "reading": "ru",
+          "full": "hiragana/ru-full.webp",
+          "visual": "hiragana/ru-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ゆ",
+          "panelId": "hiragana-3-9",
+          "box": [
+            2902,
+            1105,
+            3240,
+            1421
+          ],
+          "reading": "yu",
+          "full": "hiragana/yu-full.webp",
+          "visual": "hiragana/yu-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "え",
+          "panelId": "hiragana-4-1",
+          "box": [
+            58,
+            1448,
+            396,
+            1764
+          ],
+          "reading": "e",
+          "full": "hiragana/e-full.webp",
+          "visual": "hiragana/e-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "け",
+          "panelId": "hiragana-4-2",
+          "box": [
+            412,
+            1448,
+            750,
+            1764
+          ],
+          "reading": "ke",
+          "full": "hiragana/ke-full.webp",
+          "visual": "hiragana/ke-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "せ",
+          "panelId": "hiragana-4-3",
+          "box": [
+            765,
+            1448,
+            1103,
+            1764
+          ],
+          "reading": "se",
+          "full": "hiragana/se-full.webp",
+          "visual": "hiragana/se-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "て",
+          "panelId": "hiragana-4-4",
+          "box": [
+            1120,
+            1448,
+            1458,
+            1764
+          ],
+          "reading": "te",
+          "full": "hiragana/te-full.webp",
+          "visual": "hiragana/te-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ね",
+          "panelId": "hiragana-4-5",
+          "box": [
+            1473,
+            1448,
+            1811,
+            1764
+          ],
+          "reading": "ne",
+          "full": "hiragana/ne-full.webp",
+          "visual": "hiragana/ne-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "へ",
+          "panelId": "hiragana-4-6",
+          "box": [
+            1831,
+            1448,
+            2169,
+            1764
+          ],
+          "reading": "he",
+          "full": "hiragana/he-full.webp",
+          "visual": "hiragana/he-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "め",
+          "panelId": "hiragana-4-7",
+          "box": [
+            2188,
+            1448,
+            2526,
+            1764
+          ],
+          "reading": "me",
+          "full": "hiragana/me-full.webp",
+          "visual": "hiragana/me-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "れ",
+          "panelId": "hiragana-4-8",
+          "box": [
+            2546,
+            1448,
+            2884,
+            1764
+          ],
+          "reading": "re",
+          "full": "hiragana/re-full.webp",
+          "visual": "hiragana/re-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "お",
+          "panelId": "hiragana-5-1",
+          "box": [
+            58,
+            1790,
+            396,
+            2106
+          ],
+          "reading": "o",
+          "full": "hiragana/o-full.webp",
+          "visual": "hiragana/o-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "こ",
+          "panelId": "hiragana-5-2",
+          "box": [
+            412,
+            1790,
+            750,
+            2106
+          ],
+          "reading": "ko",
+          "full": "hiragana/ko-full.webp",
+          "visual": "hiragana/ko-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "そ",
+          "panelId": "hiragana-5-3",
+          "box": [
+            765,
+            1790,
+            1103,
+            2106
+          ],
+          "reading": "so",
+          "full": "hiragana/so-full.webp",
+          "visual": "hiragana/so-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "と",
+          "panelId": "hiragana-5-4",
+          "box": [
+            1120,
+            1790,
+            1458,
+            2106
+          ],
+          "reading": "to",
+          "full": "hiragana/to-full.webp",
+          "visual": "hiragana/to-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "の",
+          "panelId": "hiragana-5-5",
+          "box": [
+            1473,
+            1790,
+            1811,
+            2106
+          ],
+          "reading": "no",
+          "full": "hiragana/no-full.webp",
+          "visual": "hiragana/no-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ほ",
+          "panelId": "hiragana-5-6",
+          "box": [
+            1831,
+            1790,
+            2169,
+            2106
+          ],
+          "reading": "ho",
+          "full": "hiragana/ho-full.webp",
+          "visual": "hiragana/ho-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "も",
+          "panelId": "hiragana-5-7",
+          "box": [
+            2188,
+            1790,
+            2526,
+            2106
+          ],
+          "reading": "mo",
+          "full": "hiragana/mo-full.webp",
+          "visual": "hiragana/mo-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ろ",
+          "panelId": "hiragana-5-8",
+          "box": [
+            2546,
+            1790,
+            2884,
+            2106
+          ],
+          "reading": "ro",
+          "full": "hiragana/ro-full.webp",
+          "visual": "hiragana/ro-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "よ",
+          "panelId": "hiragana-5-9",
+          "box": [
+            2902,
+            1790,
+            3240,
+            2106
+          ],
+          "reading": "yo",
+          "full": "hiragana/yo-full.webp",
+          "visual": "hiragana/yo-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "わ",
+          "panelId": "hiragana-6-わ",
+          "box": [
+            228,
+            2120,
+            566,
+            2436
+          ],
+          "reading": "wa",
+          "full": "hiragana/wa-full.webp",
+          "visual": "hiragana/wa-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "を",
+          "panelId": "hiragana-6-を",
+          "box": [
+            578,
+            2120,
+            916,
+            2436
+          ],
+          "reading": "wo",
+          "full": "hiragana/wo-full.webp",
+          "visual": "hiragana/wo-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ん",
+          "panelId": "hiragana-6-ん",
+          "box": [
+            2724,
+            2120,
+            3062,
+            2436
+          ],
+          "reading": "n",
+          "full": "hiragana/n-full.webp",
+          "visual": "hiragana/n-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        }
+      ]
+    },
+    "katakana": {
+      "source": "assets\\local-mnemonics\\sources\\tofugu\\katakana-mnemonic-chart-by-tofugu.jpg",
+      "sourceSize": [
+        3300,
+        2550
+      ],
+      "panels": [
+        {
+          "kana": "ア",
+          "panelId": "katakana-1-1",
+          "box": [
+            58,
+            420,
+            396,
+            736
+          ],
+          "reading": "a",
+          "full": "katakana/a-full.webp",
+          "visual": "katakana/a-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "カ",
+          "panelId": "katakana-1-2",
+          "box": [
+            412,
+            420,
+            750,
+            736
+          ],
+          "reading": "ka",
+          "full": "katakana/ka-full.webp",
+          "visual": "katakana/ka-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "サ",
+          "panelId": "katakana-1-3",
+          "box": [
+            765,
+            420,
+            1103,
+            736
+          ],
+          "reading": "sa",
+          "full": "katakana/sa-full.webp",
+          "visual": "katakana/sa-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "タ",
+          "panelId": "katakana-1-4",
+          "box": [
+            1120,
+            420,
+            1458,
+            736
+          ],
+          "reading": "ta",
+          "full": "katakana/ta-full.webp",
+          "visual": "katakana/ta-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ナ",
+          "panelId": "katakana-1-5",
+          "box": [
+            1473,
+            420,
+            1811,
+            736
+          ],
+          "reading": "na",
+          "full": "katakana/na-full.webp",
+          "visual": "katakana/na-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ハ",
+          "panelId": "katakana-1-6",
+          "box": [
+            1831,
+            420,
+            2169,
+            736
+          ],
+          "reading": "ha",
+          "full": "katakana/ha-full.webp",
+          "visual": "katakana/ha-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "マ",
+          "panelId": "katakana-1-7",
+          "box": [
+            2188,
+            420,
+            2526,
+            736
+          ],
+          "reading": "ma",
+          "full": "katakana/ma-full.webp",
+          "visual": "katakana/ma-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ラ",
+          "panelId": "katakana-1-8",
+          "box": [
+            2546,
+            420,
+            2884,
+            736
+          ],
+          "reading": "ra",
+          "full": "katakana/ra-full.webp",
+          "visual": "katakana/ra-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ヤ",
+          "panelId": "katakana-1-9",
+          "box": [
+            2902,
+            420,
+            3240,
+            736
+          ],
+          "reading": "ya",
+          "full": "katakana/ya-full.webp",
+          "visual": "katakana/ya-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "イ",
+          "panelId": "katakana-2-1",
+          "box": [
+            58,
+            763,
+            396,
+            1079
+          ],
+          "reading": "i",
+          "full": "katakana/i-full.webp",
+          "visual": "katakana/i-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "キ",
+          "panelId": "katakana-2-2",
+          "box": [
+            412,
+            763,
+            750,
+            1079
+          ],
+          "reading": "ki",
+          "full": "katakana/ki-full.webp",
+          "visual": "katakana/ki-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "シ",
+          "panelId": "katakana-2-3",
+          "box": [
+            765,
+            763,
+            1103,
+            1079
+          ],
+          "reading": "shi",
+          "full": "katakana/shi-full.webp",
+          "visual": "katakana/shi-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "チ",
+          "panelId": "katakana-2-4",
+          "box": [
+            1120,
+            763,
+            1458,
+            1079
+          ],
+          "reading": "chi",
+          "full": "katakana/chi-full.webp",
+          "visual": "katakana/chi-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ニ",
+          "panelId": "katakana-2-5",
+          "box": [
+            1473,
+            763,
+            1811,
+            1079
+          ],
+          "reading": "ni",
+          "full": "katakana/ni-full.webp",
+          "visual": "katakana/ni-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ヒ",
+          "panelId": "katakana-2-6",
+          "box": [
+            1831,
+            763,
+            2169,
+            1079
+          ],
+          "reading": "hi",
+          "full": "katakana/hi-full.webp",
+          "visual": "katakana/hi-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ミ",
+          "panelId": "katakana-2-7",
+          "box": [
+            2188,
+            763,
+            2526,
+            1079
+          ],
+          "reading": "mi",
+          "full": "katakana/mi-full.webp",
+          "visual": "katakana/mi-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "リ",
+          "panelId": "katakana-2-8",
+          "box": [
+            2546,
+            763,
+            2884,
+            1079
+          ],
+          "reading": "ri",
+          "full": "katakana/ri-full.webp",
+          "visual": "katakana/ri-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ウ",
+          "panelId": "katakana-3-1",
+          "box": [
+            58,
+            1105,
+            396,
+            1421
+          ],
+          "reading": "u",
+          "full": "katakana/u-full.webp",
+          "visual": "katakana/u-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ク",
+          "panelId": "katakana-3-2",
+          "box": [
+            412,
+            1105,
+            750,
+            1421
+          ],
+          "reading": "ku",
+          "full": "katakana/ku-full.webp",
+          "visual": "katakana/ku-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ス",
+          "panelId": "katakana-3-3",
+          "box": [
+            765,
+            1105,
+            1103,
+            1421
+          ],
+          "reading": "su",
+          "full": "katakana/su-full.webp",
+          "visual": "katakana/su-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ツ",
+          "panelId": "katakana-3-4",
+          "box": [
+            1120,
+            1105,
+            1458,
+            1421
+          ],
+          "reading": "tsu",
+          "full": "katakana/tsu-full.webp",
+          "visual": "katakana/tsu-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ヌ",
+          "panelId": "katakana-3-5",
+          "box": [
+            1473,
+            1105,
+            1811,
+            1421
+          ],
+          "reading": "nu",
+          "full": "katakana/nu-full.webp",
+          "visual": "katakana/nu-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "フ",
+          "panelId": "katakana-3-6",
+          "box": [
+            1831,
+            1105,
+            2169,
+            1421
+          ],
+          "reading": "fu",
+          "full": "katakana/fu-full.webp",
+          "visual": "katakana/fu-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ム",
+          "panelId": "katakana-3-7",
+          "box": [
+            2188,
+            1105,
+            2526,
+            1421
+          ],
+          "reading": "mu",
+          "full": "katakana/mu-full.webp",
+          "visual": "katakana/mu-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ル",
+          "panelId": "katakana-3-8",
+          "box": [
+            2546,
+            1105,
+            2884,
+            1421
+          ],
+          "reading": "ru",
+          "full": "katakana/ru-full.webp",
+          "visual": "katakana/ru-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ユ",
+          "panelId": "katakana-3-9",
+          "box": [
+            2902,
+            1105,
+            3240,
+            1421
+          ],
+          "reading": "yu",
+          "full": "katakana/yu-full.webp",
+          "visual": "katakana/yu-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "エ",
+          "panelId": "katakana-4-1",
+          "box": [
+            58,
+            1448,
+            396,
+            1764
+          ],
+          "reading": "e",
+          "full": "katakana/e-full.webp",
+          "visual": "katakana/e-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ケ",
+          "panelId": "katakana-4-2",
+          "box": [
+            412,
+            1448,
+            750,
+            1764
+          ],
+          "reading": "ke",
+          "full": "katakana/ke-full.webp",
+          "visual": "katakana/ke-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "セ",
+          "panelId": "katakana-4-3",
+          "box": [
+            765,
+            1448,
+            1103,
+            1764
+          ],
+          "reading": "se",
+          "full": "katakana/se-full.webp",
+          "visual": "katakana/se-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "テ",
+          "panelId": "katakana-4-4",
+          "box": [
+            1120,
+            1448,
+            1458,
+            1764
+          ],
+          "reading": "te",
+          "full": "katakana/te-full.webp",
+          "visual": "katakana/te-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ネ",
+          "panelId": "katakana-4-5",
+          "box": [
+            1473,
+            1448,
+            1811,
+            1764
+          ],
+          "reading": "ne",
+          "full": "katakana/ne-full.webp",
+          "visual": "katakana/ne-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ヘ",
+          "panelId": "katakana-4-6",
+          "box": [
+            1831,
+            1448,
+            2169,
+            1764
+          ],
+          "reading": "he",
+          "full": "katakana/he-full.webp",
+          "visual": "katakana/he-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "メ",
+          "panelId": "katakana-4-7",
+          "box": [
+            2188,
+            1448,
+            2526,
+            1764
+          ],
+          "reading": "me",
+          "full": "katakana/me-full.webp",
+          "visual": "katakana/me-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "レ",
+          "panelId": "katakana-4-8",
+          "box": [
+            2546,
+            1448,
+            2884,
+            1764
+          ],
+          "reading": "re",
+          "full": "katakana/re-full.webp",
+          "visual": "katakana/re-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "オ",
+          "panelId": "katakana-5-1",
+          "box": [
+            58,
+            1790,
+            396,
+            2106
+          ],
+          "reading": "o",
+          "full": "katakana/o-full.webp",
+          "visual": "katakana/o-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "コ",
+          "panelId": "katakana-5-2",
+          "box": [
+            412,
+            1790,
+            750,
+            2106
+          ],
+          "reading": "ko",
+          "full": "katakana/ko-full.webp",
+          "visual": "katakana/ko-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ソ",
+          "panelId": "katakana-5-3",
+          "box": [
+            765,
+            1790,
+            1103,
+            2106
+          ],
+          "reading": "so",
+          "full": "katakana/so-full.webp",
+          "visual": "katakana/so-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ト",
+          "panelId": "katakana-5-4",
+          "box": [
+            1120,
+            1790,
+            1458,
+            2106
+          ],
+          "reading": "to",
+          "full": "katakana/to-full.webp",
+          "visual": "katakana/to-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ノ",
+          "panelId": "katakana-5-5",
+          "box": [
+            1473,
+            1790,
+            1811,
+            2106
+          ],
+          "reading": "no",
+          "full": "katakana/no-full.webp",
+          "visual": "katakana/no-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ホ",
+          "panelId": "katakana-5-6",
+          "box": [
+            1831,
+            1790,
+            2169,
+            2106
+          ],
+          "reading": "ho",
+          "full": "katakana/ho-full.webp",
+          "visual": "katakana/ho-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "モ",
+          "panelId": "katakana-5-7",
+          "box": [
+            2188,
+            1790,
+            2526,
+            2106
+          ],
+          "reading": "mo",
+          "full": "katakana/mo-full.webp",
+          "visual": "katakana/mo-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ロ",
+          "panelId": "katakana-5-8",
+          "box": [
+            2546,
+            1790,
+            2884,
+            2106
+          ],
+          "reading": "ro",
+          "full": "katakana/ro-full.webp",
+          "visual": "katakana/ro-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ヨ",
+          "panelId": "katakana-5-9",
+          "box": [
+            2902,
+            1790,
+            3240,
+            2106
+          ],
+          "reading": "yo",
+          "full": "katakana/yo-full.webp",
+          "visual": "katakana/yo-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ワ",
+          "panelId": "katakana-6-ワ",
+          "box": [
+            228,
+            2120,
+            566,
+            2436
+          ],
+          "reading": "wa",
+          "full": "katakana/wa-full.webp",
+          "visual": "katakana/wa-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ヲ",
+          "panelId": "katakana-6-ヲ",
+          "box": [
+            578,
+            2120,
+            916,
+            2436
+          ],
+          "reading": "wo",
+          "full": "katakana/wo-full.webp",
+          "visual": "katakana/wo-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        },
+        {
+          "kana": "ン",
+          "panelId": "katakana-6-ン",
+          "box": [
+            2724,
+            2120,
+            3062,
+            2436
+          ],
+          "reading": "n",
+          "full": "katakana/n-full.webp",
+          "visual": "katakana/n-visual.webp",
+          "fullSize": [
+            338,
+            316
+          ],
+          "visualSize": [
+            338,
+            190
+          ]
+        }
+      ]
+    }
+  }
+}

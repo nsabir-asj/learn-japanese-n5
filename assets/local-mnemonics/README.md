@@ -5,15 +5,16 @@ This folder separates local source charts from the generated per-kana assets:
 ```text
 assets/local-mnemonics/
 ├── sources/        original user-supplied/third-party charts (ignored)
-├── tofugu/         generated 46+46 fallback cards (ignored)
-├── leafpiece/      generated full/visual cards and manifest (ignored)
-└── pictografix/    generated selected cards and manifest (ignored)
+├── tofugu/         generated 46+46 fallback cards (tracked)
+├── leafpiece/      generated full/visual cards and manifest (tracked)
+└── pictografix/    generated selected cards and manifest (tracked)
 ```
 
-The source chart files and generated manifests/crops are intentionally ignored
-by Git because the artwork is third-party or user-supplied and redistribution
-permission has not been provided. See `sources/README.md` for the source
-inventory and local-use policy, and
+The original source chart files remain intentionally ignored by Git. The
+generated crops and manifests are committed so a private clone has the artwork
+needed for offline, plug-and-run use. Keep the repository private unless the
+artwork's redistribution terms are confirmed. See `sources/README.md` for the
+source inventory and local-use policy, and
 [`docs/mnemonic-artwork-sources.md`](../../docs/mnemonic-artwork-sources.md)
 for the original URLs and credits.
 

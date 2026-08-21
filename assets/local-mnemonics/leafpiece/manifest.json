@@ -1,0 +1,3997 @@
+{
+  "format": 1,
+  "chart": "LeafPiece Japanese Hiragana/Katakana Mnemonic Chart",
+  "source": "assets\\local-mnemonics\\sources\\leafpiece\\Japanese_Kana_Mnemonic_Chart.png",
+  "sourceSize": [
+    7600,
+    4200
+  ],
+  "sourceNote": "Local crops generated from a user-supplied chart. Do not redistribute without permission.",
+  "crop": {
+    "fullSize": [
+      720,
+      380
+    ],
+    "visualSize": [
+      720,
+      380
+    ],
+    "visualMethod": "complete normalized card with localized white caption masking",
+    "visualBoxSpace": "normalized full crop",
+    "visualOffset": 0,
+    "visualPadding": 8,
+    "visualMaskOverrides": {
+      "hiragana:ya": [
+        [
+          300,
+          78,
+          462,
+          120
+        ]
+      ],
+      "hiragana:ho": [
+        [
+          196,
+          28,
+          368,
+          68
+        ]
+      ],
+      "hiragana:ke": [
+        [
+          174,
+          64,
+          430,
+          112
+        ]
+      ],
+      "katakana:ro": [
+        [
+          256,
+          48,
+          408,
+          94
+        ]
+      ]
+    },
+    "topPageLefts": [
+      212,
+      1719,
+      3253,
+      4763,
+      6243
+    ],
+    "bottomPageLefts": [
+      212,
+      1750,
+      3220,
+      4721,
+      6243
+    ],
+    "hiraganaX": [
+      20,
+      590
+    ],
+    "katakanaX": [
+      540,
+      1330
+    ],
+    "topY": [
+      [
+        130,
+        520
+      ],
+      [
+        520,
+        920
+      ],
+      [
+        920,
+        1340
+      ],
+      [
+        1340,
+        1680
+      ],
+      [
+        1680,
+        2070
+      ]
+    ],
+    "bottomY": [
+      [
+        2140,
+        2580
+      ],
+      [
+        2580,
+        2960
+      ],
+      [
+        2960,
+        3340
+      ],
+      [
+        3340,
+        3710
+      ],
+      [
+        3710,
+        4080
+      ]
+    ],
+    "bottomYByPage": {
+      "6": [
+        [
+          2140,
+          2580
+        ],
+        [
+          2580,
+          2960
+        ],
+        [
+          2960,
+          3340
+        ],
+        [
+          3340,
+          3690
+        ],
+        [
+          3690,
+          4080
+        ]
+      ],
+      "7": [
+        [
+          2140,
+          2540
+        ],
+        [
+          2540,
+          2890
+        ],
+        [
+          2890,
+          3350
+        ],
+        [
+          3350,
+          3690
+        ],
+        [
+          3690,
+          4080
+        ]
+      ],
+      "8": [
+        [
+          2140,
+          2790
+        ],
+        [
+          2790,
+          3400
+        ],
+        [
+          3400,
+          3970
+        ]
+      ],
+      "9": [
+        [
+          2140,
+          2550
+        ],
+        [
+          2550,
+          2910
+        ],
+        [
+          2910,
+          3330
+        ],
+        [
+          3330,
+          3690
+        ],
+        [
+          3690,
+          4070
+        ]
+      ],
+      "10": [
+        [
+          2140,
+          2750
+        ],
+        [
+          2750,
+          3350
+        ],
+        [
+          3350,
+          3970
+        ]
+      ]
+    }
+  },
+  "charts": {
+    "hiragana": {
+      "panels": [
+        {
+          "kana": "あ",
+          "panelId": "page-1-row-1",
+          "box": [
+            232,
+            130,
+            802,
+            520
+          ],
+          "reading": "a",
+          "full": "hiragana/a-full.webp",
+          "visual": "hiragana/a-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            150,
+            92,
+            600,
+            122
+          ],
+          "visualMasks": [
+            [
+              142,
+              84,
+              608,
+              130
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "い",
+          "panelId": "page-1-row-2",
+          "box": [
+            232,
+            520,
+            802,
+            920
+          ],
+          "reading": "i",
+          "full": "hiragana/i-full.webp",
+          "visual": "hiragana/i-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            258,
+            76,
+            400,
+            106
+          ],
+          "visualMasks": [
+            [
+              250,
+              68,
+              408,
+              114
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "う",
+          "panelId": "page-1-row-3",
+          "box": [
+            232,
+            920,
+            802,
+            1340
+          ],
+          "reading": "u",
+          "full": "hiragana/u-full.webp",
+          "visual": "hiragana/u-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            230,
+            54,
+            324,
+            74
+          ],
+          "visualMasks": [
+            [
+              222,
+              46,
+              332,
+              82
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "え",
+          "panelId": "page-1-row-4",
+          "box": [
+            232,
+            1340,
+            802,
+            1680
+          ],
+          "reading": "e",
+          "full": "hiragana/e-full.webp",
+          "visual": "hiragana/e-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            144,
+            40,
+            512,
+            74
+          ],
+          "visualMasks": [
+            [
+              136,
+              32,
+              520,
+              82
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "お",
+          "panelId": "page-1-row-5",
+          "box": [
+            232,
+            1680,
+            802,
+            2070
+          ],
+          "reading": "o",
+          "full": "hiragana/o-full.webp",
+          "visual": "hiragana/o-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            152,
+            60,
+            448,
+            90
+          ],
+          "visualMasks": [
+            [
+              144,
+              52,
+              456,
+              98
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "か",
+          "panelId": "page-2-row-1",
+          "box": [
+            1739,
+            130,
+            2309,
+            520
+          ],
+          "reading": "ka",
+          "full": "hiragana/ka-full.webp",
+          "visual": "hiragana/ka-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            396,
+            102,
+            452,
+            126
+          ],
+          "visualMasks": [
+            [
+              388,
+              94,
+              460,
+              134
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "き",
+          "panelId": "page-2-row-2",
+          "box": [
+            1739,
+            520,
+            2309,
+            920
+          ],
+          "reading": "ki",
+          "full": "hiragana/ki-full.webp",
+          "visual": "hiragana/ki-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            308,
+            88,
+            362,
+            116
+          ],
+          "visualMasks": [
+            [
+              300,
+              80,
+              370,
+              124
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "く",
+          "panelId": "page-2-row-3",
+          "box": [
+            1739,
+            920,
+            2309,
+            1340
+          ],
+          "reading": "ku",
+          "full": "hiragana/ku-full.webp",
+          "visual": "hiragana/ku-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            216,
+            86,
+            370,
+            108
+          ],
+          "visualMasks": [
+            [
+              208,
+              78,
+              378,
+              116
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "け",
+          "panelId": "page-2-row-4",
+          "box": [
+            1739,
+            1340,
+            2309,
+            1680
+          ],
+          "reading": "ke",
+          "full": "hiragana/ke-full.webp",
+          "visual": "hiragana/ke-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            184,
+            72,
+            420,
+            104
+          ],
+          "visualMasks": [
+            [
+              174,
+              64,
+              430,
+              112
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "こ",
+          "panelId": "page-2-row-5",
+          "box": [
+            1739,
+            1680,
+            2309,
+            2070
+          ],
+          "reading": "ko",
+          "full": "hiragana/ko-full.webp",
+          "visual": "hiragana/ko-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            288,
+            94,
+            378,
+            116
+          ],
+          "visualMasks": [
+            [
+              280,
+              86,
+              386,
+              124
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "さ",
+          "panelId": "page-3-row-1",
+          "box": [
+            3273,
+            130,
+            3843,
+            520
+          ],
+          "reading": "sa",
+          "full": "hiragana/sa-full.webp",
+          "visual": "hiragana/sa-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            278,
+            30,
+            362,
+            54
+          ],
+          "visualMasks": [
+            [
+              270,
+              22,
+              370,
+              62
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "し",
+          "panelId": "page-3-row-2",
+          "box": [
+            3273,
+            520,
+            3843,
+            920
+          ],
+          "reading": "shi",
+          "full": "hiragana/shi-full.webp",
+          "visual": "hiragana/shi-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            188,
+            24,
+            276,
+            52
+          ],
+          "visualMasks": [
+            [
+              180,
+              16,
+              284,
+              60
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "す",
+          "panelId": "page-3-row-3",
+          "box": [
+            3273,
+            920,
+            3843,
+            1340
+          ],
+          "reading": "su",
+          "full": "hiragana/su-full.webp",
+          "visual": "hiragana/su-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            234,
+            26,
+            474,
+            52
+          ],
+          "visualMasks": [
+            [
+              226,
+              18,
+              482,
+              60
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "せ",
+          "panelId": "page-3-row-4",
+          "box": [
+            3273,
+            1340,
+            3843,
+            1680
+          ],
+          "reading": "se",
+          "full": "hiragana/se-full.webp",
+          "visual": "hiragana/se-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            212,
+            34,
+            448,
+            68
+          ],
+          "visualMasks": [
+            [
+              204,
+              26,
+              456,
+              76
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "そ",
+          "panelId": "page-3-row-5",
+          "box": [
+            3273,
+            1680,
+            3843,
+            2070
+          ],
+          "reading": "so",
+          "full": "hiragana/so-full.webp",
+          "visual": "hiragana/so-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            182,
+            38,
+            348,
+            60
+          ],
+          "visualMasks": [
+            [
+              174,
+              30,
+              356,
+              68
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "た",
+          "panelId": "page-4-row-1",
+          "box": [
+            4783,
+            130,
+            5353,
+            520
+          ],
+          "reading": "ta",
+          "full": "hiragana/ta-full.webp",
+          "visual": "hiragana/ta-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            356,
+            52,
+            412,
+            74
+          ],
+          "visualMasks": [
+            [
+              348,
+              44,
+              420,
+              82
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ち",
+          "panelId": "page-4-row-2",
+          "box": [
+            4783,
+            520,
+            5353,
+            920
+          ],
+          "reading": "chi",
+          "full": "hiragana/chi-full.webp",
+          "visual": "hiragana/chi-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            148,
+            46,
+            570,
+            74
+          ],
+          "visualMasks": [
+            [
+              140,
+              38,
+              578,
+              82
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "つ",
+          "panelId": "page-4-row-3",
+          "box": [
+            4783,
+            920,
+            5353,
+            1340
+          ],
+          "reading": "tsu",
+          "full": "hiragana/tsu-full.webp",
+          "visual": "hiragana/tsu-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            238,
+            52,
+            424,
+            74
+          ],
+          "visualMasks": [
+            [
+              230,
+              44,
+              432,
+              82
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "て",
+          "panelId": "page-4-row-4",
+          "box": [
+            4783,
+            1340,
+            5353,
+            1680
+          ],
+          "reading": "te",
+          "full": "hiragana/te-full.webp",
+          "visual": "hiragana/te-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            248,
+            0,
+            400,
+            24
+          ],
+          "visualMasks": [
+            [
+              240,
+              0,
+              408,
+              32
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "と",
+          "panelId": "page-4-row-5",
+          "box": [
+            4783,
+            1680,
+            5353,
+            2070
+          ],
+          "reading": "to",
+          "full": "hiragana/to-full.webp",
+          "visual": "hiragana/to-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            280,
+            54,
+            384,
+            78
+          ],
+          "visualMasks": [
+            [
+              272,
+              46,
+              392,
+              86
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "な",
+          "panelId": "page-5-row-1",
+          "box": [
+            6263,
+            130,
+            6833,
+            520
+          ],
+          "reading": "na",
+          "full": "hiragana/na-full.webp",
+          "visual": "hiragana/na-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            286,
+            48,
+            372,
+            70
+          ],
+          "visualMasks": [
+            [
+              278,
+              40,
+              380,
+              78
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "に",
+          "panelId": "page-5-row-2",
+          "box": [
+            6263,
+            520,
+            6833,
+            920
+          ],
+          "reading": "ni",
+          "full": "hiragana/ni-full.webp",
+          "visual": "hiragana/ni-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            218,
+            26,
+            290,
+            48
+          ],
+          "visualMasks": [
+            [
+              210,
+              18,
+              298,
+              56
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ぬ",
+          "panelId": "page-5-row-3",
+          "box": [
+            6263,
+            920,
+            6833,
+            1340
+          ],
+          "reading": "nu",
+          "full": "hiragana/nu-full.webp",
+          "visual": "hiragana/nu-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            186,
+            40,
+            492,
+            66
+          ],
+          "visualMasks": [
+            [
+              178,
+              32,
+              500,
+              74
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ね",
+          "panelId": "page-5-row-4",
+          "box": [
+            6263,
+            1340,
+            6833,
+            1680
+          ],
+          "reading": "ne",
+          "full": "hiragana/ne-full.webp",
+          "visual": "hiragana/ne-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            158,
+            20,
+            564,
+            46
+          ],
+          "visualMasks": [
+            [
+              150,
+              12,
+              572,
+              54
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "の",
+          "panelId": "page-5-row-5",
+          "box": [
+            6263,
+            1680,
+            6833,
+            2070
+          ],
+          "reading": "no",
+          "full": "hiragana/no-full.webp",
+          "visual": "hiragana/no-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            392,
+            76,
+            554,
+            106
+          ],
+          "visualMasks": [
+            [
+              384,
+              68,
+              562,
+              114
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "は",
+          "panelId": "page-6-row-1",
+          "box": [
+            232,
+            2140,
+            802,
+            2580
+          ],
+          "reading": "ha",
+          "full": "hiragana/ha-full.webp",
+          "visual": "hiragana/ha-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            262,
+            58,
+            400,
+            84
+          ],
+          "visualMasks": [
+            [
+              254,
+              50,
+              408,
+              92
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ひ",
+          "panelId": "page-6-row-2",
+          "box": [
+            232,
+            2580,
+            802,
+            2960
+          ],
+          "reading": "hi",
+          "full": "hiragana/hi-full.webp",
+          "visual": "hiragana/hi-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            252,
+            60,
+            322,
+            84
+          ],
+          "visualMasks": [
+            [
+              244,
+              52,
+              330,
+              92
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ふ",
+          "panelId": "page-6-row-3",
+          "box": [
+            232,
+            2960,
+            802,
+            3340
+          ],
+          "reading": "fu",
+          "full": "hiragana/fu-full.webp",
+          "visual": "hiragana/fu-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            272,
+            56,
+            418,
+            86
+          ],
+          "visualMasks": [
+            [
+              264,
+              48,
+              426,
+              94
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "へ",
+          "panelId": "page-6-row-4",
+          "box": [
+            232,
+            3340,
+            802,
+            3690
+          ],
+          "reading": "he",
+          "full": "hiragana/he-full.webp",
+          "visual": "hiragana/he-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            150,
+            98,
+            314,
+            124
+          ],
+          "visualMasks": [
+            [
+              142,
+              90,
+              322,
+              132
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ほ",
+          "panelId": "page-6-row-5",
+          "box": [
+            232,
+            3690,
+            802,
+            4080
+          ],
+          "reading": "ho",
+          "full": "hiragana/ho-full.webp",
+          "visual": "hiragana/ho-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            206,
+            36,
+            356,
+            58
+          ],
+          "visualMasks": [
+            [
+              196,
+              28,
+              368,
+              68
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ま",
+          "panelId": "page-7-row-1",
+          "box": [
+            1770,
+            2140,
+            2340,
+            2540
+          ],
+          "reading": "ma",
+          "full": "hiragana/ma-full.webp",
+          "visual": "hiragana/ma-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            232,
+            66,
+            454,
+            94
+          ],
+          "visualMasks": [
+            [
+              224,
+              58,
+              462,
+              102
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "み",
+          "panelId": "page-7-row-2",
+          "box": [
+            1770,
+            2540,
+            2340,
+            2890
+          ],
+          "reading": "mi",
+          "full": "hiragana/mi-full.webp",
+          "visual": "hiragana/mi-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            98,
+            34,
+            400,
+            60
+          ],
+          "visualMasks": [
+            [
+              90,
+              26,
+              408,
+              68
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "む",
+          "panelId": "page-7-row-3",
+          "box": [
+            1770,
+            2890,
+            2340,
+            3350
+          ],
+          "reading": "mu",
+          "full": "hiragana/mu-full.webp",
+          "visual": "hiragana/mu-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            156,
+            26,
+            424,
+            52
+          ],
+          "visualMasks": [
+            [
+              148,
+              18,
+              432,
+              60
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "め",
+          "panelId": "page-7-row-4",
+          "box": [
+            1770,
+            3350,
+            2340,
+            3690
+          ],
+          "reading": "me",
+          "full": "hiragana/me-full.webp",
+          "visual": "hiragana/me-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            178,
+            14,
+            336,
+            40
+          ],
+          "visualMasks": [
+            [
+              170,
+              6,
+              344,
+              48
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "も",
+          "panelId": "page-7-row-5",
+          "box": [
+            1770,
+            3690,
+            2340,
+            4080
+          ],
+          "reading": "mo",
+          "full": "hiragana/mo-full.webp",
+          "visual": "hiragana/mo-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            340,
+            110,
+            494,
+            132
+          ],
+          "visualMasks": [
+            [
+              332,
+              102,
+              502,
+              140
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "や",
+          "panelId": "page-8-row-1",
+          "box": [
+            3240,
+            2140,
+            3810,
+            2790
+          ],
+          "reading": "ya",
+          "full": "hiragana/ya-full.webp",
+          "visual": "hiragana/ya-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": null,
+          "visualMasks": [
+            [
+              300,
+              78,
+              462,
+              120
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ゆ",
+          "panelId": "page-8-row-2",
+          "box": [
+            3240,
+            2790,
+            3810,
+            3400
+          ],
+          "reading": "yu",
+          "full": "hiragana/yu-full.webp",
+          "visual": "hiragana/yu-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            216,
+            90,
+            374,
+            108
+          ],
+          "visualMasks": [
+            [
+              208,
+              82,
+              382,
+              116
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "よ",
+          "panelId": "page-8-row-3",
+          "box": [
+            3240,
+            3400,
+            3810,
+            3970
+          ],
+          "reading": "yo",
+          "full": "hiragana/yo-full.webp",
+          "visual": "hiragana/yo-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            284,
+            40,
+            332,
+            60
+          ],
+          "visualMasks": [
+            [
+              276,
+              32,
+              340,
+              68
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ら",
+          "panelId": "page-9-row-1",
+          "box": [
+            4741,
+            2140,
+            5311,
+            2550
+          ],
+          "reading": "ra",
+          "full": "hiragana/ra-full.webp",
+          "visual": "hiragana/ra-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            320,
+            216,
+            488,
+            238
+          ],
+          "visualMasks": [
+            [
+              312,
+              208,
+              496,
+              246
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "り",
+          "panelId": "page-9-row-2",
+          "box": [
+            4741,
+            2550,
+            5311,
+            2910
+          ],
+          "reading": "ri",
+          "full": "hiragana/ri-full.webp",
+          "visual": "hiragana/ri-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            226,
+            22,
+            392,
+            54
+          ],
+          "visualMasks": [
+            [
+              218,
+              14,
+              400,
+              62
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "る",
+          "panelId": "page-9-row-3",
+          "box": [
+            4741,
+            2910,
+            5311,
+            3330
+          ],
+          "reading": "ru",
+          "full": "hiragana/ru-full.webp",
+          "visual": "hiragana/ru-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            276,
+            40,
+            384,
+            62
+          ],
+          "visualMasks": [
+            [
+              268,
+              32,
+              392,
+              70
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "れ",
+          "panelId": "page-9-row-4",
+          "box": [
+            4741,
+            3330,
+            5311,
+            3690
+          ],
+          "reading": "re",
+          "full": "hiragana/re-full.webp",
+          "visual": "hiragana/re-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            406,
+            70,
+            530,
+            94
+          ],
+          "visualMasks": [
+            [
+              398,
+              62,
+              538,
+              102
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ろ",
+          "panelId": "page-9-row-5",
+          "box": [
+            4741,
+            3690,
+            5311,
+            4070
+          ],
+          "reading": "ro",
+          "full": "hiragana/ro-full.webp",
+          "visual": "hiragana/ro-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            196,
+            30,
+            522,
+            54
+          ],
+          "visualMasks": [
+            [
+              188,
+              22,
+              530,
+              62
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "わ",
+          "panelId": "page-10-row-1",
+          "box": [
+            6263,
+            2140,
+            6833,
+            2750
+          ],
+          "reading": "wa",
+          "full": "hiragana/wa-full.webp",
+          "visual": "hiragana/wa-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            296,
+            90,
+            364,
+            108
+          ],
+          "visualMasks": [
+            [
+              288,
+              82,
+              372,
+              116
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "を",
+          "panelId": "page-10-row-2",
+          "box": [
+            6263,
+            2750,
+            6833,
+            3350
+          ],
+          "reading": "wo",
+          "full": "hiragana/wo-full.webp",
+          "visual": "hiragana/wo-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            254,
+            28,
+            442,
+            42
+          ],
+          "visualMasks": [
+            [
+              246,
+              20,
+              450,
+              50
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ん",
+          "panelId": "page-10-row-3",
+          "box": [
+            6263,
+            3350,
+            6833,
+            3970
+          ],
+          "reading": "n",
+          "full": "hiragana/n-full.webp",
+          "visual": "hiragana/n-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            304,
+            8,
+            422,
+            22
+          ],
+          "visualMasks": [
+            [
+              296,
+              0,
+              430,
+              30
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        }
+      ]
+    },
+    "katakana": {
+      "panels": [
+        {
+          "kana": "ア",
+          "panelId": "page-1-row-1",
+          "box": [
+            752,
+            130,
+            1542,
+            520
+          ],
+          "reading": "a",
+          "full": "katakana/a-full.webp",
+          "visual": "katakana/a-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            6,
+            108,
+            452,
+            138
+          ],
+          "visualMasks": [
+            [
+              0,
+              100,
+              460,
+              146
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "イ",
+          "panelId": "page-1-row-2",
+          "box": [
+            752,
+            520,
+            1542,
+            920
+          ],
+          "reading": "i",
+          "full": "katakana/i-full.webp",
+          "visual": "katakana/i-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            218,
+            80,
+            448,
+            102
+          ],
+          "visualMasks": [
+            [
+              210,
+              72,
+              456,
+              110
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ウ",
+          "panelId": "page-1-row-3",
+          "box": [
+            752,
+            920,
+            1542,
+            1340
+          ],
+          "reading": "u",
+          "full": "katakana/u-full.webp",
+          "visual": "katakana/u-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            216,
+            72,
+            310,
+            94
+          ],
+          "visualMasks": [
+            [
+              208,
+              64,
+              318,
+              102
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "エ",
+          "panelId": "page-1-row-4",
+          "box": [
+            752,
+            1340,
+            1542,
+            1680
+          ],
+          "reading": "e",
+          "full": "katakana/e-full.webp",
+          "visual": "katakana/e-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            152,
+            68,
+            428,
+            96
+          ],
+          "visualMasks": [
+            [
+              144,
+              60,
+              436,
+              104
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "オ",
+          "panelId": "page-1-row-5",
+          "box": [
+            752,
+            1680,
+            1542,
+            2070
+          ],
+          "reading": "o",
+          "full": "katakana/o-full.webp",
+          "visual": "katakana/o-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            276,
+            80,
+            452,
+            108
+          ],
+          "visualMasks": [
+            [
+              268,
+              72,
+              460,
+              116
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "カ",
+          "panelId": "page-2-row-1",
+          "box": [
+            2259,
+            130,
+            3049,
+            520
+          ],
+          "reading": "ka",
+          "full": "katakana/ka-full.webp",
+          "visual": "katakana/ka-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            270,
+            108,
+            322,
+            128
+          ],
+          "visualMasks": [
+            [
+              262,
+              100,
+              330,
+              136
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "キ",
+          "panelId": "page-2-row-2",
+          "box": [
+            2259,
+            520,
+            3049,
+            920
+          ],
+          "reading": "ki",
+          "full": "katakana/ki-full.webp",
+          "visual": "katakana/ki-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            318,
+            98,
+            368,
+            126
+          ],
+          "visualMasks": [
+            [
+              310,
+              90,
+              376,
+              134
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ク",
+          "panelId": "page-2-row-3",
+          "box": [
+            2259,
+            920,
+            3049,
+            1340
+          ],
+          "reading": "ku",
+          "full": "katakana/ku-full.webp",
+          "visual": "katakana/ku-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            224,
+            90,
+            408,
+            118
+          ],
+          "visualMasks": [
+            [
+              216,
+              82,
+              416,
+              126
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ケ",
+          "panelId": "page-2-row-4",
+          "box": [
+            2259,
+            1340,
+            3049,
+            1680
+          ],
+          "reading": "ke",
+          "full": "katakana/ke-full.webp",
+          "visual": "katakana/ke-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            250,
+            94,
+            430,
+            114
+          ],
+          "visualMasks": [
+            [
+              242,
+              86,
+              438,
+              122
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "コ",
+          "panelId": "page-2-row-5",
+          "box": [
+            2259,
+            1680,
+            3049,
+            2070
+          ],
+          "reading": "ko",
+          "full": "katakana/ko-full.webp",
+          "visual": "katakana/ko-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            276,
+            100,
+            354,
+            120
+          ],
+          "visualMasks": [
+            [
+              268,
+              92,
+              362,
+              128
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "サ",
+          "panelId": "page-3-row-1",
+          "box": [
+            3793,
+            130,
+            4583,
+            520
+          ],
+          "reading": "sa",
+          "full": "katakana/sa-full.webp",
+          "visual": "katakana/sa-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            326,
+            40,
+            390,
+            62
+          ],
+          "visualMasks": [
+            [
+              318,
+              32,
+              398,
+              70
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "シ",
+          "panelId": "page-3-row-2",
+          "box": [
+            3793,
+            520,
+            4583,
+            920
+          ],
+          "reading": "shi",
+          "full": "katakana/shi-full.webp",
+          "visual": "katakana/shi-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            190,
+            30,
+            272,
+            52
+          ],
+          "visualMasks": [
+            [
+              182,
+              22,
+              280,
+              60
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ス",
+          "panelId": "page-3-row-3",
+          "box": [
+            3793,
+            920,
+            4583,
+            1340
+          ],
+          "reading": "su",
+          "full": "katakana/su-full.webp",
+          "visual": "katakana/su-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            94,
+            38,
+            238,
+            60
+          ],
+          "visualMasks": [
+            [
+              86,
+              30,
+              246,
+              68
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "セ",
+          "panelId": "page-3-row-4",
+          "box": [
+            3793,
+            1340,
+            4583,
+            1680
+          ],
+          "reading": "se",
+          "full": "katakana/se-full.webp",
+          "visual": "katakana/se-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            230,
+            62,
+            414,
+            90
+          ],
+          "visualMasks": [
+            [
+              222,
+              54,
+              422,
+              98
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ソ",
+          "panelId": "page-3-row-5",
+          "box": [
+            3793,
+            1680,
+            4583,
+            2070
+          ],
+          "reading": "so",
+          "full": "katakana/so-full.webp",
+          "visual": "katakana/so-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            244,
+            66,
+            412,
+            86
+          ],
+          "visualMasks": [
+            [
+              236,
+              58,
+              420,
+              94
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "タ",
+          "panelId": "page-4-row-1",
+          "box": [
+            5303,
+            130,
+            6093,
+            520
+          ],
+          "reading": "ta",
+          "full": "katakana/ta-full.webp",
+          "visual": "katakana/ta-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            312,
+            52,
+            406,
+            74
+          ],
+          "visualMasks": [
+            [
+              304,
+              44,
+              414,
+              82
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "チ",
+          "panelId": "page-4-row-2",
+          "box": [
+            5303,
+            520,
+            6093,
+            920
+          ],
+          "reading": "chi",
+          "full": "katakana/chi-full.webp",
+          "visual": "katakana/chi-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            312,
+            50,
+            506,
+            78
+          ],
+          "visualMasks": [
+            [
+              304,
+              42,
+              514,
+              86
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ツ",
+          "panelId": "page-4-row-3",
+          "box": [
+            5303,
+            920,
+            6093,
+            1340
+          ],
+          "reading": "tsu",
+          "full": "katakana/tsu-full.webp",
+          "visual": "katakana/tsu-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            18,
+            48,
+            432,
+            76
+          ],
+          "visualMasks": [
+            [
+              10,
+              40,
+              440,
+              84
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "テ",
+          "panelId": "page-4-row-4",
+          "box": [
+            5303,
+            1340,
+            6093,
+            1680
+          ],
+          "reading": "te",
+          "full": "katakana/te-full.webp",
+          "visual": "katakana/te-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            358,
+            34,
+            408,
+            50
+          ],
+          "visualMasks": [
+            [
+              350,
+              26,
+              416,
+              58
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ト",
+          "panelId": "page-4-row-5",
+          "box": [
+            5303,
+            1680,
+            6093,
+            2070
+          ],
+          "reading": "to",
+          "full": "katakana/to-full.webp",
+          "visual": "katakana/to-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            254,
+            68,
+            348,
+            96
+          ],
+          "visualMasks": [
+            [
+              246,
+              60,
+              356,
+              104
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ナ",
+          "panelId": "page-5-row-1",
+          "box": [
+            6783,
+            130,
+            7573,
+            520
+          ],
+          "reading": "na",
+          "full": "katakana/na-full.webp",
+          "visual": "katakana/na-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            336,
+            52,
+            404,
+            74
+          ],
+          "visualMasks": [
+            [
+              328,
+              44,
+              412,
+              82
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ニ",
+          "panelId": "page-5-row-2",
+          "box": [
+            6783,
+            520,
+            7573,
+            920
+          ],
+          "reading": "ni",
+          "full": "katakana/ni-full.webp",
+          "visual": "katakana/ni-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            172,
+            32,
+            242,
+            52
+          ],
+          "visualMasks": [
+            [
+              164,
+              24,
+              250,
+              60
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ヌ",
+          "panelId": "page-5-row-3",
+          "box": [
+            6783,
+            920,
+            7573,
+            1340
+          ],
+          "reading": "nu",
+          "full": "katakana/nu-full.webp",
+          "visual": "katakana/nu-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            184,
+            40,
+            520,
+            68
+          ],
+          "visualMasks": [
+            [
+              176,
+              32,
+              528,
+              76
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ネ",
+          "panelId": "page-5-row-4",
+          "box": [
+            6783,
+            1340,
+            7573,
+            1680
+          ],
+          "reading": "ne",
+          "full": "katakana/ne-full.webp",
+          "visual": "katakana/ne-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            222,
+            42,
+            368,
+            64
+          ],
+          "visualMasks": [
+            [
+              214,
+              34,
+              376,
+              72
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ノ",
+          "panelId": "page-5-row-5",
+          "box": [
+            6783,
+            1680,
+            7573,
+            2070
+          ],
+          "reading": "no",
+          "full": "katakana/no-full.webp",
+          "visual": "katakana/no-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            388,
+            78,
+            540,
+            106
+          ],
+          "visualMasks": [
+            [
+              380,
+              70,
+              548,
+              114
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ハ",
+          "panelId": "page-6-row-1",
+          "box": [
+            752,
+            2140,
+            1542,
+            2580
+          ],
+          "reading": "ha",
+          "full": "katakana/ha-full.webp",
+          "visual": "katakana/ha-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            240,
+            84,
+            340,
+            104
+          ],
+          "visualMasks": [
+            [
+              232,
+              76,
+              348,
+              112
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ヒ",
+          "panelId": "page-6-row-2",
+          "box": [
+            752,
+            2580,
+            1542,
+            2960
+          ],
+          "reading": "hi",
+          "full": "katakana/hi-full.webp",
+          "visual": "katakana/hi-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            166,
+            72,
+            222,
+            94
+          ],
+          "visualMasks": [
+            [
+              158,
+              64,
+              230,
+              102
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "フ",
+          "panelId": "page-6-row-3",
+          "box": [
+            752,
+            2960,
+            1542,
+            3340
+          ],
+          "reading": "fu",
+          "full": "katakana/fu-full.webp",
+          "visual": "katakana/fu-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            172,
+            68,
+            304,
+            90
+          ],
+          "visualMasks": [
+            [
+              164,
+              60,
+              312,
+              98
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ヘ",
+          "panelId": "page-6-row-4",
+          "box": [
+            752,
+            3340,
+            1542,
+            3690
+          ],
+          "reading": "he",
+          "full": "katakana/he-full.webp",
+          "visual": "katakana/he-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            0,
+            112,
+            422,
+            172
+          ],
+          "visualMasks": [
+            [
+              0,
+              104,
+              430,
+              180
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ホ",
+          "panelId": "page-6-row-5",
+          "box": [
+            752,
+            3690,
+            1542,
+            4080
+          ],
+          "reading": "ho",
+          "full": "katakana/ho-full.webp",
+          "visual": "katakana/ho-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            240,
+            48,
+            382,
+            76
+          ],
+          "visualMasks": [
+            [
+              232,
+              40,
+              390,
+              84
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "マ",
+          "panelId": "page-7-row-1",
+          "box": [
+            2290,
+            2140,
+            3080,
+            2540
+          ],
+          "reading": "ma",
+          "full": "katakana/ma-full.webp",
+          "visual": "katakana/ma-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            202,
+            86,
+            358,
+            112
+          ],
+          "visualMasks": [
+            [
+              194,
+              78,
+              366,
+              120
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ミ",
+          "panelId": "page-7-row-2",
+          "box": [
+            2290,
+            2540,
+            3080,
+            2890
+          ],
+          "reading": "mi",
+          "full": "katakana/mi-full.webp",
+          "visual": "katakana/mi-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            178,
+            58,
+            416,
+            80
+          ],
+          "visualMasks": [
+            [
+              170,
+              50,
+              424,
+              88
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ム",
+          "panelId": "page-7-row-3",
+          "box": [
+            2290,
+            2890,
+            3080,
+            3350
+          ],
+          "reading": "mu",
+          "full": "katakana/mu-full.webp",
+          "visual": "katakana/mu-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            64,
+            26,
+            370,
+            46
+          ],
+          "visualMasks": [
+            [
+              56,
+              18,
+              378,
+              54
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "メ",
+          "panelId": "page-7-row-4",
+          "box": [
+            2290,
+            3350,
+            3080,
+            3690
+          ],
+          "reading": "me",
+          "full": "katakana/me-full.webp",
+          "visual": "katakana/me-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            258,
+            46,
+            396,
+            68
+          ],
+          "visualMasks": [
+            [
+              250,
+              38,
+              404,
+              76
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "モ",
+          "panelId": "page-7-row-5",
+          "box": [
+            2290,
+            3690,
+            3080,
+            4080
+          ],
+          "reading": "mo",
+          "full": "katakana/mo-full.webp",
+          "visual": "katakana/mo-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            306,
+            114,
+            444,
+            136
+          ],
+          "visualMasks": [
+            [
+              298,
+              106,
+              452,
+              144
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ヤ",
+          "panelId": "page-8-row-1",
+          "box": [
+            3760,
+            2140,
+            4550,
+            2790
+          ],
+          "reading": "ya",
+          "full": "katakana/ya-full.webp",
+          "visual": "katakana/ya-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            336,
+            78,
+            374,
+            92
+          ],
+          "visualMasks": [
+            [
+              328,
+              70,
+              382,
+              100
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ユ",
+          "panelId": "page-8-row-2",
+          "box": [
+            3760,
+            2790,
+            4550,
+            3400
+          ],
+          "reading": "yu",
+          "full": "katakana/yu-full.webp",
+          "visual": "katakana/yu-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            114,
+            66,
+            362,
+            116
+          ],
+          "visualMasks": [
+            [
+              106,
+              58,
+              370,
+              124
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ヨ",
+          "panelId": "page-8-row-3",
+          "box": [
+            3760,
+            3400,
+            4550,
+            3970
+          ],
+          "reading": "yo",
+          "full": "katakana/yo-full.webp",
+          "visual": "katakana/yo-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            346,
+            40,
+            458,
+            60
+          ],
+          "visualMasks": [
+            [
+              338,
+              32,
+              466,
+              68
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ラ",
+          "panelId": "page-9-row-1",
+          "box": [
+            5261,
+            2140,
+            6051,
+            2550
+          ],
+          "reading": "ra",
+          "full": "katakana/ra-full.webp",
+          "visual": "katakana/ra-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            72,
+            218,
+            166,
+            240
+          ],
+          "visualMasks": [
+            [
+              64,
+              210,
+              174,
+              248
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "リ",
+          "panelId": "page-9-row-2",
+          "box": [
+            5261,
+            2550,
+            6051,
+            2910
+          ],
+          "reading": "ri",
+          "full": "katakana/ri-full.webp",
+          "visual": "katakana/ri-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            150,
+            46,
+            294,
+            72
+          ],
+          "visualMasks": [
+            [
+              142,
+              38,
+              302,
+              80
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ル",
+          "panelId": "page-9-row-3",
+          "box": [
+            5261,
+            2910,
+            6051,
+            3330
+          ],
+          "reading": "ru",
+          "full": "katakana/ru-full.webp",
+          "visual": "katakana/ru-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            182,
+            40,
+            362,
+            62
+          ],
+          "visualMasks": [
+            [
+              174,
+              32,
+              370,
+              70
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "レ",
+          "panelId": "page-9-row-4",
+          "box": [
+            5261,
+            3330,
+            6051,
+            3690
+          ],
+          "reading": "re",
+          "full": "katakana/re-full.webp",
+          "visual": "katakana/re-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            240,
+            248,
+            436,
+            270
+          ],
+          "visualMasks": [
+            [
+              232,
+              240,
+              444,
+              278
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ロ",
+          "panelId": "page-9-row-5",
+          "box": [
+            5261,
+            3690,
+            6051,
+            4070
+          ],
+          "reading": "ro",
+          "full": "katakana/ro-full.webp",
+          "visual": "katakana/ro-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            266,
+            58,
+            396,
+            84
+          ],
+          "visualMasks": [
+            [
+              256,
+              48,
+              408,
+              94
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ワ",
+          "panelId": "page-10-row-1",
+          "box": [
+            6783,
+            2140,
+            7573,
+            2750
+          ],
+          "reading": "wa",
+          "full": "katakana/wa-full.webp",
+          "visual": "katakana/wa-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            302,
+            90,
+            454,
+            104
+          ],
+          "visualMasks": [
+            [
+              294,
+              82,
+              462,
+              112
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ヲ",
+          "panelId": "page-10-row-2",
+          "box": [
+            6783,
+            2750,
+            7573,
+            3350
+          ],
+          "reading": "wo",
+          "full": "katakana/wo-full.webp",
+          "visual": "katakana/wo-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            280,
+            44,
+            440,
+            60
+          ],
+          "visualMasks": [
+            [
+              272,
+              36,
+              448,
+              68
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        },
+        {
+          "kana": "ン",
+          "panelId": "page-10-row-3",
+          "box": [
+            6783,
+            3350,
+            7573,
+            3970
+          ],
+          "reading": "n",
+          "full": "katakana/n-full.webp",
+          "visual": "katakana/n-visual.webp",
+          "visualBox": [
+            0,
+            0,
+            720,
+            380
+          ],
+          "visualCueBand": [
+            292,
+            14,
+            372,
+            32
+          ],
+          "visualMasks": [
+            [
+              284,
+              6,
+              380,
+              40
+            ]
+          ],
+          "fullSize": [
+            720,
+            380
+          ],
+          "visualSize": [
+            720,
+            380
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,444 @@
+{
+  "format": 1,
+  "chart": "Pictografix Japanese Hiragana/Katakana Mnemonic Chart",
+  "source": "assets\\local-mnemonics\\sources\\pictografix\\kanji-pictografix-download.jpg",
+  "sourceSize": [
+    3885,
+    2555
+  ],
+  "sourceNote": "Local crops generated from a user-supplied chart. Do not redistribute without permission.",
+  "crop": {
+    "fullSize": [
+      720,
+      430
+    ],
+    "visualSize": [
+      720,
+      300
+    ],
+    "visualMethod": "label-aligned top plus lowest caption-band detection",
+    "visualBottomPadding": 8
+  },
+  "selectedPanels": [
+    {
+      "kana": "イ",
+      "reading": "i",
+      "script": "katakana",
+      "sourceBox": [
+        311,
+        270,
+        631,
+        535
+      ],
+      "cue": "Eat with chopsticks.",
+      "full": "katakana/i-full.webp",
+      "visual": "katakana/i-visual.webp",
+      "visualBox": [
+        311,
+        360,
+        631,
+        478
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "エ",
+      "reading": "e",
+      "script": "katakana",
+      "sourceBox": [
+        311,
+        815,
+        631,
+        1055
+      ],
+      "cue": "Elevator doors.",
+      "full": "katakana/e-full.webp",
+      "visual": "katakana/e-visual.webp",
+      "visualBox": [
+        311,
+        870,
+        631,
+        989
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "き",
+      "reading": "ki",
+      "script": "hiragana",
+      "sourceBox": [
+        672,
+        270,
+        992,
+        535
+      ],
+      "cue": "Key.",
+      "full": "hiragana/ki-full.webp",
+      "visual": "hiragana/ki-visual.webp",
+      "visualBox": [
+        672,
+        360,
+        992,
+        481
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "キ",
+      "reading": "ki",
+      "script": "katakana",
+      "sourceBox": [
+        984,
+        270,
+        1304,
+        535
+      ],
+      "cue": "Key.",
+      "full": "katakana/ki-full.webp",
+      "visual": "katakana/ki-visual.webp",
+      "visualBox": [
+        984,
+        360,
+        1304,
+        482
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "し",
+      "reading": "shi",
+      "script": "hiragana",
+      "sourceBox": [
+        1300,
+        270,
+        1620,
+        535
+      ],
+      "cue": "She has flowing hair.",
+      "full": "hiragana/shi-full.webp",
+      "visual": "hiragana/shi-visual.webp",
+      "visualBox": [
+        1300,
+        360,
+        1620,
+        486
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "シ",
+      "reading": "shi",
+      "script": "katakana",
+      "sourceBox": [
+        1608,
+        270,
+        1928,
+        535
+      ],
+      "cue": "She has a funny smile.",
+      "full": "katakana/shi-full.webp",
+      "visual": "katakana/shi-visual.webp",
+      "visualBox": [
+        1608,
+        360,
+        1928,
+        488
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "ス",
+      "reading": "su",
+      "script": "katakana",
+      "sourceBox": [
+        1608,
+        545,
+        1928,
+        805
+      ],
+      "cue": "Suit hanger.",
+      "full": "katakana/su-full.webp",
+      "visual": "katakana/su-visual.webp",
+      "visualBox": [
+        1608,
+        614,
+        1928,
+        745
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "せ",
+      "reading": "se",
+      "script": "hiragana",
+      "sourceBox": [
+        1300,
+        815,
+        1620,
+        1055
+      ],
+      "cue": "Say.",
+      "full": "hiragana/se-full.webp",
+      "visual": "hiragana/se-visual.webp",
+      "visualBox": [
+        1300,
+        870,
+        1620,
+        998
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "セ",
+      "reading": "se",
+      "script": "katakana",
+      "sourceBox": [
+        1608,
+        815,
+        1928,
+        1055
+      ],
+      "cue": "Say.",
+      "full": "katakana/se-full.webp",
+      "visual": "katakana/se-visual.webp",
+      "visualBox": [
+        1608,
+        870,
+        1928,
+        1000
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "ね",
+      "reading": "ne",
+      "script": "hiragana",
+      "sourceBox": [
+        2585,
+        815,
+        2905,
+        1055
+      ],
+      "cue": "Net a big fish.",
+      "full": "hiragana/ne-full.webp",
+      "visual": "hiragana/ne-visual.webp",
+      "visualBox": [
+        2585,
+        870,
+        2905,
+        1002
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "み",
+      "reading": "mi",
+      "script": "hiragana",
+      "sourceBox": [
+        680,
+        1545,
+        970,
+        1805
+      ],
+      "cue": "Me, I'm 21.",
+      "full": "hiragana/mi-full.webp",
+      "visual": "hiragana/mi-visual.webp",
+      "visualBox": [
+        680,
+        1622,
+        970,
+        1753
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "も",
+      "reading": "mo",
+      "script": "hiragana",
+      "sourceBox": [
+        680,
+        2315,
+        970,
+        2555
+      ],
+      "cue": "Catch mo' fish with this.",
+      "full": "hiragana/mo-full.webp",
+      "visual": "hiragana/mo-visual.webp",
+      "visualBox": [
+        680,
+        2388,
+        970,
+        2516
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "モ",
+      "reading": "mo",
+      "script": "katakana",
+      "sourceBox": [
+        960,
+        2315,
+        1280,
+        2555
+      ],
+      "cue": "Catch mo' fish with this.",
+      "full": "katakana/mo-full.webp",
+      "visual": "katakana/mo-visual.webp",
+      "visualBox": [
+        960,
+        2388,
+        1280,
+        2516
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "ユ",
+      "reading": "yu",
+      "script": "katakana",
+      "sourceBox": [
+        1640,
+        1570,
+        1940,
+        1810
+      ],
+      "cue": "You are number one.",
+      "full": "katakana/yu-full.webp",
+      "visual": "katakana/yu-visual.webp",
+      "visualBox": [
+        1640,
+        1622,
+        1940,
+        1753
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    },
+    {
+      "kana": "ヨ",
+      "reading": "yo",
+      "script": "hiragana",
+      "sourceBox": [
+        1320,
+        1840,
+        1640,
+        2055
+      ],
+      "cue": "Yo-yo.",
+      "full": "hiragana/yo-full.webp",
+      "visual": "hiragana/yo-visual.webp",
+      "visualBox": [
+        1320,
+        1877,
+        1640,
+        2008
+      ],
+      "fullSize": [
+        720,
+        430
+      ],
+      "visualSize": [
+        720,
+        300
+      ]
+    }
+  ]
+}
