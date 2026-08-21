@@ -21,6 +21,31 @@ EXPECTED_SIZE = (7600, 4200)
 FULL_SIZE = (720, 380)
 VISUAL_SIZE = (720, 300)
 VISUAL_OFFSET = 80
+VISUAL_PADDING = 8
+INK_THRESHOLD = 150
+CLEANUP_THRESHOLD = 230
+COMPONENT_SCALE = 2
+TINY_COMPONENT_MAX_AREA = 20
+EDGE_MARGIN = 28
+KATAKANA_LEFT_MASK = 72
+
+# Some LeafPiece panels carry a small neighboring-page fragment or a cue line
+# that the component locator cannot separate cleanly.  These masks are
+# applied only to the visual hint, never to the full mnemonic crop.
+VISUAL_EDGE_MASKS = {
+    ("hiragana", "tsu"): ((260, -45, 500, VISUAL_SIZE[1]),),
+    ("hiragana", "ya"): ((300, 0, 460, 36),),
+    ("katakana", "a"): ((0, 0, 72, 58),),
+    ("katakana", "fu"): ((0, 0, 132, VISUAL_SIZE[1]),),
+    ("katakana", "i"): ((0, -12, VISUAL_SIZE[0], VISUAL_SIZE[1]),),
+    ("katakana", "ha"): ((0, 0, 112, VISUAL_SIZE[1]),),
+    ("katakana", "o"): ((0, 0, 112, VISUAL_SIZE[1]),),
+    ("katakana", "re"): ((0, 0, 220, VISUAL_SIZE[1]),),
+    ("katakana", "te"): ((0, 0, 124, VISUAL_SIZE[1]), (0, -65, VISUAL_SIZE[0], VISUAL_SIZE[1])),
+    ("katakana", "tsu"): ((0, 0, 112, VISUAL_SIZE[1]), (0, -45, VISUAL_SIZE[0], VISUAL_SIZE[1])),
+    ("katakana", "u"): ((480, -110, VISUAL_SIZE[0], VISUAL_SIZE[1]),),
+    ("katakana", "wa"): ((0, 0, 250, VISUAL_SIZE[1]),),
+}
 
 READINGS = {
     "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
@@ -171,6 +196,113 @@ def save_webp(image: Image.Image, path: Path, size: tuple[int, int]) -> None:
     fit_on_white(image, size).save(path, "WEBP", lossless=True, method=6)
 
 
+def _caption_components(image: Image.Image) -> list[tuple[int, int, int, int, int]]:
+    """Find small dark connected components in the upper panel.
+
+    LeafPiece places the English mnemonic near the kana/artwork.  The chart
+    has no machine-readable layout metadata, so a small, deterministic
+    connected-component pass gives us a one-time caption locator without
+    requiring OCR or adding a runtime dependency.  It intentionally works on
+    a half-size image: we only need the text line's extent.
+    """
+
+    width, height = image.size
+    scaled = image.convert("L").resize(
+        (max(1, width // COMPONENT_SCALE), max(1, height // COMPONENT_SCALE)),
+        Image.Resampling.BILINEAR,
+    )
+    width, height = scaled.size
+    pixels = list(scaled.getdata())
+    visited = bytearray(width * height)
+    components: list[tuple[int, int, int, int, int]] = []
+
+    for y in range(height):
+        for x in range(width):
+            index = y * width + x
+            if visited[index] or pixels[index] >= INK_THRESHOLD:
+                continue
+            visited[index] = 1
+            stack = [index]
+            min_x = max_x = x
+            min_y = max_y = y
+            area = 0
+            while stack:
+                current = stack.pop()
+                current_y, current_x = divmod(current, width)
+                area += 1
+                min_x = min(min_x, current_x)
+                max_x = max(max_x, current_x)
+                min_y = min(min_y, current_y)
+                max_y = max(max_y, current_y)
+                for neighbor_y in range(max(0, current_y - 1), min(height, current_y + 2)):
+                    row_start = neighbor_y * width
+                    for neighbor_x in range(max(0, current_x - 1), min(width, current_x + 2)):
+                        neighbor = row_start + neighbor_x
+                        if visited[neighbor] or pixels[neighbor] >= INK_THRESHOLD:
+                            continue
+                        visited[neighbor] = 1
+                        stack.append(neighbor)
+            component_width = max_x - min_x + 1
+            component_height = max_y - min_y + 1
+            if area >= 3 and component_height <= 24 and component_width <= 55:
+                components.append((min_x, min_y, max_x + 1, max_y + 1, area))
+    return components
+
+
+def _caption_band(image: Image.Image) -> tuple[int, int, int, int, tuple[tuple[int, int, int, int], ...]] | None:
+    """Return the strongest mnemonic-text band and its letter boxes."""
+
+    width, height = image.size
+    candidates = [component for component in _caption_components(image) if component[1] < int(height * 0.48)]
+    if not candidates:
+        return None
+
+    candidates.sort(key=lambda component: component[1])
+    groups: list[dict[str, object]] = []
+    for component in candidates:
+        x0, y0, x1, y1, area = component
+        if not groups or y0 > int(groups[-1]["bottom"]) + 3:
+            groups.append({"top": y0, "bottom": y1, "left": x0, "right": x1, "items": [component]})
+            continue
+        group = groups[-1]
+        group["bottom"] = max(int(group["bottom"]), y1)
+        group["left"] = min(int(group["left"]), x0)
+        group["right"] = max(int(group["right"]), x1)
+        group["items"].append(component)  # type: ignore[index]
+
+    usable = []
+    for group in groups:
+        items = group["items"]
+        count = len(items)  # type: ignore[arg-type]
+        span = int(group["right"]) - int(group["left"])
+        group_height = int(group["bottom"]) - int(group["top"])
+        if count >= 3 and span >= 18 and group_height <= 34:
+            # A caption line has several short letter components spread across
+            # the panel; small illustration details are usually narrower or
+            # taller.  Prefer the strongest such line nearest the top.
+            score = count * 5 + min(span, 240) / 24 - int(group["top"]) / 120
+            usable.append((score, group))
+    if not usable:
+        return None
+    _, group = max(usable, key=lambda item: item[0])
+    components = tuple(
+        (
+            int(component[0]) * COMPONENT_SCALE,
+            int(component[1]) * COMPONENT_SCALE,
+            int(component[2]) * COMPONENT_SCALE,
+            int(component[3]) * COMPONENT_SCALE,
+        )
+        for component in group["items"]  # type: ignore[index]
+    )
+    return (
+        int(group["left"]) * COMPONENT_SCALE,
+        int(group["top"]) * COMPONENT_SCALE,
+        int(group["right"]) * COMPONENT_SCALE,
+        int(group["bottom"]) * COMPONENT_SCALE,
+        components,
+    )
+
+
 def clean_panel_edges(image: Image.Image, script: str, kana: str) -> Image.Image:
     """Remove the small neighboring-script overlap at the chart's split.
 
@@ -196,6 +328,125 @@ def clean_panel_edges(image: Image.Image, script: str, kana: str) -> Image.Image
     return cleaned
 
 
+def visual_bounds_for(full: Image.Image, script: str, kana: str) -> tuple[int, int, int, int]:
+    """Return the normalized visual window used for every panel."""
+
+    del full, script, kana
+    return (0, VISUAL_OFFSET, FULL_SIZE[0], FULL_SIZE[1])
+
+
+def _mask_tiny_components(
+    image: Image.Image,
+    region: tuple[int, int, int, int],
+    max_area: int = TINY_COMPONENT_MAX_AREA,
+    threshold: int = INK_THRESHOLD,
+) -> Image.Image:
+    """Remove isolated specks in a small region without touching artwork."""
+
+    cleaned = image.convert("RGB")
+    gray = cleaned.convert("L")
+    width, height = cleaned.size
+    x0, y0, x1, y1 = (
+        max(0, region[0]),
+        max(0, region[1]),
+        min(width, region[2]),
+        min(height, region[3]),
+    )
+    pixels = list(gray.getdata())
+    visited: set[tuple[int, int]] = set()
+    draw = ImageDraw.Draw(cleaned)
+    for y in range(y0, y1):
+        for x in range(x0, x1):
+            if (x, y) in visited or pixels[y * width + x] >= threshold:
+                continue
+            stack = [(x, y)]
+            visited.add((x, y))
+            points: list[tuple[int, int]] = []
+            escaped = False
+            while stack:
+                current_x, current_y = stack.pop()
+                points.append((current_x, current_y))
+                for neighbor_y in range(current_y - 1, current_y + 2):
+                    for neighbor_x in range(current_x - 1, current_x + 2):
+                        if not (x0 <= neighbor_x < x1 and y0 <= neighbor_y < y1):
+                            if (
+                                0 <= neighbor_x < width
+                                and 0 <= neighbor_y < height
+                                and pixels[neighbor_y * width + neighbor_x] < threshold
+                            ):
+                                escaped = True
+                            continue
+                        if (neighbor_x, neighbor_y) in visited:
+                            continue
+                        if pixels[neighbor_y * width + neighbor_x] < threshold:
+                            visited.add((neighbor_x, neighbor_y))
+                            stack.append((neighbor_x, neighbor_y))
+            if not escaped and len(points) <= max_area:
+                xs = [point[0] for point in points]
+                ys = [point[1] for point in points]
+                draw.rectangle((min(xs), min(ys), max(xs), max(ys)), fill="white")
+    return cleaned
+
+
+def mask_caption_components(image: Image.Image, band: tuple[int, int, int, int, tuple[tuple[int, int, int, int], ...]] | None) -> Image.Image:
+    """White out only the localized cue letters, preserving nearby artwork."""
+
+    if band is None:
+        return image.convert("RGB")
+    cleaned = image.convert("RGB")
+    draw = ImageDraw.Draw(cleaned)
+    for x0, y0, x1, y1 in band[4]:
+        draw.rectangle(
+            (
+                max(0, x0 - VISUAL_PADDING // 2),
+                max(0, y0 - VISUAL_PADDING // 2),
+                min(cleaned.width, x1 + VISUAL_PADDING // 2),
+                min(cleaned.height, y1 + VISUAL_PADDING // 2),
+            ),
+            fill="white",
+        )
+    return _mask_tiny_components(
+        cleaned,
+        (
+            band[0] - VISUAL_PADDING * 2,
+            band[1] - VISUAL_PADDING * 2,
+            band[2] + VISUAL_PADDING * 2,
+            band[3] + VISUAL_PADDING * 2,
+        ),
+        threshold=CLEANUP_THRESHOLD,
+    )
+
+
+def clean_visual_edges(image: Image.Image, script: str, kana: str) -> Image.Image:
+    """Remove known neighboring-page spill from a visual-only crop."""
+
+    cleaned = image.convert("RGB")
+    draw = ImageDraw.Draw(cleaned)
+    reading = reading_for(kana)
+    for x0, y0, x1, y1 in VISUAL_EDGE_MASKS.get((script, reading), ()):
+        if y0 < 0:
+            y0 = max(0, cleaned.height + y0)
+        draw.rectangle(
+            (
+                max(0, x0),
+                max(0, y0),
+                min(cleaned.width, x1),
+                min(cleaned.height, y1),
+            ),
+            fill="white",
+        )
+    if script == "katakana":
+        draw.rectangle((0, 0, KATAKANA_LEFT_MASK, cleaned.height), fill="white")
+    for region in (
+        (0, 0, cleaned.width, EDGE_MARGIN),
+        (0, cleaned.height - EDGE_MARGIN, cleaned.width, cleaned.height),
+        (0, 0, EDGE_MARGIN, cleaned.height),
+        (cleaned.width - EDGE_MARGIN, 0, cleaned.width, cleaned.height),
+    ):
+        cleaned = _mask_tiny_components(cleaned, region, threshold=CLEANUP_THRESHOLD)
+    return cleaned
+
+
 def crop_chart(script: str, source: Image.Image, out_root: Path) -> list[dict]:
     records = validate_specs(script, source)
     script_root = out_root / script
@@ -203,7 +454,11 @@ def crop_chart(script: str, source: Image.Image, out_root: Path) -> list[dict]:
     for record in records:
         box = tuple(record["box"])
         full = clean_panel_edges(source.crop(box), script, record["kana"])
-        visual = full.crop((0, VISUAL_OFFSET, full.width, full.height))
+        normalized_full = fit_on_white(full, FULL_SIZE)
+        caption_band = _caption_band(normalized_full)
+        visual_box = visual_bounds_for(normalized_full, script, record["kana"])
+        masked_full = mask_caption_components(normalized_full, caption_band)
+        visual = clean_visual_edges(masked_full.crop(visual_box), script, record["kana"])
         slug = reading_for(record["kana"])
         full_path = script_root / f"{slug}-full.webp"
         visual_path = script_root / f"{slug}-visual.webp"
@@ -214,6 +469,8 @@ def crop_chart(script: str, source: Image.Image, out_root: Path) -> list[dict]:
                 "reading": reading_for(record["kana"]),
                 "full": str(full_path.relative_to(out_root)).replace("\\", "/"),
                 "visual": str(visual_path.relative_to(out_root)).replace("\\", "/"),
+                "visualBox": list(visual_box),
+                "visualCueBand": list(caption_band[:4]) if caption_band else None,
                 "fullSize": list(FULL_SIZE),
                 "visualSize": list(VISUAL_SIZE),
             }
@@ -248,7 +505,14 @@ def main() -> None:
         "crop": {
             "fullSize": list(FULL_SIZE),
             "visualSize": list(VISUAL_SIZE),
+            "visualMethod": "fixed normalized visual window with localized cue-letter masking",
+            "visualBoxSpace": "normalized full crop",
             "visualOffset": VISUAL_OFFSET,
+            "visualPadding": VISUAL_PADDING,
+            "visualEdgeMasks": {
+                f"{script}:{reading}": [list(mask) for mask in masks]
+                for (script, reading), masks in VISUAL_EDGE_MASKS.items()
+            },
             "topPageLefts": TOP_PAGE_LEFTS,
             "bottomPageLefts": BOTTOM_PAGE_LEFTS,
             "hiraganaX": list(HIRAGANA_X),
