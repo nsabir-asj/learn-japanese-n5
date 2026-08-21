@@ -13,7 +13,9 @@ assets/local-mnemonics/
 The source chart files and generated manifests/crops are intentionally ignored
 by Git because the artwork is third-party or user-supplied and redistribution
 permission has not been provided. See `sources/README.md` for the source
-inventory and local-use policy.
+inventory and local-use policy, and
+[`docs/mnemonic-artwork-sources.md`](../../docs/mnemonic-artwork-sources.md)
+for the original URLs and credits.
 
 Generate Tofugu cards with:
 
