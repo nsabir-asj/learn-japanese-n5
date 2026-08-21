@@ -31,6 +31,32 @@
 
   const preferences = window.KANA_SPRINT_MNEMONIC_PREFERENCES || {};
   const selectedByKana = preferences.byKana || {};
+  const SOURCE_INFO = {
+    "tofugu-hiragana": {
+      name: "Tofugu Hiragana Mnemonic Chart",
+      credit: "Tofugu",
+      url: "https://www.tofugu.com/japanese/hiragana-mnemonics-chart/",
+      rights: "Third-party artwork stored locally; redistribution permission has not been supplied."
+    },
+    "tofugu-katakana": {
+      name: "Tofugu Katakana Mnemonic Chart",
+      credit: "Tofugu",
+      url: "https://www.tofugu.com/japanese/katakana-chart/",
+      rights: "Third-party artwork stored locally; redistribution permission has not been supplied."
+    },
+    leafpiece: {
+      name: "Japanese Kana Mnemonic Chart",
+      credit: "LeafPiece",
+      url: "https://commons.wikimedia.org/wiki/File:Japanese_Kana_Mnemonic_Chart.png",
+      rights: "Stored locally. Check the Wikimedia file page for its current license and attribution requirements before redistribution."
+    },
+    pictografix: {
+      name: "Kanji Pict-O-Grafix",
+      credit: "Michael Rowley",
+      url: "https://www.tofugu.com/japanese/katakana-chart/",
+      rights: "Third-party book artwork stored locally; redistribution permission has not been supplied."
+    }
+  };
   const localPath = value => {
     const path = String(value || "");
     return path ? (path.startsWith("./") ? path : `./${path}`) : "";
@@ -45,12 +71,16 @@
   const add = (script, kana, reading) => {
     const base = `./assets/local-mnemonics/tofugu/${script}/${reading}`;
     const picked = selectedOption(kana);
+    const source = picked?.source || "tofugu";
+    const sourceId = source === "tofugu" ? `tofugu-${script}` : source;
     assets[kana] = {
       script,
       visual: localPath(picked?.visual) || `${base}-visual.webp`,
       full: localPath(picked?.full) || `${base}-full.webp`,
       cue: typeof picked?.cue === "string" ? picked.cue : "",
-      source: picked?.source || "tofugu",
+      source,
+      sourceId,
+      sourceInfo: SOURCE_INFO[sourceId],
       visualCredit: .7,
       fullCredit: .4,
       localOnly: true,

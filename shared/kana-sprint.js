@@ -29,7 +29,7 @@
   document.querySelector('.tab[data-tab="fonts"]').before(mnemonicTab);
   const mnemonicPanel=document.createElement("section");
   mnemonicPanel.className="panel";mnemonicPanel.id="panel-mnemonics";
-  mnemonicPanel.innerHTML=`<div class="card"><div class="mnemonic-heading"><div><h2>Kana mnemonics</h2><p class="muted">Use these shape-and-sound stories when a kana will not stick. You can replace any built-in mnemonic with one that is more memorable to you.</p></div><label class="mnemonic-filter"><span>Show</span><select id="mnemonicFilter"><option value="all">All kana</option><option value="weak">Weak kana</option><option value="assisted">Used a hint</option><option value="mistakes">Mistaken kana</option><option value="custom">My custom mnemonics</option></select></label></div><div class="callout">Learn introduces a new kana with its full mnemonic before testing it. An optional visual hint awards 40% of normal mastery on a standard-font question or 25% when it also supplies the standard form for a difficult font. Full answer mnemonics award no mastery. Every introduction, hint, and rescue schedules a short unaided recall check.</div><div class="mnemonic-grid" id="mnemonicGrid"></div></div>`;
+  mnemonicPanel.innerHTML=`<div class="card"><div class="mnemonic-heading"><div><h2>Kana mnemonics</h2><p class="muted">Each card offers two separate memory aids: sourced visual artwork and a prefilled text mnemonic you can edit. They may use different stories for the same kana.</p></div><label class="mnemonic-filter"><span>Show</span><select id="mnemonicFilter"><option value="all">All kana</option><option value="weak">Weak kana</option><option value="assisted">Used a hint</option><option value="mistakes">Mistaken kana</option><option value="custom">My custom mnemonics</option></select></label></div><div class="callout">Learn introduces a new kana with its full mnemonic before testing it. An optional visual hint awards 40% of normal mastery on a standard-font question or 25% when it also supplies the standard form for a difficult font. Full answer mnemonics award no mastery. Every introduction, hint, and rescue schedules a short unaided recall check.</div><div class="mnemonic-grid" id="mnemonicGrid"></div></div>`;
   document.querySelector("#panel-fonts").before(mnemonicPanel);
   ["learn","rehearse"].forEach(mode=>{
     const button=document.createElement("button");
@@ -455,16 +455,53 @@
     return kind==="visual"&&(mode==="learn"||mode==="rehearse")&&Boolean(asset&&asset.source==="tofugu");
   }
 
+  function sourceInfo(asset){
+    if(!asset)return null;
+    return asset.sourceInfo||null;
+  }
+
+  function ensureSourceDialog(){
+    let dialog=$("#mnemonicSourceDialog");
+    if(dialog)return dialog;
+    dialog=document.createElement("dialog");dialog.id="mnemonicSourceDialog";dialog.className="mnemonic-source-dialog";
+    dialog.innerHTML=`<div class="mnemonic-source-dialog-head"><h2>About this artwork</h2><button type="button" class="source-dialog-close" aria-label="Close source information">×</button></div><div class="mnemonic-source-dialog-body"><strong data-source-name></strong><span data-source-credit></span><p data-source-rights></p><a class="big-button" data-source-link target="_blank" rel="noopener noreferrer">Visit original source</a></div>`;
+    dialog.querySelector(".source-dialog-close").addEventListener("click",()=>dialog.close());
+    dialog.addEventListener("click",event=>{if(event.target===dialog)dialog.close()});
+    document.body.appendChild(dialog);return dialog;
+  }
+
+  function showSourceDialog(asset){
+    const info=sourceInfo(asset);if(!info)return;
+    const dialog=ensureSourceDialog();
+    dialog.querySelector("[data-source-name]").textContent=info.name;
+    dialog.querySelector("[data-source-credit]").textContent=`Artwork credit: ${info.credit}`;
+    dialog.querySelector("[data-source-rights]").textContent=info.rights;
+    const link=dialog.querySelector("[data-source-link]");link.href=info.url;
+    if(typeof dialog.showModal==="function")dialog.showModal();else link.click();
+  }
+
+  function createSourceAttribution(asset){
+    const info=sourceInfo(asset);if(!info)return null;
+    const footer=document.createElement("div");footer.className="mnemonic-source";
+    const label=document.createElement("span");label.textContent=`Visual: ${info.credit}`;
+    const button=document.createElement("button");button.type="button";button.className="mnemonic-source-info";button.textContent="i";button.setAttribute("aria-label",`About artwork from ${info.credit}`);button.title="About this artwork";
+    button.addEventListener("click",()=>showSourceDialog(asset));footer.append(label,button);return footer;
+  }
+
   function appendMnemonicCard(mode,item,label="Memory hook",kind="full"){
     const host=$("#"+mode+"Feedback .meta");if(!host)return;
     const card=document.createElement("div");card.className="mnemonic-card";
     const asset=mnemonicAsset(item),source=asset&&(kind==="visual"?asset.visual:asset.full),maskTofugu=shouldMaskTofuguAnswer(mode,kind,asset);
     const glyph=document.createElement("strong");glyph.className="mnemonic-glyph";glyph.textContent=item.k;glyph.style.fontFamily=STANDARD_FONT.family;
-    const copy=document.createElement("div");
+    const copy=document.createElement("div");copy.className="mnemonic-card-copy";
     const heading=document.createElement("span");heading.className="mnemonic-card-label";heading.textContent=kind==="visual"?`${label} • ${item.k}`:`${label} • ${item.k} = ${item.r}`;
+    const textLabel=document.createElement("span");textLabel.className="mnemonic-text-label";textLabel.textContent="Alternative text mnemonic";
     const text=document.createElement("p");text.textContent=kind==="visual"&&source?"Study the shape and illustration, then type the reading you remember.":mnemonicText(item);
-    copy.append(heading,text);
+    copy.append(heading);
+    if(!(kind==="visual"&&source))copy.append(textLabel);
+    copy.append(text);
     if(source){
+      const artColumn=document.createElement("div");artColumn.className="mnemonic-art-column";
       const art=document.createElement("div");art.className="mnemonic-card-art";
       if(maskTofugu){
         art.classList.add("tofugu-answer-mask");
@@ -472,7 +509,7 @@
       }
       const image=document.createElement("img");image.src=source;image.loading="lazy";image.decoding="async";image.alt=kind==="visual"?`Visual mnemonic for ${item.k}`:`Full mnemonic for ${item.k} (${item.r})`;
       image.addEventListener("error",()=>{
-        art.remove();card.classList.remove("has-art",`is-${kind}`);text.textContent=mnemonicText(item);card.prepend(glyph);
+        artColumn.remove();card.classList.remove("has-art",`is-${kind}`);text.textContent=mnemonicText(item);if(!textLabel.isConnected)copy.insertBefore(textLabel,text);card.prepend(glyph);
         const fallbackSession=sessions[mode];
         if(kind==="visual"&&fallbackSession&&fallbackSession.current===item&&fallbackSession.mnemonicStage===1){
           fallbackSession.mnemonicStage=2;
@@ -480,8 +517,9 @@
           const meta=$("#"+mode+"Feedback .meta");if(meta)meta.firstChild.textContent="The visual asset was unavailable, so the full text mnemonic is shown. It awards no mastery and schedules a short unaided recall check.";
         }
       });
-      art.appendChild(image);
-      card.replaceChildren(art,copy);card.classList.add("has-art",`is-${kind}`);
+      art.appendChild(image);artColumn.appendChild(art);
+      const attribution=createSourceAttribution(asset);if(attribution)artColumn.appendChild(attribution);
+      card.replaceChildren(artColumn,copy);card.classList.add("has-art",`is-${kind}`);
     }else card.append(glyph,copy);
     host.appendChild(card);
   }
@@ -1446,12 +1484,14 @@
     items.forEach(item=>{
       const s=itemState(item.k),builtIn=mnemonicCopy(item),custom=state.customMnemonics[item.k]||"",asset=mnemonicAsset(item);
       const card=document.createElement("article");card.className="mnemonic-library-card";
-      card.innerHTML=`<div class="mnemonic-library-top"><strong class="mnemonic-library-glyph"></strong><div><strong>${item.r}</strong><span>${GROUPS[item.groupIndex].name} • ${custom.trim()?"Custom":"Built in"}</span></div></div><div class="mnemonic-library-art" aria-label="Full visual mnemonic"></div><label>Memory hook<textarea rows="4"></textarea></label><div class="tiny mnemonic-stats">${s.mnemonicViews} mnemonic view${s.mnemonicViews===1?"":"s"} • ${s.assistedCorrect} assisted recognition${s.assistedCorrect===1?"":"s"} • ${s.wrong} mistake${s.wrong===1?"":"s"}</div><div class="actions"><button class="ghost" data-save-mnemonic>Save</button><button class="ghost" data-restore-mnemonic ${custom.trim()?"":"disabled"}>Restore built-in</button></div>`;
+      const visualCredit=sourceInfo(asset)?.credit;
+      card.innerHTML=`<div class="mnemonic-library-top"><strong class="mnemonic-library-glyph"></strong><div><strong>${item.r}</strong><span>${GROUPS[item.groupIndex].name}${visualCredit?` • ${visualCredit} visual`:""} • ${custom.trim()?"Custom text":"Built-in text"}</span></div></div><div class="mnemonic-library-art" aria-label="Full visual mnemonic"></div><label><span>Alternative text mnemonic</span><small>A separate memory aid; it may use a different story from the visual.</small><textarea rows="4"></textarea></label><div class="tiny mnemonic-stats">${s.mnemonicViews} mnemonic view${s.mnemonicViews===1?"":"s"} • ${s.assistedCorrect} assisted recognition${s.assistedCorrect===1?"":"s"} • ${s.wrong} mistake${s.wrong===1?"":"s"}</div><div class="actions"><button class="ghost" data-save-mnemonic>Save text</button><button class="ghost" data-restore-mnemonic ${custom.trim()?"":"disabled"}>Restore built-in</button></div>`;
       const glyph=card.querySelector(".mnemonic-library-glyph");glyph.textContent=item.k;glyph.style.fontFamily=STANDARD_FONT.family;
       const art=card.querySelector(".mnemonic-library-art");
       if(asset&&asset.full){
         const image=document.createElement("img");image.src=asset.full;image.loading="lazy";image.decoding="async";image.alt=`Full mnemonic for ${item.k} (${item.r})`;
-        image.addEventListener("error",()=>art.remove());art.appendChild(image);
+        image.addEventListener("error",()=>{art.remove();card.querySelector(".mnemonic-source")?.remove()});art.appendChild(image);
+        const attribution=createSourceAttribution(asset);if(attribution)art.after(attribution);
       }else art.remove();
       const textarea=card.querySelector("textarea");textarea.value=custom.trim()?custom:builtIn;
       card.querySelector("[data-save-mnemonic]").addEventListener("click",()=>{
