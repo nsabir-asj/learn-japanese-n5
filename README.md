@@ -52,6 +52,8 @@ When a difficult-font answer is wrong, the standard form appears beside it for o
 
 Learn and Rehearse include an optional **Need a mnemonic?** hint for individual kana. When the local chart crops are present, the first click shows a visual-only card and a correct answer receives about 70% of the usual mastery gain. A second click reveals the full answer mnemonic and a correct answer receives 40%. Assisted answers do not increase the unaided streak. After a rescue correction, the relevant full visual mnemonic is shown automatically.
 
+During the first Learn/Rehearse visual hint, Tofugu cards use a local CSS blur cover over their repeated Latin badge (with a wider cover for `HU / FU`). Full answer mnemonics, rescue corrections, and the Mnemonics tab remain unmasked.
+
 The **Mnemonics** tab contains built-in shape-and-sound stories for the basic hiragana and katakana, with lazy-loaded chart art when available. Voiced kana and combinations derive a memory hook from their base form and sound marks. You can edit any hook, restore its built-in version, and filter the list to weak, mistaken, assisted, or customized kana. Custom mnemonics and hint statistics are included in automatic saves and exported progress. If local artwork is absent, every hint falls back to the text mnemonic.
 
 ### Local mnemonic artwork

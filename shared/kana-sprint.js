@@ -427,10 +427,14 @@
     return typeof custom==="string"&&custom.trim()?custom.trim():mnemonicCopy(item);
   }
 
+  function shouldMaskTofuguAnswer(mode,kind,asset){
+    return kind==="visual"&&(mode==="learn"||mode==="rehearse")&&Boolean(asset&&asset.source==="tofugu");
+  }
+
   function appendMnemonicCard(mode,item,label="Memory hook",kind="full"){
     const host=$("#"+mode+"Feedback .meta");if(!host)return;
     const card=document.createElement("div");card.className="mnemonic-card";
-    const asset=mnemonicAsset(item),source=asset&&(kind==="visual"?asset.visual:asset.full);
+    const asset=mnemonicAsset(item),source=asset&&(kind==="visual"?asset.visual:asset.full),maskTofugu=shouldMaskTofuguAnswer(mode,kind,asset);
     const glyph=document.createElement("strong");glyph.className="mnemonic-glyph";glyph.textContent=item.k;glyph.style.fontFamily=STANDARD_FONT.family;
     const copy=document.createElement("div");
     const heading=document.createElement("span");heading.className="mnemonic-card-label";heading.textContent=kind==="visual"?`${label} • ${item.k}`:`${label} • ${item.k} = ${item.r}`;
@@ -438,6 +442,10 @@
     copy.append(heading,text);
     if(source){
       const art=document.createElement("div");art.className="mnemonic-card-art";
+      if(maskTofugu){
+        art.classList.add("tofugu-answer-mask");
+        if(item.r==="fu")art.classList.add("tofugu-answer-mask-wide");
+      }
       const image=document.createElement("img");image.src=source;image.loading="lazy";image.decoding="async";image.alt=kind==="visual"?`Visual mnemonic for ${item.k}`:`Full mnemonic for ${item.k} (${item.r})`;
       image.addEventListener("error",()=>{
         art.remove();card.classList.remove("has-art",`is-${kind}`);text.textContent=mnemonicText(item);card.prepend(glyph);
