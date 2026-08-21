@@ -1,0 +1,396 @@
+{
+  "format": 1,
+  "kind": "kana-mnemonic-selections",
+  "description": "User-selected local mnemonic alternatives. Look up a kana directly in byKana; keep all options when the user selected more than one chart panel.",
+  "selectionPolicy": "Options are retained in source-selection order; activeOption selects the current image (last means the latest explicit pick). No artwork is assumed to be available: callers should fall back to the text cue when a local image is missing.",
+  "activeOption": "last",
+  "selectionCount": 33,
+  "kanaCount": 29,
+  "sources": {
+    "leafpiece": {
+      "chart": "Japanese Kana Mnemonic Chart",
+      "credit": "LeafPiece",
+      "manifest": "assets/local-mnemonics/leafpiece/manifest.json",
+      "artworkLocalOnly": true
+    },
+    "pictografix": {
+      "chart": "Pictografix Japanese Hiragana/Katakana Mnemonic Chart",
+      "manifest": "assets/local-mnemonics/pictografix/manifest.json",
+      "artworkLocalOnly": true
+    }
+  },
+  "byKana": {
+    "え": {
+      "script": "hiragana",
+      "reading": "e",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Edge of a cliff",
+          "full": "assets/local-mnemonics/leafpiece/hiragana/e-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/hiragana/e-visual.webp"
+        }
+      ]
+    },
+    "す": {
+      "script": "hiragana",
+      "reading": "su",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Soup ladle",
+          "full": "assets/local-mnemonics/leafpiece/hiragana/su-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/hiragana/su-visual.webp"
+        }
+      ]
+    },
+    "せ": {
+      "script": "hiragana",
+      "reading": "se",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Security guard",
+          "full": "assets/local-mnemonics/leafpiece/hiragana/se-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/hiragana/se-visual.webp"
+        },
+        {
+          "source": "pictografix",
+          "cue": "Say",
+          "full": "assets/local-mnemonics/pictografix/hiragana/se-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/hiragana/se-visual.webp"
+        }
+      ]
+    },
+    "セ": {
+      "script": "katakana",
+      "reading": "se",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Security guard",
+          "full": "assets/local-mnemonics/leafpiece/katakana/se-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/katakana/se-visual.webp"
+        },
+        {
+          "source": "pictografix",
+          "cue": "Say",
+          "full": "assets/local-mnemonics/pictografix/katakana/se-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/katakana/se-visual.webp"
+        }
+      ]
+    },
+    "そ": {
+      "script": "hiragana",
+      "reading": "so",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Sew a stitch",
+          "full": "assets/local-mnemonics/leafpiece/hiragana/so-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/hiragana/so-visual.webp"
+        }
+      ]
+    },
+    "に": {
+      "script": "hiragana",
+      "reading": "ni",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Knee",
+          "full": "assets/local-mnemonics/leafpiece/hiragana/ni-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/hiragana/ni-visual.webp"
+        }
+      ]
+    },
+    "ニ": {
+      "script": "katakana",
+      "reading": "ni",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Knee",
+          "full": "assets/local-mnemonics/leafpiece/katakana/ni-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/katakana/ni-visual.webp"
+        }
+      ]
+    },
+    "ネ": {
+      "script": "katakana",
+      "reading": "ne",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Neck brace",
+          "full": "assets/local-mnemonics/leafpiece/katakana/ne-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/katakana/ne-visual.webp"
+        }
+      ]
+    },
+    "ひ": {
+      "script": "hiragana",
+      "reading": "hi",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Heel",
+          "full": "assets/local-mnemonics/leafpiece/hiragana/hi-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/hiragana/hi-visual.webp"
+        }
+      ]
+    },
+    "ヒ": {
+      "script": "katakana",
+      "reading": "hi",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Heel",
+          "full": "assets/local-mnemonics/leafpiece/katakana/hi-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/katakana/hi-visual.webp"
+        }
+      ]
+    },
+    "ち": {
+      "script": "hiragana",
+      "reading": "chi",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Chick (cheep, cheep)",
+          "full": "assets/local-mnemonics/leafpiece/hiragana/chi-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/hiragana/chi-visual.webp"
+        }
+      ]
+    },
+    "ふ": {
+      "script": "hiragana",
+      "reading": "fu",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Mount Fuji",
+          "full": "assets/local-mnemonics/leafpiece/hiragana/fu-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/hiragana/fu-visual.webp"
+        }
+      ]
+    },
+    "ユ": {
+      "script": "katakana",
+      "reading": "yu",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "U-turn",
+          "full": "assets/local-mnemonics/leafpiece/katakana/yu-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/katakana/yu-visual.webp"
+        },
+        {
+          "source": "pictografix",
+          "cue": "You are number one",
+          "full": "assets/local-mnemonics/pictografix/katakana/yu-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/katakana/yu-visual.webp"
+        }
+      ]
+    },
+    "よ": {
+      "script": "hiragana",
+      "reading": "yo",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Yoga",
+          "full": "assets/local-mnemonics/leafpiece/hiragana/yo-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/hiragana/yo-visual.webp"
+        },
+        {
+          "source": "pictografix",
+          "cue": "Yo-yo",
+          "full": "assets/local-mnemonics/pictografix/hiragana/yo-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/hiragana/yo-visual.webp"
+        }
+      ]
+    },
+    "り": {
+      "script": "hiragana",
+      "reading": "ri",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Reach high",
+          "full": "assets/local-mnemonics/leafpiece/hiragana/ri-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/hiragana/ri-visual.webp"
+        }
+      ]
+    },
+    "リ": {
+      "script": "katakana",
+      "reading": "ri",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Reach high",
+          "full": "assets/local-mnemonics/leafpiece/katakana/ri-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/katakana/ri-visual.webp"
+        }
+      ]
+    },
+    "ロ": {
+      "script": "katakana",
+      "reading": "ro",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Road sign",
+          "full": "assets/local-mnemonics/leafpiece/katakana/ro-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/katakana/ro-visual.webp"
+        }
+      ]
+    },
+    "ナ": {
+      "script": "katakana",
+      "reading": "na",
+      "options": [
+        {
+          "source": "leafpiece",
+          "cue": "Knife",
+          "full": "assets/local-mnemonics/leafpiece/katakana/na-full.webp",
+          "visual": "assets/local-mnemonics/leafpiece/katakana/na-visual.webp"
+        }
+      ]
+    },
+    "イ": {
+      "script": "katakana",
+      "reading": "i",
+      "options": [
+        {
+          "source": "pictografix",
+          "cue": "Eat with chopsticks",
+          "full": "assets/local-mnemonics/pictografix/katakana/i-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/katakana/i-visual.webp"
+        }
+      ]
+    },
+    "エ": {
+      "script": "katakana",
+      "reading": "e",
+      "options": [
+        {
+          "source": "pictografix",
+          "cue": "Elevator doors",
+          "full": "assets/local-mnemonics/pictografix/katakana/e-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/katakana/e-visual.webp"
+        }
+      ]
+    },
+    "き": {
+      "script": "hiragana",
+      "reading": "ki",
+      "options": [
+        {
+          "source": "pictografix",
+          "cue": "Key",
+          "full": "assets/local-mnemonics/pictografix/hiragana/ki-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/hiragana/ki-visual.webp"
+        }
+      ]
+    },
+    "キ": {
+      "script": "katakana",
+      "reading": "ki",
+      "options": [
+        {
+          "source": "pictografix",
+          "cue": "Key",
+          "full": "assets/local-mnemonics/pictografix/katakana/ki-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/katakana/ki-visual.webp"
+        }
+      ]
+    },
+    "し": {
+      "script": "hiragana",
+      "reading": "shi",
+      "options": [
+        {
+          "source": "pictografix",
+          "cue": "She has flowing hair",
+          "full": "assets/local-mnemonics/pictografix/hiragana/shi-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/hiragana/shi-visual.webp"
+        }
+      ]
+    },
+    "シ": {
+      "script": "katakana",
+      "reading": "shi",
+      "options": [
+        {
+          "source": "pictografix",
+          "cue": "She has a funny smile",
+          "full": "assets/local-mnemonics/pictografix/katakana/shi-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/katakana/shi-visual.webp"
+        }
+      ]
+    },
+    "ス": {
+      "script": "katakana",
+      "reading": "su",
+      "options": [
+        {
+          "source": "pictografix",
+          "cue": "Suit hanger",
+          "full": "assets/local-mnemonics/pictografix/katakana/su-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/katakana/su-visual.webp"
+        }
+      ]
+    },
+    "ね": {
+      "script": "hiragana",
+      "reading": "ne",
+      "options": [
+        {
+          "source": "pictografix",
+          "cue": "Net a big fish",
+          "full": "assets/local-mnemonics/pictografix/hiragana/ne-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/hiragana/ne-visual.webp"
+        }
+      ]
+    },
+    "み": {
+      "script": "hiragana",
+      "reading": "mi",
+      "options": [
+        {
+          "source": "pictografix",
+          "cue": "Me, I'm 21",
+          "full": "assets/local-mnemonics/pictografix/hiragana/mi-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/hiragana/mi-visual.webp"
+        }
+      ]
+    },
+    "も": {
+      "script": "hiragana",
+      "reading": "mo",
+      "options": [
+        {
+          "source": "pictografix",
+          "cue": "Catch mo' fish with this",
+          "full": "assets/local-mnemonics/pictografix/hiragana/mo-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/hiragana/mo-visual.webp"
+        }
+      ]
+    },
+    "モ": {
+      "script": "katakana",
+      "reading": "mo",
+      "options": [
+        {
+          "source": "pictografix",
+          "cue": "Catch mo' fish with this",
+          "full": "assets/local-mnemonics/pictografix/katakana/mo-full.webp",
+          "visual": "assets/local-mnemonics/pictografix/katakana/mo-visual.webp"
+        }
+      ]
+    }
+  }
+}

@@ -1,8 +1,9 @@
 (() => {
   "use strict";
 
-  // The chart artwork is deliberately local-only.  The files referenced here
-  // are ignored by Git; a clean checkout keeps the text mnemonic fallback.
+  // The chart artwork is deliberately local-only. The preference bridge is
+  // loaded before this file so the launchers work through file:// without a
+  // fetch; a clean checkout still falls back to the complete Tofugu set.
   const BASIC = [
     ["あ", "a"], ["い", "i"], ["う", "u"], ["え", "e"], ["お", "o"],
     ["か", "ka"], ["き", "ki"], ["く", "ku"], ["け", "ke"], ["こ", "ko"],
@@ -28,16 +29,32 @@
     ["ワ", "wa"], ["ヲ", "wo"], ["ン", "n"]
   ];
 
+  const preferences = window.KANA_SPRINT_MNEMONIC_PREFERENCES || {};
+  const selectedByKana = preferences.byKana || {};
+  const localPath = value => {
+    const path = String(value || "");
+    return path ? (path.startsWith("./") ? path : `./${path}`) : "";
+  };
+  const selectedOption = kana => {
+    const entry = selectedByKana[kana];
+    if (!entry || !Array.isArray(entry.options) || !entry.options.length) return null;
+    return preferences.activeOption === "first" ? entry.options[0] : entry.options[entry.options.length - 1];
+  };
+
   const assets = {};
   const add = (script, kana, reading) => {
-    const base = `./assets/local-mnemonics/${script}/${reading}`;
+    const base = `./assets/local-mnemonics/tofugu/${script}/${reading}`;
+    const picked = selectedOption(kana);
     assets[kana] = {
       script,
-      visual: `${base}-visual.webp`,
-      full: `${base}-full.webp`,
+      visual: localPath(picked?.visual) || `${base}-visual.webp`,
+      full: localPath(picked?.full) || `${base}-full.webp`,
+      cue: typeof picked?.cue === "string" ? picked.cue : "",
+      source: picked?.source || "tofugu",
       visualCredit: .7,
       fullCredit: .4,
-      localOnly: true
+      localOnly: true,
+      selected: Boolean(picked)
     };
   };
   BASIC.forEach(([kana, reading]) => add("hiragana", kana, reading));
