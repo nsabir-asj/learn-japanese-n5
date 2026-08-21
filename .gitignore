@@ -1,5 +1,16 @@
-assets/local-mnemonics/*
-!assets/local-mnemonics/README.md
-!assets/local-mnemonics/.gitkeep
+# User-supplied and third-party mnemonic source charts stay local unless
+# redistribution permission is explicitly documented.
+/assets/local-mnemonics/*
+!/assets/local-mnemonics/README.md
+!/assets/local-mnemonics/.gitkeep
+!/assets/local-mnemonics/sources/
+/assets/local-mnemonics/sources/*
+!/assets/local-mnemonics/sources/README.md
+!/assets/local-mnemonics/sources/.gitkeep
+
+# Generated crops and manifests are derivative artwork and remain local-only.
+/assets/local-mnemonics/tofugu/
+/assets/local-mnemonics/leafpiece/
+/assets/local-mnemonics/pictografix/
 scripts/__pycache__/
 work-*.jpg

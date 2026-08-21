@@ -1,20 +1,30 @@
 # Local-only mnemonic artwork
 
-Put user-supplied or otherwise authorized mnemonic chart crops in this folder.
-The image files and generated manifest are ignored by Git because the Tofugu
-artwork is third-party and no redistribution permission has been provided.
+This folder separates local source charts from the generated per-kana assets:
 
-Generate the expected Tofugu crops under `tofugu/hiragana/` and
-`tofugu/katakana/` with `scripts/crop_tofugu_mnemonics.py`. The alternate
-user-supplied LeafPiece chart is extracted under `leafpiece/` with
-`scripts/crop_leafpiece_mnemonics.py`; the selected panels are available to
-the trainer through `shared/kana-mnemonic-preferences.json`. The selected
-panels from the user-supplied
-Pictografix chart are extracted under `pictografix/` with
-`scripts/crop_pictografix_mnemonics.py`; they are also selected through that
-index. The trainer falls back to the JSON cue, then its built-in text
-mnemonic, if local artwork is unavailable.
+```text
+assets/local-mnemonics/
+├── sources/        original user-supplied/third-party charts (ignored)
+├── tofugu/         generated 46+46 fallback cards (ignored)
+├── leafpiece/      generated full/visual cards and manifest (ignored)
+└── pictografix/    generated selected cards and manifest (ignored)
+```
 
-The source-first layout is intentional: identical readings from different
-charts stay separate, and each source's `manifest.json` remains beside its
-artwork. All chart images and manifests are ignored by Git.
+The source chart files and generated manifests/crops are intentionally ignored
+by Git because the artwork is third-party or user-supplied and redistribution
+permission has not been provided. See `sources/README.md` for the source
+inventory and local-use policy.
+
+Generate Tofugu cards with:
+
+```text
+python scripts/crop_tofugu_mnemonics.py \
+  --hiragana assets/local-mnemonics/sources/tofugu/hiragana-mnemonic-chart-by-tofugu.jpg \
+  --katakana assets/local-mnemonics/sources/tofugu/katakana-mnemonic-chart-by-tofugu.jpg
+```
+
+Generate the LeafPiece and selected Pictografix cards by passing the matching
+file from `assets/local-mnemonics/sources/` to their crop utilities. The
+trainer uses the selected panels through
+`shared/kana-mnemonic-preferences.json` and falls back to the JSON cue, then
+the built-in text mnemonic, when local artwork is unavailable.

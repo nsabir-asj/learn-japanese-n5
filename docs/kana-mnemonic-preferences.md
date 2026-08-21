@@ -55,13 +55,18 @@ available as logged alternatives.
 
 ## Asset status
 
-The active Tofugu fallback crops live under `assets/local-mnemonics/tofugu/`.
+The supplied Tofugu originals live locally under
+`assets/local-mnemonics/sources/tofugu/`. The active Tofugu fallback crops
+live under `assets/local-mnemonics/tofugu/`.
 
 All 46 Hiragana and 46 Katakana panels from the supplied LeafPiece chart are
-extracted locally under `assets/local-mnemonics/leafpiece/`. Those files and
-their manifest remain ignored by Git because the chart artwork is third-party
-and redistribution permission has not been provided.
+extracted locally under `assets/local-mnemonics/leafpiece/`. The original
+chart is kept under `assets/local-mnemonics/sources/leafpiece/`. Those files
+and their manifest remain ignored by Git because the chart artwork is
+third-party and redistribution permission has not been provided.
 
 The selected Pictografix panels are extracted locally under
 `assets/local-mnemonics/pictografix/` (15 panels, each with full and visual
-WebP variants). Those files and their manifest are also ignored by Git.
+WebP variants). The original chart is kept under
+`assets/local-mnemonics/sources/pictografix/`. Those files and their manifest
+are also ignored by Git.
