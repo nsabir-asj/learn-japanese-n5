@@ -52,6 +52,23 @@
     control.innerHTML=`<div class="pace-copy"><strong>${config.title}</strong><span>${config.label}</span><span class="pace-description" id="${config.mode}PaceDescription"></span></div><label class="pace-range" for="${config.mode}Pace"><span id="${config.mode}PaceValue">Balanced</span><input id="${config.mode}Pace" type="range" min="0" max="6" step="1" value="2" aria-label="${config.title}"><span class="pace-scale"><span>More review</span><span>More new</span></span></label>`;
     document.querySelector(`#panel-${config.mode} .trainer`).before(control);
   });
+  const wordsPanel=document.querySelector("#panel-words");
+  const wordsTrainer=wordsPanel.querySelector('.trainer[data-trainer="words"]');
+  const wordsSetupGrid=wordsPanel.querySelector(":scope > .grid2");
+  const wordSessionToolbar=wordsSetupGrid.children[0];
+  const wordSpeechCard=wordsSetupGrid.children[1];
+  wordSessionToolbar.classList.add("word-session-toolbar");
+  wordSessionToolbar.querySelector("h2").textContent="Word set";
+  wordSessionToolbar.querySelector("p").textContent="Choose which words can appear in this session.";
+  wordSpeechCard.querySelector("h2").remove();
+  const wordDetails=document.createElement("details");
+  wordDetails.className="details-card word-details";
+  wordDetails.innerHTML='<summary>Speech and pronunciation settings</summary><div class="details-body"></div>';
+  const wordDetailsBody=wordDetails.querySelector(".details-body");
+  while(wordSpeechCard.firstChild)wordDetailsBody.appendChild(wordSpeechCard.firstChild);
+  wordsTrainer.after(wordSessionToolbar);
+  wordSessionToolbar.after(wordDetails);
+  wordsSetupGrid.remove();
   document.querySelector("#rehearseHelpPanel .muted").textContent="Until every selected kana has a graded recall attempt, the Coverage pace controls how often unassessed kana appear and prevents ordinary reviews from starving them. Their first successful recognition uses Standard; difficult fonts become eligible afterwards. Scheduled mistake and mnemonic-recall checks take priority. After full coverage, review becomes fully adaptive.";
 
   if(Array.isArray(LESSON.scriptBalanceProfiles)&&LESSON.scriptBalanceProfiles.length){
