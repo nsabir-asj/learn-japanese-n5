@@ -97,6 +97,7 @@
   .rescue-wrap{width:min(830px,calc(100% - 28px));margin:0 auto 20px;display:none}
   .rescue-wrap.show{display:block}
   .rescue-title{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:9px}
+  .rescue-mnemonic-note{margin-top:10px;color:#d2baff;font-size:.82rem;font-weight:750}
   .options{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
   .choice{min-height:61px;border:1px solid #3c4653;border-radius:13px;background:var(--panel2);color:var(--text);font-weight:800;font-size:1.05rem;position:relative;transition:.12s ease}
   .choice:hover{transform:translateY(-1px);border-color:#647083;background:#252d38}

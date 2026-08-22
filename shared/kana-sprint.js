@@ -173,7 +173,7 @@
   let currentTab="learn";
   const INACTIVITY_MS=2*60*1000;
   function newPracticeSession(){
-    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],lastScripts:[],fontRetry:false,rescue:false,introduction:false,mnemonicUsed:false,mnemonicStage:0,typingRetryOffered:false,typingRetryTimer:null,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0,forcedReason:"",forceStandard:false};
+    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],lastScripts:[],fontRetry:false,rescue:false,rescueWrongAttempts:0,rescueMnemonicShown:false,introduction:false,mnemonicUsed:false,mnemonicStage:0,typingRetryOffered:false,typingRetryTimer:null,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0,forcedReason:"",forceStandard:false};
   }
   const sessions={
     learn:newPracticeSession(),
@@ -1022,16 +1022,18 @@
   function renderRescue(mode,target,pool){
     const wrap=$("#"+mode+"Rescue"), box=$("#"+mode+"Options");
     box.innerHTML="";
-    const title=wrap.querySelector(".rescue-title");if(title)title.textContent="Choose the correct reading to reinforce the mistake";
+    const session=sessions[mode];session.rescueWrongAttempts=0;session.rescueMnemonicShown=false;
+    const title=wrap.querySelector(".rescue-title");if(title)title.textContent="Choose the correct reading, or type it and press Enter";
     const opts=shuffle([{item:target,correct:true},...distractorItems(target,pool).map(item=>({item,correct:false}))]);
     opts.forEach((o,i)=>{
       const b=document.createElement("button");
-      b.className="choice"; b.dataset.correct=o.correct?"1":"0";
+      b.className="choice"; b.dataset.correct=o.correct?"1":"0";b.dataset.reading=normalize(o.item.r);b.dataset.kana=o.item.k;
       b.innerHTML=`<span class="num">${i+1}</span>${o.item.r}`;
       b.addEventListener("click",()=>handleKanaRescueChoice(mode,b,o,target,pool));
       box.appendChild(b);
     });
     wrap.classList.add("show");
+    focusInput(mode);
   }
 
   function hideRescue(mode){
@@ -1081,7 +1083,7 @@
       setFeedback(mode,false,"No kana selected","Choose at least one rehearsal row above.");
       return;
     }
-    session.n++;session.rescue=false;session.fontRetry=false;session.introduction=false;session.mnemonicUsed=false;session.mnemonicStage=0;session.typingRetryOffered=false;
+    session.n++;session.rescue=false;session.rescueWrongAttempts=0;session.rescueMnemonicShown=false;session.fontRetry=false;session.introduction=false;session.mnemonicUsed=false;session.mnemonicStage=0;session.typingRetryOffered=false;
     document.querySelector(`#panel-${mode} .trainer`).classList.remove("introduction");
     setKanaQuestionLabel(mode,"Type the romaji reading");
     clearFeedback(mode);hideRescue(mode);
@@ -1124,7 +1126,7 @@
         const wrongItem=value?itemForReading(value,item.script):null;
         if(wrongItem)recordRescueConfusion(item,wrongItem);
         session.fontRetry=false;session.rescue=true;
-        input.value="";input.blur();
+        input.value="";
         const typedNote=value?`You typed “${value}” again.`:"Still marked as unknown.";
         setFeedback(mode,false,"Still not quite",`${typedNote} Choose the correct reading below.`);
         appendGlyphComparison(mode,item,session.currentFont||STANDARD_FONT);
@@ -1164,7 +1166,7 @@
         focusInput(mode);
       }else{
         session.rescue=true;
-        input.value="";input.blur();
+        input.value="";
         setFeedback(mode,false,"Not quite",`${typedNote} Choose the correct reading below. The answer will be shown after you identify it.`);
         renderRescue(mode,item,mode==="learn"?learnPool():rehearsalPool());
         $("#"+mode+"DontKnow").classList.add("hidden");
@@ -1181,8 +1183,7 @@
     noteSessionActivity(session);
     if(!opt.correct){
       button.classList.add("wrong");button.disabled=true;
-      recordRescueConfusion(target,opt.item);
-      $("#"+mode+"Rescue .rescue-title").textContent=confusionComparison(target,opt.item);
+      registerWrongKanaRescue(mode,target,opt.item);
       return;
     }
     [...$("#"+mode+"Options").children].forEach(b=>{b.disabled=true;if(b.dataset.correct==="1")b.classList.add("correct")});
@@ -1194,6 +1195,52 @@
     appendMnemonicCard(mode,target,"Remember after this correction","full");
     focusInput(mode);
     updateAllUI();
+  }
+
+  function showAutomaticRescueMnemonic(mode,target){
+    const session=sessions[mode];
+    if(session.rescueMnemonicShown)return;
+    session.rescueMnemonicShown=true;
+    const s=itemState(target.k);s.mnemonicViews++;
+    const hasVisual=Boolean(mnemonicAsset(target)?.visual);
+    const meta=$("#"+mode+"Feedback .meta");
+    if(meta){
+      const note=document.createElement("div");note.className="rescue-mnemonic-note";
+      note.textContent=hasVisual?"Two rescue attempts were incorrect, so a visual mnemonic hint is now shown below.":"Two rescue attempts were incorrect, so the built-in mnemonic is now shown below.";
+      meta.appendChild(note);
+    }
+    appendMnemonicCard(mode,target,"Rescue hint",hasVisual?"visual":"full");
+    saveState();
+  }
+
+  function registerWrongKanaRescue(mode,target,wrongItem=null,typedValue=""){
+    const session=sessions[mode];
+    session.rescueWrongAttempts++;
+    if(wrongItem)recordRescueConfusion(target,wrongItem);
+    const title=$("#"+mode+"Rescue .rescue-title");
+    if(title){
+      if(wrongItem)title.textContent=confusionComparison(target,wrongItem);
+      else title.textContent=typedValue?`“${typedValue}” is not one of the readings here. Try again.`:"Type a reading or choose one of the options.";
+    }
+    if(session.rescueWrongAttempts>=2)showAutomaticRescueMnemonic(mode,target);
+    focusInput(mode);
+  }
+
+  function handleKanaRescueTyped(mode){
+    const session=sessions[mode],target=session.current;
+    if(!session.rescue||!target)return;
+    const input=$("#"+mode+"Input"),value=normalize(input.value);
+    if(!value)return;
+    input.value="";
+    const buttons=[...$("#"+mode+"Options").children];
+    const matchingButton=buttons.find(button=>button.dataset.reading===value);
+    if(matchingButton){
+      const item=byKana[matchingButton.dataset.kana]||itemForReading(value,target.script);
+      handleKanaRescueChoice(mode,matchingButton,{item,correct:matchingButton.dataset.correct==="1"},target,mode==="learn"?learnPool():rehearsalPool());
+      return;
+    }
+    noteSessionActivity(session);
+    registerWrongKanaRescue(mode,target,itemForReading(value,target.script),value);
   }
 
   function wordPool(){
@@ -1362,15 +1409,17 @@
 
   function renderWordRescue(word){
     const wrap=$("#wordsRescue"),box=$("#wordsOptions");box.innerHTML="";
+    const title=wrap.querySelector(".rescue-title");if(title)title.textContent="Choose the correct reading, or type it and press Enter";
     const opts=shuffle([{r:word.r,correct:true},...makeWordDistractors(word).map(r=>({r,correct:false}))]);
     opts.forEach((o,i)=>{
       const b=document.createElement("button");
-      b.className="choice";b.dataset.correct=o.correct?"1":"0";
+      b.className="choice";b.dataset.correct=o.correct?"1":"0";b.dataset.reading=normalize(o.r);
       b.innerHTML=`<span class="num">${i+1}</span>${o.r}`;
       b.addEventListener("click",()=>handleWordRescueChoice(b,o,word));
       box.appendChild(b);
     });
     wrap.classList.add("show");
+    focusInput("words");
   }
 
   function handleWordTyped(forceWrong=false){
@@ -1386,7 +1435,7 @@
         finishWordRecognition(w,"recognized with the standard reference • press Enter for the next word",true);
       }else{
         recordWordKanaConfusions(w,value);
-        s.fontRetry=false;s.rescue=true;input.value="";input.blur();
+        s.fontRetry=false;s.rescue=true;input.value="";
         const typedNote=value?`You typed “${value}” again.`:"Still marked as unknown.";
         setFeedback("words",false,"Still not quite",`${typedNote} Choose the correct reading below.`);
         appendGlyphComparison("words",w,s.currentFont||STANDARD_FONT);
@@ -1409,7 +1458,7 @@
         setFeedback("words",false,"Compare the two forms",`${typedNote} Look at the standard word, then type the reading once more.`);
         appendGlyphComparison("words",w,s.currentFont||STANDARD_FONT);focusInput("words");
       }else{
-        s.rescue=true;input.value="";input.blur();
+        s.rescue=true;input.value="";
         setFeedback("words",false,"Not quite",`${typedNote} Choose the correct reading below. The answer and meaning will be shown after you identify it.`);
         renderWordRescue(w);$("#wordsDontKnow").classList.add("hidden");
       }
@@ -1425,6 +1474,23 @@
     if(!opt.correct){button.classList.add("wrong");button.disabled=true;return}
     [...$("#wordsOptions").children].forEach(b=>{b.disabled=true;if(b.dataset.correct==="1")b.classList.add("correct")});
     finishWordRecognition(word,"correction reinforced • press Enter for the next word",(s.currentFont||STANDARD_FONT).id!=="standard");
+  }
+
+  function handleWordRescueTyped(){
+    const s=sessions.words,word=s.current;
+    if(!s.rescue||!word)return;
+    const input=$("#wordsInput"),value=normalize(input.value);
+    if(!value)return;
+    input.value="";
+    const buttons=[...$("#wordsOptions").children];
+    const button=isCorrectWordReading(word,value)?buttons.find(option=>option.dataset.correct==="1"):buttons.find(option=>option.dataset.reading===value);
+    if(button){
+      handleWordRescueChoice(button,{r:value,correct:isCorrectWordReading(word,value)},word);
+      return;
+    }
+    noteSessionActivity(s);
+    $("#wordsRescue .rescue-title").textContent=`“${value}” is not one of the choices. Try again.`;
+    focusInput("words");
   }
 
   let lastRenderedStreak=null;
@@ -1803,7 +1869,7 @@
       if(e.key==="Enter"){
         e.preventDefault();
         const s=sessions[mode];
-        if(s.rescue)return;
+        if(s.rescue){handleKanaRescueTyped(mode);return}
         if(!$("#"+mode+"Next").classList.contains("hidden"))advanceKana(mode);
         else handleKanaTyped(mode,false);
       }
@@ -1818,7 +1884,7 @@
   $("#wordsInput").addEventListener("keydown",e=>{
     if(e.key==="Enter"){
       e.preventDefault();
-      if(sessions.words.rescue)return;
+      if(sessions.words.rescue){handleWordRescueTyped();return}
       if(!$("#wordsNext").classList.contains("hidden"))nextWordQuestion();
       else handleWordTyped(false);
     }
@@ -1861,9 +1927,9 @@
     }
     if(!/^[1-8]$/.test(e.key))return;
     const mode=currentTab;
-    if(mode==="learn"&&sessions.learn.rescue){const b=$("#learnOptions").children[Number(e.key)-1];if(b)b.click()}
-    if(mode==="rehearse"&&sessions.rehearse.rescue){const b=$("#rehearseOptions").children[Number(e.key)-1];if(b)b.click()}
-    if(mode==="words"&&sessions.words.rescue){const b=$("#wordsOptions").children[Number(e.key)-1];if(b)b.click()}
+    if(mode==="learn"&&sessions.learn.rescue){e.preventDefault();const b=$("#learnOptions").children[Number(e.key)-1];if(b)b.click()}
+    if(mode==="rehearse"&&sessions.rehearse.rescue){e.preventDefault();const b=$("#rehearseOptions").children[Number(e.key)-1];if(b)b.click()}
+    if(mode==="words"&&sessions.words.rescue){e.preventDefault();const b=$("#wordsOptions").children[Number(e.key)-1];if(b)b.click()}
   });
 
   $("#selectBasic").addEventListener("click",()=>{

@@ -54,7 +54,7 @@ When a difficult-font answer is wrong, the standard form appears beside it for o
 
 ### Mnemonics
 
-Learn and Rehearse include an optional **Need a mnemonic?** hint for individual kana. When local chart crops are present, the first click shows a visual-only card. A visual-assisted correct answer receives 40% of normal mastery in standard print or 25% when the mnemonic also supplies the standard form for a difficult-font question. A second click reveals the full answer mnemonic and awards no mastery. Assisted recognitions do not affect accuracy or streak. Introductions, assisted recognitions, and rescue corrections schedule guaranteed unaided checks after several intervening questions.
+Learn and Rehearse include an optional **Need a mnemonic?** hint for individual kana. When local chart crops are present, the first click shows a visual-only card. A visual-assisted correct answer receives 40% of normal mastery in standard print or 25% when the mnemonic also supplies the standard form for a difficult-font question. A second click reveals the full answer mnemonic and awards no mastery. Assisted recognitions do not affect accuracy or streak. Introductions, assisted recognitions, and rescue corrections schedule guaranteed unaided checks after several intervening questions. If two rescue attempts are incorrect, one visual mnemonic hint appears automatically; the built-in mnemonic is used when local artwork is unavailable.
 
 Exposure and assessment are tracked separately. Seeing a difficult font still increases its exposure count, but font accuracy uses only unaided graded attempts. Kana Progress shows a simple assisted-recognition total.
 
@@ -80,7 +80,7 @@ The shared current-streak box begins with gentle rewards at 5 and 15, then becom
 - After a correct word, press **Enter** again to move on.
 - After a typed wrong answer, **Typing mistake? Retry** is available for three seconds. Click it or press **Esc** to restore the same prompt and original font. On difficult-font questions, the standard reference stays blurred until this window expires. The first result remains recorded, and the retry is offered only once for that question.
 - In Learn and Rehearse, the retry appears only when the answer looks like a likely keyboard typo: one adjacent-key substitution (such as `kp` for `ko`) or one pair of neighboring letters entered in reverse order (such as `hsa` for `sha` or `ot` for `to`). A typed answer that is itself another valid kana reading remains a normal learning mistake. Word mode keeps its general retry behavior.
-- If rescue choices appear, click one or press **1–8**.
+- If rescue choices appear, type the reading and press **Enter**, click one, or press **1–8**. Word rescues also accept typed readings; the automatic two-mistake mnemonic applies to kana practice.
 - Use **I don't know** when you cannot recall the answer.
 
 Typing speed is diagnostic only. A slow correct answer does not reduce mastery, and returning after an inactivity gap is not treated as a slow response.
