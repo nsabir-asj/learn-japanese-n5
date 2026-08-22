@@ -12,6 +12,8 @@
     .replaceAll("{{SCRIPT_LOWER}}", LESSON.scriptNameLower)
     .replaceAll("あ", LESSON.sampleKana)
     .replaceAll("ねこ", LESSON.sampleWord);
+  document.querySelector("#panel-learn .typing-hint").textContent="A likely adjacent-key typo offers a brief retry. Other mistakes continue to the normal correction flow.";
+  document.querySelector("#panel-rehearse .typing-hint").textContent="Likely adjacent-key typo → brief retry. Otherwise: hard font → standard reference → rescue if still wrong.";
 
   const streakStat=document.querySelector("#sStreak").closest(".stat");
   streakStat.id="streakStat";
@@ -71,6 +73,17 @@
     const item={k,r,group:g.id,groupIndex:gi,script:LESSON.scriptForKana?LESSON.scriptForKana(k):LESSON.scriptNameLower};
     allItems.push(item); byKana[k]=item; groupByKana[k]=gi;
   }));
+  const VALID_KANA_READINGS=new Set(allItems.map(item=>normalize(item.r)));
+  const KEYBOARD_ROWS=["qwertyuiop","asdfghjkl","zxcvbnm"];
+  const KEYBOARD_ROW_OFFSETS=[0,.25,.75];
+  const KEY_POSITIONS={};
+  KEYBOARD_ROWS.forEach((row,y)=>[...row].forEach((key,x)=>KEY_POSITIONS[key]={x:x+KEYBOARD_ROW_OFFSETS[y],y}));
+  const KEYBOARD_NEIGHBORS={};
+  Object.entries(KEY_POSITIONS).forEach(([key,a])=>{
+    KEYBOARD_NEIGHBORS[key]=new Set(Object.entries(KEY_POSITIONS)
+      .filter(([other,b])=>other!==key&&Math.abs(a.y-b.y)<=1&&Math.abs(a.x-b.x)<=1.05)
+      .map(([other])=>other));
+  });
 
   const SMALL_TSU=Array.isArray(LESSON.smallTsuList)?LESSON.smallTsuList:[LESSON.smallTsu];
   const KANA_PACE_PROFILES=[
@@ -689,6 +702,18 @@
     return String(s||"").toLowerCase().trim().replace(/\s+/g,"").replace(/ō/g,"ou").replace(/ū/g,"uu");
   }
 
+  function isLikelyAdjacentKeyTypo(value,expected){
+    const typed=normalize(value),answer=normalize(expected);
+    if(!typed||typed===answer||typed.length!==answer.length||VALID_KANA_READINGS.has(typed))return false;
+    let mismatch=-1;
+    for(let i=0;i<answer.length;i++){
+      if(typed[i]===answer[i])continue;
+      if(mismatch!==-1)return false;
+      mismatch=i;
+    }
+    return mismatch!==-1&&Boolean(KEYBOARD_NEIGHBORS[answer[mismatch]]?.has(typed[mismatch]));
+  }
+
   function shuffle(arr){
     const a=[...arr];
     for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
@@ -965,7 +990,7 @@
     focusInput(mode);
   }
 
-  function offerTypingRetry(mode){
+  function offerTypingRetry(mode,likelyTypo=false){
     const session=sessions[mode];
     if(session.typingRetryOffered)return;
     const host=$("#"+mode+"Feedback .meta");
@@ -976,8 +1001,9 @@
     const button=document.createElement("button");
     button.className="typing-retry";
     button.type="button";
-    button.setAttribute("aria-label","Typing mistake? Retry this question. Shortcut: Escape");
-    button.innerHTML='<span class="typing-retry-label">Typing mistake? Retry</span><kbd>Esc</kbd><span class="typing-retry-bar" aria-hidden="true"></span>';
+    const prompt=likelyTypo?"Likely typo — Retry?":"Typing mistake? Retry";
+    button.setAttribute("aria-label",`${prompt} Retry this question. Shortcut: Escape`);
+    button.innerHTML=`<span class="typing-retry-label">${prompt}</span><kbd>Esc</kbd><span class="typing-retry-bar" aria-hidden="true"></span>`;
     button.addEventListener("click",()=>retryTypingMistake(mode));
     wrap.appendChild(button);
     host.appendChild(wrap);
@@ -1098,7 +1124,6 @@
         $("#"+mode+"DontKnow").classList.add("hidden");
         updateAllUI();
       }
-      if(!forceWrong&&value)offerTypingRetry(mode);
       return;
     }
     if(correct){
@@ -1137,7 +1162,7 @@
         $("#"+mode+"DontKnow").classList.add("hidden");
       }
       updateAllUI();
-      if(!forceWrong&&value)offerTypingRetry(mode);
+      if(!forceWrong&&isLikelyAdjacentKeyTypo(value,item.r))offerTypingRetry(mode,true);
     }
   }
 

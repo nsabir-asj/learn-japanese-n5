@@ -30,6 +30,8 @@ Lets you select any rows immediately. An assessment means a graded recall attemp
 
 Recent mistakes increase the share of difficult sound categories, including voiced, semi-voiced, and combination kana. Mistake reviews are delayed enough to test recall instead of immediate repetition.
 
+Learn and Rehearse offer the brief typing-retry button only when an initial wrong answer differs from the expected reading by exactly one adjacent QWERTY key and is not itself another valid kana reading. For example, `kp` for `ko` can trigger Retry, while `ki` for `ko` remains a normal learning mistake. This constant-time check runs only after an incorrect kana submission; Word mode keeps its existing behavior.
+
 In Kana Mix, the Script balance panel offers adaptive, even, focused, and custom Hiragana/Katakana ratios. Adaptive balance favors the weaker script while continuing to practise both.
 
 ### Words
