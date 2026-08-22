@@ -14,6 +14,7 @@
     .replaceAll("ねこ", LESSON.sampleWord);
   document.querySelector("#panel-learn .typing-hint").textContent="A likely adjacent-key or reversed-letter typo offers a brief retry. Other mistakes continue to the normal correction flow.";
   document.querySelector("#panel-rehearse .typing-hint").textContent="Likely adjacent-key or reversed-letter typo → brief retry. Otherwise: hard font → standard reference → rescue if still wrong.";
+  document.querySelector("#panel-words .typing-hint").textContent="After recognition, the answer, meaning, and a complete romaji spelling guide appear. Press Enter again for the next word.";
 
   const streakStat=document.querySelector("#sStreak").closest(".stat");
   streakStat.id="streakStat";
@@ -106,6 +107,15 @@
     {label:"Very fast",early:.92,late:.65,guarantee:1},
     {label:"New-first",early:1,late:1,guarantee:0}
   ];
+  const WORD_GUIDE_ROMAJI={
+    "うぃ":"wi","うぇ":"we","うぉ":"wo","ゔぁ":"va","ゔぃ":"vi","ゔぇ":"ve","ゔぉ":"vo","ゔ":"vu",
+    "ウィ":"wi","ウェ":"we","ウォ":"wo","ヴァ":"va","ヴィ":"vi","ヴェ":"ve","ヴォ":"vo","ヴ":"vu",
+    "ファ":"fa","フィ":"fi","フェ":"fe","フォ":"fo","ティ":"ti","ディ":"di","トゥ":"tu","ドゥ":"du",
+    "シェ":"she","ジェ":"je","チェ":"che","ツァ":"tsa","ツィ":"tsi","ツェ":"tse","ツォ":"tso",
+    "クァ":"kwa","クィ":"kwi","クェ":"kwe","クォ":"kwo",
+    "ぁ":"a","ぃ":"i","ぅ":"u","ぇ":"e","ぉ":"o","ァ":"a","ィ":"i","ゥ":"u","ェ":"e","ォ":"o"
+  };
+  const SMALL_Y_KANA=new Set(["ゃ","ゅ","ょ","ャ","ュ","ョ"]);
 
   function splitWordKana(kana){
     const chars=[...kana],units=[];
@@ -114,6 +124,86 @@
       if(byKana[combo]){units.push(combo);i++}else units.push(chars[i]);
     }
     return units;
+  }
+
+  function wordGuideTokens(kana){
+    const chars=[...kana],tokens=[];
+    for(let i=0;i<chars.length;i++){
+      const pair=chars[i]+(chars[i+1]||"");
+      if(byKana[pair]||WORD_GUIDE_ROMAJI[pair]){tokens.push(pair);i++}
+      else tokens.push(chars[i]);
+    }
+    return tokens;
+  }
+
+  function wordGuideRomaji(token){
+    return byKana[token]?.r||WORD_GUIDE_ROMAJI[token]||"";
+  }
+
+  function lastVowel(value){
+    const match=String(value||"").match(/[aeiou](?!.*[aeiou])/);
+    return match?match[0]:"";
+  }
+
+  function buildWordSpellingGuide(word){
+    const tokens=wordGuideTokens(word.k),segments=[],rules=[];
+    const rawReadings=tokens.map(wordGuideRomaji);
+    tokens.forEach((kana,index)=>{
+      if(SMALL_TSU.includes(kana)){
+        const next=rawReadings[index+1]||"",added=next.charAt(0);
+        segments.push({kana,romaji:added?`+${added}`:"pause"});
+        rules.push(added?`Small ${kana} repeats the first consonant of the next block. ${tokens[index+1]} begins with “${added}”, so type an extra ${added}.`:`Small ${kana} creates a brief consonant pause before the next sound.`);
+        return;
+      }
+      if(kana==="ー"){
+        const previous=segments.map(segment=>segment.romaji.replace(/^\+/,"")).join(""),vowel=lastVowel(previous);
+        segments.push({kana,romaji:vowel?`+${vowel}`:"long vowel"});
+        rules.push(vowel?`The long-vowel mark ー repeats the previous vowel in romaji, so type another ${vowel}.`:`The mark ー stretches the vowel before it.`);
+        return;
+      }
+      const romaji=rawReadings[index];
+      segments.push({kana,romaji:romaji||word.r});
+      if(kana.length>1&&SMALL_Y_KANA.has([...kana][1]))rules.push(`${kana} is one combined sound block: type ${romaji}, not the two kana separately.`);
+      if(kana==="ん"||kana==="ン")rules.push(`${kana} is typed n. Keep that n before the following sound block.`);
+    });
+    for(let index=1;index<tokens.length;index++){
+      const kana=tokens[index],previousKana=tokens[index-1];
+      if(!["あ","い","う","え","お","ア","イ","ウ","エ","オ"].includes(kana))continue;
+      const previousReading=rawReadings[index-1],currentReading=rawReadings[index];
+      const previousVowel=lastVowel(previousReading);
+      const isLong=(currentReading==="a"&&previousVowel==="a")||(currentReading==="i"&&["i","e"].includes(previousVowel))||(currentReading==="u"&&["u","o"].includes(previousVowel))||(currentReading==="e"&&previousVowel==="e")||(currentReading==="o"&&previousVowel==="o");
+      if(isLong)rules.push(`The long vowel in ${previousKana}${kana} keeps both kana in the practice spelling: ${previousReading} + ${currentReading} → ${previousReading+currentReading}.`);
+    }
+    const assembled=segments.map(segment=>segment.romaji.replace(/^\+/,"")).join("");
+    const safe=normalize(assembled)===normalize(word.r);
+    return {
+      segments:safe?segments:[{kana:word.k,romaji:word.r}],
+      rules:[...new Set(safe?(rules.length?rules:["Read each kana block from left to right, then join the romaji without spaces."]):[`This word uses the practice spelling ${word.r}. Type those letters in that order.`])]
+    };
+  }
+
+  function appendWordSpellingGuide(word,{rescue=false}={}){
+    const host=$("#wordsFeedback .meta");if(!host)return;
+    const guide=buildWordSpellingGuide(word),card=document.createElement("div");
+    card.className="word-spelling-guide"+(rescue?" rescue-spelling-guide":"");
+    const heading=document.createElement("div");heading.className="word-spelling-heading";
+    const label=document.createElement("strong");label.textContent=rescue?"Spelling help":"How to type this word";
+    const answer=document.createElement("span");answer.textContent=`${word.k} → ${word.r}`;
+    heading.append(label,answer);
+    const equation=document.createElement("div");equation.className="word-spelling-equation";
+    guide.segments.forEach((segment,index)=>{
+      if(index){const plus=document.createElement("span");plus.className="word-spelling-plus";plus.textContent="+";equation.appendChild(plus)}
+      const chip=document.createElement("span");chip.className="word-spelling-chip";
+      const kana=document.createElement("b");kana.textContent=segment.kana;kana.style.fontFamily=STANDARD_FONT.family;
+      const romaji=document.createElement("span");romaji.textContent=segment.romaji;
+      chip.append(kana,romaji);equation.appendChild(chip);
+    });
+    const result=document.createElement("span");result.className="word-spelling-result";result.textContent=`= ${word.r}`;equation.appendChild(result);
+    card.append(heading,equation);
+    const explanation=document.createElement("ul");explanation.className="word-spelling-rules";
+    const rules=guide.rules.length?guide.rules:["Read each kana block from left to right, then join the romaji without spaces."];
+    rules.forEach(rule=>{const item=document.createElement("li");item.textContent=rule;explanation.appendChild(item)});
+    card.appendChild(explanation);host.appendChild(card);
   }
 
   function wordFeatureLabels(word){
@@ -173,7 +263,7 @@
   let currentTab="learn";
   const INACTIVITY_MS=2*60*1000;
   function newPracticeSession(){
-    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],lastScripts:[],fontRetry:false,rescue:false,rescueWrongAttempts:0,rescueMnemonicShown:false,introduction:false,mnemonicUsed:false,mnemonicStage:0,typingRetryOffered:false,typingRetryTimer:null,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0,forcedReason:"",forceStandard:false};
+    return {n:0,current:null,currentFont:STANDARD_FONT,lastFonts:[],lastScripts:[],fontRetry:false,rescue:false,rescueWrongAttempts:0,rescueMnemonicShown:false,rescueGuideShown:false,introduction:false,mnemonicUsed:false,mnemonicStage:0,typingRetryOffered:false,typingRetryTimer:null,last:[],forced:{},sinceUnseen:0,lastActivityAt:Date.now(),resumeGrace:0,forcedReason:"",forceStandard:false};
   }
   const sessions={
     learn:newPracticeSession(),
@@ -1312,7 +1402,7 @@
     const s=sessions.words;
     clearTypingRetry("words");
     if(!state.speech.continueOnAdvance)stopSpeech();
-    s.n++;s.rescue=false;s.fontRetry=false;s.typingRetryOffered=false;
+    s.n++;s.rescue=false;s.rescueWrongAttempts=0;s.rescueGuideShown=false;s.fontRetry=false;s.typingRetryOffered=false;
     clearFeedback("words");hideRescue("words");
     $("#wordsNext").classList.add("hidden");$("#wordsDontKnow").classList.remove("hidden");
     const w=selectWord();
@@ -1399,6 +1489,7 @@
     $("#wordsNext").classList.remove("hidden");$("#wordsDontKnow").classList.add("hidden");
     setFeedback("words",true,`${word.k} → ${word.r}`,`${word.m} • ${meta}`);
     if(showComparison)appendGlyphComparison("words",word,s.currentFont||STANDARD_FONT);
+    appendWordSpellingGuide(word);
     const replay=document.createElement("button");replay.className="ghost speak-again";replay.type="button";replay.textContent="🔊 Replay word and meaning";
     replay.disabled=!speechSupported||!voicesFor("ja").length;
     replay.addEventListener("click",()=>speakWordSequence(word));
@@ -1409,6 +1500,7 @@
 
   function renderWordRescue(word){
     const wrap=$("#wordsRescue"),box=$("#wordsOptions");box.innerHTML="";
+    const s=sessions.words;s.rescueWrongAttempts=0;s.rescueGuideShown=false;
     const title=wrap.querySelector(".rescue-title");if(title)title.textContent="Choose the correct reading, or type it and press Enter";
     const opts=shuffle([{r:word.r,correct:true},...makeWordDistractors(word).map(r=>({r,correct:false}))]);
     opts.forEach((o,i)=>{
@@ -1471,9 +1563,29 @@
     const s=sessions.words;if(!s.rescue)return;
     clearTypingRetry("words");
     noteSessionActivity(s);
-    if(!opt.correct){button.classList.add("wrong");button.disabled=true;return}
+    if(!opt.correct){button.classList.add("wrong");button.disabled=true;registerWrongWordRescue(word,opt.r);return}
     [...$("#wordsOptions").children].forEach(b=>{b.disabled=true;if(b.dataset.correct==="1")b.classList.add("correct")});
     finishWordRecognition(word,"correction reinforced • press Enter for the next word",(s.currentFont||STANDARD_FONT).id!=="standard");
+  }
+
+  function showAutomaticWordSpellingGuide(word){
+    const s=sessions.words;if(s.rescueGuideShown)return;
+    s.rescueGuideShown=true;
+    const meta=$("#wordsFeedback .meta");
+    if(meta){
+      const note=document.createElement("div");note.className="rescue-spelling-note";
+      note.textContent="Two rescue attempts were incorrect, so the complete spelling guide is now shown below.";
+      meta.appendChild(note);
+    }
+    appendWordSpellingGuide(word,{rescue:true});
+  }
+
+  function registerWrongWordRescue(word,value=""){
+    const s=sessions.words;s.rescueWrongAttempts++;
+    const title=$("#wordsRescue .rescue-title");
+    if(title)title.textContent=value?`“${value}” is not the reading. Try again.`:"Try another reading.";
+    if(s.rescueWrongAttempts>=2)showAutomaticWordSpellingGuide(word);
+    focusInput("words");
   }
 
   function handleWordRescueTyped(){
@@ -1489,8 +1601,7 @@
       return;
     }
     noteSessionActivity(s);
-    $("#wordsRescue .rescue-title").textContent=`“${value}” is not one of the choices. Try again.`;
-    focusInput("words");
+    registerWrongWordRescue(word,value);
   }
 
   let lastRenderedStreak=null;

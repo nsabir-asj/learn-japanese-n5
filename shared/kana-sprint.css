@@ -98,6 +98,12 @@
   .rescue-wrap.show{display:block}
   .rescue-title{text-align:center;color:var(--muted);font-size:.88rem;margin-bottom:9px}
   .rescue-mnemonic-note{margin-top:10px;color:#d2baff;font-size:.82rem;font-weight:750}
+  .rescue-spelling-note{margin-top:10px;color:#9fd0ff;font-size:.82rem;font-weight:750}
+  .word-spelling-guide{margin-top:13px;border:1px solid rgba(88,166,255,.42);border-radius:14px;background:linear-gradient(135deg,rgba(88,166,255,.11),rgba(63,185,80,.055));padding:13px 14px;color:var(--text);text-align:left}
+  .word-spelling-guide.rescue-spelling-guide{border-color:rgba(163,113,247,.48);background:linear-gradient(135deg,rgba(163,113,247,.12),rgba(88,166,255,.06))}
+  .word-spelling-heading{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}.word-spelling-heading strong{color:#b9dcff;font-size:.82rem}.word-spelling-heading span{font-size:.9rem;font-weight:850;color:#eef6ff}
+  .word-spelling-equation{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:11px}.word-spelling-chip{display:inline-grid;grid-template-columns:auto auto;align-items:baseline;gap:7px;border:1px solid #465363;border-radius:10px;background:#10161d;padding:7px 9px}.word-spelling-chip b{font-size:1.35rem;line-height:1}.word-spelling-chip span{color:#9fd0ff;font-size:.82rem;font-weight:850}.word-spelling-plus{color:#778596;font-weight:850}.word-spelling-result{color:#7ee787;font-size:1rem;font-weight:900;margin-left:2px}
+  .word-spelling-rules{display:grid;gap:6px;margin:11px 0 0;padding-left:19px;color:#cbd6e2;font-size:.82rem;line-height:1.5}.word-spelling-rules li::marker{color:#58a6ff}
   .options{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
   .choice{min-height:61px;border:1px solid #3c4653;border-radius:13px;background:var(--panel2);color:var(--text);font-weight:800;font-size:1.05rem;position:relative;transition:.12s ease}
   .choice:hover{transform:translateY(-1px);border-color:#647083;background:#252d38}

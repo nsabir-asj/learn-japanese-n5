@@ -36,7 +36,9 @@ In Kana Mix, the Script balance panel offers adaptive, even, focused, and custom
 
 ### Words
 
-Practises whole words in romaji. A correct answer reveals the English meaning; press Enter again to continue. The word scheduler mixes new vocabulary with adaptive review and increases features that have caused recent trouble.
+Practises whole words in romaji. Every revealed answer includes the English meaning and a complete kana-to-romaji spelling guide. The guide separates each sound block and explains applicable rules such as small `っ / ッ` consonant doubling, long vowels, Katakana `ー`, combined sounds such as `きょ / キョ`, and `ん / ン`. If a word cannot be decomposed safely, it shows the exact practice spelling instead of guessing. Press Enter again to continue.
+
+Word rescue accepts typing plus Enter, mouse selection, or number keys **1–8**. After two incorrect rescue attempts, the complete spelling guide appears while the rescue choices remain available. The word scheduler mixes new vocabulary with adaptive review and increases features that have caused recent trouble.
 
 If Japanese speech is available in the browser, the trainer can pronounce the word and optionally its English meaning. The Speech panel reports whether suitable voices were found and includes test buttons. Voice selections and speech options are saved locally. An optional setting lets the current pronunciation finish after Enter moves to the next word.
 
