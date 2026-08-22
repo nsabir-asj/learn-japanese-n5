@@ -24,6 +24,10 @@ Keep the `shared`, `lessons`, and `fonts` folders beside the HTML files. Moving 
 
 Introduces rows gradually. A completely new kana first appears in standard print with its reading and full mnemonic; this study step changes neither mastery, accuracy, nor streak. An unaided check follows after several intervening questions. Weak kana return more often, while successful unaided practice unlocks later rows. Rehearsal can also unlock a row when you demonstrate that you already know every kana in it.
 
+The introduction card pairs the standard kana with its sourced visual and a prefilled alternative text hook. It is a study step, so the next encounter—not the introduction itself—tests recall.
+
+![A new kana introduction showing the standard form, visual mnemonic, and alternative text mnemonic](docs/images/learn-mnemonic-introduction.png)
+
 ### Rehearse
 
 Lets you select any rows immediately. An assessment means a graded recall attempt rather than merely viewing a mnemonic. While unassessed kana remain, the trainer favors coverage so the last few unseen kana do not get starved by reviews. A kana's first successful assessment uses standard print; varied fonts become eligible after that unaided recognition. Once the selected set has been fully assessed, practice becomes fully adaptive.
@@ -37,6 +41,10 @@ In Kana Mix, the Script balance panel offers adaptive, even, focused, and custom
 ### Words
 
 Practises whole words in romaji. Every revealed answer includes the English meaning and a complete kana-to-romaji spelling guide. The guide separates each sound block and explains applicable rules such as small `っ / ッ` consonant doubling, long vowels, Katakana `ー`, combined sounds such as `きょ / キョ`, and `ん / ン`. If a word cannot be decomposed safely, it shows the exact practice spelling instead of guessing. Press Enter again to continue.
+
+After the answer is revealed, the guide shows how each kana block contributes to the required spelling and explains every special typing rule used by that word.
+
+![A correct word answer followed by its kana-to-romaji spelling breakdown and typing rules](docs/images/word-romaji-spelling-guide.png)
 
 Word rescue accepts typing plus Enter, mouse selection, or number keys **1–8**. After two incorrect rescue attempts, the complete spelling guide appears while the rescue choices remain available. The word scheduler mixes new vocabulary with adaptive review and increases features that have caused recent trouble.
 
