@@ -12,8 +12,8 @@
     .replaceAll("{{SCRIPT_LOWER}}", LESSON.scriptNameLower)
     .replaceAll("あ", LESSON.sampleKana)
     .replaceAll("ねこ", LESSON.sampleWord);
-  document.querySelector("#panel-learn .typing-hint").textContent="A likely adjacent-key typo offers a brief retry. Other mistakes continue to the normal correction flow.";
-  document.querySelector("#panel-rehearse .typing-hint").textContent="Likely adjacent-key typo → brief retry. Otherwise: hard font → standard reference → rescue if still wrong.";
+  document.querySelector("#panel-learn .typing-hint").textContent="A likely adjacent-key or reversed-letter typo offers a brief retry. Other mistakes continue to the normal correction flow.";
+  document.querySelector("#panel-rehearse .typing-hint").textContent="Likely adjacent-key or reversed-letter typo → brief retry. Otherwise: hard font → standard reference → rescue if still wrong.";
 
   const streakStat=document.querySelector("#sStreak").closest(".stat");
   streakStat.id="streakStat";
@@ -702,16 +702,24 @@
     return String(s||"").toLowerCase().trim().replace(/\s+/g,"").replace(/ō/g,"ou").replace(/ū/g,"uu");
   }
 
-  function isLikelyAdjacentKeyTypo(value,expected){
+  function isLikelyKanaTypo(value,expected){
     const typed=normalize(value),answer=normalize(expected);
     if(!typed||typed===answer||typed.length!==answer.length||VALID_KANA_READINGS.has(typed))return false;
-    let mismatch=-1;
+    const mismatches=[];
     for(let i=0;i<answer.length;i++){
       if(typed[i]===answer[i])continue;
-      if(mismatch!==-1)return false;
-      mismatch=i;
+      mismatches.push(i);
+      if(mismatches.length>2)return false;
     }
-    return mismatch!==-1&&Boolean(KEYBOARD_NEIGHBORS[answer[mismatch]]?.has(typed[mismatch]));
+    if(mismatches.length===1){
+      const mismatch=mismatches[0];
+      return Boolean(KEYBOARD_NEIGHBORS[answer[mismatch]]?.has(typed[mismatch]));
+    }
+    if(mismatches.length===2){
+      const [first,second]=mismatches;
+      return second===first+1&&typed[first]===answer[second]&&typed[second]===answer[first];
+    }
+    return false;
   }
 
   function shuffle(arr){
@@ -1162,7 +1170,7 @@
         $("#"+mode+"DontKnow").classList.add("hidden");
       }
       updateAllUI();
-      if(!forceWrong&&isLikelyAdjacentKeyTypo(value,item.r))offerTypingRetry(mode,true);
+      if(!forceWrong&&isLikelyKanaTypo(value,item.r))offerTypingRetry(mode,true);
     }
   }
 

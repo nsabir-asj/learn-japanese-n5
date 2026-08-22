@@ -79,6 +79,7 @@ The shared current-streak box begins with gentle rewards at 5 and 15, then becom
 - Type the romaji reading and press **Enter**.
 - After a correct word, press **Enter** again to move on.
 - After a typed wrong answer, **Typing mistake? Retry** is available for three seconds. Click it or press **Esc** to restore the same prompt and original font. On difficult-font questions, the standard reference stays blurred until this window expires. The first result remains recorded, and the retry is offered only once for that question.
+- In Learn and Rehearse, the retry appears only when the answer looks like a likely keyboard typo: one adjacent-key substitution (such as `kp` for `ko`) or one pair of neighboring letters entered in reverse order (such as `hsa` for `sha` or `ot` for `to`). A typed answer that is itself another valid kana reading remains a normal learning mistake. Word mode keeps its general retry behavior.
 - If rescue choices appear, click one or press **1–8**.
 - Use **I don't know** when you cannot recall the answer.
 
