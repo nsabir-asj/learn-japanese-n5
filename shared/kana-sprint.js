@@ -66,8 +66,14 @@
   wordDetails.innerHTML='<summary>Speech and pronunciation settings</summary><div class="details-body"></div>';
   const wordDetailsBody=wordDetails.querySelector(".details-body");
   while(wordSpeechCard.firstChild)wordDetailsBody.appendChild(wordSpeechCard.firstChild);
-  wordsTrainer.after(wordSessionToolbar);
-  wordSessionToolbar.after(wordDetails);
+  const wordSessionRow=document.createElement("div");
+  wordSessionRow.className="grid2 word-session-row";
+  const wordSetProgress=document.createElement("div");
+  wordSetProgress.className="card word-set-progress-card";
+  wordSetProgress.innerHTML='<h2>Current set progress</h2><div class="word-coverage-heading"><strong id="wordSetAssessed">0 of 0</strong><span>assessed</span></div><div class="progressbar word-coverage-bar" id="wordSetCoverage" role="progressbar" aria-label="Word set assessment coverage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="wordSetCoverageBar"></span></div><div class="word-set-stats"><div class="mini"><strong id="wordSetUnseen">0</strong><span class="tiny">unseen</span></div><div class="mini"><strong id="wordSetWeak">0</strong><span class="tiny">weak</span></div><div class="mini"><strong id="wordSetMastered">0</strong><span class="tiny">mastered</span></div><div class="mini"><strong id="wordSetAccuracy">—</strong><span class="tiny">accuracy</span></div></div>';
+  wordSessionRow.append(wordSessionToolbar,wordSetProgress);
+  wordsTrainer.after(wordSessionRow);
+  wordSessionRow.after(wordDetails);
   wordsSetupGrid.remove();
   document.querySelector("#rehearseHelpPanel .muted").textContent="Until every selected kana has a graded recall attempt, the Coverage pace controls how often unassessed kana appear and prevents ordinary reviews from starving them. Their first successful recognition uses Standard; difficult fonts become eligible afterwards. Scheduled mistake and mnemonic-recall checks take priority. After full coverage, review becomes fully adaptive.";
 
@@ -1818,16 +1824,29 @@
   function updateWordSummary(){
     const pool=wordPool(),states=pool.map(w=>wordItemState(w.k));
     const unique=states.filter(s=>s.seen>0).length;
+    const unseen=Math.max(0,pool.length-unique);
+    const weak=states.filter(isWeakWordState).length;
+    const mastered=states.filter(s=>s.mastery>=80).length;
+    const setAttempts=states.reduce((sum,s)=>sum+(s.seen||0),0);
+    const setCorrect=states.reduce((sum,s)=>sum+(s.correct||0),0);
     $("#wordSeen").textContent=state.wordStats.seen;
     $("#wordPoolCount").textContent=pool.length;
     $("#wordUnique").textContent=unique;
-    $("#wordUnseen").textContent=Math.max(0,pool.length-unique);
-    $("#wordWeak").textContent=states.filter(isWeakWordState).length;
-    $("#wordMastered").textContent=states.filter(s=>s.mastery>=80).length;
+    $("#wordUnseen").textContent=unseen;
+    $("#wordWeak").textContent=weak;
+    $("#wordMastered").textContent=mastered;
     $("#wordAccuracy").textContent="Word accuracy: "+(state.wordStats.seen?Math.round(state.wordStats.correct/state.wordStats.seen*100)+"%":"—");
-    const weak=pool.map(word=>({word,s:wordItemState(word.k)})).filter(x=>isWeakWordState(x.s))
+    $("#wordSetAssessed").textContent=`${unique} of ${pool.length}`;
+    const coverage=pool.length?Math.round(unique/pool.length*100):0;
+    $("#wordSetCoverageBar").style.width=coverage+"%";
+    $("#wordSetCoverage").setAttribute("aria-valuenow",String(coverage));
+    $("#wordSetUnseen").textContent=unseen;
+    $("#wordSetWeak").textContent=weak;
+    $("#wordSetMastered").textContent=mastered;
+    $("#wordSetAccuracy").textContent=setAttempts?Math.round(setCorrect/setAttempts*100)+"%":"—";
+    const weakWords=pool.map(word=>({word,s:wordItemState(word.k)})).filter(x=>isWeakWordState(x.s))
       .sort((a,b)=>((100-b.s.mastery)+b.s.wrong*4)-((100-a.s.mastery)+a.s.wrong*4)).slice(0,12);
-    $("#weakWordList").innerHTML=weak.length?weak.map(({word,s})=>`<div class="trouble word-trouble">
+    $("#weakWordList").innerHTML=weakWords.length?weakWords.map(({word,s})=>`<div class="trouble word-trouble">
       <div class="word-small">${word.k}</div>
       <div><strong>${word.r}</strong><div class="tiny">${word.m} • ${s.correct}/${s.seen} correct</div><div class="meter"><span style="width:${Math.round(s.mastery)}%"></span></div></div>
       <strong>${Math.round(s.mastery)}%</strong>
