@@ -66,9 +66,9 @@ After the P-row reaches 72 average mastery and combination rows become available
 
 ### Fonts
 
-Standard print is always enabled. Additional handwriting-style fonts can be selected for all practice modes. Harder fonts award slightly more mastery for a correct first attempt.
+Standard print is always enabled. Additional handwriting-style fonts can be selected for all practice modes from the expandable **Practice fonts** manager in **Settings & Data**. Harder fonts award slightly more mastery for a correct first attempt.
 
-When a difficult-font answer is wrong, the standard form appears beside it for one more attempt. Rescue choices appear only if that comparison attempt is also wrong.
+When a difficult-font answer is wrong, the standard form appears beside it for one more attempt. The correction identifies the font and links directly to its highlighted entry in the font manager. Rescue choices appear only if that comparison attempt is also wrong.
 
 ### Mnemonics
 

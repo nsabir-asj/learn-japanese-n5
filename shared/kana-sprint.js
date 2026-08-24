@@ -101,6 +101,10 @@
     const panel=document.createElement("section");
     panel.className="panel";panel.id="panel-settingsdata";
     panel.innerHTML=`<div class="data-layout">
+      <details class="details-card data-details practice-font-settings" id="practiceFontSettings">
+        <summary><span class="font-settings-title"><strong>Practice fonts</strong><span id="fontSettingsSummary">Standard font is always enabled</span></span></summary>
+        <div class="details-body" id="practiceFontSettingsBody"></div>
+      </details>
       <div class="card data-primary-card">
         <div class="data-heading"><div><h2>Progress backup</h2><p class="muted">One file can carry your kana, word, number, mnemonic, font, voice, and app settings to another browser or computer.</p></div><span class="data-badge">Complete backup</span></div>
         <div class="save-status"><span class="save-dot"></span><div><strong>Progress saves automatically on this device</strong><div class="tiny" id="lastSaved">Not saved yet</div></div></div>
@@ -129,6 +133,19 @@
       </details>
     </div>`;
     document.querySelector(".wrap").appendChild(panel);
+
+    const fontTab=document.querySelector('.tab[data-tab="fonts"]');
+    const fontPanel=document.querySelector("#panel-fonts");
+    const fontSettingsBody=panel.querySelector("#practiceFontSettingsBody");
+    if(fontTab)fontTab.remove();
+    if(fontPanel&&fontSettingsBody){
+      [...fontPanel.children].forEach((block,index)=>{
+        block.classList.add("font-settings-block");
+        if(index)block.style.marginTop="14px";
+        fontSettingsBody.appendChild(block);
+      });
+      fontPanel.remove();
+    }
   }
   buildDataPanel();
 
@@ -597,7 +614,7 @@
     $("#"+mode+"FontNote").textContent=mode==="words"?`${font.label} • ${font.wordGainMultiplier.toFixed(2)}× word mastery`:`${font.label} • ${font.gainMultiplier.toFixed(2)}× mastery`;
   }
 
-  function appendGlyphComparison(mode,item,font){
+  function appendGlyphComparison(mode,item,font,showFontManagement=true){
     const host=$("#"+mode+"Feedback .meta");
     if(!host)return;
     const compare=document.createElement("div");compare.className="glyph-compare";
@@ -608,6 +625,33 @@
       sample.append(caption,glyph);compare.appendChild(sample);
     });
     host.appendChild(compare);
+    if(showFontManagement&&font.id!=="standard")appendFontManagementNote(host,font);
+  }
+
+  function appendFontManagementNote(host,font){
+    const note=document.createElement("div");note.className="font-management-note";
+    note.append("This question used ");
+    const fontName=document.createElement("strong");fontName.textContent=`${font.label} · ${font.difficulty}`;
+    note.append(fontName,". Optional fonts can be changed in ");
+    const location=document.createElement("strong");location.textContent="Settings & Data → Practice fonts";
+    note.append(location,". ");
+    const manage=document.createElement("button");manage.type="button";manage.className="font-management-link";manage.textContent="Manage practice fonts";
+    manage.addEventListener("click",()=>openFontSettings(font.id));
+    note.appendChild(manage);host.appendChild(note);
+  }
+
+  function openFontSettings(fontId=""){
+    switchTab("settingsdata");
+    const settings=$("#practiceFontSettings");
+    if(!settings)return;
+    settings.open=true;renderFontTab();
+    requestAnimationFrame(()=>{
+      const card=fontId?document.querySelector(`[data-font-card="${fontId}"]`):settings;
+      if(!card)return;
+      card.classList.add("font-settings-focus");
+      card.scrollIntoView({behavior:"smooth",block:"center"});
+      setTimeout(()=>card.classList.remove("font-settings-focus"),1800);
+    });
   }
 
   function builtInMnemonic(item){
@@ -729,13 +773,13 @@
       const credit=difficult?25:40;
       const feedback=$("#"+mode+"Feedback");feedback.className="feedback show hint";feedback.innerHTML=`<strong>💡 Visual mnemonic hint</strong><div class="meta">This assisted answer can earn ${credit}% of normal mastery and will not affect accuracy or streak. Need the answer text? Ask again.</div>`;
       appendMnemonicCard(mode,item,"Visual clue","visual");
-      if(difficult)appendGlyphComparison(mode,item,session.currentFont||STANDARD_FONT);
+      if(difficult)appendGlyphComparison(mode,item,session.currentFont||STANDARD_FONT,false);
       const button=$("#"+mode+"Mnemonic");button.textContent="Show answer mnemonic";button.disabled=false;
     }else{
       session.mnemonicStage=2;
       const feedback=$("#"+mode+"Feedback");feedback.className="feedback show hint";feedback.innerHTML='<strong>💡 Answer mnemonic</strong><div class="meta">The answer is now shown, so this response awards no mastery and does not affect accuracy or streak. A short unaided recall check will follow.</div>';
       appendMnemonicCard(mode,item,"Answer mnemonic","full");
-      if(difficult)appendGlyphComparison(mode,item,session.currentFont||STANDARD_FONT);
+      if(difficult)appendGlyphComparison(mode,item,session.currentFont||STANDARD_FONT,false);
       $("#"+mode+"Mnemonic").textContent="Answer mnemonic shown";$("#"+mode+"Mnemonic").disabled=true;
     }
     saveState();const input=$("#"+mode+"Input");requestAnimationFrame(()=>input.focus({preventScroll:true}));
@@ -1857,11 +1901,15 @@
 
   function renderFontTab(){
     const selectors=$("#fontSelectors");
+    if(!selectors)return;
+    const enabledOptional=FONT_PROFILES.slice(1).filter(isFontEnabled).length;
+    const summary=$("#fontSettingsSummary");
+    if(summary)summary.textContent=`Standard + ${enabledOptional} optional font${enabledOptional===1?"":"s"} enabled`;
     selectors.innerHTML=FONT_PROFILES.map(font=>{
       const summary=fontSummary(font),safeFamily=font.family.replaceAll('"',"'");
       const accuracy=summary.seen?`${summary.accuracy}% • ${summary.seen} answers`:"Not assessed";
-      if(font.id==="standard")return `<div class="font-select-card fixed"><div style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">${LESSON.fontPreview}</div><span class="tiny">Always enabled • ${accuracy}</span></div></div>`;
-      return `<label class="font-select-card"><input type="checkbox" data-font-select="${font.id}" ${isFontEnabled(font)?"checked":""}><div style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">${LESSON.fontPreview}</div><span class="tiny">${font.difficulty}<br>${font.gainMultiplier.toFixed(2)}× kana • ${font.wordGainMultiplier.toFixed(2)}× word<br>${accuracy}</span></div></label>`;
+      if(font.id==="standard")return `<div class="font-select-card fixed" data-font-card="${font.id}"><div style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">${LESSON.fontPreview}</div><span class="tiny">Always enabled • ${accuracy}</span></div></div>`;
+      return `<label class="font-select-card" data-font-card="${font.id}"><input type="checkbox" data-font-select="${font.id}" ${isFontEnabled(font)?"checked":""}><div style="font-family:${safeFamily}"><strong>${font.label}</strong><div class="font-preview">${LESSON.fontPreview}</div><span class="tiny">${font.difficulty}<br>${font.gainMultiplier.toFixed(2)}× kana • ${font.wordGainMultiplier.toFixed(2)}× word<br>${accuracy}</span></div></label>`;
     }).join("");
     selectors.querySelectorAll("[data-font-select]").forEach(input=>input.addEventListener("change",e=>{
       state.selectedFonts[e.target.dataset.fontSelect]=e.target.checked;state.selectedFonts.standard=true;saveState();renderFontTab();
@@ -2043,7 +2091,7 @@
   function updateAllUI(){
     updateTopStats();updateRehearseSummary();updateWordSummary();renderProgress();renderCurriculum();updateLastSaved();
     renderScriptBalance();renderPaceControls();
-    if(currentTab==="fonts")renderFontTab();
+    if(currentTab==="settingsdata")renderFontTab();
     if(currentTab==="mnemonics")renderMnemonicTab();
   }
 
@@ -2058,7 +2106,6 @@
     if(tab==="learn"){if(!sessions.learn.current)nextKanaQuestion("learn");else if(!sessions.learn.introduction)focusInput("learn")}
     if(tab==="rehearse"){if(!sessions.rehearse.current)nextKanaQuestion("rehearse");else if(!sessions.rehearse.introduction)focusInput("rehearse")}
     if(tab==="words"){if(!sessions.words.current)nextWordQuestion();else focusInput("words")}
-    if(tab==="fonts")renderFontTab();
     if(tab==="mnemonics")renderMnemonicTab();
     if(tab==="kanaprogress"||tab==="wordprogress"||tab==="settingsdata")updateAllUI();
   }
