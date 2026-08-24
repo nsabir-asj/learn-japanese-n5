@@ -487,7 +487,7 @@
     $("#numberRescue").classList.add("show");
     $("#numberDontKnow").classList.add("number-hidden");
     setFeedback("Not quite. Choose the correct answer to reinforce the pattern.", "bad");
-    $("#numberOptions").innerHTML = distractors().map((answer, index) => `<button class="option" data-answer="${answer}"><kbd>${index + 1}</kbd> ${answer}</button>`).join("");
+    $("#numberOptions").innerHTML = distractors().map((answer, index) => `<button class="choice" data-answer="${answer}"><span class="num">${index + 1}</span>${answer}</button>`).join("");
     $("#numberOptions").querySelectorAll("button").forEach(button => {
       button.addEventListener("click", () => rescueAnswer(button.dataset.answer, button));
     });
