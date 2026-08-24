@@ -269,7 +269,9 @@
     tab.className = "tab";
     tab.dataset.tab = "numbers";
     tab.textContent = "Numbers";
-    $('.tab[data-tab="fonts"]').before(tab);
+    const tabAnchor = $('.tab[data-tab="kanaprogress"]');
+    if (tabAnchor) tabAnchor.before(tab);
+    else $('.tabs').appendChild(tab);
 
     const panel = document.createElement("section");
     panel.className = "panel";
@@ -307,7 +309,9 @@
         <div class="footer-actions"><div class="number-actions"><button class="ghost" id="numberDontKnow">I don't know</button><button class="ghost number-hidden" id="numberNext">Next <kbd>Enter</kbd></button></div><span class="tiny">Progress is shared between Hiragana Sprint and Kana Mix.</span></div>
       </div>
       <div class="card" style="margin-top:14px"><h2>Pattern mastery</h2><div class="number-concepts" id="numberConcepts"></div></div>`;
-    $("#panel-fonts").before(panel);
+    const panelAnchor = $("#panel-kanaprogress");
+    if (panelAnchor) panelAnchor.before(panel);
+    else $(".wrap").appendChild(panel);
     $("#numberDataTools").classList.remove("hidden");
     $("#numberReset").classList.remove("hidden");
     tab.addEventListener("click", switchToNumbers);
