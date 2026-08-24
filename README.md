@@ -90,7 +90,7 @@ The separate user-supplied LeafPiece original is kept locally under `assets/loca
 
 The **Kana Progress** and **Word Progress** tabs show mastery, weak items, common confusions, font recognition, curriculum status, and word statistics.
 
-The shared current-streak box begins with gentle rewards at 5 and 15, then becomes more prominent at 25, 50, 75, 100, 150, and 200 consecutive correct answers. The 200+ tier uses the legendary purple-gold style. Both progress tabs include the complete milestone guide and show the current and best streak.
+The top streak box follows the active practice mode: Kana in Learn and Rehearse, Words in Word mode, and Numbers in Number mode. Each mode keeps an independent streak, so a mistake in one activity does not reset the others. The highlight begins with gentle rewards at 5 and 15, then becomes more prominent at 25, 50, 75, 100, 150, and 200 consecutive correct answers. The 200+ tier uses the legendary purple-gold style. Kana Progress and Word Progress include the complete milestone guide and show their current and best streaks; Number Progress keeps the live streak in the header and shows the best number streak in its summary.
 
 ## Answering questions
 

@@ -19,12 +19,13 @@
   const streakStat=document.querySelector("#sStreak").closest(".stat");
   streakStat.id="streakStat";
   streakStat.classList.add("streak-stat");
+  streakStat.querySelector("span").id="sStreakLabel";
   const streakGuide=(scope,description)=>`<div class="card streak-progress-card" style="margin-top:14px">
     <div class="streak-progress-heading"><div><h2>Streak milestones</h2><p class="muted">${description}</p></div><div class="streak-record"><strong id="${scope}StreakCurrent">0</strong><span>current</span><strong id="${scope}StreakBest">0</strong><span>best</span></div></div>
     <div class="streak-tier-guide" aria-label="Streak highlight levels"><span>0–4<br><small>Standard</small></span><span class="tier-1">5–14<br><small>Spark</small></span><span class="tier-2">15–24<br><small>Warming up</small></span><span class="tier-3">25–49<br><small>Soft amber</small></span><span class="tier-4">50–74<br><small>Amber glow</small></span><span class="tier-5">75–99<br><small>Bright gold</small></span><span class="tier-6">100–149<br><small>Orange fire</small></span><span class="tier-7">150–199<br><small>Fiery glow</small></span><span class="tier-8">200+<br><small>Legendary</small></span></div>
   </div>`;
-  document.querySelector("#panel-kanaprogress > .grid2").insertAdjacentHTML("afterend",streakGuide("kana","The streak box gains a stronger highlight as consecutive correct answers build up. A mistake resets the current streak without a negative animation."));
-  document.querySelector("#panel-wordprogress > .grid2").insertAdjacentHTML("afterend",streakGuide("word","Word answers and kana answers share one live streak. Keep recognizing correctly to strengthen the highlight."));
+  document.querySelector("#panel-kanaprogress > .grid2").insertAdjacentHTML("afterend",streakGuide("kana","Learn and Rehearse share this kana streak. A mistake resets the current streak without affecting the separate Word or Number streaks."));
+  document.querySelector("#panel-wordprogress > .grid2").insertAdjacentHTML("afterend",streakGuide("word","Word practice has its own streak, so a word mistake does not reset your Kana or Number streaks."));
   document.querySelector("#speechMeaning").closest("label").insertAdjacentHTML("afterend",`<label class="toggle-line"><input type="checkbox" id="speechContinue"> Let pronunciation finish after moving to the next word</label>`);
 
   const mnemonicTab=document.createElement("button");
@@ -87,6 +88,7 @@
     const progressGrid=document.querySelector("#panel-kanaprogress > .grid2");
     const backupCard=document.querySelector("#exportProgress").closest(".card");
     const curriculumCard=backupCard.nextElementSibling;
+    curriculumCard.classList.add("curriculum-card");
     const assistedSummary=backupCard.querySelector(".assisted-summary");
     if(assistedSummary)curriculumCard.querySelector(".muted").after(assistedSummary);
     progressGrid.before(curriculumCard);
@@ -313,6 +315,7 @@
       version:LESSON.progressVersion,
       learnUnlockedCount:LESSON.initialLearnUnlockedCount,
       stats:{answered:0,correct:0,assisted:0,streak:0,bestStreak:0},
+      streaks:{kana:{current:0,best:0},word:{current:0,best:0}},
       wordStats:{seen:0,correct:0},
       wordItems:{},
       wordFeatureHistory:{},
@@ -368,6 +371,16 @@
   function ensureStateShape(){
     if(!state.stats) state.stats={answered:0,correct:0,streak:0,bestStreak:0};
     if(!Number.isFinite(state.stats.assisted))state.stats.assisted=0;
+    if(!state.streaks||typeof state.streaks!=="object"){
+      const legacyCurrent=Math.max(0,Number(state.stats.streak)||0);
+      const legacyBest=Math.max(legacyCurrent,Number(state.stats.bestStreak)||0);
+      state.streaks={kana:{current:legacyCurrent,best:legacyBest},word:{current:legacyCurrent,best:legacyBest}};
+    }
+    ["kana","word"].forEach(scope=>{
+      if(!state.streaks[scope]||typeof state.streaks[scope]!=="object")state.streaks[scope]={current:0,best:0};
+      state.streaks[scope].current=Math.max(0,Number(state.streaks[scope].current)||0);
+      state.streaks[scope].best=Math.max(state.streaks[scope].current,Number(state.streaks[scope].best)||0);
+    });
     if(!state.wordStats) state.wordStats={seen:0,correct:0};
     if(!state.wordItems) state.wordItems={};
     if(!state.wordFeatureHistory)state.wordFeatureHistory={};
@@ -979,12 +992,15 @@
       const gain=Math.min(17,masteryGain(s)*(assisted?1:font.gainMultiplier)*masteryMultiplier);
       s.mastery=Math.min(100,s.mastery+gain);
       if(assisted)s.dueAt=Date.now()+5*60000;else scheduleCorrect(s);
-      if(!assisted){state.stats.answered++;state.stats.correct++;state.stats.streak++;state.stats.bestStreak=Math.max(state.stats.bestStreak,state.stats.streak)}
+      if(!assisted){
+        state.stats.answered++;state.stats.correct++;
+        state.streaks.kana.current++;state.streaks.kana.best=Math.max(state.streaks.kana.best,state.streaks.kana.current);
+      }
     }else{
       const penalty=font.penalty;
       s.wrong++;s.unaidedSeen++;s.streak=0;s.lastWasCorrect=false;s.errorStreak=(s.errorStreak||0)+1;s.mastery=Math.max(0,s.mastery-penalty);s.dueAt=Date.now()+60000;
       state.stats.answered++;
-      state.stats.streak=0;
+      state.streaks.kana.current=0;
       if(typedWrongItem && typedWrongItem.k!==item.k){
         s.confusions[typedWrongItem.k]=(s.confusions[typedWrongItem.k]||0)+1;
       }
@@ -1504,12 +1520,12 @@
       ws.correct++;ws.streak++;ws.errorStreak=0;
       ws.mastery=Math.min(100,ws.mastery+wordMasteryGain(ws)*font.wordGainMultiplier);scheduleWordCorrect(ws);
       state.wordStats.correct++;
-      state.stats.answered++;state.stats.correct++;state.stats.streak++;
-      state.stats.bestStreak=Math.max(state.stats.bestStreak||0,state.stats.streak);
+      state.stats.answered++;state.stats.correct++;
+      state.streaks.word.current++;state.streaks.word.best=Math.max(state.streaks.word.best,state.streaks.word.current);
       w.u.forEach(k=>{const s=itemState(k);s.mastery=Math.min(100,s.mastery+2)});
     }else{
       ws.wrong++;ws.streak=0;ws.errorStreak=(ws.errorStreak||0)+1;ws.mastery=Math.max(0,ws.mastery-14);ws.dueAt=Date.now()+60000;
-      state.stats.answered++;state.stats.streak=0;
+      state.stats.answered++;state.streaks.word.current=0;
       w.u.forEach(k=>{
         const s=itemState(k);s.mastery=Math.max(0,s.mastery-2);s.dueAt=Date.now()+60000;
       });
@@ -1682,6 +1698,7 @@
   }
 
   let lastRenderedStreak=null;
+  let lastRenderedStreakScope="kana";
   function streakTier(streak){
     if(streak>=200)return 8;
     if(streak>=150)return 7;
@@ -1694,25 +1711,37 @@
     return 0;
   }
 
+  function renderTopStreak(scope,current,best,label){
+    const streak=Math.max(0,Number(current)||0),record=Math.max(streak,Number(best)||0);
+    const streakBox=$("#streakStat"),tier=streakTier(streak);
+    const previousTier=lastRenderedStreak===null||lastRenderedStreakScope!==scope?tier:streakTier(lastRenderedStreak);
+    $("#sStreak").textContent=streak;
+    $("#sStreakLabel").textContent=label;
+    streakBox.classList.remove("streak-tier-1","streak-tier-2","streak-tier-3","streak-tier-4","streak-tier-5","streak-tier-6","streak-tier-7","streak-tier-8","streak-celebrate");
+    if(tier)streakBox.classList.add(`streak-tier-${tier}`);
+    if(lastRenderedStreak!==null&&lastRenderedStreakScope===scope&&tier>previousTier){
+      void streakBox.offsetWidth;
+      streakBox.classList.add("streak-celebrate");
+      setTimeout(()=>streakBox.classList.remove("streak-celebrate"),1100);
+    }
+    lastRenderedStreak=streak;
+    lastRenderedStreakScope=scope;
+    return record;
+  }
+
   function updateTopStats(){
     const all=allItems.map(x=>itemState(x.k));
     const mastered=all.filter(s=>s.mastery>=80).length;
     $("#sMastered").textContent=mastered;
     $("#sAccuracy").textContent=state.stats.answered?Math.round(state.stats.correct/state.stats.answered*100)+"%":"—";
     $("#assistedRecognitionCount").textContent=state.stats.assisted||0;
-    const streak=Math.max(0,state.stats.streak||0),best=Math.max(streak,state.stats.bestStreak||0);
-    const streakBox=$("#streakStat"),tier=streakTier(streak),previousTier=lastRenderedStreak===null?tier:streakTier(lastRenderedStreak);
-    $("#sStreak").textContent=streak;
-    streakBox.classList.remove("streak-tier-1","streak-tier-2","streak-tier-3","streak-tier-4","streak-tier-5","streak-tier-6","streak-tier-7","streak-tier-8","streak-celebrate");
-    if(tier)streakBox.classList.add(`streak-tier-${tier}`);
-    if(lastRenderedStreak!==null&&tier>previousTier){
-      void streakBox.offsetWidth;
-      streakBox.classList.add("streak-celebrate");
-      setTimeout(()=>streakBox.classList.remove("streak-celebrate"),1100);
-    }
-    lastRenderedStreak=streak;
-    ["kanaStreakCurrent","wordStreakCurrent"].forEach(id=>$("#"+id).textContent=streak);
-    ["kanaStreakBest","wordStreakBest"].forEach(id=>$("#"+id).textContent=best);
+    const scope=currentTab==="words"?"word":"kana";
+    const activeStreak=state.streaks[scope];
+    if(currentTab!=="numbers")renderTopStreak(scope,activeStreak.current,activeStreak.best,scope==="word"?"word streak":"kana streak");
+    $("#kanaStreakCurrent").textContent=state.streaks.kana.current;
+    $("#kanaStreakBest").textContent=state.streaks.kana.best;
+    $("#wordStreakCurrent").textContent=state.streaks.word.current;
+    $("#wordStreakBest").textContent=state.streaks.word.best;
     $("#sWeak").textContent=all.filter(s=>s.seen&&(isWeakKanaState(s)||s.dueAt<=Date.now())).length;
     const lp=learnPool(),avg=lp.length?lp.reduce((a,x)=>a+itemState(x.k).mastery,0)/lp.length:0;
     $("#learnProgress").style.width=Math.round(avg)+"%";
@@ -1720,6 +1749,7 @@
   }
 
   function renderCurriculum(){
+    let lastPhase="";
     $("#curriculumRows").innerHTML=GROUPS.map((g,gi)=>{
       const unlocked=isGroupUnlocked(gi);
       const rehearsalUnlock=state.groupUnlockSource[g.id]==="rehearsal";
@@ -1732,7 +1762,9 @@
       const rehearsalAccuracy=rehearsalSeen?Math.round(rehearsalCorrect/rehearsalSeen*100):0;
       const status=unlocked?`${avg}% mastery`:rehearsalSeen?`${demonstrated}/${g.items.length} kana demonstrated • ${rehearsalAccuracy}% rehearsal accuracy`:"locked in Learn";
       const tag=unlocked?`<span class="unlock-tag ${rehearsalUnlock?"rehearsal":""}">Unlocked through ${rehearsalUnlock?"Rehearsal":"Learn"}</span>`:"";
-      return `<div class="row-chip ${unlocked?"":"locked"}">
+      const section=g.phase!==lastPhase?`<div class="curriculum-phase">${g.phase}</div>`:"";
+      lastPhase=g.phase;
+      return `${section}<div class="row-chip ${unlocked?"":"locked"}">
         <div class="row-name"><div class="row-heading"><strong>${g.name}</strong>${tag}</div><span>${g.phase} • ${status}</span></div>
         <div class="kana-line">${g.items.map(x=>x[0]).join(" ")}</div>
       </div>`;
@@ -2022,6 +2054,7 @@
     document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
     document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
     $("#panel-"+tab).classList.add("active");
+    updateTopStats();
     if(tab==="learn"){if(!sessions.learn.current)nextKanaQuestion("learn");else if(!sessions.learn.introduction)focusInput("learn")}
     if(tab==="rehearse"){if(!sessions.rehearse.current)nextKanaQuestion("rehearse");else if(!sessions.rehearse.introduction)focusInput("rehearse")}
     if(tab==="words"){if(!sessions.words.current)nextWordQuestion();else focusInput("words")}
@@ -2294,6 +2327,11 @@
     location.reload();
   });
   window.addEventListener("kana-sprint-progress-saved",updateLastSaved);
+  window.addEventListener("kana-sprint-streak-context",event=>{
+    const detail=event.detail||{};
+    currentTab="numbers";
+    renderTopStreak("numbers",detail.current,detail.best,"number streak");
+  });
 
   window.addEventListener("focus",()=>{
     if(currentTab==="learn"&&!sessions.learn.rescue&&!sessions.learn.introduction)focusInput("learn");

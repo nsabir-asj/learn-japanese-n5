@@ -291,7 +291,7 @@
             <div class="mini"><strong id="numberTotal">0</strong><span class="tiny">answers</span></div>
             <div class="mini"><strong id="numberAccuracy">—</strong><span class="tiny">accuracy</span></div>
             <div class="mini"><strong id="numberMastered">0</strong><span class="tiny">patterns mastered</span></div>
-            <div class="mini"><strong id="numberStreak">0</strong><span class="tiny">current streak</span></div>
+            <div class="mini"><strong id="numberBestStreak">0</strong><span class="tiny">best streak</span></div>
           </div>
         </div>
       </div>
@@ -322,6 +322,7 @@
   function switchToNumbers() {
     document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab.dataset.tab === "numbers"));
     document.querySelectorAll(".panel").forEach(panel => panel.classList.toggle("active", panel.id === "panel-numbers"));
+    publishStreakContext();
     if (!current && !pendingIntroduction) nextQuestion();
     setTimeout(() => $("#numberInput")?.focus(), 0);
   }
@@ -338,7 +339,7 @@
     if (!$("#numberTotal")) return;
     $("#numberTotal").textContent = state.total;
     $("#numberAccuracy").textContent = state.total ? `${Math.round(state.correct / state.total * 100)}%` : "—";
-    $("#numberStreak").textContent = state.streak;
+    $("#numberBestStreak").textContent = state.bestStreak;
     $("#numberMastered").textContent = availableConcepts().filter(concept => state.concepts[concept.id].mastery >= 72).length;
     $("#numberPaceName").textContent = paceName();
     $("#numberSaveStatus").textContent = state.savedAt ? `Auto-saved ${new Date(state.savedAt).toLocaleString()}` : "Number progress auto-saves in this browser.";
@@ -346,6 +347,11 @@
       const progress = state.concepts[concept.id];
       return `<div class="number-concept"><strong>${concept.name}</strong><div class="number-concept-meter"><span style="width:${progress.mastery}%"></span></div><span class="tiny">${Math.round(progress.mastery)}% · ${progress.seen} tries</span></div>`;
     }).join("");
+    if ($("#panel-numbers")?.classList.contains("active")) publishStreakContext();
+  }
+
+  function publishStreakContext() {
+    window.dispatchEvent(new CustomEvent("kana-sprint-streak-context", { detail: { current: state.streak, best: state.bestStreak } }));
   }
 
   function setFeedback(html, tone = "") {
