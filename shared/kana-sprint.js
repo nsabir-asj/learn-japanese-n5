@@ -83,7 +83,61 @@
     document.querySelector(".rehearse-status").before(balance);
   }
 
+  function buildDataPanel(){
+    const progressGrid=document.querySelector("#panel-kanaprogress > .grid2");
+    const backupCard=document.querySelector("#exportProgress").closest(".card");
+    const curriculumCard=backupCard.nextElementSibling;
+    const assistedSummary=backupCard.querySelector(".assisted-summary");
+    if(assistedSummary)curriculumCard.querySelector(".muted").after(assistedSummary);
+    progressGrid.before(curriculumCard);
+    progressGrid.remove();
+
+    const tab=document.createElement("button");
+    tab.className="tab";tab.dataset.tab="settingsdata";tab.textContent="Settings & Data";
+    document.querySelector(".tabs").appendChild(tab);
+
+    const panel=document.createElement("section");
+    panel.className="panel";panel.id="panel-settingsdata";
+    panel.innerHTML=`<div class="data-layout">
+      <div class="card data-primary-card">
+        <div class="data-heading"><div><h2>Progress backup</h2><p class="muted">One file can carry your kana, word, number, mnemonic, font, voice, and app settings to another browser or computer.</p></div><span class="data-badge">Complete backup</span></div>
+        <div class="save-status"><span class="save-dot"></span><div><strong>Progress saves automatically on this device</strong><div class="tiny" id="lastSaved">Not saved yet</div></div></div>
+        <div class="actions data-primary-actions"><button class="big-button" id="exportAllProgress">Export all progress</button><button class="ghost" id="importAllProgressBtn">Choose backup to import</button><input id="importAllProgressFile" type="file" accept=".json,application/json" class="hidden"></div>
+        <div class="callout data-import-preview" id="allImportStatus">Choose a complete backup file to preview it before anything is replaced.</div>
+        <button class="big-button hidden" id="restoreAllProgress">Restore this backup</button>
+      </div>
+      <details class="details-card data-details">
+        <summary>Advanced component backups</summary>
+        <div class="details-body data-tools">
+          <div class="component-data-tools">
+            <div><strong>Current trainer</strong><p class="tiny">Kana, words, mnemonics, fonts, voices, and settings for ${LESSON.appName}.</p></div>
+            <div class="actions"><button class="ghost" id="exportProgress">Export current trainer</button><button class="ghost" id="importProgressBtn">Import current trainer</button><input id="importProgressFile" type="file" accept=".json,application/json" class="hidden"></div>
+            <div class="callout" id="importStatus">Older trainer-specific backup files remain supported here.</div>
+          </div>
+          <div class="component-data-tools hidden" id="numberDataTools">
+            <div><strong>Numbers</strong><p class="tiny">Number-pattern history shared by Hiragana Sprint and Kana Mix.</p></div>
+            <div class="actions"><button class="ghost" id="numberExport">Export numbers</button><button class="ghost" id="numberImport">Import numbers</button><input class="hidden" id="numberImportFile" type="file" accept=".json,application/json"></div>
+            <div class="callout" id="numberSaveStatus">Number progress auto-saves in this browser.</div>
+          </div>
+        </div>
+      </details>
+      <details class="details-card data-details danger-zone">
+        <summary>Reset progress</summary>
+        <div class="details-body"><p class="muted">Reset actions cannot be undone. Export a complete backup first if you may want this progress later.</p><div class="actions"><button class="ghost danger" id="resetProgress">Reset current trainer</button><button class="ghost danger hidden" id="numberReset">Reset numbers</button><button class="ghost danger" id="resetAllProgress">Reset all app data</button></div></div>
+      </details>
+    </div>`;
+    document.querySelector(".wrap").appendChild(panel);
+  }
+  buildDataPanel();
+
   const STORAGE_KEY = LESSON.storageKey;
+  const COMPLETE_BACKUP_FORMAT="kana-sprint-complete-backup";
+  const APP_STORAGE_KEYS={
+    "hiragana-sprint-v3":{label:"Hiragana",version:3},
+    "katakana-sprint-v1":{label:"Katakana",version:1},
+    "kana-sprint-mix-v1":{label:"Kana Mix",version:1},
+    "kanaSprintNumbersV1":{label:"Numbers",version:1}
+  };
   const FONT_PROFILES = LESSON.fontProfiles;
   const STANDARD_FONT=FONT_PROFILES[0];
   const GROUPS = LESSON.groups;
@@ -1945,8 +1999,12 @@
 
   function updateLastSaved(){
     const el=$("#lastSaved");
-    if(!state.savedAt){el.textContent="Not saved yet";return}
-    const d=new Date(state.savedAt);
+    let latest=Number(state.savedAt)||0;
+    Object.keys(APP_STORAGE_KEYS).forEach(key=>{
+      try{latest=Math.max(latest,Number(JSON.parse(localStorage.getItem(key))?.savedAt)||0)}catch(e){}
+    });
+    if(!latest){el.textContent="No progress saved yet";return}
+    const d=new Date(latest);
     el.textContent="Last saved: "+d.toLocaleString();
   }
 
@@ -1969,7 +2027,7 @@
     if(tab==="words"){if(!sessions.words.current)nextWordQuestion();else focusInput("words")}
     if(tab==="fonts")renderFontTab();
     if(tab==="mnemonics")renderMnemonicTab();
-    if(tab==="kanaprogress"||tab==="wordprogress")updateAllUI();
+    if(tab==="kanaprogress"||tab==="wordprogress"||tab==="settingsdata")updateAllUI();
   }
 
   function exportProgress(){
@@ -1987,6 +2045,106 @@
     document.body.appendChild(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(a.href),1000);
     $("#importStatus").textContent="Progress exported successfully.";
+  }
+
+  function downloadJson(payload,filename){
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);a.download=filename;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }
+
+  function storedAppData(){
+    const stores={};
+    Object.keys(APP_STORAGE_KEYS).forEach(key=>{
+      try{
+        const value=JSON.parse(localStorage.getItem(key));
+        if(value&&typeof value==="object")stores[key]=value;
+      }catch(e){}
+    });
+    return stores;
+  }
+
+  function exportAllProgress(){
+    saveState();
+    const stamp=new Date().toISOString().slice(0,10);
+    downloadJson({
+      app:"Kana Sprint",
+      format:COMPLETE_BACKUP_FORMAT,
+      formatVersion:1,
+      exportedAt:new Date().toISOString(),
+      stores:storedAppData()
+    },`kana-sprint-complete-backup-${stamp}.json`);
+    $("#allImportStatus").textContent="Complete backup exported successfully.";
+  }
+
+  function validateCompleteBackup(data){
+    if(!data||data.format!==COMPLETE_BACKUP_FORMAT||data.formatVersion!==1||!data.stores||typeof data.stores!=="object")throw new Error("This is not a Kana Sprint complete-backup file.");
+    const stores={};
+    Object.entries(data.stores).forEach(([key,value])=>{
+      const definition=APP_STORAGE_KEYS[key];
+      if(!definition||!value||typeof value!=="object")return;
+      if(value.version!==definition.version)throw new Error(`${definition.label} data uses an unsupported version.`);
+      stores[key]=value;
+    });
+    if(!Object.keys(stores).length)throw new Error("This backup does not contain recognized app progress.");
+    return {...data,stores};
+  }
+
+  function storeSummary(key,value){
+    const label=APP_STORAGE_KEYS[key].label;
+    if(key==="kanaSprintNumbersV1"){
+      const patterns=Object.values(value.concepts||{}).filter(concept=>(concept.seen||0)>0).length;
+      return `${label}: ${value.total||0} answers · ${patterns} patterns assessed`;
+    }
+    const kana=Object.values(value.items||{}).filter(item=>(item.unaidedSeen??item.seen??0)>0).length;
+    const words=Object.values(value.wordItems||{}).filter(item=>(item.seen||0)>0).length;
+    return `${label}: ${kana} kana · ${words} words assessed`;
+  }
+
+  let stagedCompleteBackup=null;
+  function showCompleteBackupPreview(data){
+    const status=$("#allImportStatus");
+    status.replaceChildren();
+    const title=document.createElement("strong");
+    title.textContent="Ready to restore";
+    const date=document.createElement("div");
+    date.className="tiny";
+    const exported=new Date(data.exportedAt);
+    date.textContent=Number.isNaN(exported.getTime())?"Backup date unavailable":`Exported ${exported.toLocaleString()}`;
+    const list=document.createElement("ul");
+    list.className="data-preview-list";
+    Object.entries(data.stores).forEach(([key,value])=>{
+      const item=document.createElement("li");item.textContent=storeSummary(key,value);list.appendChild(item);
+    });
+    const note=document.createElement("div");
+    note.className="tiny";note.textContent="Restoring replaces the areas listed above. Other app data stays unchanged.";
+    status.append(title,date,list,note);
+    $("#restoreAllProgress").classList.remove("hidden");
+  }
+
+  function prepareCompleteImport(file){
+    stagedCompleteBackup=null;
+    $("#restoreAllProgress").classList.add("hidden");
+    const reader=new FileReader();
+    reader.onload=()=>{
+      try{
+        stagedCompleteBackup=validateCompleteBackup(JSON.parse(reader.result));
+        showCompleteBackupPreview(stagedCompleteBackup);
+      }catch(err){
+        $("#allImportStatus").textContent="Import failed: "+err.message;
+      }
+    };
+    reader.onerror=()=>{$("#allImportStatus").textContent="Import failed: the selected file could not be read."};
+    reader.readAsText(file);
+  }
+
+  function restoreCompleteBackup(){
+    if(!stagedCompleteBackup)return;
+    Object.entries(stagedCompleteBackup.stores).forEach(([key,value])=>localStorage.setItem(key,JSON.stringify(value)));
+    $("#allImportStatus").textContent="Backup restored. Reloading the trainer…";
+    setTimeout(()=>location.reload(),250);
   }
 
   function importProgressFile(file){
@@ -2114,9 +2272,15 @@
   $("#importProgressFile").addEventListener("change",e=>{
     const file=e.target.files&&e.target.files[0];if(file)importProgressFile(file);e.target.value="";
   });
+  $("#exportAllProgress").addEventListener("click",exportAllProgress);
+  $("#importAllProgressBtn").addEventListener("click",()=>$("#importAllProgressFile").click());
+  $("#importAllProgressFile").addEventListener("change",e=>{
+    const file=e.target.files&&e.target.files[0];if(file)prepareCompleteImport(file);e.target.value="";
+  });
+  $("#restoreAllProgress").addEventListener("click",restoreCompleteBackup);
 
   $("#resetProgress").addEventListener("click",()=>{
-    if(!confirm("Reset all mastery, mistakes, word stats, and selections? This cannot be undone."))return;
+    if(!confirm(`Reset kana, word, mnemonic, and settings data for ${LESSON.appName}? Number progress is not affected. This cannot be undone.`))return;
     if(typeof LESSON.resetProgress==="function")LESSON.resetProgress();else localStorage.removeItem(STORAGE_KEY);
     state=defaultState();saveState();
     sessions.learn=newPracticeSession();
@@ -2124,6 +2288,12 @@
     sessions.words=newPracticeSession();
     renderRehearseSelectors();renderSpeechControls();updateAllUI();switchTab("learn");nextKanaQuestion("learn");
   });
+  $("#resetAllProgress").addEventListener("click",()=>{
+    if(!confirm("Reset all Hiragana, Katakana, Kana Mix, word, number, mnemonic, and settings data on this device? This cannot be undone."))return;
+    Object.keys(APP_STORAGE_KEYS).forEach(key=>localStorage.removeItem(key));
+    location.reload();
+  });
+  window.addEventListener("kana-sprint-progress-saved",updateLastSaved);
 
   window.addEventListener("focus",()=>{
     if(currentTab==="learn"&&!sessions.learn.rescue&&!sessions.learn.introduction)focusInput("learn");

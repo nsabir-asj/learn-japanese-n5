@@ -116,7 +116,9 @@ Kana Mix merges the two script records when it opens. Every mixed answer is then
 
 This data belongs to that browser and computer. It is **not** saved as a file in this project folder. Clearing browser data, using another browser, or changing how the files are opened can make the saved progress unavailable.
 
-For a portable backup, open **Kana Progress** and select **Export progress**. This downloads a JSON file containing mastery, mistakes, confusions, settings, and rehearsal selections. Use **Import progress** in the matching trainer to restore it.
+For a portable backup, open **Settings & Data** and select **Export all progress**. The complete backup includes every available Hiragana, Katakana, Kana Mix, word, number, mnemonic, font, voice, and app-settings record. Importing first shows a dated summary and only restores the listed areas after confirmation.
+
+Older trainer-specific and number-only backup files remain supported under **Advanced component backups**.
 
 It is a good idea to export a backup occasionally.
 
@@ -162,10 +164,10 @@ The launchers deliberately use ordinary deferred scripts rather than JavaScript 
 
 ## Resetting or transferring progress
 
-- To start over, use **Reset everything** in Kana Progress.
-- To move progress to another computer or browser, export the JSON backup, open the same trainer there, and import it.
-- Hiragana and Katakana backups are intentionally separate.
-- Resetting everything from Kana Mix resets the linked Hiragana and Katakana progress as well.
+- To move all progress to another computer or browser, use the complete backup in **Settings & Data**.
+- Use **Advanced component backups** when you only want the current trainer or number history.
+- **Reset current trainer**, **Reset numbers**, and **Reset all app data** are kept separate so the affected data is clear.
+- Resetting the current trainer from Kana Mix resets its linked Hiragana and Katakana progress as well.
 
 ## Font licences
 

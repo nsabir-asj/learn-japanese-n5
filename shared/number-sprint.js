@@ -85,6 +85,7 @@
     state.savedAt = Date.now();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     renderProgress();
+    window.dispatchEvent(new CustomEvent("kana-sprint-progress-saved"));
   }
 
   function romajiDigit(number) { return DIGITS[number].r; }
@@ -305,11 +306,10 @@
         </div>
         <div class="footer-actions"><div class="number-actions"><button class="ghost" id="numberDontKnow">I don't know</button><button class="ghost number-hidden" id="numberNext">Next <kbd>Enter</kbd></button></div><span class="tiny">Progress is shared between Hiragana Sprint and Kana Mix.</span></div>
       </div>
-      <div class="grid2" style="margin-top:14px">
-        <div class="card"><h2>Pattern mastery</h2><div class="number-concepts" id="numberConcepts"></div></div>
-        <div class="card"><h2>Number progress backup</h2><p class="muted">Number history is stored separately so both supported trainers use the same progress.</p><div class="number-actions"><button class="ghost" id="numberExport">Export numbers</button><button class="ghost" id="numberImport">Import numbers</button><input class="number-hidden" id="numberImportFile" type="file" accept=".json,application/json"><button class="ghost danger" id="numberReset">Reset numbers</button></div><div class="callout" id="numberSaveStatus">Not saved yet</div></div>
-      </div>`;
+      <div class="card" style="margin-top:14px"><h2>Pattern mastery</h2><div class="number-concepts" id="numberConcepts"></div></div>`;
     $("#panel-fonts").before(panel);
+    $("#numberDataTools").classList.remove("hidden");
+    $("#numberReset").classList.remove("hidden");
     tab.addEventListener("click", switchToNumbers);
     document.querySelectorAll('.tab:not([data-tab="numbers"])').forEach(other => {
       other.addEventListener("click", () => panel.classList.remove("active"));
