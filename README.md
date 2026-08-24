@@ -2,9 +2,9 @@
 
 Three offline, adaptive reading trainers for Japanese kana:
 
-- **Hiragana Sprint** — hiragana characters, combinations, and beginner words.
+- **Hiragana Sprint** — hiragana characters, combinations, beginner words, and Japanese numbers.
 - **Katakana Sprint** — katakana characters, practical combinations, and beginner words.
-- **Kana Mix** — interleaved hiragana and katakana practice with adaptive script balancing.
+- **Kana Mix** — interleaved hiragana and katakana practice, plus the shared Japanese-number course.
 
 All three trainers share the same interface and learning system. Hiragana and Katakana keep their own mastery records; Kana Mix reads and updates both sets.
 
@@ -49,6 +49,14 @@ After the answer is revealed, the guide shows how each kana block contributes to
 Word rescue accepts typing plus Enter, mouse selection, or number keys **1–8**. After two incorrect rescue attempts, the complete spelling guide appears while the rescue choices remain available. The word scheduler mixes new vocabulary with adaptive review and increases features that have caused recent trouble.
 
 If Japanese speech is available in the browser, the trainer can pronounce the word and optionally its English meaning. The Speech panel reports whether suitable voices were found and includes test buttons. Voice selections and speech options are saved locally. An optional setting lets the current pronunciation finish after Enter moves to the next word.
+
+### Numbers
+
+Hiragana Sprint and Kana Mix include the same **Numbers** tab; Katakana Sprint stays focused on katakana. The course begins with 0–10, then covers teens, tens, hundreds, thousands, irregular readings such as `sanbyaku`, `roppyaku`, `happyaku`, `sanzen`, and `hassen`, and the Japanese 10,000 unit `man`.
+
+New number patterns are explained before the first graded question. Practice can run from digits to a romaji reading, from a hiragana reading to digits, or in both directions. Correct and corrected answers show the number, kanji, hiragana, romaji, and a component-by-component breakdown. Japanese speech uses the voice selected in Word mode when available.
+
+The number scheduler tracks patterns rather than memorizing individual generated numbers. Weak patterns return more often, the pace slider controls new-pattern frequency, recent numbers are avoided, likely one-character or transposed-letter typing errors receive one ungraded retry, and mistakes open four keyboard-accessible rescue choices. Number progress has its own import, export, and reset controls.
 
 ### Learning pace
 
@@ -102,6 +110,7 @@ Progress is automatically saved after answers and setting changes using the brow
 - Hiragana key: `hiragana-sprint-v3`
 - Katakana key: `katakana-sprint-v1`
 - Kana Mix settings key: `kana-sprint-mix-v1`
+- Shared number-learning key: `kanaSprintNumbersV1`
 
 Kana Mix merges the two script records when it opens. Every mixed answer is then written back to the appropriate Hiragana or Katakana record, so practising in Kana Mix also updates the corresponding individual trainer.
 
@@ -129,6 +138,8 @@ Japanese-N5-lessons/
 ├── shared/
 │   ├── kana-sprint.js         Shared trainer and adaptive logic
 │   ├── kana-sprint.css        Shared interface styles
+│   ├── number-sprint.js       Shared number course and adaptive logic
+│   ├── number-sprint.css      Number-course interface styles
 │   ├── kana-mnemonic-preferences.json  Selected mnemonic index
 │   ├── kana-mnemonic-preferences.js  Offline bridge for the JSON index
 │   └── kana-mnemonic-assets.js  Local-art mapping with text fallback
