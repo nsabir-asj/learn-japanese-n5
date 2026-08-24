@@ -97,6 +97,37 @@
   padding: 12px 16px;
   overflow-wrap: anywhere;
 }
+
+.number-rescue-options .option {
+  min-height: 61px;
+  position: relative;
+  border: 1px solid #3c4653;
+  border-radius: 13px;
+  background: var(--panel2);
+  color: var(--text);
+  padding: 12px 16px;
+  overflow-wrap: anywhere;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  transition: transform .12s ease, border-color .12s ease, background .12s ease;
+}
+
+.number-rescue-options .option:hover {
+  transform: translateY(-1px);
+  border-color: #647083;
+  background: #252d38;
+}
+
+.number-rescue-options .option:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(88, 166, 255, .16);
+}
+
+.number-rescue-options .option.correct { border-color: var(--good); background: rgba(63, 185, 80, .13); }
+.number-rescue-options .option.wrong { border-color: var(--bad); background: rgba(248, 81, 73, .12); }
+.number-rescue-options .option kbd { position: absolute; left: 9px; top: 7px; }
 .number-progress-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
 .number-progress-grid .mini { min-width: 0; }
 .number-concepts { display: grid; gap: 8px; margin-top: 12px; }

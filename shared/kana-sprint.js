@@ -1916,6 +1916,20 @@
     renderPaceControls();
   }
 
+  function syncRangeFill(input){
+    const min=Number(input.min||0),max=Number(input.max||100),value=Number(input.value||min);
+    const percent=max===min?0:Math.max(0,Math.min(100,(value-min)/(max-min)*100));
+    input.style.setProperty("--range-fill",`${percent}%`);
+  }
+
+  function setupRangeDesign(){
+    window.KANA_SPRINT_SYNC_RANGE=syncRangeFill;
+    document.querySelectorAll('input[type="range"]').forEach(syncRangeFill);
+    document.addEventListener("input",event=>{
+      if(event.target.matches?.('input[type="range"]'))syncRangeFill(event.target);
+    });
+  }
+
   function setupScriptBalance(){
     const host=$("#scriptBalanceButtons");if(!host)return;
     host.innerHTML=LESSON.scriptBalanceProfiles.map(profile=>`<button class="seg" data-script-balance="${profile.id}">${profile.label}</button>`).join("");
@@ -2119,6 +2133,7 @@
 
   setupScriptBalance();
   setupPaceControls();
+  setupRangeDesign();
   renderRehearseSelectors();
   renderSpeechControls();
   refreshSpeechVoices();
