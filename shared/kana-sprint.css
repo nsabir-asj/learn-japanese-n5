@@ -179,7 +179,7 @@
   .details-card[open] summary::after{content:"−"}
   .details-card[open] summary{border-bottom:1px solid var(--line)}
   .details-body{padding:0 18px 18px}
-  .data-layout{display:grid;gap:14px;max-width:980px;margin:0 auto}
+  .data-layout{display:grid;gap:14px;width:100%}
   .font-settings-title{display:grid;gap:3px;text-align:left}.font-settings-title>span{color:var(--muted);font-size:.76rem;font-weight:500}.practice-font-settings .details-body{padding-top:18px}.font-settings-block{box-shadow:none}.font-select-card{transition:border-color .22s ease,background-color .22s ease,box-shadow .22s ease}.font-select-card.font-settings-focus{border-color:var(--accent);background:rgba(88,166,255,.11);box-shadow:0 0 0 3px rgba(88,166,255,.12)}
   .data-primary-card{padding:22px}
   .data-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
