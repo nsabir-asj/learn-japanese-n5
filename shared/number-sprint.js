@@ -299,7 +299,7 @@
           <p class="muted">Adjust the session when you need to. New patterns are explained before testing, and weak patterns return more often.</p>
           <div class="number-controls">
             <label><span class="tiny">Practice range</span><select id="numberRange">${RANGES.map(range => `<option value="${range.value}">${range.label}</option>`).join("")}</select></label>
-            <label><span class="tiny">Question direction</span><select id="numberDirection"><option value="reading">Digits → Japanese reading</option><option value="digits">Japanese reading → digits</option><option value="mixed">Digits ↔ Japanese reading (silent)</option><option value="audio">Spoken Japanese → digits</option><option value="all">All directions (includes listening)</option></select><span class="number-direction-hint tiny" id="numberDirectionHint"></span></label>
+            <label><span class="tiny">Question direction</span><select id="numberDirection"><option value="reading">Digits → Japanese reading</option><option value="digits">Japanese reading → digits</option><option value="audio">Spoken Japanese → digits</option><option value="mixed">Digits ↔ Japanese reading</option><option value="all">All directions</option></select><span class="number-direction-hint tiny" id="numberDirectionHint"></span></label>
             <label><span class="tiny">New-pattern pace: <strong id="numberPaceName"></strong></span><input id="numberPace" type="range" min="10" max="90" step="10"><span class="number-pace-labels"><span>More review</span><span>More new</span></span></label>
           </div>
           <div class="number-playback-settings"><label class="toggle-line"><input type="checkbox" id="numberSpeechAuto"> Automatically pronounce revealed readings</label><button class="ghost" id="numberManageVoices" type="button">Manage voices</button></div>
@@ -343,9 +343,9 @@
     ["audio", "all"].forEach(value => { select.querySelector(`option[value="${value}"]`).disabled = !ready; });
     const audioSelected = state.direction === "audio" || state.direction === "all";
     $("#numberDirectionHint").textContent = state.direction === "mixed"
-      ? "Silent mix uses both visual directions."
+      ? "Alternates between digits-first and reading-first questions."
       : ready
-        ? (state.direction === "all" ? "Questions rotate through both visual directions and listening." : state.direction === "audio" ? "The spoken reading is the question; no Japanese text is shown." : "")
+        ? (state.direction === "all" ? "Questions rotate through all three directions." : state.direction === "audio" ? "The spoken reading is the question; no Japanese text is shown." : "")
         : (audioSelected ? "No Japanese voice is available, so questions temporarily use the silent mix." : "Listening modes require a Japanese voice in Settings & Data.");
   }
 
