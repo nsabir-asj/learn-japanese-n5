@@ -177,6 +177,32 @@
   }
   buildDataPanel();
 
+  function buildGroupedNavigation(){
+    const nav=document.querySelector(".tabs");
+    const hasNumberPractice=Boolean(document.querySelector('script[src*="number-sprint.js"]'));
+    const groupDefinitions=[
+      {id:"kana",label:"Kana practice",tabs:["learn","rehearse","mnemonics","kanaprogress"]},
+      {id:"words",label:hasNumberPractice?"Words & numbers":"Word practice",tabs:["words","numbers","wordprogress"]},
+      {id:"manage",label:"Manage",tabs:["settingsdata"]}
+    ];
+    const existingTabs=new Map([...nav.querySelectorAll(":scope > .tab")].map(tab=>[tab.dataset.tab,tab]));
+    const wordTab=existingTabs.get("words");if(wordTab)wordTab.textContent="Word Reading";
+    nav.replaceChildren();
+    nav.setAttribute("aria-label","Practice and progress navigation");
+    groupDefinitions.forEach(definition=>{
+      const group=document.createElement("div");
+      group.className=`tab-group tab-group-${definition.id}`;
+      group.dataset.navGroup=definition.id;
+      const label=document.createElement("span");
+      label.className="tab-group-label";label.id=`tabGroupLabel-${definition.id}`;label.textContent=definition.label;
+      const controls=document.createElement("div");
+      controls.className="tab-group-tabs";controls.setAttribute("role","group");controls.setAttribute("aria-labelledby",label.id);
+      definition.tabs.forEach(id=>{const tab=existingTabs.get(id);if(tab)controls.appendChild(tab)});
+      group.append(label,controls);nav.appendChild(group);
+    });
+  }
+  buildGroupedNavigation();
+
   const STORAGE_KEY = LESSON.storageKey;
   const SPEECH_STORAGE_KEY="kanaSprintSpeechV1";
   const COMPLETE_BACKUP_FORMAT="kana-sprint-complete-backup";

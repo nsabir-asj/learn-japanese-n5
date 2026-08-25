@@ -274,8 +274,10 @@
     tab.className = "tab";
     tab.dataset.tab = "numbers";
     tab.textContent = "Numbers";
-    const tabAnchor = $('.tab[data-tab="kanaprogress"]');
+    const wordsGroup = $('.tab-group[data-nav-group="words"] .tab-group-tabs');
+    const tabAnchor = wordsGroup?.querySelector('.tab[data-tab="wordprogress"]') || $('.tab[data-tab="kanaprogress"]');
     if (tabAnchor) tabAnchor.before(tab);
+    else if (wordsGroup) wordsGroup.appendChild(tab);
     else $('.tabs').appendChild(tab);
 
     const panel = document.createElement("section");
