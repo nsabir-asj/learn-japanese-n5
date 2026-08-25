@@ -551,6 +551,7 @@
   function refreshSpeechVoices(){
     if(!speechSupported){renderSpeechControls();return}
     speechVoices=window.speechSynthesis.getVoices();renderSpeechControls();
+    window.dispatchEvent(new CustomEvent("kana-sprint-speech-voices-changed",{detail:{japaneseAvailable:voicesFor("ja").length>0}}));
   }
 
   function selectedSpeechVoice(language){
@@ -574,8 +575,9 @@
   window.KANA_SPRINT_SPEECH={
     getPreferences:()=>({...speechPreferences}),
     isSupported:()=>speechSupported,
+    hasJapaneseVoice:()=>speechSupported&&voicesFor("ja").length>0,
     speakJapanese(text,{cancel=true}={}){
-      if(!speechSupported)return false;
+      if(!speechSupported||!voicesFor("ja").length)return false;
       if(cancel)stopSpeech();
       window.speechSynthesis.speak(makeUtterance(text,"ja"));
       return true;

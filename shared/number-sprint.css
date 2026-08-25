@@ -61,6 +61,18 @@
   font-size: clamp(3.6rem, 8vw, 7rem) !important;
 }
 
+.number-audio-prompt {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 24px 16px 12px;
+}
+
+.number-audio-icon { font-size: clamp(3.4rem, 8vw, 5.8rem); line-height: 1; }
+.number-audio-prompt strong { font-size: 1.25rem; }
+.number-audio-prompt .tiny { max-width: 34rem; }
+.number-direction-hint:empty { display: none; }
+
 .number-intro {
   padding: 24px;
   border: 0;
