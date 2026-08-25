@@ -22,12 +22,13 @@
   gap: 12px;
 }
 
-.number-controls label { display: grid; gap: 6px; }
+.number-controls label { display: grid; align-content: start; gap: 6px; }
 .number-controls select,
 .number-controls input[type="range"] { width: 100%; }
 
 .number-controls select {
   appearance: none;
+  height: 44px;
   min-height: 44px;
   border: 1px solid #414b58;
   border-radius: 11px;
@@ -71,7 +72,13 @@
 .number-audio-icon { font-size: clamp(3.4rem, 8vw, 5.8rem); line-height: 1; }
 .number-audio-prompt strong { font-size: 1.25rem; }
 .number-audio-prompt .tiny { max-width: 34rem; }
-.number-direction-hint:empty { display: none; }
+.number-direction-hint {
+  min-height: 2.6em;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: .78rem;
+  line-height: 1.3;
+}
 
 .number-intro {
   padding: 24px;
