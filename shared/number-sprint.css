@@ -2,10 +2,19 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(270px, .38fr);
   gap: 14px;
-  margin-bottom: 14px;
+  margin-top: 14px;
 }
 
-.number-speech-bar { margin: 0 0 14px; }
+.number-playback-settings {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
 
 .number-controls {
   display: grid;
@@ -62,6 +71,7 @@
 }
 
 .number-intro h2 { margin: 0 0 8px; }
+.number-intro-actions { margin-top: 18px; }
 
 .number-intro-example {
   margin: 18px 0 8px;
@@ -173,6 +183,7 @@
 @media (max-width: 850px) {
   .number-layout,
   .number-controls { grid-template-columns: 1fr; }
+  .number-playback-settings { align-items: flex-start; flex-direction: column; }
   .number-rescue-options { grid-template-columns: 1fr; }
   .number-concept { grid-template-columns: 1fr; }
   .number-prompt { font-size: clamp(4.5rem, 23vw, 8rem) !important; }

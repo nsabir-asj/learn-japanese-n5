@@ -278,30 +278,6 @@
     panel.className = "panel";
     panel.id = "panel-numbers";
     panel.innerHTML = `
-      <div class="number-layout">
-        <div class="card">
-          <h2>Number practice</h2>
-          <p class="muted">Learn how Japanese numbers are built. New patterns are explained before they are tested; weak patterns return more often.</p>
-          <div class="number-controls">
-            <label><span class="tiny">Practice range</span><select id="numberRange">${RANGES.map(range => `<option value="${range.value}">${range.label}</option>`).join("")}</select></label>
-            <label><span class="tiny">Question direction</span><select id="numberDirection"><option value="reading">Digits → Japanese reading</option><option value="digits">Japanese reading → digits</option><option value="mixed">Mixed directions</option></select></label>
-            <label><span class="tiny">New-pattern pace: <strong id="numberPaceName"></strong></span><input id="numberPace" type="range" min="10" max="90" step="10"><span class="number-pace-labels"><span>More review</span><span>More new</span></span></label>
-          </div>
-        </div>
-        <div class="card">
-          <h2>Number progress</h2>
-          <div class="number-progress-grid">
-            <div class="mini"><strong id="numberTotal">0</strong><span class="tiny">answers</span></div>
-            <div class="mini"><strong id="numberAccuracy">—</strong><span class="tiny">accuracy</span></div>
-            <div class="mini"><strong id="numberMastered">0</strong><span class="tiny">patterns mastered</span></div>
-            <div class="mini"><strong id="numberBestStreak">0</strong><span class="tiny">best streak</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="card speech-quick-bar number-speech-bar">
-        <div><h2>Speech</h2><p class="muted">Choose what plays during Number practice.</p></div>
-        <div class="speech-quick-controls"><label class="toggle-line"><input type="checkbox" id="numberSpeechAuto"> Automatically pronounce revealed readings</label><button class="ghost" id="numberReplaySpeech" type="button" disabled>Replay reading</button><button class="ghost" id="numberManageVoices" type="button">Manage voices</button></div>
-      </div>
       <div class="trainer" data-trainer="numbers">
         <div class="trainer-top"><div class="mode-tag"><span class="dot"></span><span>Numbers • adaptive patterns</span></div><div class="tiny" id="numberCount">Question 1</div></div>
         <div id="numberIntro" class="number-intro number-hidden"></div>
@@ -312,6 +288,27 @@
           <div class="rescue-wrap" id="numberRescue"><div class="rescue-title">Choose the correct answer</div><div class="number-rescue-options" id="numberOptions"></div></div>
         </div>
         <div class="footer-actions"><div class="number-actions"><button class="ghost" id="numberDontKnow">I don't know</button><button class="ghost number-hidden" id="numberNext">Next <kbd>Enter</kbd></button></div><span class="tiny">Progress is shared between Hiragana Sprint and Kana Mix.</span></div>
+      </div>
+      <div class="number-layout">
+        <div class="card">
+          <h2>Practice setup</h2>
+          <p class="muted">Adjust the session when you need to. New patterns are explained before testing, and weak patterns return more often.</p>
+          <div class="number-controls">
+            <label><span class="tiny">Practice range</span><select id="numberRange">${RANGES.map(range => `<option value="${range.value}">${range.label}</option>`).join("")}</select></label>
+            <label><span class="tiny">Question direction</span><select id="numberDirection"><option value="reading">Digits → Japanese reading</option><option value="digits">Japanese reading → digits</option><option value="mixed">Mixed directions</option></select></label>
+            <label><span class="tiny">New-pattern pace: <strong id="numberPaceName"></strong></span><input id="numberPace" type="range" min="10" max="90" step="10"><span class="number-pace-labels"><span>More review</span><span>More new</span></span></label>
+          </div>
+          <div class="number-playback-settings"><label class="toggle-line"><input type="checkbox" id="numberSpeechAuto"> Automatically pronounce revealed readings</label><button class="ghost" id="numberManageVoices" type="button">Manage voices</button></div>
+        </div>
+        <div class="card">
+          <h2>Number progress</h2>
+          <div class="number-progress-grid">
+            <div class="mini"><strong id="numberTotal">0</strong><span class="tiny">answers</span></div>
+            <div class="mini"><strong id="numberAccuracy">—</strong><span class="tiny">accuracy</span></div>
+            <div class="mini"><strong id="numberMastered">0</strong><span class="tiny">patterns mastered</span></div>
+            <div class="mini"><strong id="numberBestStreak">0</strong><span class="tiny">best streak</span></div>
+          </div>
+        </div>
       </div>
       <div class="card" style="margin-top:14px"><h2>Pattern mastery</h2><div class="number-concepts" id="numberConcepts"></div></div>`;
     const panelAnchor = $("#panel-kanaprogress");
@@ -327,7 +324,6 @@
     $("#numberDirection").value = state.direction;
     $("#numberPace").value = state.pace;
     $("#numberSpeechAuto").checked = state.speechAutoPlay;
-    $("#numberReplaySpeech").disabled = !window.KANA_SPRINT_SPEECH?.isSupported();
   }
 
   function switchToNumbers() {
@@ -383,7 +379,6 @@
     questionNumber++;
     rescueFailures = 0;
     typoRetried = false;
-    $("#numberReplaySpeech").disabled = true;
     if (!state.concepts[current.concept.id].seen) {
       pendingIntroduction = current.concept;
       showIntroduction(current.concept);
@@ -397,8 +392,11 @@
     $("#numberQuestion").classList.add("number-hidden");
     $("#numberIntro").classList.remove("number-hidden");
     const example = concept.example;
-    $("#numberIntro").innerHTML = `<div class="question-label">New number pattern</div><h2>${concept.name}</h2><p>${concept.note}</p><div class="number-intro-example">${example.toLocaleString()} = ${reading(example, "hiragana")}</div><div><strong>${reading(example)}</strong> · ${kanji(example)}</div><div class="number-actions" style="margin-top:18px"><button class="big-button" id="numberStartPattern">Practice this pattern <kbd>Enter</kbd></button></div>`;
+    const exampleReading = reading(example, "hiragana");
+    $("#numberIntro").innerHTML = `<div class="question-label">New number pattern</div><h2>${concept.name}</h2><p>${concept.note}</p><div class="number-intro-example">${example.toLocaleString()} = ${exampleReading}</div><div><strong>${reading(example)}</strong> · ${kanji(example)}</div><div class="number-actions number-intro-actions"><button class="big-button" id="numberStartPattern">Practice this pattern <kbd>Enter</kbd></button><button class="ghost" id="numberIntroSpeech" type="button">🔊 Listen to example</button></div>`;
     $("#numberStartPattern").addEventListener("click", beginAfterIntroduction);
+    $("#numberIntroSpeech").disabled = !window.KANA_SPRINT_SPEECH?.isSupported();
+    $("#numberIntroSpeech").addEventListener("click", () => speakJapanese(exampleReading));
     $("#numberDontKnow").classList.add("number-hidden");
     $("#numberNext").classList.add("number-hidden");
   }
@@ -483,8 +481,9 @@
     $("#numberDontKnow").classList.add("number-hidden");
     $("#numberNext").classList.remove("number-hidden");
     $("#numberRescue").classList.remove("show");
-    setFeedback(`<div class="number-breakdown"><div class="number-breakdown-main"><strong>${wasCorrect ? "Correct" : "Answer"}: ${current.number.toLocaleString()}</strong><span>${current.kanji}</span><span>${current.hiragana}</span><span>${current.romaji}</span></div><div class="number-breakdown-parts">${breakdown(current.number)}</div></div>`, wasCorrect ? "good" : "hint");
+    setFeedback(`<div class="number-breakdown"><div class="number-breakdown-main"><strong>${wasCorrect ? "Correct" : "Answer"}: ${current.number.toLocaleString()}</strong><span>${current.kanji}</span><span>${current.hiragana}</span><span>${current.romaji}</span></div><div class="number-breakdown-parts">${breakdown(current.number)}</div><button class="ghost speak-again" id="numberReplaySpeech" type="button">🔊 Replay reading</button></div>`, wasCorrect ? "good" : "hint");
     $("#numberReplaySpeech").disabled = !window.KANA_SPRINT_SPEECH?.isSupported();
+    $("#numberReplaySpeech").addEventListener("click", () => speakJapanese(current.hiragana));
     if (state.speechAutoPlay) speakJapanese(current.hiragana);
     $("#numberNext").focus();
   }
@@ -582,7 +581,6 @@
     $("#numberDirection").addEventListener("change", event => { state.direction = event.target.value; saveState(); current = null; nextQuestion(); });
     $("#numberPace").addEventListener("input", event => { state.pace = Number(event.target.value); saveState(); });
     $("#numberSpeechAuto").addEventListener("change", event => { state.speechAutoPlay = event.target.checked; saveState(); });
-    $("#numberReplaySpeech").addEventListener("click", () => { if (current && phase === "answer") speakJapanese(current.hiragana); });
     $("#numberManageVoices").addEventListener("click", () => window.KANA_SPRINT_SPEECH?.openSettings());
     $("#numberExport").addEventListener("click", exportProgress);
     $("#numberImport").addEventListener("click", () => $("#numberImportFile").click());
