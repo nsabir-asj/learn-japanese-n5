@@ -5,6 +5,8 @@
   margin-bottom: 14px;
 }
 
+.number-speech-bar { margin: 0 0 14px; }
+
 .number-controls {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

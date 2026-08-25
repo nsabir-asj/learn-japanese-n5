@@ -52,6 +52,7 @@
       range: 10,
       direction: "reading",
       pace: 50,
+      speechAutoPlay: true,
       concepts: Object.fromEntries(CONCEPTS.map(concept => [concept.id, {
         seen: 0, correct: 0, mastery: 0, mistakes: 0, last: 0
       }])),
@@ -297,6 +298,10 @@
           </div>
         </div>
       </div>
+      <div class="card speech-quick-bar number-speech-bar">
+        <div><h2>Speech</h2><p class="muted">Choose what plays during Number practice.</p></div>
+        <div class="speech-quick-controls"><label class="toggle-line"><input type="checkbox" id="numberSpeechAuto"> Automatically pronounce revealed readings</label><button class="ghost" id="numberReplaySpeech" type="button" disabled>Replay reading</button><button class="ghost" id="numberManageVoices" type="button">Manage voices</button></div>
+      </div>
       <div class="trainer" data-trainer="numbers">
         <div class="trainer-top"><div class="mode-tag"><span class="dot"></span><span>Numbers • adaptive patterns</span></div><div class="tiny" id="numberCount">Question 1</div></div>
         <div id="numberIntro" class="number-intro number-hidden"></div>
@@ -321,6 +326,8 @@
     $("#numberRange").value = state.range;
     $("#numberDirection").value = state.direction;
     $("#numberPace").value = state.pace;
+    $("#numberSpeechAuto").checked = state.speechAutoPlay;
+    $("#numberReplaySpeech").disabled = !window.KANA_SPRINT_SPEECH?.isSupported();
   }
 
   function switchToNumbers() {
@@ -371,10 +378,12 @@
   }
 
   function nextQuestion() {
+    if (!window.KANA_SPRINT_SPEECH?.getPreferences().continueOnAdvance) window.KANA_SPRINT_SPEECH?.stop();
     current = makeQuestion();
     questionNumber++;
     rescueFailures = 0;
     typoRetried = false;
+    $("#numberReplaySpeech").disabled = true;
     if (!state.concepts[current.concept.id].seen) {
       pendingIntroduction = current.concept;
       showIntroduction(current.concept);
@@ -475,7 +484,8 @@
     $("#numberNext").classList.remove("number-hidden");
     $("#numberRescue").classList.remove("show");
     setFeedback(`<div class="number-breakdown"><div class="number-breakdown-main"><strong>${wasCorrect ? "Correct" : "Answer"}: ${current.number.toLocaleString()}</strong><span>${current.kanji}</span><span>${current.hiragana}</span><span>${current.romaji}</span></div><div class="number-breakdown-parts">${breakdown(current.number)}</div></div>`, wasCorrect ? "good" : "hint");
-    speakJapanese(current.hiragana);
+    $("#numberReplaySpeech").disabled = !window.KANA_SPRINT_SPEECH?.isSupported();
+    if (state.speechAutoPlay) speakJapanese(current.hiragana);
     $("#numberNext").focus();
   }
 
@@ -516,14 +526,7 @@
   }
 
   function speakJapanese(text) {
-    if (!("speechSynthesis" in window)) return;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "ja-JP";
-    utterance.rate = .82;
-    const selectedVoice = $("#japaneseVoice")?.value;
-    const voices = speechSynthesis.getVoices();
-    utterance.voice = voices.find(voice => voice.voiceURI === selectedVoice) || voices.find(voice => voice.lang?.toLowerCase().startsWith("ja")) || null;
-    speechSynthesis.speak(utterance);
+    window.KANA_SPRINT_SPEECH?.speakJapanese(text);
   }
 
   function exportProgress() {
@@ -578,6 +581,9 @@
     $("#numberRange").addEventListener("change", event => { state.range = Number(event.target.value); saveState(); current = null; nextQuestion(); });
     $("#numberDirection").addEventListener("change", event => { state.direction = event.target.value; saveState(); current = null; nextQuestion(); });
     $("#numberPace").addEventListener("input", event => { state.pace = Number(event.target.value); saveState(); });
+    $("#numberSpeechAuto").addEventListener("change", event => { state.speechAutoPlay = event.target.checked; saveState(); });
+    $("#numberReplaySpeech").addEventListener("click", () => { if (current && phase === "answer") speakJapanese(current.hiragana); });
+    $("#numberManageVoices").addEventListener("click", () => window.KANA_SPRINT_SPEECH?.openSettings());
     $("#numberExport").addEventListener("click", exportProgress);
     $("#numberImport").addEventListener("click", () => $("#numberImportFile").click());
     $("#numberImportFile").addEventListener("change", event => {

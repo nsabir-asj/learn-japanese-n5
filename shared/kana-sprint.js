@@ -26,7 +26,7 @@
   </div>`;
   document.querySelector("#panel-kanaprogress > .grid2").insertAdjacentHTML("afterend",streakGuide("kana","Learn and Rehearse share this kana streak. A mistake resets the current streak without affecting the separate Word or Number streaks."));
   document.querySelector("#panel-wordprogress > .grid2").insertAdjacentHTML("afterend",streakGuide("word","Word practice has its own streak, so a word mistake does not reset your Kana or Number streaks."));
-  document.querySelector("#speechMeaning").closest("label").insertAdjacentHTML("afterend",`<label class="toggle-line"><input type="checkbox" id="speechContinue"> Let pronunciation finish after moving to the next word</label>`);
+  document.querySelector("#speechMeaning").closest("label").insertAdjacentHTML("afterend",`<label class="toggle-line"><input type="checkbox" id="speechContinue"> Let speech finish after moving to the next question</label>`);
 
   const mnemonicTab=document.createElement("button");
   mnemonicTab.className="tab";mnemonicTab.dataset.tab="mnemonics";mnemonicTab.textContent="Mnemonics";
@@ -63,10 +63,17 @@
   wordSessionToolbar.querySelector("p").textContent="Choose which words can appear in this session.";
   wordSpeechCard.querySelector("h2").remove();
   const wordDetails=document.createElement("details");
-  wordDetails.className="details-card word-details";
-  wordDetails.innerHTML='<summary>Speech and pronunciation settings</summary><div class="details-body"></div>';
+  wordDetails.className="details-card data-details speech-voice-settings";
+  wordDetails.id="speechVoiceSettings";
+  wordDetails.innerHTML='<summary><span class="font-settings-title"><strong>Speech & voices</strong><span>One voice setup for Words and Numbers</span></span></summary><div class="details-body"></div>';
   const wordDetailsBody=wordDetails.querySelector(".details-body");
   while(wordSpeechCard.firstChild)wordDetailsBody.appendChild(wordSpeechCard.firstChild);
+  const wordPlayback=document.createElement("div");
+  wordPlayback.className="card speech-quick-bar";
+  wordPlayback.innerHTML='<div><h2>Speech</h2><p class="muted">Choose what plays during Word practice.</p></div><div class="speech-quick-controls"></div>';
+  const wordPlaybackControls=wordPlayback.querySelector(".speech-quick-controls");
+  ["#speechAuto","#speechMeaning"].forEach(selector=>wordPlaybackControls.appendChild(wordDetailsBody.querySelector(selector).closest("label")));
+  wordPlaybackControls.insertAdjacentHTML("beforeend",'<button class="ghost" id="manageSpeechVoices" type="button">Manage voices</button>');
   const wordSessionRow=document.createElement("div");
   wordSessionRow.className="grid2 word-session-row";
   const wordSetProgress=document.createElement("div");
@@ -74,7 +81,7 @@
   wordSetProgress.innerHTML='<h2>Current set progress</h2><div class="word-coverage-heading"><strong id="wordSetAssessed">0 of 0</strong><span>assessed</span></div><div class="progressbar word-coverage-bar" id="wordSetCoverage" role="progressbar" aria-label="Word set assessment coverage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="wordSetCoverageBar"></span></div><div class="word-set-stats"><div class="mini"><strong id="wordSetUnseen">0</strong><span class="tiny">unseen</span></div><div class="mini"><strong id="wordSetWeak">0</strong><span class="tiny">weak</span></div><div class="mini"><strong id="wordSetMastered">0</strong><span class="tiny">mastered</span></div><div class="mini"><strong id="wordSetAccuracy">—</strong><span class="tiny">accuracy</span></div></div>';
   wordSessionRow.append(wordSessionToolbar,wordSetProgress);
   wordsTrainer.after(wordSessionRow);
-  wordSessionRow.after(wordDetails);
+  wordSessionRow.after(wordPlayback);
   wordsSetupGrid.remove();
   document.querySelector("#rehearseHelpPanel .muted").textContent="Until every selected kana has a graded recall attempt, the Coverage pace controls how often unassessed kana appear and prevents ordinary reviews from starving them. Their first successful recognition uses Standard; difficult fonts become eligible afterwards. Scheduled mistake and mnemonic-recall checks take priority. After full coverage, review becomes fully adaptive.";
 
@@ -105,6 +112,7 @@
         <summary><span class="font-settings-title"><strong>Practice fonts</strong><span id="fontSettingsSummary">Standard font is always enabled</span></span></summary>
         <div class="details-body" id="practiceFontSettingsBody"></div>
       </details>
+      <div id="speechVoiceSettingsSlot"></div>
       <div class="card data-primary-card">
         <div class="data-heading"><div><h2>Progress backup</h2><p class="muted">One file can carry your kana, word, number, mnemonic, font, voice, and app settings to another browser or computer.</p></div><span class="data-badge">Complete backup</span></div>
         <div class="save-status"><span class="save-dot"></span><div><strong>Progress saves automatically on this device</strong><div class="tiny" id="lastSaved">Not saved yet</div></div></div>
@@ -133,6 +141,7 @@
       </details>
     </div>`;
     document.querySelector(".wrap").appendChild(panel);
+    panel.querySelector("#speechVoiceSettingsSlot").replaceWith(wordDetails);
 
     const fontTab=document.querySelector('.tab[data-tab="fonts"]');
     const fontPanel=document.querySelector("#panel-fonts");
@@ -150,12 +159,14 @@
   buildDataPanel();
 
   const STORAGE_KEY = LESSON.storageKey;
+  const SPEECH_STORAGE_KEY="kanaSprintSpeechV1";
   const COMPLETE_BACKUP_FORMAT="kana-sprint-complete-backup";
   const APP_STORAGE_KEYS={
     "hiragana-sprint-v3":{label:"Hiragana",version:3},
     "katakana-sprint-v1":{label:"Katakana",version:1},
     "kana-sprint-mix-v1":{label:"Kana Mix",version:1},
-    "kanaSprintNumbersV1":{label:"Numbers",version:1}
+    "kanaSprintNumbersV1":{label:"Numbers",version:1},
+    [SPEECH_STORAGE_KEY]:{label:"Speech & voices",version:1}
   };
   const FONT_PROFILES = LESSON.fontProfiles;
   const STANDARD_FONT=FONT_PROFILES[0];
@@ -443,6 +454,43 @@
   }
   ensureStateShape();
 
+  function normalizedSpeechPreferences(value){
+    const source=value&&typeof value==="object"?value:{};
+    return {
+      version:1,
+      continueOnAdvance:typeof source.continueOnAdvance==="boolean"?source.continueOnAdvance:false,
+      rate:[.75,.85,1].includes(Number(source.rate))?Number(source.rate):.85,
+      jaVoice:typeof source.jaVoice==="string"?source.jaVoice:"",
+      enVoice:typeof source.enVoice==="string"?source.enVoice:""
+    };
+  }
+
+  function loadSpeechPreferences(){
+    try{
+      const saved=JSON.parse(localStorage.getItem(SPEECH_STORAGE_KEY));
+      if(saved&&saved.version===1)return normalizedSpeechPreferences(saved);
+    }catch(e){}
+    return normalizedSpeechPreferences(state.speech);
+  }
+
+  let speechPreferences=loadSpeechPreferences();
+  localStorage.setItem(SPEECH_STORAGE_KEY,JSON.stringify(speechPreferences));
+  Object.assign(state.speech,{
+    continueOnAdvance:speechPreferences.continueOnAdvance,
+    rate:speechPreferences.rate,
+    jaVoice:speechPreferences.jaVoice,
+    enVoice:speechPreferences.enVoice
+  });
+  function saveSpeechPreferences(){
+    localStorage.setItem(SPEECH_STORAGE_KEY,JSON.stringify(speechPreferences));
+    state.speech.continueOnAdvance=speechPreferences.continueOnAdvance;
+    state.speech.rate=speechPreferences.rate;
+    state.speech.jaVoice=speechPreferences.jaVoice;
+    state.speech.enVoice=speechPreferences.enVoice;
+    saveState();
+    window.dispatchEvent(new CustomEvent("kana-sprint-speech-changed",{detail:{...speechPreferences}}));
+  }
+
   const speechSupported="speechSynthesis" in window&&"SpeechSynthesisUtterance" in window;
   let speechVoices=[];
   let speechRun=0;
@@ -473,8 +521,8 @@
   function renderSpeechControls(){
     $("#speechAuto").checked=state.speech.autoPlay;
     $("#speechMeaning").checked=state.speech.speakMeaning;
-    $("#speechContinue").checked=state.speech.continueOnAdvance;
-    $("#speechRate").value=String(state.speech.rate);
+    $("#speechContinue").checked=speechPreferences.continueOnAdvance;
+    $("#speechRate").value=String(speechPreferences.rate);
     const status=$("#speechStatus");status.classList.remove("ready","unavailable");
     if(!speechSupported){
       status.classList.add("unavailable");$("#speechStatusTitle").textContent="Speech is not supported";
@@ -483,12 +531,12 @@
       return;
     }
     const japanese=voicesFor("ja"),english=voicesFor("en");
-    state.speech.jaVoice=fillVoiceSelect("#japaneseVoice",japanese,state.speech.jaVoice,"No Japanese voice found");
-    state.speech.enVoice=fillVoiceSelect("#englishVoice",english,state.speech.enVoice,"No English voice found");
+    speechPreferences.jaVoice=fillVoiceSelect("#japaneseVoice",japanese,speechPreferences.jaVoice,"No Japanese voice found");
+    speechPreferences.enVoice=fillVoiceSelect("#englishVoice",english,speechPreferences.enVoice,"No English voice found");
     $("#testJapaneseSpeech").disabled=!japanese.length;
     $("#testEnglishSpeech").disabled=!english.length;
     if(japanese.length){
-      const chosen=japanese.find(voice=>matchesSavedVoice(voice,state.speech.jaVoice))||japanese[0];
+      const chosen=japanese.find(voice=>matchesSavedVoice(voice,speechPreferences.jaVoice))||japanese[0];
       status.classList.add("ready");$("#speechStatusTitle").textContent="Japanese speech is ready";
       $("#speechStatusDetail").textContent=chosen.localService?"The selected Japanese voice works locally and should work offline.":"The selected Japanese voice may require an internet connection.";
     }else if(speechVoices.length){
@@ -506,7 +554,7 @@
   }
 
   function selectedSpeechVoice(language){
-    const name=language==="ja"?state.speech.jaVoice:state.speech.enVoice;
+    const name=language==="ja"?speechPreferences.jaVoice:speechPreferences.enVoice;
     return voicesFor(language).find(voice=>matchesSavedVoice(voice,name))||voicesFor(language)[0]||null;
   }
 
@@ -518,10 +566,27 @@
   function makeUtterance(text,language){
     const utterance=new SpeechSynthesisUtterance(text);
     utterance.lang=language==="ja"?"ja-JP":"en-US";
-    utterance.rate=Number(state.speech.rate)||.85;
+    utterance.rate=Number(speechPreferences.rate)||.85;
     const voice=selectedSpeechVoice(language);if(voice)utterance.voice=voice;
     return utterance;
   }
+
+  window.KANA_SPRINT_SPEECH={
+    getPreferences:()=>({...speechPreferences}),
+    isSupported:()=>speechSupported,
+    speakJapanese(text,{cancel=true}={}){
+      if(!speechSupported)return false;
+      if(cancel)stopSpeech();
+      window.speechSynthesis.speak(makeUtterance(text,"ja"));
+      return true;
+    },
+    stop:stopSpeech,
+    openSettings(){
+      switchTab("settingsdata");
+      const settings=$("#speechVoiceSettings");
+      if(settings){settings.open=true;setTimeout(()=>settings.scrollIntoView({behavior:"smooth",block:"start"}),0)}
+    }
+  };
 
   function cleanMeaningForSpeech(meaning){
     return String(meaning||"").replace(/\//g," or ").replace(/[()]/g,", ").replace(/\s+/g," ").trim();
@@ -1538,7 +1603,7 @@
   function nextWordQuestion(){
     const s=sessions.words;
     clearTypingRetry("words");
-    if(!state.speech.continueOnAdvance)stopSpeech();
+    if(!speechPreferences.continueOnAdvance)stopSpeech();
     s.n++;s.rescue=false;s.rescueWrongAttempts=0;s.rescueGuideShown=false;s.fontRetry=false;s.typingRetryOffered=false;
     clearFeedback("words");hideRescue("words");
     $("#wordsNext").classList.add("hidden");$("#wordsDontKnow").classList.remove("hidden");
@@ -2174,6 +2239,7 @@
 
   function storeSummary(key,value){
     const label=APP_STORAGE_KEYS[key].label;
+    if(key===SPEECH_STORAGE_KEY)return `${label}: universal Japanese and English voice setup`;
     if(key==="kanaSprintNumbersV1"){
       const patterns=Object.values(value.concepts||{}).filter(concept=>(concept.seen||0)>0).length;
       return `${label}: ${value.total||0} answers · ${patterns} patterns assessed`;
@@ -2234,7 +2300,9 @@
         const data=JSON.parse(reader.result);
         const incoming=data&&data.state?data.state:data;
         if(!incoming||incoming.version!==LESSON.progressVersion)throw new Error(`This does not look like a ${LESSON.appName} v${LESSON.progressVersion} progress file.`);
-        state=incoming;ensureStateShape();saveState();
+        state=incoming;ensureStateShape();
+        speechPreferences=normalizedSpeechPreferences(state.speech);
+        saveSpeechPreferences();
         sessions.learn=newPracticeSession();
         sessions.rehearse=newPracticeSession();
         sessions.words=newPracticeSession();
@@ -2290,13 +2358,14 @@
   });
   $("#wordsDontKnow").addEventListener("click",()=>handleWordTyped(true));
   $("#wordsNext").addEventListener("click",nextWordQuestion);
+  $("#manageSpeechVoices").addEventListener("click",()=>window.KANA_SPRINT_SPEECH.openSettings());
 
   $("#speechAuto").addEventListener("change",e=>{state.speech.autoPlay=e.target.checked;saveState()});
   $("#speechMeaning").addEventListener("change",e=>{state.speech.speakMeaning=e.target.checked;saveState()});
-  $("#speechContinue").addEventListener("change",e=>{state.speech.continueOnAdvance=e.target.checked;saveState()});
-  $("#speechRate").addEventListener("change",e=>{state.speech.rate=Number(e.target.value);saveState()});
-  $("#japaneseVoice").addEventListener("change",e=>{state.speech.jaVoice=e.target.value;saveState();renderSpeechControls()});
-  $("#englishVoice").addEventListener("change",e=>{state.speech.enVoice=e.target.value;saveState();renderSpeechControls()});
+  $("#speechContinue").addEventListener("change",e=>{speechPreferences.continueOnAdvance=e.target.checked;saveSpeechPreferences()});
+  $("#speechRate").addEventListener("change",e=>{speechPreferences.rate=Number(e.target.value);saveSpeechPreferences()});
+  $("#japaneseVoice").addEventListener("change",e=>{speechPreferences.jaVoice=e.target.value;saveSpeechPreferences();renderSpeechControls()});
+  $("#englishVoice").addEventListener("change",e=>{speechPreferences.enVoice=e.target.value;saveSpeechPreferences();renderSpeechControls()});
   $("#testJapaneseSpeech").addEventListener("click",()=>{
     if(!speechSupported||!voicesFor("ja").length)return;
     stopSpeech();window.speechSynthesis.speak(makeUtterance(LESSON.testSpeech.ja,"ja"));
