@@ -298,8 +298,8 @@
           <h2>Practice setup</h2>
           <p class="muted">Adjust the session when you need to. New patterns are explained before testing, and weak patterns return more often.</p>
           <div class="number-controls">
-            <label><span class="tiny">Practice range</span><select id="numberRange">${RANGES.map(range => `<option value="${range.value}">${range.label}</option>`).join("")}</select></label>
             <label><span class="tiny">Question direction</span><select id="numberDirection"><option value="reading">Digits → Japanese reading</option><option value="digits">Japanese reading → digits</option><option value="audio">Spoken Japanese → digits</option><option value="mixed">Digits ↔ Japanese reading</option><option value="all">All directions</option></select></label>
+            <label><span class="tiny">Practice range</span><select id="numberRange">${RANGES.map(range => `<option value="${range.value}">${range.label}</option>`).join("")}</select></label>
             <label><span class="tiny">New-pattern pace: <strong id="numberPaceName"></strong></span><input id="numberPace" type="range" min="10" max="90" step="10"><span class="number-pace-labels"><span>More review</span><span>More new</span></span></label>
           </div>
           <div class="number-direction-hint" id="numberDirectionHint" aria-live="polite"></div>
@@ -310,7 +310,9 @@
           <div class="number-progress-grid">
             <div class="mini"><strong id="numberTotal">0</strong><span class="tiny">answers</span></div>
             <div class="mini"><strong id="numberAccuracy">—</strong><span class="tiny">accuracy</span></div>
+            <div class="mini"><strong id="numberIntroduced">0 / 0</strong><span class="tiny">patterns introduced</span></div>
             <div class="mini"><strong id="numberMastered">0</strong><span class="tiny">patterns mastered</span></div>
+            <div class="mini"><strong id="numberWeak">0</strong><span class="tiny">weak patterns</span></div>
             <div class="mini"><strong id="numberBestStreak">0</strong><span class="tiny">best streak</span></div>
           </div>
         </div>
@@ -368,13 +370,17 @@
 
   function renderProgress() {
     if (!$("#numberTotal")) return;
+    const available = availableConcepts();
+    const introduced = available.filter(concept => state.concepts[concept.id].seen > 0);
     $("#numberTotal").textContent = state.total;
     $("#numberAccuracy").textContent = state.total ? `${Math.round(state.correct / state.total * 100)}%` : "—";
     $("#numberBestStreak").textContent = state.bestStreak;
-    $("#numberMastered").textContent = availableConcepts().filter(concept => state.concepts[concept.id].mastery >= 72).length;
+    $("#numberIntroduced").textContent = `${introduced.length} / ${available.length}`;
+    $("#numberMastered").textContent = available.filter(concept => state.concepts[concept.id].mastery >= 72).length;
+    $("#numberWeak").textContent = introduced.filter(concept => state.concepts[concept.id].mastery < 55).length;
     $("#numberPaceName").textContent = paceName();
     $("#numberSaveStatus").textContent = state.savedAt ? `Auto-saved ${new Date(state.savedAt).toLocaleString()}` : "Number progress auto-saves in this browser.";
-    $("#numberConcepts").innerHTML = availableConcepts().map(concept => {
+    $("#numberConcepts").innerHTML = available.map(concept => {
       const progress = state.concepts[concept.id];
       return `<div class="number-concept"><strong>${concept.name}</strong><div class="number-concept-meter"><span style="width:${progress.mastery}%"></span></div><span class="tiny">${Math.round(progress.mastery)}% · ${progress.seen} tries</span></div>`;
     }).join("");
