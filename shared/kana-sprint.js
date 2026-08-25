@@ -15,6 +15,13 @@
   document.querySelector("#panel-learn .typing-hint").textContent="A likely adjacent-key or reversed-letter typo offers a brief retry. Other mistakes continue to the normal correction flow.";
   document.querySelector("#panel-rehearse .typing-hint").textContent="Likely adjacent-key or reversed-letter typo → brief retry. Otherwise: hard font → standard reference → rescue if still wrong.";
   document.querySelector("#panel-words .typing-hint").textContent="After recognition, the answer, meaning, and a complete romaji spelling guide appear. Press Enter again for the next word.";
+  const wordsQuestionLabel=document.querySelector('#panel-words .question-label');
+  const wordsFontNote=document.querySelector("#wordsFontNote");
+  const wordsQuestionText=document.createElement("span");
+  wordsQuestionText.textContent="Read this word in romaji";
+  wordsQuestionLabel.id="wordsQuestionLabel";
+  wordsQuestionLabel.replaceChildren(wordsQuestionText," ",wordsFontNote);
+  document.querySelector("#wordsPrompt").insertAdjacentHTML("afterend",'<div class="word-audio-prompt hidden" id="wordsAudioPrompt"><span class="word-audio-icon" aria-hidden="true">🔊</span><strong>Listen to the Japanese word</strong><button class="big-button" id="wordsQuestionSpeech" type="button">Play word again</button><span class="tiny">Replay as often as you need. Replays do not reduce mastery.</span></div>');
 
   const streakStat=document.querySelector("#sStreak").closest(".stat");
   streakStat.id="streakStat";
@@ -53,6 +60,18 @@
     control.innerHTML=`<div class="pace-copy"><strong>${config.title}</strong><span>${config.label}</span><span class="pace-description" id="${config.mode}PaceDescription"></span></div><label class="pace-range" for="${config.mode}Pace"><span id="${config.mode}PaceValue">Balanced</span><input id="${config.mode}Pace" type="range" min="0" max="6" step="1" value="2" aria-label="${config.title}"><span class="pace-scale"><span>More review</span><span>More new</span></span></label>`;
     document.querySelector(`#panel-${config.mode} .trainer`).before(control);
   });
+  const wordsPaceControl=document.querySelector("#wordsPace").closest(".pace-control");
+  const wordsPaceCopy=wordsPaceControl.querySelector(".pace-copy");
+  const wordsPaceRange=wordsPaceControl.querySelector(".pace-range");
+  const wordsPaceValue=wordsPaceControl.querySelector("#wordsPaceValue");
+  const wordsPaceHeading=document.createElement("span");
+  wordsPaceHeading.className="word-pace-heading";
+  wordsPaceHeading.append("New-word pace: ",wordsPaceValue);
+  wordsPaceRange.prepend(wordsPaceHeading);
+  wordsPaceRange.append(wordsPaceCopy.querySelector("#wordsPaceDescription"));
+  wordsPaceCopy.remove();
+  wordsPaceControl.classList.add("word-pace-control");
+  wordsPaceControl.insertAdjacentHTML("afterbegin",`<label class="word-question-mode" for="wordQuestionMode"><span>Question format</span><select id="wordQuestionMode"><option value="written">Written Japanese → reading</option><option value="spoken">Spoken Japanese → reading</option><option value="both">Both</option></select><span class="word-question-mode-hint" id="wordQuestionModeHint" aria-live="polite"></span></label>`);
   const wordsPanel=document.querySelector("#panel-words");
   const wordsTrainer=wordsPanel.querySelector('.trainer[data-trainer="words"]');
   const wordsSetupGrid=wordsPanel.querySelector(":scope > .grid2");
@@ -357,6 +376,7 @@
       rehearseSetOpen:false,
       rehearseHelpOpen:false,
       wordSet:"learned",
+      wordQuestionMode:"written",
       speech:{autoPlay:true,speakMeaning:true,continueOnAdvance:false,rate:.85,jaVoice:"",enVoice:""},
       scriptBalance:LESSON.defaultScriptBalance||"adaptive",
       hiraganaShare:50,
@@ -435,6 +455,7 @@
     if(typeof state.rehearseSetOpen!=="boolean") state.rehearseSetOpen=false;
     if(typeof state.rehearseHelpOpen!=="boolean") state.rehearseHelpOpen=false;
     if(!state.wordSet) state.wordSet="learned";
+    if(!["written","spoken","both"].includes(state.wordQuestionMode))state.wordQuestionMode="written";
     if(!state.speech)state.speech={autoPlay:true,speakMeaning:true,continueOnAdvance:false,rate:.85,jaVoice:"",enVoice:""};
     if(typeof state.speech.autoPlay!=="boolean")state.speech.autoPlay=true;
     if(typeof state.speech.speakMeaning!=="boolean")state.speech.speakMeaning=true;
@@ -528,6 +549,7 @@
       status.classList.add("unavailable");$("#speechStatusTitle").textContent="Speech is not supported";
       $("#speechStatusDetail").textContent="This browser cannot use built-in pronunciation.";
       ["#speechAuto","#speechMeaning","#speechContinue","#speechRate","#japaneseVoice","#englishVoice","#testJapaneseSpeech","#testEnglishSpeech"].forEach(id=>$(id).disabled=true);
+      updateWordQuestionModeAvailability();
       return;
     }
     const japanese=voicesFor("ja"),english=voicesFor("en");
@@ -546,6 +568,28 @@
       $("#speechStatusTitle").textContent="Checking speech voices…";
       $("#speechStatusDetail").textContent="Your browser has not reported its available voices yet.";
     }
+    updateWordQuestionModeAvailability();
+  }
+
+  function japaneseSpeechReady(){
+    return speechSupported&&voicesFor("ja").length>0;
+  }
+
+  function updateWordQuestionModeAvailability(){
+    const select=$("#wordQuestionMode");if(!select)return;
+    const ready=japaneseSpeechReady();
+    ["spoken","both"].forEach(value=>{select.querySelector(`option[value="${value}"]`).disabled=!ready});
+    select.value=state.wordQuestionMode;
+    const unavailable=state.wordQuestionMode!=="written"&&!ready;
+    $("#wordQuestionModeHint").textContent=unavailable
+      ? "No Japanese voice is available, so questions temporarily use written Japanese."
+      : !ready
+        ? "Listening formats require a Japanese voice in Settings & Data."
+        : state.wordQuestionMode==="spoken"
+          ? "The spoken word is the question; its spelling appears after you answer."
+          : state.wordQuestionMode==="both"
+            ? "Questions alternate between written and spoken Japanese."
+            : "Read the displayed Japanese word and type its romaji reading.";
   }
 
   function refreshSpeechVoices(){
@@ -1602,6 +1646,14 @@
     return chosen;
   }
 
+  function nextWordQuestionFormat(session){
+    if(!japaneseSpeechReady()||state.wordQuestionMode==="written")return "written";
+    if(state.wordQuestionMode==="spoken")return "spoken";
+    if(session.lastQuestionFormat==="spoken")return "written";
+    if(session.lastQuestionFormat==="written")return "spoken";
+    return Math.random()<.5?"written":"spoken";
+  }
+
   function nextWordQuestion(){
     const s=sessions.words;
     clearTypingRetry("words");
@@ -1617,10 +1669,18 @@
     }
     s.current=w;s.last.push(w.k);if(s.last.length>8)s.last.shift();
     s.lastScripts.push(w.script);if(s.lastScripts.length>12)s.lastScripts.shift();
-    s.currentFont=chooseWordFont(w,s);s.lastFonts.push(s.currentFont.id);if(s.lastFonts.length>5)s.lastFonts.shift();
+    s.questionFormat=nextWordQuestionFormat(s);
+    s.lastQuestionFormat=s.questionFormat;
+    s.currentFont=s.questionFormat==="spoken"?STANDARD_FONT:chooseWordFont(w,s);s.lastFonts.push(s.currentFont.id);if(s.lastFonts.length>5)s.lastFonts.shift();
     if(s.resumeGrace>0)s.resumeGrace--;
     $("#wordsPrompt").textContent=w.k;applyPromptFont("words",s.currentFont);$("#wordsCount").textContent="Question "+s.n;
+    const spoken=s.questionFormat==="spoken";
+    $("#wordsPrompt").classList.toggle("hidden",spoken);
+    $("#wordsAudioPrompt").classList.toggle("hidden",!spoken);
+    wordsQuestionText.textContent=spoken?"Listen and type the reading in romaji":"Read this word in romaji";
+    wordsFontNote.classList.toggle("hidden",spoken);
     focusInput("words");updateAllUI();
+    if(spoken)setTimeout(()=>window.KANA_SPRINT_SPEECH.speakJapanese(w.k),100);
   }
 
   function applyWordResult(w,correct,font=STANDARD_FONT){
@@ -2360,6 +2420,12 @@
   });
   $("#wordsDontKnow").addEventListener("click",()=>handleWordTyped(true));
   $("#wordsNext").addEventListener("click",nextWordQuestion);
+  $("#wordsQuestionSpeech").addEventListener("click",()=>{
+    if(sessions.words.current&&sessions.words.questionFormat==="spoken")window.KANA_SPRINT_SPEECH.speakJapanese(sessions.words.current.k);
+  });
+  $("#wordQuestionMode").addEventListener("change",event=>{
+    state.wordQuestionMode=event.target.value;saveState();updateWordQuestionModeAvailability();sessions.words.current=null;nextWordQuestion();
+  });
   $("#manageSpeechVoices").addEventListener("click",()=>window.KANA_SPRINT_SPEECH.openSettings());
 
   $("#speechAuto").addEventListener("change",e=>{state.speech.autoPlay=e.target.checked;saveState()});
