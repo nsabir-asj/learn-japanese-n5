@@ -12,6 +12,15 @@
     .replaceAll("{{SCRIPT_LOWER}}", LESSON.scriptNameLower)
     .replaceAll("あ", LESSON.sampleKana)
     .replaceAll("ねこ", LESSON.sampleWord);
+  const headerPill=document.querySelector("header .pill");
+  const headerActions=document.createElement("div");
+  headerActions.className="header-actions";
+  const guidedLessonsLink=document.createElement("a");
+  guidedLessonsLink.className="ghost header-link-button";
+  guidedLessonsLink.href="./guided_lessons.html";
+  guidedLessonsLink.textContent="Guided Lessons";
+  headerPill.replaceWith(headerActions);
+  headerActions.append(guidedLessonsLink,headerPill);
   document.querySelector("#panel-learn .typing-hint").textContent="A likely adjacent-key or reversed-letter typo offers a brief retry. Other mistakes continue to the normal correction flow.";
   document.querySelector("#panel-rehearse .typing-hint").textContent="Likely adjacent-key or reversed-letter typo → brief retry. Otherwise: hard font → standard reference → rescue if still wrong.";
   document.querySelector("#panel-words .typing-hint").textContent="After recognition, the answer, meaning, and a complete romaji spelling guide appear. Press Enter again for the next word.";
@@ -216,6 +225,7 @@
     "kana-sprint-mix-v1":{label:"Kana Mix",version:1},
     "kanaSprintNumbersV1":{label:"Numbers",version:1},
     "kanaSprintVocabularyV1":{label:"Vocabulary",version:1},
+    "kanaSprintGuidedLessonsV1":{label:"Guided lessons",version:1},
     [SPEECH_STORAGE_KEY]:{label:"Speech & voices",version:1}
   };
   const FONT_PROFILES = LESSON.fontProfiles;
@@ -2337,6 +2347,10 @@
       const patterns=Object.values(value.concepts||{}).filter(concept=>(concept.seen||0)>0).length;
       return `${label}: ${value.total||0} answers · ${patterns} patterns assessed`;
     }
+    if(key==="kanaSprintGuidedLessonsV1"){
+      const completed=Object.values(value.activities||{}).filter(activity=>activity.completed).length;
+      return `${label}: ${completed} activities completed · ${value.total||0} graded answers`;
+    }
     const kana=Object.values(value.items||{}).filter(item=>(item.unaidedSeen??item.seen??0)>0).length;
     const words=Object.values(value.wordItems||{}).filter(item=>(item.seen||0)>0).length;
     return `${label}: ${kana} kana · ${words} words assessed`;
@@ -2537,7 +2551,7 @@
     renderRehearseSelectors();renderSpeechControls();updateAllUI();switchTab("learn");nextKanaQuestion("learn");
   });
   $("#resetAllProgress").addEventListener("click",()=>{
-    if(!confirm("Reset all Hiragana, Katakana, Kana Mix, word, number, mnemonic, and settings data on this device? This cannot be undone."))return;
+    if(!confirm("Reset all Hiragana, Katakana, Kana Mix, word, vocabulary, number, guided-lesson, mnemonic, and settings data on this device? This cannot be undone."))return;
     Object.keys(APP_STORAGE_KEYS).forEach(key=>localStorage.removeItem(key));
     location.reload();
   });
@@ -2563,5 +2577,7 @@
   refreshSpeechVoices();
   if(speechSupported)window.speechSynthesis.addEventListener("voiceschanged",refreshSpeechVoices);
   updateAllUI();
-  nextKanaQuestion("learn");
+  const initialHash=location.hash.slice(1);
+  if(["learn","rehearse","words","mnemonics","kanaprogress","wordprogress","settingsdata"].includes(initialHash))switchTab(initialHash);
+  else nextKanaQuestion("learn");
 })();

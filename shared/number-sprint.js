@@ -645,4 +645,5 @@
   wireEvents();
   renderProgress();
   window.KANA_SPRINT_SYNC_RANGE?.($("#numberPace"));
+  if (location.hash === "#numbers") switchToNumbers();
 })();

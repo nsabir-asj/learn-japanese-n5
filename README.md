@@ -1,10 +1,11 @@
 # Japanese Kana Sprint
 
-Three offline, adaptive reading trainers for Japanese kana:
+Three offline, adaptive reading trainers and one guided language-learning experience:
 
 - **Hiragana Sprint** — hiragana characters, combinations, beginner words, and Japanese numbers.
 - **Katakana Sprint** — katakana characters, practical combinations, and beginner words.
 - **Kana Mix** — interleaved hiragana and katakana practice, plus the shared Japanese-number course.
+- **Guided Lessons** — mission-based conversation, grammar, listening, sentence production, and delayed review.
 
 All three trainers share the same interface and learning system. Hiragana and Katakana keep their own mastery records; Kana Mix reads and updates both sets.
 
@@ -15,6 +16,7 @@ No installation or web server is needed. Open either file directly in a modern b
 - `hiragana_sprint.html`
 - `katakana_sprint.html`
 - `kana_sprint.html`
+- `guided_lessons.html`
 
 Keep the `shared`, `lessons`, and `fonts` folders beside the HTML files. Moving only an HTML file will prevent the trainer from loading.
 
@@ -65,6 +67,14 @@ Hiragana Sprint and Kana Mix include the same **Numbers** tab; Katakana Sprint s
 New number patterns are explained before the first graded question. Practice can run from digits to a romaji reading, from a hiragana reading to digits, or in both directions. Correct and corrected answers show the number, kanji, hiragana, romaji, and a component-by-component breakdown. Japanese speech uses the voice selected in Word mode when available.
 
 The number scheduler tracks patterns rather than memorizing individual generated numbers. Weak patterns return more often, the pace slider controls new-pattern frequency, recent numbers are avoided, likely one-character or transposed-letter typing errors receive one ungraded retry, and mistakes open four keyboard-accessible rescue choices. Number progress has its own import, export, and reset controls.
+
+### Guided lessons
+
+`guided_lessons.html` turns beginner vocabulary and grammar into a cumulative first-conversation journey. Lesson 1 is organized by conversational purpose rather than textbook page order: open a meeting, identify yourself, ask back, connect nouns with `の`, exchange age/time/telephone details, and complete a mixed conversation mission.
+
+Each idea moves from a concise model to retrieval through situational choices, audio-only comprehension, sentence construction, typed details, and a mixed checkpoint. Choice questions award less mastery than independent construction. Correct recall expands the next review interval from minutes to days and weeks; a lapse schedules a near-term review without immediately repeating the same prompt.
+
+General number construction remains in Kana Mix. Guided Lesson 1 links to that foundation and teaches only the contextual forms needed for ages, school years, telephone digits, and time. Japanese pronunciation reads the universal voice and speed saved in **Settings & Data**.
 
 ### Learning pace
 
@@ -120,12 +130,13 @@ Progress is automatically saved after answers and setting changes using the brow
 - Kana Mix settings key: `kana-sprint-mix-v1`
 - Shared number-learning key: `kanaSprintNumbersV1`
 - Shared vocabulary-learning key: `kanaSprintVocabularyV1`
+- Guided-lessons key: `kanaSprintGuidedLessonsV1`
 
 Kana Mix merges the two script records when it opens. Every mixed answer is then written back to the appropriate Hiragana or Katakana record, so practising in Kana Mix also updates the corresponding individual trainer.
 
 This data belongs to that browser and computer. It is **not** saved as a file in this project folder. Clearing browser data, using another browser, or changing how the files are opened can make the saved progress unavailable.
 
-For a portable backup, open **Settings & Data** and select **Export all progress**. The complete backup includes every available Hiragana, Katakana, Kana Mix, word, number, mnemonic, font, voice, and app-settings record. Importing first shows a dated summary and only restores the listed areas after confirmation.
+For a portable backup, open **Settings & Data** and select **Export all progress**. The complete backup includes every available Hiragana, Katakana, Kana Mix, word, vocabulary, number, guided-lesson, mnemonic, font, voice, and app-settings record. Importing first shows a dated summary and only restores the listed areas after confirmation.
 
 Older trainer-specific and number-only backup files remain supported under **Advanced component backups**.
 
@@ -146,9 +157,12 @@ Japanese-N5-lessons/
 ├── hiragana_sprint.html       Hiragana launcher
 ├── katakana_sprint.html       Katakana launcher
 ├── kana_sprint.html           Combined Kana Mix launcher
+├── guided_lessons.html        Universal guided-lessons launcher
 ├── shared/
 │   ├── kana-sprint.js         Shared trainer and adaptive logic
 │   ├── kana-sprint.css        Shared interface styles
+│   ├── guided-lessons.js      Lesson 1 journey, retrieval, and review logic
+│   ├── guided-lessons.css     Guided-lesson interface styles
 │   ├── number-sprint.js       Shared number course and adaptive logic
 │   ├── number-sprint.css      Number-course interface styles
 │   ├── kana-mnemonic-preferences.json  Selected mnemonic index

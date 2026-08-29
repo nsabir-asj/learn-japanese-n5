@@ -447,4 +447,5 @@
       if (button) { event.preventDefault(); button.click(); }
     }
   });
+  if (location.hash === "#vocabulary") switchToVocabulary();
 })();

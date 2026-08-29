@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Guided Japanese Lessons</title>
+<link rel="stylesheet" href="./shared/kana-sprint.css?v=20260829-2" />
+<link rel="stylesheet" href="./shared/guided-lessons.css?v=20260829-1" />
+<script defer src="./shared/guided-lessons.js?v=20260829-1"></script>
+</head>
+<body>
+  <div class="wrap lesson-wrap">
+    <header class="lesson-header">
+      <div>
+        <div class="lesson-eyebrow">Guided Japanese</div>
+        <h1>Lesson 1 · Meet Someone</h1>
+        <p class="subtitle">Learn to open a conversation, introduce yourself, ask about another person, and understand their answers.</p>
+      </div>
+      <div class="lesson-header-actions">
+        <a class="ghost lesson-link-button" href="./kana_sprint.html">Kana Mix</a>
+        <span class="pill">Standalone · offline · auto-saved</span>
+      </div>
+    </header>
+
+    <section class="stats" aria-label="Lesson progress">
+      <div class="stat"><strong id="lessonCompletion">0%</strong><span>journey completed</span></div>
+      <div class="stat"><strong id="lessonMastery">0%</strong><span>independent mastery</span></div>
+      <div class="stat streak-stat" id="lessonStreakStat"><strong id="lessonStreak">0</strong><span>current streak</span></div>
+      <div class="stat"><strong id="lessonDue">0</strong><span>reviews due</span></div>
+    </section>
+
+    <nav class="lesson-mode-tabs" aria-label="Guided lesson modes">
+      <button class="lesson-mode active" data-mode="learn" type="button"><span>Learn</span><small>Follow the guided journey</small></button>
+      <button class="lesson-mode" data-mode="practice" type="button"><span>Practice</span><small>Strengthen weak and due material</small></button>
+      <button class="lesson-mode" data-mode="checkpoint" type="button"><span>Checkpoint</span><small>Test yourself without teaching help</small></button>
+      <button class="lesson-mode" data-mode="progress" type="button"><span>Progress</span><small>See skills, profile, and review timing</small></button>
+    </nav>
+
+    <main>
+      <section id="lessonWorkspace" class="lesson-workspace">
+        <aside class="card lesson-roadmap-card">
+          <div class="lesson-roadmap-heading">
+            <div><span class="tiny">Lesson journey</span><h2>First conversation</h2></div>
+            <span class="data-badge" id="lessonStageCount">1 / 6</span>
+          </div>
+          <div class="lesson-roadmap" id="lessonRoadmap"></div>
+          <div class="lesson-foundation">
+            <strong>Number foundation</strong>
+            <p>General number fluency stays in Kana Mix. This lesson only teaches how numbers behave in ages, school years, phone numbers, and time.</p>
+            <a class="ghost lesson-link-button" href="./kana_sprint.html#numbers">Review numbers in Kana Mix</a>
+          </div>
+        </aside>
+
+        <div class="lesson-main-column">
+          <section class="trainer lesson-trainer" id="lessonTrainer" aria-live="polite">
+            <div class="trainer-top">
+              <div class="mode-tag"><span class="dot"></span><span id="lessonModeLabel">Learn · guided retrieval</span></div>
+              <div class="tiny" id="lessonQuestionCount">Activity 1</div>
+            </div>
+            <div class="lesson-stage-progress"><span id="lessonStageProgress"></span></div>
+            <div id="lessonActivity" class="lesson-activity"></div>
+            <div id="lessonFeedback" class="feedback lesson-feedback"></div>
+            <div class="footer-actions lesson-footer">
+              <div class="actions">
+                <button class="ghost hidden" id="lessonDontKnow" type="button">I don’t know</button>
+                <button class="ghost hidden" id="lessonClear" type="button">Clear</button>
+                <button class="big-button hidden" id="lessonSubmit" type="button">Check answer</button>
+                <button class="big-button hidden" id="lessonNext" type="button">Continue <kbd>Enter</kbd></button>
+              </div>
+              <span class="tiny" id="lessonKeyboardHint">Retrieval becomes less assisted as you progress.</span>
+            </div>
+          </section>
+
+          <section class="card lesson-session-card">
+            <div>
+              <h2 id="lessonSessionTitle">Why this sequence works</h2>
+              <p class="muted" id="lessonSessionCopy">Useful conversation comes first. Grammar appears when you need it, then returns through listening, sentence building, and delayed recall.</p>
+            </div>
+            <button class="ghost" id="lessonReplay" type="button">🔊 Replay Japanese</button>
+          </section>
+        </div>
+      </section>
+
+      <section id="lessonProgressPanel" class="lesson-progress-panel hidden">
+        <div class="grid2">
+          <div class="card">
+            <div class="data-heading"><div><h2>Lesson readiness</h2><p class="muted">Mastery counts unaided retrieval more heavily than recognition or supported sentence building.</p></div><span class="data-badge" id="lessonReadinessBadge">Getting started</span></div>
+            <div class="lesson-skill-grid" id="lessonSkillGrid"></div>
+          </div>
+          <div class="card">
+            <h2>Your conversation profile</h2>
+            <p class="muted">Optional details make practice feel personally relevant. They stay only in this browser.</p>
+            <form class="lesson-profile-form" id="lessonProfileForm">
+              <label><span>Name</span><input id="profileName" autocomplete="name" placeholder="Your name" /></label>
+              <label><span>Country or hometown</span><input id="profileHome" placeholder="Bangladesh" /></label>
+              <label><span>Occupation or school status</span><input id="profileRole" placeholder="Student, engineer…" /></label>
+              <label><span>Major or field</span><input id="profileField" placeholder="Computer science…" /></label>
+              <label><span>School year</span><select id="profileYear"><option value="">Not applicable</option><option value="いちねんせい">First year</option><option value="にねんせい">Second year</option><option value="さんねんせい">Third year</option><option value="よねんせい">Fourth year</option></select></label>
+              <label><span>Age</span><input id="profileAge" inputmode="numeric" placeholder="Optional" /></label>
+              <button class="big-button" type="submit">Save profile</button>
+            </form>
+            <div class="callout" id="profileStatus">Add only the details you want to practise.</div>
+          </div>
+        </div>
+
+        <div class="grid2 lesson-progress-row">
+          <div class="card">
+            <h2>Review schedule</h2>
+            <p class="muted">Successful recall expands the delay. A lapse brings the idea back soon without repeating it immediately.</p>
+            <div class="lesson-review-list" id="lessonReviewList"></div>
+          </div>
+          <div class="card">
+            <h2>Speech and related practice</h2>
+            <div class="speech-status" id="lessonSpeechStatus"><span class="speech-dot"></span><div><strong id="lessonSpeechTitle">Checking Japanese speech…</strong><div class="tiny" id="lessonSpeechDetail">This page uses the universal voice selected by Kana Sprint.</div></div></div>
+            <div class="actions">
+              <button class="ghost" id="lessonTestSpeech" type="button">Test Japanese voice</button>
+              <a class="ghost lesson-link-button" href="./kana_sprint.html#settingsdata">Manage voices</a>
+              <a class="ghost lesson-link-button" href="./kana_sprint.html#numbers">Practise general numbers</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
