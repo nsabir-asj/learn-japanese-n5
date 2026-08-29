@@ -187,6 +187,10 @@
     ];
     const existingTabs=new Map([...nav.querySelectorAll(":scope > .tab")].map(tab=>[tab.dataset.tab,tab]));
     const wordTab=existingTabs.get("words");if(wordTab)wordTab.textContent="Word Reading";
+    [["kanaprogress","Kana Progress"],["wordprogress","Word Progress"]].forEach(([id,accessibleLabel])=>{
+      const tab=existingTabs.get(id);if(!tab)return;
+      tab.textContent="Progress";tab.setAttribute("aria-label",accessibleLabel);
+    });
     nav.replaceChildren();
     nav.setAttribute("aria-label","Practice and progress navigation");
     groupDefinitions.forEach(definition=>{
