@@ -210,6 +210,35 @@
     }
   ];
 
+  const ANSWER_BREAKDOWNS = {
+    "open-situation": [["はじめまして", "nice to meet you · first-meeting opener"]],
+    "open-listen": [["よろしく", "favorably · with goodwill"], ["おねがいします", "please · literally, I make a request"]],
+    "open-build": [["はじめまして", "nice to meet you"], ["はる", "Haru"], ["です", "am · polite ending"], ["よろしくおねがいします", "please treat me kindly · polite close"]],
+    "open-response": [["はじめまして", "nice to meet you"], ["けん", "Ken"], ["です", "am · polite ending"], ["よろしくおねがいします", "please treat me kindly · polite close"]],
+    "identity-meaning": [["けんさん", "Ken · さん adds polite respect"], ["は", "topic marker · pronounced wa"], ["せんせい", "teacher"], ["です", "is · polite ending"]],
+    "identity-build": [["わたし", "I · me"], ["は", "topic marker · pronounced wa"], ["がくせい", "student"], ["です", "am · polite ending"]],
+    "identity-omit": [["はい", "yes"], ["がくせい", "student"], ["です", "am · polite ending"]],
+    "identity-other": [["めいさん", "Mei · さん adds polite respect"], ["は", "topic marker · pronounced wa"], ["かいしゃいん", "office worker · company employee"], ["です", "is · polite ending"]],
+    "ask-yes-no": [["いいえ", "no"], ["バングラデシュじん", "Bangladeshi person"], ["です", "am · polite ending"]],
+    "ask-major": [["せんこう", "major · field of study"], ["は", "topic marker · pronounced wa"], ["なん", "what"], ["です", "is · polite ending"], ["か", "question marker"]],
+    "ask-year": [["なん", "what · which"], ["ねんせい", "school year"], ["です", "is · polite ending"], ["か", "question marker"]],
+    "ask-listen-age": [["なんさい", "how old · what age"], ["です", "is · polite ending"], ["か", "question marker"]],
+    "connect-main": [["にほんご", "Japanese language"], ["の", "connects and specifies nouns"], ["がくせい", "student · the main noun"]],
+    "connect-build": [["だいがく", "university"], ["の", "of · associated with"], ["せんせい", "teacher · the main noun"]],
+    "connect-possess": [["みかさん", "Mika · さん adds polite respect"], ["の", "Mika’s · possession or association"], ["ともだち", "friend · the main noun"]],
+    "connect-sentence": [["ゆきさん", "Yuki · さん adds polite respect"], ["の", "Yuki’s · possession or association"], ["せんこう", "major · field of study"], ["は", "topic marker · pronounced wa"], ["れきし", "history"], ["です", "is · polite ending"]],
+    "details-age": [["はたち", "20 years old · special reading"], ["です", "is · polite ending"]],
+    "details-year": [["よねんせい", "fourth-year student · special よ reading"], ["です", "is · polite ending"]],
+    "details-phone": [["さん", "three"], ["ぜろ", "zero"], ["はち", "eight"], ["よん", "four"]],
+    "details-time": [["よじ", "four o’clock · special よ reading"], ["です", "is · polite ending"]],
+    "details-time-listen": [["ごぜん", "a.m. · before noon"], ["くじ", "nine o’clock"], ["はん", "half past"], ["です", "is · polite ending"]],
+    "mission-greet": [["はじめまして", "nice to meet you"], ["よろしくおねがいします", "please treat me kindly · polite close"]],
+    "mission-understand": [["せんこう", "major · field of study"], ["は", "topic marker · pronounced wa"], ["せいぶつがく", "biology"], ["です", "is · polite ending"], ["さんねんせい", "third-year student"], ["です", "is · polite ending"]],
+    "mission-ask": [["なんさい", "how old · what age"], ["です", "is · polite ending"], ["か", "question marker"]],
+    "mission-age": [["にじゅういっさい", "21 years old · いち + さい becomes いっさい"], ["です", "is · polite ending"]],
+    "mission-close": [["そうですか", "I see · acknowledges new information"], ["よろしくおねがいします", "please treat me kindly · polite close"]]
+  };
+
   const ALL_ACTIVITIES = STAGES.flatMap((stage, stageIndex) => stage.activities.map((activity, activityIndex) => ({ ...activity, stageIndex, activityIndex })));
   const GRADED_ACTIVITIES = ALL_ACTIVITIES.filter(activity => activity.type !== "teach");
 
@@ -409,7 +438,9 @@
   function showFeedback(correct) {
     const feedback = $("#lessonFeedback");
     feedback.className = `feedback lesson-feedback show ${correct ? "good" : "bad"}`;
-    feedback.innerHTML = `<strong>${correct ? "Correct" : "Build this memory"}</strong><div class="meta"><span class="lesson-correction">${escapeHtml(currentActivity.correction || "Review the model")}</span><span class="lesson-feedback-explanation">${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span></div>`;
+    const breakdown = ANSWER_BREAKDOWNS[currentActivity.id] || [];
+    const breakdownMarkup = breakdown.length ? `<div class="lesson-answer-breakdown"><span class="lesson-breakdown-label">Answer breakdown</span><div class="lesson-breakdown-pieces">${breakdown.map(([piece, meaning]) => `<span class="lesson-breakdown-piece"><strong>${escapeHtml(piece)}</strong><small>${escapeHtml(meaning)}</small></span>`).join("")}</div></div>` : "";
+    feedback.innerHTML = `<strong>${correct ? "Correct" : "Build this memory"}</strong><div class="meta"><span class="lesson-correction">${escapeHtml(currentActivity.correction || "Review the model")}</span>${breakdownMarkup}<span class="lesson-feedback-explanation">${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span></div>`;
   }
 
   function updateResult(activity, correct) {
