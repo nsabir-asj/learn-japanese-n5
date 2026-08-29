@@ -48,7 +48,15 @@ After the answer is revealed, the guide shows how each kana block contributes to
 
 Word rescue accepts typing plus Enter, mouse selection, or number keys **1–8**. After two incorrect rescue attempts, the complete spelling guide appears while the rescue choices remain available. The word scheduler mixes new vocabulary with adaptive review and increases features that have caused recent trouble.
 
-If Japanese speech is available in the browser, the trainer can pronounce the word and optionally its English meaning. The Speech panel reports whether suitable voices were found and includes test buttons. Voice selections and speech options are saved locally. An optional setting lets the current pronunciation finish after Enter moves to the next word.
+If Japanese speech is available in the browser, the trainer can pronounce the word and optionally its English meaning. **Settings & Data → Speech & voices** reports whether suitable voices were found and includes test buttons. Voice selection is shared with Vocabulary and Numbers, while playback options are saved locally. An optional setting lets the current pronunciation finish after Enter moves to the next word.
+
+### Vocabulary
+
+The universal **Vocabulary** tab practises Japanese-to-English comprehension separately from word reading. New expressions are taught with their Japanese form, romaji, English meaning, and pronunciation before the first graded question. Answers use four meaning choices so legitimate English synonyms do not become false typing errors; number keys **1–4** are supported.
+
+The curriculum is ordered by everyday usefulness: greetings and courtesy first, followed by people and conversation, daily routines, food and shopping, and getting around. A later stage opens only after every expression in the current stage has been introduced and the stage reaches 35% average mastery. The saved pace control changes how quickly new expressions appear without skipping this order. Written, spoken, and alternating question formats use the universal voice selected in **Settings & Data**.
+
+Vocabulary mastery, accuracy, weak items, streak, and curriculum position are stored independently from word-reading mastery and shared by Hiragana Sprint, Katakana Sprint, and Kana Mix. The grouped **Progress** tab shows both word-reading and vocabulary-comprehension summaries.
 
 ### Numbers
 
@@ -88,14 +96,14 @@ The separate user-supplied LeafPiece original is kept locally under `assets/loca
 
 ### Progress
 
-The **Kana Progress** and **Word Progress** tabs show mastery, weak items, common confusions, font recognition, curriculum status, and word statistics.
+The two grouped **Progress** tabs show kana mastery, weak items, common confusions, font recognition, curriculum status, word-reading statistics, and a separate vocabulary-comprehension summary.
 
 The top streak box follows the active practice mode: Kana in Learn and Rehearse, Words in Word mode, and Numbers in Number mode. Each mode keeps an independent streak, so a mistake in one activity does not reset the others. The highlight begins with gentle rewards at 5 and 15, then becomes more prominent at 25, 50, 75, 100, 150, and 200 consecutive correct answers. The 200+ tier uses the legendary purple-gold style. Kana Progress and Word Progress include the complete milestone guide and show their current and best streaks; Number Progress keeps the live streak in the header and shows the best number streak in its summary.
 
 ## Answering questions
 
 - Type the romaji reading and press **Enter**.
-- After a correct word, press **Enter** again to move on.
+- After a correct word or vocabulary choice, press **Enter** again to move on.
 - After a typed wrong answer, **Typing mistake? Retry** is available for three seconds. Click it or press **Esc** to restore the same prompt and original font. On difficult-font questions, the standard reference stays blurred until this window expires. The first result remains recorded, and the retry is offered only once for that question.
 - In Learn and Rehearse, the retry appears only when the answer looks like a likely keyboard typo: one adjacent-key substitution (such as `kp` for `ko`) or one pair of neighboring letters entered in reverse order (such as `hsa` for `sha` or `ot` for `to`). A typed answer that is itself another valid kana reading remains a normal learning mistake. Word mode keeps its general retry behavior.
 - If rescue choices appear, type the reading and press **Enter**, click one, or press **1–8**. Word rescues also accept typed readings; the automatic two-mistake mnemonic applies to kana practice.
@@ -111,6 +119,7 @@ Progress is automatically saved after answers and setting changes using the brow
 - Katakana key: `katakana-sprint-v1`
 - Kana Mix settings key: `kana-sprint-mix-v1`
 - Shared number-learning key: `kanaSprintNumbersV1`
+- Shared vocabulary-learning key: `kanaSprintVocabularyV1`
 
 Kana Mix merges the two script records when it opens. Every mixed answer is then written back to the appropriate Hiragana or Katakana record, so practising in Kana Mix also updates the corresponding individual trainer.
 

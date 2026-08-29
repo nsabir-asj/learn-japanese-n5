@@ -215,6 +215,7 @@
     "katakana-sprint-v1":{label:"Katakana",version:1},
     "kana-sprint-mix-v1":{label:"Kana Mix",version:1},
     "kanaSprintNumbersV1":{label:"Numbers",version:1},
+    "kanaSprintVocabularyV1":{label:"Vocabulary",version:1},
     [SPEECH_STORAGE_KEY]:{label:"Speech & voices",version:1}
   };
   const FONT_PROFILES = LESSON.fontProfiles;
@@ -2543,8 +2544,9 @@
   window.addEventListener("kana-sprint-progress-saved",updateLastSaved);
   window.addEventListener("kana-sprint-streak-context",event=>{
     const detail=event.detail||{};
-    currentTab="numbers";
-    renderTopStreak("numbers",detail.current,detail.best,"number streak");
+    const scope=detail.tab||"numbers";
+    currentTab=scope;
+    renderTopStreak(scope,detail.current,detail.best,detail.label||"number streak");
   });
 
   window.addEventListener("focus",()=>{
