@@ -34,6 +34,7 @@
         {
           id: "open-build", type: "tiles", skill: "Production", kicker: "Build the exchange", title: "Introduce Haru in a natural order.", prompt: "Arrange the three chunks.",
           tokens: ["はじめまして。", "はるです。", "よろしくおねがいします。"], answer: ["はじめまして。", "はるです。", "よろしくおねがいします。"],
+          distractors: ["いいえ。", "がくせいですか。", "ごちそうさまでした。"], learnExtras: 0,
           correction: "はじめまして。はるです。よろしくおねがいします。", explanation: "The sequence mirrors the social job of each chunk: opening, identity, then a courteous close.", audioText: "はじめまして。はるです。よろしくおねがいします。"
         },
         {
@@ -61,6 +62,7 @@
         {
           id: "identity-build", type: "tiles", skill: "Production", kicker: "Construct the pattern", title: "Build: “I am a student.”", prompt: "Put the Japanese pieces in order.",
           tokens: ["わたしは", "がくせい", "です。"], answer: ["わたしは", "がくせい", "です。"], correction: "わたしは がくせいです。",
+          distractors: ["せんせい", "か。", "の", "なん"], learnExtras: 1,
           explanation: "The topic comes first, followed by the identity or description and です.", audioText: "わたしは、がくせいです。"
         },
         {
@@ -71,6 +73,7 @@
         {
           id: "identity-other", type: "tiles", skill: "Production", kicker: "Describe another person", title: "Build: “Mei is an office worker.”", prompt: "Create the complete statement.",
           tokens: ["めいさんは", "かいしゃいん", "です。"], answer: ["めいさんは", "かいしゃいん", "です。"], correction: "めいさんは かいしゃいんです。",
+          distractors: ["わたしは", "がくせい", "か。", "の"], learnExtras: 1,
           explanation: "The same frame works for many identities: student, teacher, office worker, nationality, major, and more.", audioText: "めいさんは、かいしゃいんです。"
         }
       ]
@@ -92,6 +95,7 @@
         {
           id: "ask-major", type: "tiles", skill: "Production", kicker: "Generate the question", title: "Ask: “What is your major?”", prompt: "Build the question from meaning, not by copying a model.",
           tokens: ["せんこうは", "なん", "です", "か。"], answer: ["せんこうは", "なん", "です", "か。"], correction: "せんこうは なんですか。",
+          distractors: ["なんさい", "だれ", "の", "がくせい"], learnExtras: 2,
           explanation: "なん occupies the missing-information position; か makes the whole sentence a question.", audioText: "せんこうは、なんですか。"
         },
         {
@@ -123,6 +127,7 @@
         {
           id: "connect-build", type: "tiles", skill: "Production", kicker: "Order the relationship", title: "Build: “a university teacher”", prompt: "Put the specifying noun before の and the main idea after it.",
           tokens: ["だいがく", "の", "せんせい"], answer: ["だいがく", "の", "せんせい"], correction: "だいがくの せんせい",
+          distractors: ["は", "がくせい", "です。", "めいさん"], learnExtras: 2,
           explanation: "The university specifies which kind of teacher, so だいがく comes before の.", audioText: "だいがくの、せんせい。"
         },
         {
@@ -133,6 +138,7 @@
         {
           id: "connect-sentence", type: "tiles", skill: "Production", kicker: "Use の inside a sentence", title: "Build: “Yuki’s major is history.”", prompt: "Connect the owner and the topic before completing the statement.",
           tokens: ["ゆきさんの", "せんこうは", "れきし", "です。"], answer: ["ゆきさんの", "せんこうは", "れきし", "です。"], correction: "ゆきさんの せんこうは れきしです。",
+          distractors: ["なん", "か。", "がくせい", "の"], learnExtras: 2,
           explanation: "ゆきさんの modifies せんこう. The complete noun phrase then becomes the topic marked by は.", audioText: "ゆきさんの、せんこうは、れきしです。"
         }
       ]
@@ -194,7 +200,8 @@
         },
         {
           id: "mission-ask", type: "tiles", skill: "Production", kicker: "Mission · ask back", title: "Ask Aoi’s age.", prompt: "Construct the shortest natural question.",
-          tokens: ["なんさい", "です", "か。"], answer: ["なんさい", "です", "か。"], correction: "なんさいですか。", explanation: "The person is already established in the conversation, so repeating あおいさんは is optional.", audioText: "なんさいですか。"
+          tokens: ["なんさい", "です", "か。"], answer: ["なんさい", "です", "か。"], correction: "なんさいですか。", explanation: "The person is already established in the conversation, so repeating あおいさんは is optional.", audioText: "なんさいですか。",
+          distractors: ["なんねんせい", "なんじ", "だれ", "の"], learnExtras: 3
         },
         {
           id: "mission-age", type: "choice", skill: "Listening", kicker: "Mission · decode the answer", title: "Choose the age you heard.", prompt: "Listen to Aoi’s answer.",
@@ -301,6 +308,7 @@
   let stageCursor = null;
   let tileSelection = [];
   let tileBank = [];
+  let currentDistractorCount = 0;
   let checkpointQueue = [];
   let checkpointIndex = 0;
   let checkpointCorrect = 0;
@@ -468,13 +476,20 @@
   }
 
   function renderTiles(activity) {
-    tileBank = shuffle(activity.tokens.map((text, index) => ({ id: `${activity.id}-${index}`, text })));
-    $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + `<div class="lesson-tiles"><div class="lesson-tile-answer" id="lessonTileAnswer"></div><div class="lesson-tile-bank" id="lessonTileBank"></div></div>`;
+    const availableDistractors = shuffle(activity.distractors || []);
+    const requestedCount = mode === "checkpoint" ? 4 : mode === "practice" ? 3 : activity.learnExtras || 0;
+    const distractors = availableDistractors.slice(0, requestedCount);
+    currentDistractorCount = distractors.length;
+    const answerTiles = activity.tokens.map((text, index) => ({ id: `${activity.id}-answer-${index}`, text }));
+    const extraTiles = distractors.map((text, index) => ({ id: `${activity.id}-extra-${index}`, text }));
+    tileBank = shuffle([...answerTiles, ...extraTiles]);
+    const extraNote = currentDistractorCount ? `<div class="lesson-tile-note"><strong>Choose only what you need.</strong> Some tiles are extras.</div>` : "";
+    $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + `<div class="lesson-tiles">${extraNote}<div class="lesson-tile-answer" id="lessonTileAnswer"></div><div class="lesson-tile-bank" id="lessonTileBank"></div></div>`;
     renderTileControls();
     $("#lessonClear").classList.remove("hidden");
     $("#lessonSubmit").classList.remove("hidden");
     $("#lessonDontKnow").classList.remove("hidden");
-    $("#lessonKeyboardHint").textContent = "Build from meaning. Click an answer tile to return it to the bank.";
+    $("#lessonKeyboardHint").textContent = currentDistractorCount ? "Build from meaning. Extra tiles can remain in the bank." : "Build from meaning. Click an answer tile to return it to the bank.";
   }
 
   function renderTileControls() {
@@ -522,7 +537,7 @@
     if (correct) {
       progress.correct++;
       progress.interval = Math.min(REVIEW_INTERVALS.length - 1, progress.interval + 1);
-      const gain = activity.type === "choice" ? 15 : 22;
+      const gain = activity.type === "choice" ? 15 : activity.type === "tiles" && currentDistractorCount ? 26 : 22;
       progress.mastery = Math.min(100, progress.mastery + Math.max(7, gain * (1 - progress.mastery / 140)));
       progress.dueAt = Date.now() + REVIEW_INTERVALS[progress.interval];
       state.correct++;
