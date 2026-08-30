@@ -6,7 +6,14 @@
   const VERSION = 1;
   const REVIEW_INTERVALS = [2 * 60000, 24 * 60 * 60000, 3 * 24 * 60 * 60000, 7 * 24 * 60 * 60000, 14 * 24 * 60 * 60000, 30 * 24 * 60 * 60000];
   const $ = selector => document.querySelector(selector);
-  const shuffle = values => [...values].sort(() => Math.random() - .5);
+  const shuffle = values => {
+    const shuffled = [...values];
+    for (let index = shuffled.length - 1; index > 0; index--) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+    }
+    return shuffled;
+  };
   const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
   const normalize = value => String(value ?? "").toLowerCase().trim().replace(/[\s。、・,.!?！？:：'’_-]+/g, "").replace(/ō/g, "ou");
@@ -54,7 +61,7 @@
         {
           id: "open-build", type: "tiles", skill: "Production", kicker: "Build the exchange", title: "Introduce Haru in a natural order.", prompt: "Arrange the three chunks.",
           tokens: ["はじめまして。", "はるです。", "よろしくおねがいします。"], answer: ["はじめまして。", "はるです。", "よろしくおねがいします。"],
-          distractors: ["いいえ。", "がくせいですか。", "ごちそうさまでした。"], learnExtras: 0,
+          distractors: ["いいえ。", "がくせいですか。", "ごちそうさまでした。"], learnExtras: 2,
           correction: "はじめまして。はるです。よろしくおねがいします。", explanation: "The sequence mirrors the social job of each chunk: opening, identity, then a courteous close.", audioText: "はじめまして。はるです。よろしくおねがいします。"
         },
         {
@@ -82,7 +89,7 @@
         {
           id: "identity-build", type: "tiles", skill: "Production", kicker: "Construct the pattern", title: "Build: “I am a student.”", prompt: "Put the Japanese pieces in order.",
           tokens: ["わたしは", "がくせい", "です。"], answer: ["わたしは", "がくせい", "です。"], correction: "わたしは がくせいです。",
-          distractors: ["せんせい", "か。", "の", "なん"], learnExtras: 1,
+          distractors: ["せんせい", "か。", "の", "なん"], learnExtras: 2,
           explanation: "The topic comes first, followed by the identity or description and です.", audioText: "わたしは、がくせいです。"
         },
         {
@@ -93,7 +100,7 @@
         {
           id: "identity-other", type: "tiles", skill: "Production", kicker: "Describe another person", title: "Build: “Mei is an office worker.”", prompt: "Create the complete statement.",
           tokens: ["めいさんは", "かいしゃいん", "です。"], answer: ["めいさんは", "かいしゃいん", "です。"], correction: "めいさんは かいしゃいんです。",
-          distractors: ["わたしは", "がくせい", "か。", "の"], learnExtras: 1,
+          distractors: ["わたしは", "がくせい", "か。", "の"], learnExtras: 2,
           explanation: "The same frame works for many identities: student, teacher, office worker, nationality, major, and more.", audioText: "めいさんは、かいしゃいんです。"
         },
         {
@@ -545,6 +552,7 @@
   let currentActivity = null;
   let currentAnswered = false;
   let stageCursor = null;
+  let replayingStage = false;
   let tileSelection = [];
   let tileBank = [];
   let currentDistractorCount = 0;
@@ -605,7 +613,8 @@
     }).join("");
     $("#lessonRoadmap").querySelectorAll("[data-stage]").forEach(button => button.addEventListener("click", () => {
       state.currentStage = Number(button.dataset.stage);
-      stageCursor = stageComplete(state.currentStage) ? 0 : firstIncompleteIndex(state.currentStage);
+      replayingStage = stageComplete(state.currentStage);
+      stageCursor = replayingStage ? 0 : firstIncompleteIndex(state.currentStage);
       saveState();
       setMode("learn");
     }));
@@ -728,6 +737,13 @@
     const answerTiles = activity.tokens.map((text, index) => ({ id: `${activity.id}-answer-${index}`, text }));
     const extraTiles = distractors.map((text, index) => ({ id: `${activity.id}-extra-${index}`, text }));
     tileBank = shuffle([...answerTiles, ...extraTiles]);
+    const answerPositions = answerTiles.map(tile => tileBank.findIndex(candidate => candidate.id === tile.id));
+    const answersRemainOrdered = answerPositions.every((position, index) => index === 0 || answerPositions[index - 1] < position);
+    if (answersRemainOrdered && answerTiles.length > 1) {
+      const firstPosition = answerPositions[0];
+      const secondPosition = answerPositions[1];
+      [tileBank[firstPosition], tileBank[secondPosition]] = [tileBank[secondPosition], tileBank[firstPosition]];
+    }
     const extraNote = currentDistractorCount ? `<div class="lesson-tile-note"><strong>Choose only what you need.</strong> Some tiles are extras.</div>` : "";
     $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + `<div class="lesson-tiles">${extraNote}<div class="lesson-tile-answer" id="lessonTileAnswer"></div><div class="lesson-tile-bank" id="lessonTileBank"></div></div>`;
     renderTileControls();
@@ -877,6 +893,7 @@
       if (state.currentStage < STAGES.length - 1) {
         state.unlockedStage = Math.max(state.unlockedStage, state.currentStage + 1);
         state.currentStage++;
+        replayingStage = false;
         stageCursor = firstIncompleteIndex(state.currentStage);
         saveState();
         renderLearn();
@@ -884,8 +901,11 @@
       return;
     }
     if (currentActivity?.type === "teach") completeTeaching();
-    const nextIncomplete = stage.activities.findIndex((activity, index) => index > stageCursor && !activityState(activity).completed);
-    stageCursor = nextIncomplete < 0 ? stage.activities.length : nextIncomplete;
+    if (replayingStage) stageCursor++;
+    else {
+      const nextIncomplete = stage.activities.findIndex((activity, index) => index > stageCursor && !activityState(activity).completed);
+      stageCursor = nextIncomplete < 0 ? stage.activities.length : nextIncomplete;
+    }
     renderLearn();
   }
 
