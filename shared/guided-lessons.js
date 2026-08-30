@@ -248,33 +248,33 @@
 
   const GUIDE_BREAKDOWNS = {
     "open-chunks": [
-      { pieces: [["はじめまして", "nice to meet you · first-meeting opener"]], insight: "Use this when meeting someone for the first time, not as an everyday hello." },
-      { pieces: [["はる", "Haru · a name"], ["です", "am · polite ending"]], insight: "Place your name before です to give it politely: ［name］です。" },
-      { pieces: [["よろしく", "favorably · with goodwill"], ["おねがいします", "please · literally, I make a request"]], insight: "Learn the full expression as a courteous close to an introduction." }
+      { meaning: "Nice to meet you.", pieces: [["はじめまして", "nice to meet you · first-meeting opener"]], insight: "Use this when meeting someone for the first time, not as an everyday hello." },
+      { meaning: "I’m Haru.", pieces: [["はる", "Haru · a name"], ["です", "am · polite ending"]], insight: "Place your name before です to give it politely: ［name］です。" },
+      { meaning: "I look forward to getting to know you.", pieces: [["よろしく", "favorably · with goodwill"], ["おねがいします", "please · literally, I make a request"]], insight: "Learn the full expression as a courteous close to an introduction." }
     ],
     "identity-pattern": [
-      { pieces: [["X", "the topic"], ["は", "topic marker · pronounced wa"], ["Y", "identity or description"], ["です", "is / am · polite ending"]], insight: "Use X は Y です to identify or describe the current topic." },
-      { pieces: [["めいさん", "Mei · さん adds polite respect"], ["は", "topic marker · pronounced wa"], ["がくせい", "student"], ["です", "is · polite ending"]], insight: "Replace Mei and student to create many new identity statements." },
+      { meaning: "X is Y.", pieces: [["X", "the topic"], ["は", "topic marker · pronounced wa"], ["Y", "identity or description"], ["です", "is / am · polite ending"]], insight: "Use X は Y です to identify or describe the current topic." },
+      { meaning: "Mei is a student.", pieces: [["めいさん", "Mei · さん adds polite respect"], ["は", "topic marker · pronounced wa"], ["がくせい", "student"], ["です", "is · polite ending"]], insight: "Replace Mei and student to create many new identity statements." },
       null
     ],
     "ask-pattern": [
-      { pieces: [["がくせい", "student"], ["です", "is / are · polite ending"], ["か", "question marker"]], insight: "Add か after a polite statement to turn it into a yes-or-no question." },
-      { pieces: [["せんこう", "major · field of study"], ["は", "topic marker · pronounced wa"], ["なん", "what"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "Put なん where the missing information belongs, then finish with ですか." },
-      { pieces: [["なん", "what · which"], ["ねんせい", "school year"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "なん combines with ねんせい to ask which school year someone is in." }
+      { meaning: "Are you a student?", pieces: [["がくせい", "student"], ["です", "is / are · polite ending"], ["か", "question marker"]], insight: "Add か after a polite statement to turn it into a yes-or-no question." },
+      { meaning: "What is your major?", pieces: [["せんこう", "major · field of study"], ["は", "topic marker · pronounced wa"], ["なん", "what"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "Put なん where the missing information belongs, then finish with ですか." },
+      { meaning: "What year are you in at school?", pieces: [["なん", "what · which"], ["ねんせい", "school year"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "なん combines with ねんせい to ask which school year someone is in." }
     ],
     "connect-pattern": [
-      { pieces: [["めいさん", "Mei · the associated person"], ["の", "Mei’s · possession or association"], ["なまえ", "name · the main noun"]], insight: "A person before の commonly marks possession or association." },
-      { pieces: [["にほんご", "Japanese language · the field"], ["の", "connects and specifies nouns"], ["がくせい", "student · the main noun"]], insight: "The noun before の specifies the kind of student." },
-      { pieces: [["だいがく", "university · the institution"], ["の", "of · affiliated with"], ["せんせい", "teacher · the main noun"]], insight: "Read from the main noun backward: a teacher associated with a university." }
+      { meaning: "Mei’s name", pieces: [["めいさん", "Mei · the associated person"], ["の", "Mei’s · possession or association"], ["なまえ", "name · the main noun"]], insight: "A person before の commonly marks possession or association." },
+      { meaning: "a student of Japanese", pieces: [["にほんご", "Japanese language · the field"], ["の", "connects and specifies nouns"], ["がくせい", "student · the main noun"]], insight: "The noun before の specifies the kind of student." },
+      { meaning: "a university teacher", pieces: [["だいがく", "university · the institution"], ["の", "of · affiliated with"], ["せんせい", "teacher · the main noun"]], insight: "Read from the main noun backward: a teacher associated with a university." }
     ],
     "details-context": [
-      { pieces: [["なんさい", "how old · what age"], ["です", "is · polite ending"], ["か", "question marker"], ["はたち", "20 years old · special reading"], ["です", "is · polite ending"]], insight: "Learn はたち as the complete conversational answer for age 20." },
-      { pieces: [["なん", "what · which"], ["ねんせい", "school year"], ["ですか", "is it? · polite question"], ["よねんせい", "fourth-year student · special よ reading"], ["です", "is · polite ending"]], insight: "Four uses the special reading よ inside よねんせい." },
-      { pieces: [["でんわばんごう", "telephone number"], ["は", "topic marker · pronounced wa"], ["なんばん", "what number"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "The complete topic でんわばんごう comes before は; なんばん asks for the number." },
-      { pieces: [["なんじ", "what time"], ["ですか", "is it? · polite question"], ["よじ", "four o’clock · special よ reading"], ["はん", "half past"], ["です", "is · polite ending"]], insight: "Attach はん after the hour to express half past: よじはん is 4:30." }
+      { meaning: "How old are you? → I’m 20.", pieces: [["なんさい", "how old · what age"], ["です", "is · polite ending"], ["か", "question marker"], ["はたち", "20 years old · special reading"], ["です", "is · polite ending"]], insight: "Learn はたち as the complete conversational answer for age 20." },
+      { meaning: "What year are you in? → I’m a fourth-year student.", pieces: [["なん", "what · which"], ["ねんせい", "school year"], ["ですか", "is it? · polite question"], ["よねんせい", "fourth-year student · special よ reading"], ["です", "is · polite ending"]], insight: "Four uses the special reading よ inside よねんせい." },
+      { meaning: "What is your telephone number?", pieces: [["でんわばんごう", "telephone number"], ["は", "topic marker · pronounced wa"], ["なんばん", "what number"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "The complete topic でんわばんごう comes before は; なんばん asks for the number." },
+      { meaning: "What time is it? → It’s 4:30.", pieces: [["なんじ", "what time"], ["ですか", "is it? · polite question"], ["よじ", "four o’clock · special よ reading"], ["はん", "half past"], ["です", "is · polite ending"]], insight: "Attach はん after the hour to express half past: よじはん is 4:30." }
     ],
     "mission-setup": [
-      { pieces: [["はじめまして", "nice to meet you"], ["たなか", "Tanaka · family name"], ["あおい", "Aoi · given name"], ["です", "am · polite ending"]], insight: "Aoi opens the meeting and then supplies her name with です." }
+      { meaning: "Nice to meet you. I’m Aoi Tanaka.", pieces: [["はじめまして", "nice to meet you"], ["たなか", "Tanaka · family name"], ["あおい", "Aoi · given name"], ["です", "am · polite ending"]], insight: "Aoi opens the meeting and then supplies her name with です." }
     ]
   };
 
@@ -431,7 +431,7 @@
       const example = row.querySelector("strong")?.textContent || "";
       const panelId = `lessonGuide-${activity.id}-${index}`;
       row.classList.add("lesson-guide-row");
-      row.innerHTML = `<button class="lesson-guide-toggle" type="button" aria-expanded="false" aria-controls="${panelId}"><span class="lesson-guide-copy"><span>${escapeHtml(label)}</span><strong>${escapeHtml(example)}</strong></span><span class="lesson-guide-action">Breakdown <span class="lesson-guide-icon" aria-hidden="true"><svg viewBox="0 0 16 16" focusable="false"><path d="M3.5 6 8 10.5 12.5 6" /></svg></span></span></button><div class="lesson-guide-detail" id="${panelId}" hidden><div class="lesson-breakdown-pieces">${detail.pieces.map(([piece, meaning]) => `<span class="lesson-breakdown-piece"><strong>${escapeHtml(piece)}</strong><small>${escapeHtml(meaning)}</small></span>`).join("")}</div><p><strong>Pattern:</strong> ${escapeHtml(detail.insight)}</p></div>`;
+      row.innerHTML = `<button class="lesson-guide-toggle" type="button" aria-expanded="false" aria-controls="${panelId}"><span class="lesson-guide-copy"><span>${escapeHtml(label)}</span><strong>${escapeHtml(example)}</strong></span><span class="lesson-guide-action">Breakdown <span class="lesson-guide-icon" aria-hidden="true"><svg viewBox="0 0 16 16" focusable="false"><path d="M3.5 6 8 10.5 12.5 6" /></svg></span></span></button><div class="lesson-guide-detail" id="${panelId}" hidden><div class="lesson-guide-meaning"><span>Natural meaning</span><strong>${escapeHtml(detail.meaning)}</strong></div><div class="lesson-breakdown-pieces">${detail.pieces.map(([piece, meaning]) => `<span class="lesson-breakdown-piece"><strong>${escapeHtml(piece)}</strong><small>${escapeHtml(meaning)}</small></span>`).join("")}</div><p><strong>Pattern:</strong> ${escapeHtml(detail.insight)}</p></div>`;
     });
 
     const toggles = rows.flatMap(row => [...row.querySelectorAll(".lesson-guide-toggle")]);
