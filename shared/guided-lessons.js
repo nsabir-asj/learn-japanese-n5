@@ -179,7 +179,7 @@
         {
           id: "mission-setup", type: "teach", skill: "Conversation", kicker: "Conversation mission", title: "Meet Aoi without memorising a script",
           instruction: "Aoi’s information is new, but every conversational job is familiar: greet, identify, ask, understand, and close.",
-          body: `<div class="lesson-speaker"><div class="lesson-avatar">葵</div><div><strong>Aoi Tanaka</strong><span>University student · biology · third year · 21 years old</span></div></div><div class="lesson-rule">Choose what performs the right conversational job. Some wrong options are grammatical Japanese but do not fit the moment.</div>`,
+          body: `<div class="lesson-speaker"><div class="lesson-avatar">葵</div><div><strong>Aoi Tanaka</strong><span>University student · biology · third year · 21 years old</span></div></div><div class="lesson-model"><div class="lesson-model-row"><span>Aoi’s opening</span><strong>はじめまして。たなか あおいです。</strong></div></div><div class="lesson-rule">Choose what performs the right conversational job. Some wrong options are grammatical Japanese but do not fit the moment.</div>`,
           audioText: "はじめまして。たなか、あおいです。"
         },
         {
@@ -239,13 +239,45 @@
     "mission-close": [["そうですか", "I see · acknowledges new information"], ["よろしくおねがいします", "please treat me kindly · polite close"]]
   };
 
+  const GUIDE_BREAKDOWNS = {
+    "open-chunks": [
+      { pieces: [["はじめまして", "nice to meet you · first-meeting opener"]], insight: "Use this when meeting someone for the first time, not as an everyday hello." },
+      { pieces: [["はる", "Haru · a name"], ["です", "am · polite ending"]], insight: "Place your name before です to give it politely: ［name］です。" },
+      { pieces: [["よろしく", "favorably · with goodwill"], ["おねがいします", "please · literally, I make a request"]], insight: "Learn the full expression as a courteous close to an introduction." }
+    ],
+    "identity-pattern": [
+      { pieces: [["X", "the topic"], ["は", "topic marker · pronounced wa"], ["Y", "identity or description"], ["です", "is / am · polite ending"]], insight: "Use X は Y です to identify or describe the current topic." },
+      { pieces: [["めいさん", "Mei · さん adds polite respect"], ["は", "topic marker · pronounced wa"], ["がくせい", "student"], ["です", "is · polite ending"]], insight: "Replace Mei and student to create many new identity statements." },
+      null
+    ],
+    "ask-pattern": [
+      { pieces: [["がくせい", "student"], ["です", "is / are · polite ending"], ["か", "question marker"]], insight: "Add か after a polite statement to turn it into a yes-or-no question." },
+      { pieces: [["せんこう", "major · field of study"], ["は", "topic marker · pronounced wa"], ["なん", "what"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "Put なん where the missing information belongs, then finish with ですか." },
+      { pieces: [["なん", "what · which"], ["ねんせい", "school year"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "なん combines with ねんせい to ask which school year someone is in." }
+    ],
+    "connect-pattern": [
+      { pieces: [["めいさん", "Mei · the associated person"], ["の", "Mei’s · possession or association"], ["なまえ", "name · the main noun"]], insight: "A person before の commonly marks possession or association." },
+      { pieces: [["にほんご", "Japanese language · the field"], ["の", "connects and specifies nouns"], ["がくせい", "student · the main noun"]], insight: "The noun before の specifies the kind of student." },
+      { pieces: [["だいがく", "university · the institution"], ["の", "of · affiliated with"], ["せんせい", "teacher · the main noun"]], insight: "Read from the main noun backward: a teacher associated with a university." }
+    ],
+    "details-context": [
+      { pieces: [["なんさい", "how old · what age"], ["です", "is · polite ending"], ["か", "question marker"], ["はたち", "20 years old · special reading"], ["です", "is · polite ending"]], insight: "Learn はたち as the complete conversational answer for age 20." },
+      { pieces: [["なん", "what · which"], ["ねんせい", "school year"], ["ですか", "is it? · polite question"], ["よねんせい", "fourth-year student · special よ reading"], ["です", "is · polite ending"]], insight: "Four uses the special reading よ inside よねんせい." },
+      { pieces: [["でんわばんごう", "telephone number"], ["は", "topic marker · pronounced wa"], ["なんばん", "what number"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "The complete topic でんわばんごう comes before は; なんばん asks for the number." },
+      { pieces: [["なんじ", "what time"], ["ですか", "is it? · polite question"], ["よじ", "four o’clock · special よ reading"], ["はん", "half past"], ["です", "is · polite ending"]], insight: "Attach はん after the hour to express half past: よじはん is 4:30." }
+    ],
+    "mission-setup": [
+      { pieces: [["はじめまして", "nice to meet you"], ["たなか", "Tanaka · family name"], ["あおい", "Aoi · given name"], ["です", "am · polite ending"]], insight: "Aoi opens the meeting and then supplies her name with です." }
+    ]
+  };
+
   const ALL_ACTIVITIES = STAGES.flatMap((stage, stageIndex) => stage.activities.map((activity, activityIndex) => ({ ...activity, stageIndex, activityIndex })));
   const GRADED_ACTIVITIES = ALL_ACTIVITIES.filter(activity => activity.type !== "teach");
 
   function defaultState() {
     return {
       version: VERSION, unlockedStage: 0, currentStage: 0, total: 0, correct: 0, streak: 0, bestStreak: 0,
-      activities: {}, recent: [], profile: { name: "", home: "", role: "", field: "", year: "", age: "" }, savedAt: 0
+      activities: {}, recent: [], viewedGuides: [], profile: { name: "", home: "", role: "", field: "", year: "", age: "" }, savedAt: 0
     };
   }
 
@@ -370,8 +402,45 @@
   function renderTeach(activity) {
     const personalized = activity.id === "mission-setup" ? profileMissionCard() : "";
     $("#lessonActivity").innerHTML = activityHeading(activity) + activity.body + personalized;
+    enhanceGuideExamples(activity);
     $("#lessonNext").classList.remove("hidden");
     $("#lessonKeyboardHint").textContent = "Read for meaning, listen once, then continue into retrieval practice.";
+  }
+
+  function enhanceGuideExamples(activity) {
+    const guide = GUIDE_BREAKDOWNS[activity.id];
+    if (!guide) return;
+    const rows = [...$("#lessonActivity").querySelectorAll(".lesson-model-row")].slice(0, guide.length);
+    state.viewedGuides = Array.isArray(state.viewedGuides) ? state.viewedGuides : [];
+    const firstVisit = !state.viewedGuides.includes(activity.id);
+    const model = rows[0]?.parentElement;
+    if (model) model.insertAdjacentHTML("afterbegin", `<p class="lesson-guide-help">Open an example to see what each part means.</p>`);
+
+    rows.forEach((row, index) => {
+      const detail = guide[index];
+      if (!detail) return;
+      const label = row.querySelector("span")?.textContent || "Example";
+      const example = row.querySelector("strong")?.textContent || "";
+      const panelId = `lessonGuide-${activity.id}-${index}`;
+      row.classList.add("lesson-guide-row");
+      row.innerHTML = `<button class="lesson-guide-toggle" type="button" aria-expanded="false" aria-controls="${panelId}"><span class="lesson-guide-copy"><span>${escapeHtml(label)}</span><strong>${escapeHtml(example)}</strong></span><span class="lesson-guide-action">Breakdown <span class="lesson-guide-chevron" aria-hidden="true">⌄</span></span></button><div class="lesson-guide-detail" id="${panelId}" hidden><div class="lesson-breakdown-pieces">${detail.pieces.map(([piece, meaning]) => `<span class="lesson-breakdown-piece"><strong>${escapeHtml(piece)}</strong><small>${escapeHtml(meaning)}</small></span>`).join("")}</div><p><strong>Pattern:</strong> ${escapeHtml(detail.insight)}</p></div>`;
+    });
+
+    const toggles = rows.flatMap(row => [...row.querySelectorAll(".lesson-guide-toggle")]);
+    const setOpen = (button, open) => {
+      button.setAttribute("aria-expanded", String(open));
+      button.closest(".lesson-guide-row").querySelector(".lesson-guide-detail").hidden = !open;
+    };
+    toggles.forEach(button => button.addEventListener("click", () => {
+      const open = button.getAttribute("aria-expanded") !== "true";
+      toggles.forEach(other => setOpen(other, false));
+      setOpen(button, open);
+    }));
+    if (firstVisit && toggles[0]) {
+      setOpen(toggles[0], true);
+      state.viewedGuides.push(activity.id);
+      saveState();
+    }
   }
 
   function profileMissionCard() {
