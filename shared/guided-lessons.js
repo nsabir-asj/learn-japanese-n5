@@ -13,13 +13,33 @@
 
   const STAGES = [
     {
-      id: "open", title: "Open the conversation", short: "Greetings that fit the moment", outcome: "Begin and close a first meeting naturally.",
+      id: "open", title: "Greetings that fit the moment", short: "Time, courtesy, home, meals, and first meetings", outcome: "Choose greetings by situation and relationship instead of translating one universal hello.",
       activities: [
         {
           id: "open-chunks", type: "teach", skill: "Conversation", kicker: "Useful chunks first", title: "Start with language you can use today",
           instruction: "Learn these as complete conversational actions. We will take them apart only when that helps you create new sentences.",
-          body: `<div class="lesson-model"><div class="lesson-model-row"><span>Meeting for the first time</span><strong>はじめまして。</strong></div><div class="lesson-model-row"><span>Giving your name</span><strong>はるです。</strong></div><div class="lesson-model-row"><span>Closing the introduction</span><strong>よろしくおねがいします。</strong></div></div><div class="lesson-rule"><strong>Memory cue:</strong> a first introduction has three moves—open, identify yourself, and close warmly.</div>`,
-          audioText: "はじめまして。はるです。よろしくおねがいします。"
+          body: `<div class="lesson-model"><div class="lesson-model-row"><span>Time of day</span><strong>おはようございます。／こんにちは。／こんばんは。</strong></div><div class="lesson-model-row"><span>Courtesy</span><strong>すみません。／ありがとうございます。／いいえ。</strong></div><div class="lesson-model-row"><span>Leaving and returning</span><strong>いってきます。↔ いってらっしゃい。／ただいま。↔ おかえりなさい。</strong></div><div class="lesson-model-row"><span>Meals</span><strong>いただきます。↔ ごちそうさまでした。</strong></div><div class="lesson-model-row"><span>First meeting</span><strong>はじめまして。［name］です。よろしくおねがいします。</strong></div></div><div class="lesson-rule"><strong>Conversation first:</strong> these expressions perform social jobs. Learn the situation and response together instead of treating them as interchangeable translations.</div>`,
+          audioText: "おはようございます。すみません。ありがとうございます。はじめまして。よろしくおねがいします。"
+        },
+        {
+          id: "greet-time", type: "choice", skill: "Conversation", kicker: "Match the moment", title: "It is 8 p.m. and you meet your teacher.", prompt: "Which greeting fits the time and relationship?",
+          options: ["こんばんは。", "おはよう。", "いただきます。", "ただいま。"], answer: 0,
+          correction: "こんばんは。", explanation: "こんばんは is the evening greeting. The time of day matters more than translating a general English hello.", audioText: "こんばんは。"
+        },
+        {
+          id: "greet-courtesy", type: "choice", skill: "Listening", kicker: "One phrase, several jobs", title: "Why did the speaker say this?", prompt: "Listen and choose the situation that best fits.",
+          listenOnly: true, audioText: "すみません。", options: ["They need attention or are apologising", "They have finished eating", "They arrived home", "They are meeting for the first time"], answer: 0,
+          correction: "すみません。", explanation: "すみません can get attention, apologise, or express appreciative indebtedness. Context tells you which job it performs."
+        },
+        {
+          id: "greet-home", type: "choice", skill: "Conversation", kicker: "Learn the exchange", title: "You are leaving home and plan to return.", prompt: "What do you say, and what does the family answer?",
+          options: ["いってきます。→ いってらっしゃい。", "ただいま。→ おかえりなさい。", "いただきます。→ いいえ。", "さようなら。→ おやすみなさい。"], answer: 0,
+          correction: "いってきます。→ いってらっしゃい。", explanation: "The leaving expression literally carries the idea of going and coming back; the reply sends the person off safely.", audioText: "いってきます。いってらっしゃい。"
+        },
+        {
+          id: "greet-meal", type: "choice", skill: "Conversation", kicker: "Before and after", title: "You have just finished a meal.", prompt: "Which expression belongs after eating?",
+          options: ["ごちそうさまでした。", "いただきます。", "おかえりなさい。", "はじめまして。"], answer: 0,
+          correction: "ごちそうさまでした。", explanation: "いただきます comes before eating; ごちそうさまでした expresses appreciation after the meal.", audioText: "ごちそうさまでした。"
         },
         {
           id: "open-situation", type: "choice", skill: "Conversation", kicker: "Choose by situation", title: "You meet a new classmate for the first time.",
@@ -46,7 +66,7 @@
       ]
     },
     {
-      id: "identity", title: "Say who you are", short: "Identity statements with は and です", outcome: "Create simple statements about yourself and other people.",
+      id: "identity", title: "Meet and introduce yourself", short: "Name, role, affiliation, and natural omission", outcome: "Give a short introduction and understand how です identifies people and information.",
       activities: [
         {
           id: "identity-pattern", type: "teach", skill: "Grammar", kicker: "Grammar when you need it", title: "Use X は Y です to identify someone",
@@ -75,6 +95,63 @@
           tokens: ["めいさんは", "かいしゃいん", "です。"], answer: ["めいさんは", "かいしゃいん", "です。"], correction: "めいさんは かいしゃいんです。",
           distractors: ["わたしは", "がくせい", "か。", "の"], learnExtras: 1,
           explanation: "The same frame works for many identities: student, teacher, office worker, nationality, major, and more.", audioText: "めいさんは、かいしゃいんです。"
+        },
+        {
+          id: "intro-listen", type: "choice", skill: "Listening", kicker: "Follow a real introduction", title: "What did Emi tell you?", prompt: "Listen without Japanese text, then choose the complete meaning.",
+          listenOnly: true, audioText: "はじめまして。えみです。だいがくせいです。にねんせいです。よろしくおねがいします。", options: ["She is Emi, a second-year university student", "She is Mei, a second-year teacher", "She is Emi, 20 years old", "She is a university professor named Emi"], answer: 0,
+          correction: "Emi · university student · second year", explanation: "A Japanese introduction can move through name, role or affiliation, and school year without repeating わたしは before every sentence."
+        },
+        {
+          id: "intro-build", type: "tiles", skill: "Production", kicker: "Build a useful introduction", title: "Introduce Ren as a first-year international student.", prompt: "Choose the useful chunks and put them in a natural order.",
+          tokens: ["はじめまして。", "れんです。", "りゅうがくせいです。", "いちねんせいです。", "よろしくおねがいします。"], answer: ["はじめまして。", "れんです。", "りゅうがくせいです。", "いちねんせいです。", "よろしくおねがいします。"],
+          distractors: ["なんさいですか。", "せんせいです。", "ごちそうさまでした。", "いいえ。"], learnExtras: 2,
+          correction: "はじめまして。れんです。りゅうがくせいです。いちねんせいです。よろしくおねがいします。", explanation: "A compact introduction gives information in useful chunks and omits an already obvious subject.", audioText: "はじめまして。れんです。りゅうがくせいです。いちねんせいです。よろしくおねがいします。"
+        },
+        {
+          id: "identity-flex", type: "choice", skill: "Grammar", kicker: "Let context do its work", title: "A group points to two new classmates and says: がくせいです。", prompt: "Which translation can fit the Japanese?",
+          options: ["They are students.", "Only: I am one student.", "They are not students.", "Are they students?"], answer: 0,
+          correction: "They are students.", explanation: "Japanese nouns do not add English-style articles or plural endings. Context supplies who and whether the noun is singular or plural.", audioText: "がくせいです。"
+        }
+      ]
+    },
+    {
+      id: "people", title: "Say who someone is", short: "School, nationality, work, and majors", outcome: "Recognise and produce the personal vocabulary that makes Lesson 1 conversations useful.",
+      activities: [
+        {
+          id: "people-pattern", type: "teach", skill: "Vocabulary", kicker: "Build a useful personal toolkit", title: "Learn personal information in connected groups",
+          instruction: "Do not memorise an alphabetical list. Learn each word inside the kind of information it answers.",
+          body: `<div class="lesson-model"><div class="lesson-model-row"><span>School</span><strong>だいがく・こうこう・がくせい・だいがくせい・りゅうがくせい・せんせい</strong></div><div class="lesson-model-row"><span>People</span><strong>わたし・ともだち・～さん・～じん</strong></div><div class="lesson-model-row"><span>Work</span><strong>かいしゃいん・いしゃ・かんごし・べんごし</strong></div><div class="lesson-model-row"><span>Majors</span><strong>にほんご・れきし・けいざい・こうがく・せいぶつがく</strong></div></div><div class="lesson-rule"><strong>Usefulness rule:</strong> begin with words that describe you and people you actually meet. Less relevant countries, occupations, and majors can enter Practice later as recognition vocabulary.</div>`,
+          audioText: "だいがくせい。りゅうがくせい。かいしゃいん。いしゃ。かんごし。べんごし。"
+        },
+        {
+          id: "people-nationality", type: "choice", skill: "Vocabulary", kicker: "Build nationality", title: "ミナさんは インドじんです。", prompt: "What does ～じん contribute?",
+          options: ["A person from a country", "A language", "A school year", "An occupation"], answer: 0,
+          correction: "インドじん · an Indian person", explanation: "Attach ～じん to a country name to describe nationality or national origin.", audioText: "ミナさんは、インドじんです。"
+        },
+        {
+          id: "people-work", type: "choice", skill: "Listening", kicker: "Recognise an occupation", title: "What is Aya’s occupation?", prompt: "Listen and choose the occupation.",
+          listenOnly: true, audioText: "あやさんは、かんごしです。", options: ["Nurse", "Doctor", "Office worker", "Lawyer"], answer: 0,
+          correction: "かんごし · nurse", explanation: "Occupations work in the same X は Y です frame as student status and nationality."
+        },
+        {
+          id: "people-build", type: "tiles", skill: "Production", kicker: "Describe someone new", title: "Build: “Ken is a doctor.”", prompt: "Choose the correct occupation and form the statement.",
+          tokens: ["けんさんは", "いしゃ", "です。"], answer: ["けんさんは", "いしゃ", "です。"], distractors: ["かんごし", "べんごし", "か。", "の"], learnExtras: 2,
+          correction: "けんさんは いしゃです。", explanation: "The person is the topic; the occupation supplies the identifying information.", audioText: "けんさんは、いしゃです。"
+        },
+        {
+          id: "people-major", type: "choice", skill: "Listening", kicker: "Hear a field of study", title: "What is Rina’s major?", prompt: "Listen, then choose the field.",
+          listenOnly: true, audioText: "りなさんの、せんこうは、けいざいです。", options: ["Economics", "History", "Engineering", "Biology"], answer: 0,
+          correction: "けいざい · economics", explanation: "せんこう identifies the category; the final noun supplies the field of study."
+        },
+        {
+          id: "people-school", type: "choice", skill: "Vocabulary", kicker: "Student types", title: "Which word means “international student”?", prompt: "Choose the useful school identity.",
+          options: ["りゅうがくせい", "だいがく", "こうこう", "かいしゃいん"], answer: 0,
+          correction: "りゅうがくせい", explanation: "りゅうがくせい is a student studying abroad. だいがく is a university, while こうこう is a high school.", audioText: "りゅうがくせいです。"
+        },
+        {
+          id: "people-transfer", type: "tiles", skill: "Production", kicker: "Use the same grammar with new content", title: "Build: “Mika is a Japanese international student.”", prompt: "Combine nationality and student status into a compact description.",
+          tokens: ["みかさんは", "にほんじんの", "りゅうがくせい", "です。"], answer: ["みかさんは", "にほんじんの", "りゅうがくせい", "です。"], distractors: ["なん", "か。", "せんせい", "は"], learnExtras: 2,
+          correction: "みかさんは にほんじんの りゅうがくせいです。", explanation: "にほんじんの narrows the kind of international student; the full phrase identifies Mika.", audioText: "みかさんは、にほんじんの、りゅうがくせいです。"
         }
       ]
     },
@@ -107,6 +184,57 @@
           id: "ask-listen-age", type: "choice", skill: "Listening", kicker: "Recognize the question", title: "What information is being requested?", prompt: "Listen without Japanese text.",
           listenOnly: true, audioText: "なんさいですか。", options: ["Age", "School year", "Telephone number", "Current time"], answer: 0,
           correction: "なんさいですか。", explanation: "なんさい asks how many years old someone is. Keep it distinct from なんねんせい, which asks a school year."
+        },
+        {
+          id: "ask-phone-kind", type: "choice", skill: "Grammar", kicker: "Choose the right question word", title: "The answer is a telephone number.", prompt: "Which question asks for that information?",
+          options: ["でんわばんごうは なんばんですか。", "なんねんせいですか。", "なんさいですか。", "せんこうは なにですか。"], answer: 0,
+          correction: "でんわばんごうは なんばんですか。", explanation: "なんばん asks which number; the topic tells the listener that the number is a telephone number.", audioText: "でんわばんごうは、なんばんですか。"
+        }
+      ]
+    },
+    {
+      id: "natural", title: "Names, titles, and natural conversation", short: "さん, せんせい, あのう, and useful responses", outcome: "Address people respectfully and make personal questions sound like real conversation.",
+      activities: [
+        {
+          id: "natural-pattern", type: "teach", skill: "Conversation", kicker: "Grammar is also social", title: "Choose language that fits the relationship",
+          instruction: "Natural Japanese depends on who is speaking, who is being addressed, and what the listener already knows.",
+          body: `<div class="lesson-model"><div class="lesson-model-row"><span>Name and title</span><strong>たなか あおいさん／やましたせんせい</strong></div><div class="lesson-model-row"><span>Address the listener</span><strong>あおいさんは がくせいですか。</strong></div><div class="lesson-model-row"><span>Soften a question</span><strong>あのう、りゅうがくせいですか。</strong></div><div class="lesson-model-row"><span>Confirm and acknowledge</span><strong>そうです。／そうですか。／そうですね。</strong></div><div class="lesson-model-row"><span>Two forms of “what”</span><strong>なんですか。／なにを…</strong></div></div><div class="lesson-rule"><strong>Names:</strong> Japanese names normally place the family name first. さん follows another person’s name; it is not normally attached to your own name. A title such as せんせい can replace さん.</div>`,
+          audioText: "あのう、あおいさんは、りゅうがくせいですか。そうです。そうですか。"
+        },
+        {
+          id: "natural-san", type: "choice", skill: "Culture", kicker: "Use titles respectfully", title: "You introduce yourself as Haru.", prompt: "Which version is natural?",
+          options: ["はるです。", "はるさんです。", "あなたはるです。", "はるせんせいですか。"], answer: 0,
+          correction: "はるです。", explanation: "さん is generally attached to another person’s name, not your own name when introducing yourself.", audioText: "はるです。"
+        },
+        {
+          id: "natural-order", type: "choice", skill: "Culture", kicker: "Read a Japanese name", title: "たなか あおい", prompt: "Which part is normally the family name?",
+          options: ["たなか", "あおい", "Both are titles", "Japanese names have no family name"], answer: 0,
+          correction: "たなか · family name", explanation: "Japanese names normally put the family name before the given name. Aoi is the given name here."
+        },
+        {
+          id: "natural-address", type: "choice", skill: "Conversation", kicker: "Avoid unnecessary あなた", title: "You are speaking directly to Aoi.", prompt: "Which question sounds most natural?",
+          options: ["あおいさんは がくせいですか。", "あなたさんは がくせいですか。", "わたしは あおいですか。", "がくせいの あなたですか。"], answer: 0,
+          correction: "あおいさんは がくせいですか。", explanation: "Japanese commonly uses the listener’s name and title instead of repeatedly saying あなた.", audioText: "あおいさんは、がくせいですか。"
+        },
+        {
+          id: "natural-anou", type: "choice", skill: "Conversation", kicker: "Enter politely", title: "You want to ask a stranger a personal question.", prompt: "Which opening gently gets attention and shows hesitation?",
+          options: ["あのう…", "いただきます。", "ただいま。", "さようなら。"], answer: 0,
+          correction: "あのう…", explanation: "あのう gets attention or softens what comes next, especially when interrupting or asking something personal.", audioText: "あのう。"
+        },
+        {
+          id: "natural-sou", type: "choice", skill: "Conversation", kicker: "Confirm versus acknowledge", title: "Aoi says she is a biology major.", prompt: "Which response naturally means “I see”?",
+          options: ["そうですか。", "そうです。", "なんですか。", "いいえ、せいぶつがくです。"], answer: 0,
+          correction: "そうですか。", explanation: "そうです confirms “That’s right.” そうですか, often with falling intonation, acknowledges new information as “I see.”", audioText: "そうですか。"
+        },
+        {
+          id: "natural-nan-nani", type: "choice", skill: "Grammar", kicker: "Two readings of 何", title: "Complete: せんこうは ___ ですか。", prompt: "Which form normally comes before です?",
+          options: ["なん", "なに", "だれ", "なんさい"], answer: 0,
+          correction: "せんこうは なんですか。", explanation: "なん commonly appears before です and counters. なに appears in many other environments; Lesson 1 only needs this reliable starting distinction.", audioText: "せんこうは、なんですか。"
+        },
+        {
+          id: "natural-sensei", type: "choice", skill: "Culture", kicker: "Use occupational titles carefully", title: "You are describing Professor Yamashita.", prompt: "Which sentence is appropriate?",
+          options: ["やましたせんせいは にほんごの せんせいです。", "やましたさんは わたしです。", "わたしさんは せんせいです。", "あなたせんせいです。"], answer: 0,
+          correction: "やましたせんせいは にほんごの せんせいです。", explanation: "せんせい can respectfully follow Yamashita’s name as a title. にほんごの せんせい then describes the occupation without the empty repetition “the teacher is a teacher.”", audioText: "やましたせんせいは、にほんごの、せんせいです。"
         }
       ]
     },
@@ -116,7 +244,7 @@
         {
           id: "connect-pattern", type: "teach", skill: "Grammar", kicker: "One relationship, many uses", title: "Use の to connect two nouns",
           instruction: "The noun after の is the main idea. The noun before の narrows or identifies it.",
-          body: `<div class="lesson-model"><div class="lesson-model-row"><span>Person → possession</span><strong>めいさんの なまえ</strong></div><div class="lesson-model-row"><span>Field → kind of person</span><strong>にほんごの がくせい</strong></div><div class="lesson-model-row"><span>Institution → affiliation</span><strong>だいがくの せんせい</strong></div></div><div class="lesson-rule"><strong>Head-noun test:</strong> ask “What kind of thing is the whole phrase?” In だいがくの せんせい, the whole phrase is a kind of せんせい.</div>`,
+          body: `<div class="lesson-model"><div class="lesson-model-row"><span>Person → possession</span><strong>めいさんの なまえ</strong></div><div class="lesson-model-row"><span>Field → kind of person</span><strong>にほんごの がくせい</strong></div><div class="lesson-model-row"><span>Institution → affiliation</span><strong>だいがくの せんせい</strong></div><div class="lesson-model-row"><span>Longer affiliation</span><strong>アリゾナだいがくの がくせい</strong></div><div class="lesson-model-row"><span>Family information</span><strong>あおいさんの おかあさんは かんごしです。</strong></div></div><div class="lesson-rule"><strong>Head-noun test:</strong> ask “What kind of thing is the whole phrase?” The noun after の is the main idea; the material before の narrows it. The complete noun phrase can then become the topic of a sentence.</div>`,
           audioText: "にほんごの、がくせい。"
         },
         {
@@ -140,6 +268,21 @@
           tokens: ["ゆきさんの", "せんこうは", "れきし", "です。"], answer: ["ゆきさんの", "せんこうは", "れきし", "です。"], correction: "ゆきさんの せんこうは れきしです。",
           distractors: ["なん", "か。", "がくせい", "の"], learnExtras: 2,
           explanation: "ゆきさんの modifies せんこう. The complete noun phrase then becomes the topic marked by は.", audioText: "ゆきさんの、せんこうは、れきしです。"
+        },
+        {
+          id: "connect-nested", type: "choice", skill: "Grammar", kicker: "Read a longer noun phrase", title: "ロンドンだいがくの がくせい", prompt: "What is the main idea of the complete phrase?",
+          options: ["A student", "London", "A university", "A teacher"], answer: 0,
+          correction: "a student at the University of London", explanation: "がくせい is the final noun and main idea; ロンドンだいがく tells you the student’s institution.", audioText: "ロンドンだいがくの、がくせい。"
+        },
+        {
+          id: "connect-family", type: "choice", skill: "Vocabulary", kicker: "Read family relationships", title: "あおいさんの おにいさん", prompt: "Who is this?",
+          options: ["Aoi’s older brother", "Aoi’s younger brother", "Aoi’s father", "A teacher named Aoi"], answer: 0,
+          correction: "あおいさんの おにいさん · Aoi’s older brother", explanation: "Family words combine naturally with a person’s name and の to identify whose relative is being discussed.", audioText: "あおいさんの、おにいさん。"
+        },
+        {
+          id: "connect-family-build", type: "tiles", skill: "Production", kicker: "Describe a family member", title: "Build: “Aoi’s mother is a nurse.”", prompt: "Make the family noun phrase the topic, then identify the occupation.",
+          tokens: ["あおいさんの", "おかあさんは", "かんごし", "です。"], answer: ["あおいさんの", "おかあさんは", "かんごし", "です。"], distractors: ["おとうさんは", "いしゃ", "なんさい", "か。"], learnExtras: 2,
+          correction: "あおいさんの おかあさんは かんごしです。", explanation: "あおいさんの modifies おかあさん; the whole family phrase becomes the topic before the occupation.", audioText: "あおいさんの、おかあさんは、かんごしです。"
         }
       ]
     },
@@ -149,7 +292,7 @@
         {
           id: "details-context", type: "teach", skill: "Details", kicker: "Apply number knowledge", title: "Numbers change shape inside useful expressions",
           instruction: "Kana Mix already teaches general number construction. Here, focus only on the forms required for conversation.",
-          body: `<div class="lesson-model"><div class="lesson-model-row"><span>Age</span><strong>なんさいですか。→ はたちです。</strong></div><div class="lesson-model-row"><span>School year</span><strong>なんねんせいですか。→ よねんせいです。</strong></div><div class="lesson-model-row"><span>Telephone</span><strong>でんわばんごうは なんばんですか。</strong></div><div class="lesson-model-row"><span>Time</span><strong>なんじですか。→ よじはんです。</strong></div></div><div class="lesson-rule">Irregular readings are easier to remember as complete answers—はたちです, よねんせいです, よじです—rather than as detached exceptions. Repeat a telephone number with ですね to confirm what you heard.</div>`,
+          body: `<div class="lesson-model"><div class="lesson-model-row"><span>Age</span><strong>なんさいですか。→ はたちです。</strong></div><div class="lesson-model-row"><span>School year</span><strong>なんねんせいですか。→ よねんせいです。</strong></div><div class="lesson-model-row"><span>Telephone</span><strong>でんわばんごうは なんばんですか。→ 3084ですね。</strong></div><div class="lesson-model-row"><span>Time</span><strong>いま なんじですか。→ ごご よじはんです。</strong></div><div class="lesson-model-row"><span>Special clock readings</span><strong>よじ・しちじ・くじ</strong></div></div><div class="lesson-rule">Irregular readings are easier to remember as complete answers—はたちです, よねんせいです, よじです—rather than as detached exceptions. Use ごぜん for a.m., ごご for p.m., はん for half past, and ですね to confirm a number you heard.</div>`,
           audioText: "なんじですか。よじはんです。"
         },
         {
@@ -176,6 +319,36 @@
           id: "details-time-listen", type: "input", skill: "Listening", kicker: "Hear a complete time", title: "What time did you hear?", prompt: "Enter the time using digits and a colon.",
           audioText: "ごぜん、くじはんです。", answers: ["9:30", "09:30"], inputMode: "text", placeholder: "9:30", correction: "9:30 a.m. · ごぜん くじはん",
           explanation: "ごぜん signals a.m.; くじ is nine o’clock and はん adds half past."
+        },
+        {
+          id: "details-age-listen", type: "input", skill: "Listening", kicker: "Decode an age", title: "How old is the person?", prompt: "Listen and enter only the age in digits.",
+          audioText: "さんじゅうごさいです。", answers: ["35"], inputMode: "numeric", placeholder: "Age", correction: "35 years old · さんじゅうごさい",
+          explanation: "Age attaches さい to the number. Important sound changes return through Practice rather than being memorised as an isolated chart."
+        },
+        {
+          id: "details-phone-long", type: "input", skill: "Listening", kicker: "Longer telephone decoding", title: "Enter the complete telephone number.", prompt: "Listen to each digit. Hyphens are optional.",
+          audioText: "はち、ろく、なな、ご、さん、ぜろ、きゅう", answers: ["8675309", "867-5309"], inputMode: "tel", placeholder: "867-5309", correction: "867-5309",
+          explanation: "Telephone numbers are decoded one digit at a time. Seven is often なな and nine is often きゅう because they are easy to distinguish."
+        },
+        {
+          id: "details-confirm", type: "choice", skill: "Conversation", kicker: "Confirm what you heard", title: "Someone says their number is 3084.", prompt: "Which response naturally checks the number?",
+          options: ["3084ですね。", "3084ですか。なんさいです。", "いいえ、よじです。", "3084のせんせいです。"], answer: 0,
+          correction: "3084ですね。", explanation: "ね invites confirmation: “3084, right?” The other person can answer はい、そうです.", audioText: "さん、ぜろ、はち、よん、ですね。"
+        },
+        {
+          id: "details-seven", type: "choice", skill: "Details", kicker: "Special clock reading", title: "The clock shows 7:00.", prompt: "Which answer is standard?",
+          options: ["しちじです。", "ななじです。", "しちさいです。", "ななねんせいです。"], answer: 0,
+          correction: "しちじです。", explanation: "Seven o’clock is しちじ. Clock readings must be learned as time expressions, not copied mechanically from ordinary counting.", audioText: "しちじです。"
+        },
+        {
+          id: "details-world-time", type: "choice", skill: "Conversation", kicker: "Time around the world", title: "It is 7:00 p.m. in London.", prompt: "Which complete answer fits いま なんじですか。?",
+          options: ["ごご しちじです。", "ごぜん ななじです。", "しちねんせいです。", "ごご しちさいです。"], answer: 0,
+          correction: "ごご しちじです。", explanation: "ごご marks p.m.; しちじ is seven o’clock. The same question pattern works for local and world times.", audioText: "ごご、しちじです。"
+        },
+        {
+          id: "details-family-listen", type: "choice", skill: "Listening", kicker: "Combine family, work, and age", title: "What did Aoi say about her mother?", prompt: "Listen and choose both details.",
+          listenOnly: true, audioText: "おかあさんは、かんごしです。よんじゅうごさいです。", options: ["She is a 45-year-old nurse", "She is a 40-year-old doctor", "She is a fourth-year student", "She is a 35-year-old office worker"], answer: 0,
+          correction: "かんごし · よんじゅうごさい", explanation: "The obvious family topic is stated once; the second sentence continues describing the same person."
         }
       ]
     },
@@ -194,6 +367,11 @@
           correction: "はじめまして。よろしくおねがいします。", explanation: "Match the first-meeting opening before moving to personal questions.", audioText: "はじめまして。よろしくおねがいします。"
         },
         {
+          id: "mission-address", type: "choice", skill: "Conversation", kicker: "Mission · enter politely", title: "You want to ask whether Aoi is an international student.", prompt: "Which question addresses her naturally and softens the approach?",
+          options: ["あのう、あおいさんは りゅうがくせいですか。", "あなたさんは なんですか。", "あおいさんの りゅうがくせいです。", "ただいま、りゅうがくせいですか。"], answer: 0,
+          correction: "あのう、あおいさんは りゅうがくせいですか。", explanation: "あのう gently introduces the question; her name plus さん is more natural than unnecessary あなた.", audioText: "あのう、あおいさんは、りゅうがくせいですか。"
+        },
+        {
           id: "mission-understand", type: "choice", skill: "Listening", kicker: "Mission · understand", title: "What did Aoi tell you?", prompt: "Listen, then choose the accurate information.",
           listenOnly: true, audioText: "せんこうは、せいぶつがくです。さんねんせいです。", options: ["Her major is biology and she is a third-year student.", "She teaches biology to third-year students.", "She is 30 years old and studies history.", "Her friend is a biology teacher."], answer: 0,
           correction: "Biology major · third-year student", explanation: "せんこう identifies the field of study; さんねんせい identifies the school year."
@@ -209,6 +387,16 @@
           correction: "21 years old · にじゅういっさい", explanation: "The final いち combines with さい as いっさい. This is a contextual sound change, not a new number system."
         },
         {
+          id: "mission-phone", type: "input", skill: "Listening", kicker: "Mission · exchange details", title: "Aoi shares her telephone number.", prompt: "Listen and type the four digits.",
+          audioText: "に、よん、ろく、はち", answers: ["2468"], inputMode: "numeric", placeholder: "Four digits", correction: "2468",
+          explanation: "Decode each telephone digit independently. Replaying remains available because accurate listening is the target."
+        },
+        {
+          id: "mission-confirm", type: "tiles", skill: "Conversation", kicker: "Mission · confirm", title: "Confirm Aoi’s telephone number: “2468, right?”", prompt: "Build the short confirmation.",
+          tokens: ["2468", "です", "ね。"], answer: ["2468", "です", "ね。"], distractors: ["か。", "なんさい", "の", "いいえ"], learnExtras: 3,
+          correction: "2468ですね。", explanation: "ね turns the repeated information into a friendly confirmation rather than asking the entire question again.", audioText: "に、よん、ろく、はち、ですね。"
+        },
+        {
           id: "mission-close", type: "choice", skill: "Conversation", kicker: "Mission · close", title: "The first exchange is complete.", prompt: "Which response closes it warmly without abruptly changing topics?",
           options: ["そうですか。よろしくおねがいします。", "でんわばんごうはなんばんですか。", "いいえ、はたちです。", "おはようございますか。"], answer: 0,
           correction: "そうですか。よろしくおねがいします。", explanation: "そうですか acknowledges the new information; よろしくおねがいします provides an appropriate first-meeting close.", audioText: "そうですか。よろしくおねがいします。"
@@ -218,6 +406,10 @@
   ];
 
   const ANSWER_BREAKDOWNS = {
+    "greet-time": [["こんばんは", "good evening · used after the day has turned to evening"]],
+    "greet-courtesy": [["すみません", "excuse me / I’m sorry · gets attention, apologises, or shows indebtedness"]],
+    "greet-home": [["いってきます", "I’m leaving and will return · said by the person going out"], ["いってらっしゃい", "go and come back safely · reply from the person staying"]],
+    "greet-meal": [["ごちそうさま", "thanks for the meal · literally acknowledges the feast or effort"], ["でした", "was · makes the expression politely retrospective after eating"]],
     "open-situation": [["はじめまして", "nice to meet you · first-meeting opener"]],
     "open-listen": [["よろしく", "favorably · with goodwill"], ["おねがいします", "please · literally, I make a request"]],
     "open-build": [["はじめまして", "nice to meet you"], ["はる", "Haru"], ["です", "am · polite ending"], ["よろしくおねがいします", "please treat me kindly · polite close"]],
@@ -226,52 +418,99 @@
     "identity-build": [["わたし", "I · me"], ["は", "topic marker · pronounced wa"], ["がくせい", "student"], ["です", "am · polite ending"]],
     "identity-omit": [["はい", "yes"], ["がくせい", "student"], ["です", "am · polite ending"]],
     "identity-other": [["めいさん", "Mei · さん adds polite respect"], ["は", "topic marker · pronounced wa"], ["かいしゃいん", "office worker · company employee"], ["です", "is · polite ending"]],
+    "intro-listen": [["えみ", "Emi · the speaker’s name"], ["だいがくせい", "university student"], ["にねんせい", "second-year student"]],
+    "intro-build": [["はじめまして", "nice to meet you"], ["れん", "Ren · the speaker’s name"], ["です", "am · polite ending"], ["りゅうがくせい", "international student"], ["いちねんせい", "first-year student"], ["よろしくおねがいします", "please treat me kindly · polite close"]],
+    "identity-flex": [["がくせい", "student or students · Japanese nouns need no plural ending"], ["です", "is / am / are · context supplies the subject"]],
+    "people-nationality": [["ミナさん", "Mina · さん adds polite respect"], ["は", "topic marker · pronounced wa"], ["インド", "India"], ["じん", "person from · nationality suffix"], ["です", "is · polite ending"]],
+    "people-work": [["あやさん", "Aya · さん adds polite respect"], ["は", "topic marker · pronounced wa"], ["かんごし", "nurse"], ["です", "is · polite ending"]],
+    "people-build": [["けんさん", "Ken · さん adds polite respect"], ["は", "topic marker · pronounced wa"], ["いしゃ", "doctor"], ["です", "is · polite ending"]],
+    "people-major": [["りなさん", "Rina · さん adds polite respect"], ["の", "Rina’s · possession or association"], ["せんこう", "major · field of study"], ["は", "topic marker · pronounced wa"], ["けいざい", "economics"], ["です", "is · polite ending"]],
+    "people-school": [["りゅうがく", "study abroad"], ["せい", "student · forms the compound りゅうがくせい"]],
+    "people-transfer": [["みかさん", "Mika · さん adds polite respect"], ["は", "topic marker · pronounced wa"], ["にほんじん", "Japanese person"], ["の", "specifies the kind of student"], ["りゅうがくせい", "international student"], ["です", "is · polite ending"]],
     "ask-yes-no": [["いいえ", "no"], ["バングラデシュじん", "Bangladeshi person"], ["です", "am · polite ending"]],
     "ask-major": [["せんこう", "major · field of study"], ["は", "topic marker · pronounced wa"], ["なん", "what"], ["です", "is · polite ending"], ["か", "question marker"]],
     "ask-year": [["なん", "what · which"], ["ねんせい", "school year"], ["です", "is · polite ending"], ["か", "question marker"]],
     "ask-listen-age": [["なんさい", "how old · what age"], ["です", "is · polite ending"], ["か", "question marker"]],
+    "ask-phone-kind": [["でんわばんごう", "telephone number"], ["は", "topic marker · pronounced wa"], ["なんばん", "what number"], ["です", "is · polite ending"], ["か", "question marker"]],
+    "natural-san": [["はる", "Haru · your own name"], ["です", "am · polite ending; no さん on your own name"]],
+    "natural-order": [["たなか", "Tanaka · family name, normally placed first"], ["あおい", "Aoi · given name"]],
+    "natural-address": [["あおいさん", "Aoi · name plus respectful さん"], ["は", "topic marker · also marks the person being addressed"], ["がくせい", "student"], ["ですか", "is / are? · polite question"]],
+    "natural-anou": [["あのう", "um / excuse me · gently gets attention or signals hesitation"]],
+    "natural-sou": [["そう", "so · that way / what you just said"], ["です", "is · polite ending"], ["か", "question form that here acknowledges: “I see”"]],
+    "natural-nan-nani": [["せんこう", "major · field of study"], ["は", "topic marker · pronounced wa"], ["なん", "what · the form normally used before です"], ["ですか", "is it? · polite question"]],
+    "natural-sensei": [["やましたせんせい", "Professor Yamashita · せんせい used as a respectful title"], ["は", "topic marker · pronounced wa"], ["にほんご", "Japanese language"], ["の", "specifies the kind of teacher"], ["せんせい", "teacher · the occupation"], ["です", "is · polite ending"]],
     "connect-main": [["にほんご", "Japanese language"], ["の", "connects and specifies nouns"], ["がくせい", "student · the main noun"]],
     "connect-build": [["だいがく", "university"], ["の", "of · associated with"], ["せんせい", "teacher · the main noun"]],
     "connect-possess": [["みかさん", "Mika · さん adds polite respect"], ["の", "Mika’s · possession or association"], ["ともだち", "friend · the main noun"]],
     "connect-sentence": [["ゆきさん", "Yuki · さん adds polite respect"], ["の", "Yuki’s · possession or association"], ["せんこう", "major · field of study"], ["は", "topic marker · pronounced wa"], ["れきし", "history"], ["です", "is · polite ending"]],
+    "connect-nested": [["ロンドンだいがく", "University of London · the institution"], ["の", "affiliated with"], ["がくせい", "student · the main noun"]],
+    "connect-family": [["あおいさん", "Aoi · さん adds polite respect"], ["の", "Aoi’s · identifies whose relative"], ["おにいさん", "older brother · respectful family term"]],
+    "connect-family-build": [["あおいさん", "Aoi · さん adds polite respect"], ["の", "Aoi’s · identifies whose relative"], ["おかあさん", "mother · respectful family term"], ["は", "topic marker · pronounced wa"], ["かんごし", "nurse"], ["です", "is · polite ending"]],
     "details-age": [["はたち", "20 years old · special reading"], ["です", "is · polite ending"]],
     "details-year": [["よねんせい", "fourth-year student · special よ reading"], ["です", "is · polite ending"]],
     "details-phone": [["さん", "three"], ["ぜろ", "zero"], ["はち", "eight"], ["よん", "four"]],
     "details-time": [["よじ", "four o’clock · special よ reading"], ["です", "is · polite ending"]],
     "details-time-listen": [["ごぜん", "a.m. · before noon"], ["くじ", "nine o’clock"], ["はん", "half past"], ["です", "is · polite ending"]],
+    "details-age-listen": [["さんじゅうご", "thirty-five"], ["さい", "years old · age counter"], ["です", "is · polite ending"]],
+    "details-phone-long": [["はち", "8"], ["ろく", "6"], ["なな", "7"], ["ご", "5"], ["さん", "3"], ["ぜろ", "0"], ["きゅう", "9"]],
+    "details-confirm": [["3084", "the telephone digits just heard"], ["です", "is · polite ending"], ["ね", "right? · invites confirmation"]],
+    "details-seven": [["しちじ", "seven o’clock · special clock reading"], ["です", "is · polite ending"]],
+    "details-world-time": [["ごご", "p.m. · after noon"], ["しちじ", "seven o’clock"], ["です", "is · polite ending"]],
+    "details-family-listen": [["おかあさん", "mother · the continuing topic"], ["は", "topic marker · pronounced wa"], ["かんごし", "nurse"], ["です", "is · polite ending"], ["よんじゅうごさい", "45 years old"], ["です", "is · polite ending"]],
     "mission-greet": [["はじめまして", "nice to meet you"], ["よろしくおねがいします", "please treat me kindly · polite close"]],
+    "mission-address": [["あのう", "um / excuse me · softens the approach"], ["あおいさん", "Aoi · name plus respectful さん"], ["は", "topic marker · pronounced wa"], ["りゅうがくせい", "international student"], ["ですか", "is / are? · polite question"]],
     "mission-understand": [["せんこう", "major · field of study"], ["は", "topic marker · pronounced wa"], ["せいぶつがく", "biology"], ["です", "is · polite ending"], ["さんねんせい", "third-year student"], ["です", "is · polite ending"]],
     "mission-ask": [["なんさい", "how old · what age"], ["です", "is · polite ending"], ["か", "question marker"]],
     "mission-age": [["にじゅういっさい", "21 years old · いち + さい becomes いっさい"], ["です", "is · polite ending"]],
+    "mission-phone": [["に", "2"], ["よん", "4"], ["ろく", "6"], ["はち", "8"]],
+    "mission-confirm": [["2468", "the telephone digits just heard"], ["です", "is · polite ending"], ["ね", "right? · invites confirmation"]],
     "mission-close": [["そうですか", "I see · acknowledges new information"], ["よろしくおねがいします", "please treat me kindly · polite close"]]
   };
 
   const GUIDE_BREAKDOWNS = {
     "open-chunks": [
-      { meaning: "Nice to meet you.", pieces: [["はじめまして", "nice to meet you · first-meeting opener"]], insight: "Use this when meeting someone for the first time, not as an everyday hello." },
-      { meaning: "I’m Haru.", pieces: [["はる", "Haru · a name"], ["です", "am · polite ending"]], insight: "Place your name before です to give it politely: ［name］です。" },
-      { meaning: "I look forward to getting to know you.", pieces: [["よろしく", "favorably · with goodwill"], ["おねがいします", "please · literally, I make a request"]], insight: "Learn the full expression as a courteous close to an introduction." }
+      { meaning: "Good morning. / Hello. / Good evening.", pieces: [["おはようございます", "good morning · polite"], ["こんにちは", "hello · daytime greeting"], ["こんばんは", "good evening"]], insight: "Japanese greetings track the time and relationship. おはようございます is the polite morning form." },
+      { meaning: "Excuse me / I’m sorry. / Thank you. / No, not at all.", pieces: [["すみません", "excuse me / I’m sorry · also shows indebtedness"], ["ありがとうございます", "thank you · polite"], ["いいえ", "no / not at all · can modestly answer thanks"]], insight: "The social situation decides the best English meaning; these are conversational actions, not one-to-one labels." },
+      { meaning: "I’m leaving and will return. / Go safely. / I’m home. / Welcome home.", pieces: [["いってきます", "said by the person leaving home"], ["いってらっしゃい", "reply from the person staying"], ["ただいま", "I’m home · said on returning"], ["おかえりなさい", "welcome home · reply to the returner"]], insight: "Learn each departure or return phrase with its partner so you can participate in the exchange." },
+      { meaning: "I gratefully receive this meal. / Thank you for the meal.", pieces: [["いただきます", "said before eating"], ["ごちそうさまでした", "said with appreciation after eating"]], insight: "These expressions mark the beginning and end of a meal; they are not ordinary descriptions of food." },
+      { meaning: "Nice to meet you. I’m [name]. I look forward to knowing you.", pieces: [["はじめまして", "nice to meet you · first-meeting opener"], ["［name］です", "I’m [name] · polite identity"], ["よろしくおねがいします", "please treat me kindly · courteous close"]], insight: "The three chunks perform opening, identity, and goodwill in that order." }
     ],
     "identity-pattern": [
       { meaning: "X is Y.", pieces: [["X", "the topic"], ["は", "topic marker · pronounced wa"], ["Y", "identity or description"], ["です", "is / am · polite ending"]], insight: "Use X は Y です to identify or describe the current topic." },
       { meaning: "Mei is a student.", pieces: [["めいさん", "Mei · さん adds polite respect"], ["は", "topic marker · pronounced wa"], ["がくせい", "student"], ["です", "is · polite ending"]], insight: "Replace Mei and student to create many new identity statements." },
       null
     ],
+    "people-pattern": [
+      { meaning: "School and student identities", pieces: [["だいがく", "university"], ["こうこう", "high school"], ["がくせい", "student"], ["だいがくせい", "university student"], ["りゅうがくせい", "international student"], ["せんせい", "teacher / professor"]], insight: "Learn the institution and the people connected to it as one useful cluster." },
+      { meaning: "People and nationality", pieces: [["わたし", "I / me"], ["ともだち", "friend"], ["～さん", "respectful title after another person’s name"], ["～じん", "person from · nationality suffix"]], insight: "Attach ～じん to a country name; attach さん to another person’s name, not normally your own." },
+      { meaning: "Common occupations", pieces: [["かいしゃいん", "office worker · company employee"], ["いしゃ", "doctor"], ["かんごし", "nurse"], ["べんごし", "lawyer"]], insight: "Each occupation fits directly into X は Y です." },
+      { meaning: "Fields of study", pieces: [["にほんご", "Japanese language"], ["れきし", "history"], ["けいざい", "economics"], ["こうがく", "engineering"], ["せいぶつがく", "biology"]], insight: "Use these after せんこうは to answer what someone studies." }
+    ],
     "ask-pattern": [
       { meaning: "Are you a student?", pieces: [["がくせい", "student"], ["です", "is / are · polite ending"], ["か", "question marker"]], insight: "Add か after a polite statement to turn it into a yes-or-no question." },
       { meaning: "What is your major?", pieces: [["せんこう", "major · field of study"], ["は", "topic marker · pronounced wa"], ["なん", "what"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "Put なん where the missing information belongs, then finish with ですか." },
       { meaning: "What year are you in at school?", pieces: [["なん", "what · which"], ["ねんせい", "school year"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "なん combines with ねんせい to ask which school year someone is in." }
     ],
+    "natural-pattern": [
+      { meaning: "Aoi Tanaka / Professor Yamashita", pieces: [["たなか", "Tanaka · family name"], ["あおい", "Aoi · given name"], ["さん", "respectful title"], ["やました", "Yamashita · family name"], ["せんせい", "teacher / professor · also a title"]], insight: "Family name normally comes first. A professional title such as せんせい can replace さん." },
+      { meaning: "Aoi, are you a student?", pieces: [["あおいさん", "Aoi · name plus respectful title"], ["は", "topic marker · pronounced wa"], ["がくせい", "student"], ["ですか", "are you? · polite question"]], insight: "Using the listener’s name and title is often more natural than repeating あなた." },
+      { meaning: "Um, are you an international student?", pieces: [["あのう", "um / excuse me · gets attention or softens hesitation"], ["りゅうがくせい", "international student"], ["ですか", "are you? · polite question"]], insight: "あのう helps a personal question enter the conversation gently." },
+      { meaning: "That’s right. / I see. / That’s right, isn’t it?", pieces: [["そうです", "that’s right · confirms information"], ["そうですか", "I see / is that so? · receives new information"], ["そうですね", "that’s right, isn’t it? / let me see · invites agreement or reflection"]], insight: "The final particle changes the conversational job even though そうです remains." },
+      { meaning: "What is it? / What do you…?", pieces: [["なん", "what · commonly before です and counters"], ["なに", "what · used in many other environments"], ["を", "object marker · previews later grammar"]], insight: "For Lesson 1, the reliable production rule is なんですか. Recognise that the same 何 can also be read なに elsewhere." }
+    ],
     "connect-pattern": [
       { meaning: "Mei’s name", pieces: [["めいさん", "Mei · the associated person"], ["の", "Mei’s · possession or association"], ["なまえ", "name · the main noun"]], insight: "A person before の commonly marks possession or association." },
       { meaning: "a student of Japanese", pieces: [["にほんご", "Japanese language · the field"], ["の", "connects and specifies nouns"], ["がくせい", "student · the main noun"]], insight: "The noun before の specifies the kind of student." },
-      { meaning: "a university teacher", pieces: [["だいがく", "university · the institution"], ["の", "of · affiliated with"], ["せんせい", "teacher · the main noun"]], insight: "Read from the main noun backward: a teacher associated with a university." }
+      { meaning: "a university teacher", pieces: [["だいがく", "university · the institution"], ["の", "of · affiliated with"], ["せんせい", "teacher · the main noun"]], insight: "Read from the main noun backward: a teacher associated with a university." },
+      { meaning: "a student at Arizona University", pieces: [["アリゾナだいがく", "Arizona University · the institution"], ["の", "affiliated with"], ["がくせい", "student · the main noun"]], insight: "A long institution name behaves just like any other noun before の." },
+      { meaning: "Aoi’s mother is a nurse.", pieces: [["あおいさん", "Aoi · さん adds polite respect"], ["の", "Aoi’s · identifies whose relative"], ["おかあさん", "mother"], ["は", "topic marker · pronounced wa"], ["かんごし", "nurse"], ["です", "is · polite ending"]], insight: "First build the family noun phrase; then mark the complete phrase as the topic." }
     ],
     "details-context": [
       { meaning: "How old are you? → I’m 20.", pieces: [["なんさい", "how old · what age"], ["です", "is · polite ending"], ["か", "question marker"], ["はたち", "20 years old · special reading"], ["です", "is · polite ending"]], insight: "Learn はたち as the complete conversational answer for age 20." },
       { meaning: "What year are you in? → I’m a fourth-year student.", pieces: [["なん", "what · which"], ["ねんせい", "school year"], ["ですか", "is it? · polite question"], ["よねんせい", "fourth-year student · special よ reading"], ["です", "is · polite ending"]], insight: "Four uses the special reading よ inside よねんせい." },
-      { meaning: "What is your telephone number?", pieces: [["でんわばんごう", "telephone number"], ["は", "topic marker · pronounced wa"], ["なんばん", "what number"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "The complete topic でんわばんごう comes before は; なんばん asks for the number." },
-      { meaning: "What time is it? → It’s 4:30.", pieces: [["なんじ", "what time"], ["ですか", "is it? · polite question"], ["よじ", "four o’clock · special よ reading"], ["はん", "half past"], ["です", "is · polite ending"]], insight: "Attach はん after the hour to express half past: よじはん is 4:30." }
+      { meaning: "What is your telephone number? → 3084, right?", pieces: [["でんわばんごう", "telephone number"], ["は", "topic marker · pronounced wa"], ["なんばん", "what number"], ["ですか", "is it? · polite question"], ["3084", "the digits heard"], ["ですね", "right? · polite confirmation"]], insight: "Repeat a number with ですね to check that you heard it accurately." },
+      { meaning: "What time is it now? → It’s 4:30 p.m.", pieces: [["いま", "now"], ["なんじ", "what time"], ["ですか", "is it? · polite question"], ["ごご", "p.m. · after noon"], ["よじ", "four o’clock · special よ reading"], ["はん", "half past"], ["です", "is · polite ending"]], insight: "ごご sets p.m.; はん after the hour means half past." },
+      { meaning: "4:00 / 7:00 / 9:00", pieces: [["よじ", "four o’clock · not よんじ"], ["しちじ", "seven o’clock · standard clock reading"], ["くじ", "nine o’clock · not きゅうじ"]], insight: "Memorise these three as complete clock expressions because ordinary counting forms do not transfer mechanically." }
     ],
     "mission-setup": [
       { meaning: "Nice to meet you. I’m Aoi Tanaka.", pieces: [["はじめまして", "nice to meet you"], ["たなか", "Tanaka · family name"], ["あおい", "Aoi · given name"], ["です", "am · polite ending"]], insight: "Aoi opens the meeting and then supplies her name with です." }

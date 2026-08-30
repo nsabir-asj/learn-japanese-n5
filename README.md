@@ -70,9 +70,9 @@ The number scheduler tracks patterns rather than memorizing individual generated
 
 ### Guided lessons
 
-`guided_lessons.html` turns beginner vocabulary and grammar into a cumulative first-conversation journey. Lesson 1 is organized by conversational purpose rather than textbook page order: open a meeting, identify yourself, ask back, connect nouns with `の`, exchange age/time/telephone details, and complete a mixed conversation mission.
+`guided_lessons.html` turns beginner vocabulary and grammar into a cumulative first-conversation journey. Lesson 1 uses eight stages organized by learning purpose rather than textbook page order: situational greetings; introductions; useful school, work, nationality, and major vocabulary; questions; natural names and titles; noun relationships with `の`; family, age, time, and telephone details; and a mixed conversation mission.
 
-Each idea moves from a concise model to retrieval through situational choices, audio-only comprehension, sentence construction, typed details, and a mixed checkpoint. Choice questions award less mastery than independent construction. Correct recall expands the next review interval from minutes to days and weeks; a lapse schedules a near-term review without immediately repeating the same prompt.
+Each idea moves from a concise model to retrieval through situational choices, audio-only comprehension, sentence construction, typed details, and a mixed checkpoint. Expandable examples explain both the full sentence meaning and each meaningful piece. Choice questions award less mastery than independent construction. Correct recall expands the next review interval from minutes to days and weeks; a lapse schedules a near-term review without immediately repeating the same prompt.
 
 General number construction remains in Kana Mix. Guided Lesson 1 links to that foundation and teaches only the contextual forms needed for ages, school years, telephone digits, and time. Japanese pronunciation reads the universal voice and speed saved in **Settings & Data**.
 
