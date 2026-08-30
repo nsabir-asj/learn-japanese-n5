@@ -605,7 +605,7 @@
     }).join("");
     $("#lessonRoadmap").querySelectorAll("[data-stage]").forEach(button => button.addEventListener("click", () => {
       state.currentStage = Number(button.dataset.stage);
-      stageCursor = 0;
+      stageCursor = stageComplete(state.currentStage) ? 0 : firstIncompleteIndex(state.currentStage);
       saveState();
       setMode("learn");
     }));
@@ -629,7 +629,12 @@
     const progress = activityState(activity);
     const stage = STAGES[activity.stageIndex];
     const stageCompleted = stage.activities.filter(item => activityState(item).completed).length;
-    $("#lessonStageProgress").style.width = `${stageCompleted / stage.activities.length * 100}%`;
+    const stageProgress = mode === "learn"
+      ? activity.activityIndex / stage.activities.length * 100
+      : mode === "checkpoint" && checkpointQueue.length
+        ? checkpointIndex / checkpointQueue.length * 100
+        : stageCompleted / stage.activities.length * 100;
+    $("#lessonStageProgress").style.width = `${stageProgress}%`;
     $("#lessonQuestionCount").textContent = mode === "checkpoint" ? `Question ${checkpointIndex + 1} of ${checkpointQueue.length}` : mode === "practice" ? `${progress.seen} previous attempts` : `Activity ${activity.activityIndex + 1} of ${stage.activities.length}`;
     $("#lessonSessionTitle").textContent = stage.outcome;
     $("#lessonSessionCopy").textContent = activity.explanation || activity.instruction || "Retrieve the idea in a new form before moving on.";
@@ -707,7 +712,8 @@
   }
 
   function renderChoice(activity) {
-    $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + `<div class="lesson-choice-grid">${activity.options.map((option, index) => `<button class="lesson-choice" data-choice="${index}" type="button"><span class="lesson-choice-number">${index + 1}</span><span>${escapeHtml(option)}</span></button>`).join("")}</div>`;
+    const displayedOptions = shuffle(activity.options.map((option, originalIndex) => ({ option, originalIndex })));
+    $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + `<div class="lesson-choice-grid">${displayedOptions.map(({ option, originalIndex }, displayIndex) => `<button class="lesson-choice" data-choice="${originalIndex}" data-key="${displayIndex + 1}" type="button"><span class="lesson-choice-number">${displayIndex + 1}</span><span>${escapeHtml(option)}</span></button>`).join("")}</div>`;
     $("#lessonActivity").querySelector("[data-listen]")?.addEventListener("click", () => speakJapanese(activity.audioText));
     $("#lessonActivity").querySelectorAll("[data-choice]").forEach(button => button.addEventListener("click", () => gradeAnswer(Number(button.dataset.choice) === activity.answer, Number(button.dataset.choice))));
     $("#lessonDontKnow").classList.remove("hidden");
@@ -878,7 +884,8 @@
       return;
     }
     if (currentActivity?.type === "teach") completeTeaching();
-    stageCursor++;
+    const nextIncomplete = stage.activities.findIndex((activity, index) => index > stageCursor && !activityState(activity).completed);
+    stageCursor = nextIncomplete < 0 ? stage.activities.length : nextIncomplete;
     renderLearn();
   }
 
@@ -1116,7 +1123,7 @@
   document.addEventListener("keydown", event => {
     if (mode === "progress") return;
     if (/^[1-4]$/.test(event.key) && currentActivity?.type === "choice" && !currentAnswered) {
-      const button = $("#lessonActivity").querySelector(`[data-choice="${Number(event.key) - 1}"]`);
+      const button = $("#lessonActivity").querySelector(`[data-key="${event.key}"]`);
       if (button) { event.preventDefault(); button.click(); }
       return;
     }
