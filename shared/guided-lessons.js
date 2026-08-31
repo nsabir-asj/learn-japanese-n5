@@ -127,7 +127,7 @@
         {
           id: "people-pattern", type: "teach", skill: "Vocabulary", kicker: "Build a useful personal toolkit", title: "Learn personal information in connected groups",
           instruction: "Do not memorise an alphabetical list. Learn each word inside the kind of information it answers.",
-          body: `<div class="lesson-model"><div class="lesson-model-row"><span>School</span><strong>だいがく・こうこう・がくせい・だいがくせい・りゅうがくせい・せんせい</strong></div><div class="lesson-model-row"><span>People</span><strong>わたし・ともだち・～さん・～じん</strong></div><div class="lesson-model-row"><span>Work</span><strong>かいしゃいん・いしゃ・かんごし・べんごし</strong></div><div class="lesson-model-row"><span>Majors</span><strong>にほんご・れきし・けいざい・こうがく・せいぶつがく</strong></div></div><div class="lesson-rule"><strong>Usefulness rule:</strong> begin with words that describe you and people you actually meet. Less relevant countries, occupations, and majors can enter Practice later as recognition vocabulary.</div>`,
+          body: `<div class="lesson-model"><div class="lesson-model-row"><span>School</span><strong>だいがく・こうこう・がくせい・だいがくせい・こうこうせい・だいがくいんせい・りゅうがくせい・せんせい</strong></div><div class="lesson-model-row"><span>People</span><strong>わたし・ともだち・～さん・～じん</strong></div><div class="lesson-model-row"><span>Work</span><strong>かいしゃいん・いしゃ・かんごし・べんごし</strong></div><div class="lesson-model-row"><span>Majors</span><strong>にほんご・れきし・けいざい・こうがく・せいぶつがく</strong></div></div><div class="lesson-rule"><strong>Usefulness rule:</strong> begin with words that describe you and people you actually meet. Less relevant countries, occupations, and majors can enter Practice later as recognition vocabulary.</div>`,
           audioText: "だいがくせい。りゅうがくせい。かいしゃいん。いしゃ。かんごし。べんごし。"
         },
         {
@@ -168,7 +168,7 @@
         {
           id: "ask-pattern", type: "teach", skill: "Grammar", kicker: "Turn information into interaction", title: "Add か to ask a polite question",
           instruction: "A statement becomes a question when か is added at the end. Question words replace the missing information you want.",
-          body: `<div class="lesson-model"><div class="lesson-model-row"><span>Yes / no</span><strong>がくせいですか。</strong></div><div class="lesson-model-row"><span>Ask for a major</span><strong>せんこうは なんですか。</strong></div><div class="lesson-model-row"><span>Ask a school year</span><strong>なんねんせいですか。</strong></div></div><div class="lesson-rule">Learn questions together with their likely answers. That creates a usable conversational pair instead of an isolated grammar fact.</div>`,
+          body: `<div class="lesson-model"><div class="lesson-model-row"><span>Yes / no</span><strong>がくせいですか。</strong></div><div class="lesson-model-row"><span>Ask for a major</span><strong>せんこうは なんですか。</strong></div><div class="lesson-model-row"><span>Ask a school year</span><strong>なんねんせいですか。</strong></div><div class="lesson-model-row"><span>Ask nationality</span><strong>なんじんですか。</strong></div></div><div class="lesson-rule">Learn questions together with their likely answers. That creates a usable conversational pair instead of an isolated grammar fact.</div>`,
           audioText: "せんこうは、なんですか。"
         },
         {
@@ -251,7 +251,7 @@
         {
           id: "connect-pattern", type: "teach", skill: "Grammar", kicker: "One relationship, many uses", title: "Use の to connect two nouns",
           instruction: "The noun after の is the main idea. The noun before の narrows or identifies it.",
-          body: `<div class="lesson-model"><div class="lesson-model-row"><span>Person → possession</span><strong>めいさんの なまえ</strong></div><div class="lesson-model-row"><span>Field → kind of person</span><strong>にほんごの がくせい</strong></div><div class="lesson-model-row"><span>Institution → affiliation</span><strong>だいがくの せんせい</strong></div><div class="lesson-model-row"><span>Longer affiliation</span><strong>アリゾナだいがくの がくせい</strong></div><div class="lesson-model-row"><span>Family information</span><strong>あおいさんの おかあさんは かんごしです。</strong></div></div><div class="lesson-rule"><strong>Head-noun test:</strong> ask “What kind of thing is the whole phrase?” The noun after の is the main idea; the material before の narrows it. The complete noun phrase can then become the topic of a sentence.</div>`,
+          body: `<div class="lesson-model"><div class="lesson-model-row"><span>Person → possession</span><strong>めいさんの なまえ</strong></div><div class="lesson-model-row"><span>Field → kind of person</span><strong>にほんごの がくせい</strong></div><div class="lesson-model-row"><span>Institution → affiliation</span><strong>だいがくの せんせい</strong></div><div class="lesson-model-row"><span>Longer affiliation</span><strong>アリゾナだいがくの がくせい</strong></div><div class="lesson-model-row"><span>Family toolkit</span><strong>おかあさん・おとうさん・おねえさん・おにいさん・いもうと・おとうと</strong></div><div class="lesson-model-row"><span>Family information</span><strong>あおいさんの おかあさんは かんごしです。</strong></div></div><div class="lesson-rule"><strong>Head-noun test:</strong> ask “What kind of thing is the whole phrase?” The noun after の is the main idea; the material before の narrows it. The complete noun phrase can then become the topic of a sentence.</div>`,
           audioText: "にほんごの、がくせい。"
         },
         {
@@ -488,7 +488,7 @@
       null
     ],
     "people-pattern": [
-      { meaning: "School and student identities", pieces: [["だいがく", "university"], ["こうこう", "high school"], ["がくせい", "student"], ["だいがくせい", "university student"], ["りゅうがくせい", "international student"], ["せんせい", "teacher / professor"]], insight: "Learn the institution and the people connected to it as one useful cluster." },
+      { meaning: "School and student identities", pieces: [["だいがく", "university"], ["こうこう", "high school"], ["がくせい", "student"], ["だいがくせい", "university student"], ["こうこうせい", "high-school student"], ["だいがくいんせい", "graduate student"], ["りゅうがくせい", "international student"], ["せんせい", "teacher / professor"]], insight: "Learn the institution and the people connected to it as one useful cluster." },
       { meaning: "People and nationality", pieces: [["わたし", "I / me"], ["ともだち", "friend"], ["～さん", "respectful title after another person’s name"], ["～じん", "person from · nationality suffix"]], insight: "Attach ～じん to a country name; attach さん to another person’s name, not normally your own." },
       { meaning: "Common occupations", pieces: [["かいしゃいん", "office worker · company employee"], ["いしゃ", "doctor"], ["かんごし", "nurse"], ["べんごし", "lawyer"]], insight: "Each occupation fits directly into X は Y です." },
       { meaning: "Fields of study", pieces: [["にほんご", "Japanese language"], ["れきし", "history"], ["けいざい", "economics"], ["こうがく", "engineering"], ["せいぶつがく", "biology"]], insight: "Use these after せんこうは to answer what someone studies." }
@@ -496,7 +496,8 @@
     "ask-pattern": [
       { meaning: "Are you a student?", pieces: [["がくせい", "student"], ["です", "is / are · polite ending"], ["か", "question marker"]], insight: "Add か after a polite statement to turn it into a yes-or-no question." },
       { meaning: "What is your major?", pieces: [["せんこう", "major · field of study"], ["は", "topic marker · pronounced wa"], ["なん", "what"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "Put なん where the missing information belongs, then finish with ですか." },
-      { meaning: "What year are you in at school?", pieces: [["なん", "what · which"], ["ねんせい", "school year"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "なん combines with ねんせい to ask which school year someone is in." }
+      { meaning: "What year are you in at school?", pieces: [["なん", "what · which"], ["ねんせい", "school year"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "なん combines with ねんせい to ask which school year someone is in." },
+      { meaning: "What nationality are you?", pieces: [["なん", "what · which"], ["じん", "person from · nationality suffix"], ["です", "is · polite ending"], ["か", "question marker"]], insight: "なん combines with じん to ask which nationality or national origin applies." }
     ],
     "natural-pattern": [
       { meaning: "Aoi Tanaka / Professor Yamashita", pieces: [["たなか", "Tanaka · family name"], ["あおい", "Aoi · given name"], ["さん", "respectful title"], ["やました", "Yamashita · family name"], ["せんせい", "teacher / professor · also a title"]], insight: "Family name normally comes first. A professional title such as せんせい can replace さん." },
@@ -510,6 +511,7 @@
       { meaning: "a student of Japanese", pieces: [["にほんご", "Japanese language · the field"], ["の", "connects and specifies nouns"], ["がくせい", "student · the main noun"]], insight: "The noun before の specifies the kind of student." },
       { meaning: "a university teacher", pieces: [["だいがく", "university · the institution"], ["の", "of · affiliated with"], ["せんせい", "teacher · the main noun"]], insight: "Read from the main noun backward: a teacher associated with a university." },
       { meaning: "a student at Arizona University", pieces: [["アリゾナだいがく", "Arizona University · the institution"], ["の", "affiliated with"], ["がくせい", "student · the main noun"]], insight: "A long institution name behaves just like any other noun before の." },
+      { meaning: "Mother, father, older sister, older brother, younger sister, younger brother", pieces: [["おかあさん", "mother"], ["おとうさん", "father"], ["おねえさん", "older sister"], ["おにいさん", "older brother"], ["いもうと", "younger sister"], ["おとうと", "younger brother"]], insight: "Learn family words as a relationship set, then use a person’s name plus の to show whose relative is meant." },
       { meaning: "Aoi’s mother is a nurse.", pieces: [["あおいさん", "Aoi · さん adds polite respect"], ["の", "Aoi’s · identifies whose relative"], ["おかあさん", "mother"], ["は", "topic marker · pronounced wa"], ["かんごし", "nurse"], ["です", "is · polite ending"]], insight: "First build the family noun phrase; then mark the complete phrase as the topic." }
     ],
     "details-context": [
@@ -524,13 +526,188 @@
     ]
   };
 
+  const practiceChoice = (key, title, prompt, options, correction, explanation, audioText = "", breakdown = [], listenOnly = false) => ({
+    key, type: "choice", title, prompt, options, answer: 0, correction, explanation, audioText, breakdown, listenOnly
+  });
+  const practiceTiles = (key, title, prompt, answer, distractors, correction, explanation, audioText = "", breakdown = []) => ({
+    key, type: "tiles", title, prompt, tokens: answer, answer, distractors, correction, explanation, audioText, breakdown
+  });
+  const practiceInput = (key, title, prompt, answers, correction, explanation, audioText, placeholder, inputMode = "text", breakdown = []) => ({
+    key, type: "input", title, prompt, answers, correction, explanation, audioText, placeholder, inputMode, breakdown
+  });
+
+  const PRACTICE_FAMILIES = {
+    firstMeeting: [
+      practiceTiles("intro-aki", "Introduce yourself as Aki.", "Build the three-part first meeting.", ["はじめまして。", "あきです。", "よろしくおねがいします。"], ["ただいま。", "なんさいですか。", "いいえ。", "ごちそうさまでした。"], "はじめまして。あきです。よろしくおねがいします。", "Open the first meeting, give the name, and close with goodwill.", "はじめまして。あきです。よろしくおねがいします。", [["はじめまして", "nice to meet you"], ["あきです", "I’m Aki"], ["よろしくおねがいします", "courteous close"]]),
+      practiceChoice("reply-yuna", "Yuna introduces herself for the first time.", "Which response fits naturally?", ["はじめまして。けんです。よろしくおねがいします。", "ただいま。", "ごちそうさまでした。", "なんじですか。"], "はじめまして。けんです。よろしくおねがいします。", "Mirror the first-meeting structure while giving your own name.", "はじめまして。けんです。よろしくおねがいします。", [["はじめまして", "nice to meet you"], ["けんです", "I’m Ken"], ["よろしくおねがいします", "courteous close"]]),
+      practiceChoice("purpose-yoroshiku", "What conversational job does the expression perform?", "Listen and choose.", ["It closes a first introduction with goodwill", "It welcomes someone home", "It begins a meal", "It asks a person’s name"], "よろしくおねがいします。", "In a first meeting, よろしくおねがいします provides a courteous close.", "よろしくおねがいします。", [["よろしく", "favorably · with goodwill"], ["おねがいします", "please · polite request"]], true),
+      practiceChoice("opener-new", "You are meeting Ren for the first time.", "What should you say before giving your name?", ["はじめまして。", "おかえりなさい。", "いただきます。", "そうですか。"], "はじめまして。", "はじめまして is reserved for the beginning of a first meeting.", "はじめまして。", [["はじめまして", "nice to meet you · first-meeting opener"]]),
+      practiceTiles("intro-kana", "Introduce yourself as Kana.", "Choose only the useful chunks.", ["はじめまして。", "かなです。", "よろしくおねがいします。"], ["いってきます。", "がくせいですか。", "こんばんは。", "いいえ。"], "はじめまして。かなです。よろしくおねがいします。", "The social sequence remains opener, identity, then goodwill.", "はじめまして。かなです。よろしくおねがいします。", [["かなです", "I’m Kana"], ["よろしくおねがいします", "courteous close"]]),
+      practiceChoice("listen-name", "What name did the new classmate give?", "Listen before choosing.", ["Haru", "Aki", "Yuna", "Ken"], "はる · Haru", "The middle chunk gives the speaker’s name between the opener and close.", "はじめまして。はるです。よろしくおねがいします。", [["はる", "Haru · the speaker’s name"]], true)
+    ],
+    greetings: [
+      practiceChoice("morning-teacher", "You meet your teacher at 8 a.m.", "Choose the greeting that fits.", ["おはようございます。", "こんばんは。", "ただいま。", "いただきます。"], "おはようございます。", "The morning and respectful relationship call for the polite morning greeting.", "おはようございます。", [["おはようございます", "good morning · polite"]]),
+      practiceChoice("day-classmate", "You see a classmate during the afternoon.", "Which greeting fits naturally?", ["こんにちは。", "おかえりなさい。", "ごちそうさまでした。", "おやすみなさい。"], "こんにちは。", "こんにちは is the ordinary daytime greeting.", "こんにちは。", [["こんにちは", "hello · daytime greeting"]]),
+      practiceChoice("return-home", "Your sister has just arrived home.", "What do you say to her?", ["おかえりなさい。", "ただいま。", "いってきます。", "よろしくおねがいします。"], "おかえりなさい。", "The person already at home welcomes the returning person with おかえりなさい.", "おかえりなさい。", [["おかえりなさい", "welcome home · reply to the returner"]]),
+      practiceChoice("before-meal", "Everyone is about to start eating.", "Which expression belongs now?", ["いただきます。", "ごちそうさまでした。", "いってらっしゃい。", "すみません。"], "いただきます。", "いただきます marks the beginning of a meal.", "いただきます。", [["いただきます", "said gratefully before eating"]]),
+      practiceChoice("thanks-response", "Someone thanks you for a small favour.", "Which modest response can fit?", ["いいえ。", "はじめまして。", "いってきます。", "こんばんは。"], "いいえ。", "In this context いいえ can modestly mean “not at all.”", "いいえ。", [["いいえ", "no / not at all · modest response"]]),
+      practiceChoice("listen-leaving", "Which situation matches the expression?", "Listen, then choose.", ["The speaker is leaving home and plans to return", "The speaker has returned home", "The speaker finished eating", "The speaker met someone new"], "いってきます。", "いってきます is said by the person leaving home with the expectation of returning.", "いってきます。", [["いってきます", "I’m leaving and will return"]], true)
+    ],
+    introductions: [
+      practiceTiles("intro-yuna", "Introduce Yuna as a university student.", "Build a natural short introduction.", ["はじめまして。", "ゆなです。", "だいがくせいです。", "よろしくおねがいします。"], ["なんさいですか。", "せんせいです。", "ただいま。", "いいえ。"], "はじめまして。ゆなです。だいがくせいです。よろしくおねがいします。", "Open, give the name and role, then close with goodwill.", "はじめまして。ゆなです。だいがくせいです。よろしくおねがいします。", [["ゆなです", "I’m Yuna"], ["だいがくせいです", "I’m a university student"]]),
+      practiceChoice("omit-topic", "Someone asks: りゅうがくせいですか。", "You are an international student. Choose the natural answer.", ["はい、りゅうがくせいです。", "はい、わたしはです。", "りゅうがくせいですか。", "わたしのはいです。"], "はい、りゅうがくせいです。", "The question already establishes you as the topic, so the short answer omits わたしは.", "はい、りゅうがくせいです。", [["はい", "yes"], ["りゅうがくせい", "international student"], ["です", "am · polite ending"]]),
+      practiceChoice("listen-kai", "What did Kai tell you?", "Listen and choose the complete meaning.", ["Kai is a first-year international student", "Kai is a first-year teacher", "Kai is 20 years old", "Kai studies first-year Japanese"], "かい · りゅうがくせい · いちねんせい", "The introduction gives the name, international-student status, and school year without repeating the subject.", "はじめまして。かいです。りゅうがくせいです。いちねんせいです。", [["かい", "Kai"], ["りゅうがくせい", "international student"], ["いちねんせい", "first-year student"]], true),
+      practiceTiles("identity-sora", "Build: “Sora is a high-school student.”", "Construct the complete statement.", ["そらさんは", "こうこうせい", "です。"], ["だいがく", "せんせい", "か。", "の"], "そらさんは こうこうせいです。", "The person is the topic and the school identity comes before です.", "そらさんは、こうこうせいです。", [["そらさん", "Sora · respectful さん"], ["は", "topic marker"], ["こうこうせい", "high-school student"], ["です", "is"]]),
+      practiceChoice("plural-context", "Three people are introduced as がくせいです。", "What can the Japanese mean?", ["They are students.", "Only one person is a student.", "They are teachers.", "Are they students?"], "They are students.", "Japanese nouns do not need a plural ending; the situation supplies the plural meaning.", "がくせいです。", [["がくせい", "student / students"], ["です", "is / are"]]),
+      practiceTiles("intro-mei", "Introduce Mei as a second-year student.", "Choose the useful chunks and order them.", ["はじめまして。", "めいです。", "にねんせいです。", "よろしくおねがいします。"], ["なんねんせいですか。", "いしゃです。", "ごちそうさまでした。", "か。"], "はじめまして。めいです。にねんせいです。よろしくおねがいします。", "A compact introduction moves from opening to identity, useful detail, and courteous close.", "はじめまして。めいです。にねんせいです。よろしくおねがいします。", [["めいです", "I’m Mei"], ["にねんせいです", "I’m a second-year student"]])
+    ],
+    personalInfo: [
+      practiceChoice("listen-lawyer", "What is Ken’s occupation?", "Listen and choose.", ["Lawyer", "Doctor", "Nurse", "Office worker"], "べんごし · lawyer", "べんごし identifies Ken’s occupation.", "けんさんは、べんごしです。", [["けんさん", "Ken"], ["べんごし", "lawyer"]], true),
+      practiceChoice("major-history", "ゆきさんの せんこうは れきしです。", "What is Yuki’s major?", ["History", "Economics", "Engineering", "Biology"], "れきし · history", "The noun after せんこうは supplies the field of study.", "ゆきさんの、せんこうは、れきしです。", [["せんこう", "major"], ["れきし", "history"]]),
+      practiceTiles("engineer-major", "Build: “Riku’s major is engineering.”", "Construct the statement.", ["りくさんの", "せんこうは", "こうがく", "です。"], ["けいざい", "かんごし", "なんさい", "か。"], "りくさんの せんこうは こうがくです。", "The possessed major becomes the topic; engineering completes the information.", "りくさんの、せんこうは、こうがくです。", [["りくさんの", "Riku’s"], ["せんこう", "major"], ["こうがく", "engineering"]]),
+      practiceChoice("nationality-korea", "ジンさんは かんこくじんです。", "What does the sentence tell you?", ["Jin is Korean.", "Jin studies Korean.", "Jin is in Korea.", "Jin is a Korean teacher."], "Jin is Korean.", "The country name plus じん describes nationality.", "ジンさんは、かんこくじんです。", [["かんこく", "Korea"], ["じん", "person from"], ["です", "is"]]),
+      practiceChoice("school-graduate", "Which word means “graduate student”?", "Choose the school identity.", ["だいがくいんせい", "だいがくせい", "こうこうせい", "りゅうがくせい"], "だいがくいんせい", "だいがくいんせい is a graduate student; だいがくせい is an undergraduate university student.", "だいがくいんせいです。", [["だいがくいん", "graduate school"], ["せい", "student"]]),
+      practiceTiles("office-worker", "Build: “Mina is an office worker.”", "Choose the right occupation.", ["ミナさんは", "かいしゃいん", "です。"], ["いしゃ", "がくせい", "なん", "の"], "ミナさんは かいしゃいんです。", "The occupation identifies the topic Mina.", "ミナさんは、かいしゃいんです。", [["ミナさん", "Mina"], ["かいしゃいん", "office worker"]])
+    ],
+    questions: [
+      practiceTiles("ask-nationality", "Ask: “What nationality are you?”", "Build the natural question.", ["なんじん", "です", "か。"], ["なんさい", "なんじ", "せんこう", "の"], "なんじんですか。", "なんじん asks what nationality; か marks the polite question.", "なんじんですか。", [["なんじん", "what nationality"], ["ですか", "is / are? · polite question"]]),
+      practiceTiles("ask-time", "Ask: “What time is it now?”", "Build the complete question.", ["いま", "なんじ", "です", "か。"], ["なんさい", "なんばん", "ねんせい", "の"], "いま なんじですか。", "いま establishes now; なんじ asks what time.", "いま、なんじですか。", [["いま", "now"], ["なんじ", "what time"], ["ですか", "is it? · polite question"]]),
+      practiceChoice("answer-negative", "カナダじんですか。", "You are British. Choose the informative answer.", ["いいえ、イギリスじんです。", "はい、カナダじんです。", "なんじんですか。", "いいえ、がくせいですか。"], "いいえ、イギリスじんです。", "A useful negative answer supplies the correct information.", "いいえ、イギリスじんです。", [["いいえ", "no"], ["イギリスじん", "British person"], ["です", "am"]]),
+      practiceChoice("answer-positive", "さんねんせいですか。", "You are a third-year student. Choose the natural answer.", ["はい、そうです。", "いいえ、さんねんせいです。", "はい、なんねんせいですか。", "そうですか。"], "はい、そうです。", "はい、そうです confirms that the questioner’s information is correct.", "はい、そうです。", [["はい", "yes"], ["そうです", "that’s right"]]),
+      practiceChoice("question-from-age", "The answer is: じゅうはっさいです。", "Which question directly asks for it?", ["なんさいですか。", "なんねんせいですか。", "なんじですか。", "なんばんですか。"], "なんさいですか。", "なんさい asks age; the other question words request different kinds of information.", "なんさいですか。", [["なんさい", "how old"], ["ですか", "are you? · polite question"]]),
+      practiceChoice("question-from-year", "The answer is: さんねんせいです。", "Which question directly asks for it?", ["なんねんせいですか。", "なんさいですか。", "なんじですか。", "なんばんですか。"], "なんねんせいですか。", "なんねんせい asks which school year; さんねんせい answers third year.", "なんねんせいですか。", [["なんねんせい", "what school year"], ["ですか", "are you? · polite question"]]),
+      practiceTiles("ask-major-alt", "Ask Rina: “What is your major?”", "Address her naturally and build the question.", ["りなさんの", "せんこうは", "なん", "です", "か。"], ["なんさい", "なんじ", "がくせい", "ね。"], "りなさんの せんこうは なんですか。", "The name avoids unnecessary あなた; なん replaces the unknown major.", "りなさんの、せんこうは、なんですか。", [["りなさんの", "Rina’s"], ["せんこう", "major"], ["なん", "what"], ["ですか", "is it?"]])
+    ],
+    socialUsage: [
+      practiceChoice("anou-interrupt", "Someone is already talking nearby.", "How can you politely enter before asking a question?", ["あのう…", "ただいま。", "いただきます。", "そうです。"], "あのう…", "あのう signals hesitation and softens an interruption.", "あのう。", [["あのう", "um / excuse me · hesitant opener"]]),
+      practiceChoice("sou-confirm", "Someone asks whether you are a student.", "Which response means “That’s right”?", ["そうです。", "そうですか。", "そうですね。", "なんですか。"], "そうです。", "そうです confirms information already proposed by the other speaker.", "そうです。", [["そうです", "that’s right"]]),
+      practiceChoice("sou-agree", "Your classmate says the lesson is interesting, and you agree.", "Which response invites shared agreement?", ["そうですね。", "そうですか。", "いいえ。", "なんですか。"], "そうですね。", "そうですね can agree with or reflect on what was just said.", "そうですね。", [["そう", "so / that way"], ["です", "is"], ["ね", "isn’t it? · shared agreement"]]),
+      practiceChoice("title-professor", "You address Professor Mori directly.", "Which form is natural?", ["もりせんせい", "もりさんせんせい", "あなたせんせい", "わたしせんせい"], "もりせんせい", "A professional title can follow the name directly and replaces さん.", "もりせんせい。", [["もり", "Mori"], ["せんせい", "teacher / professor · respectful title"]]),
+      practiceChoice("own-name", "You introduce yourself as Aoi Tanaka.", "Which name form is natural?", ["たなか あおいです。", "たなかさん あおいです。", "あおいせんせいです。", "あなたは あおいです。"], "たなか あおいです。", "Do not normally attach さん to your own name; Japanese names commonly put the family name first.", "たなか、あおいです。", [["たなか", "Tanaka · family name"], ["あおい", "Aoi · given name"], ["です", "am"]]),
+      practiceChoice("nan-before-desu", "Complete: せんこうは ___ ですか。", "Which reading of 何 belongs before です?", ["なん", "なに", "だれ", "なんさい"], "せんこうは なんですか。", "なん is the reliable form before です; なに occurs in many other environments.", "せんこうは、なんですか。", [["なん", "what · before です"], ["ですか", "is it? · polite question"]]),
+      practiceTiles("address-aoi", "Ask Aoi whether she is a student.", "Use her name rather than unnecessary あなた.", ["あおいさんは", "がくせい", "です", "か。"], ["あなたさんは", "わたしは", "の", "ね。"], "あおいさんは がくせいですか。", "The listener’s name and title naturally identify who the question concerns.", "あおいさんは、がくせいですか。", [["あおいさん", "Aoi · respectful さん"], ["は", "topic marker"], ["がくせい", "student"], ["ですか", "are you?"]])
+    ],
+    nounConnections: [
+      practiceChoice("main-phone", "たけしさんの でんわばんごう", "What is the main idea?", ["A telephone number", "Takeshi", "A telephone", "A student"], "Takeshi’s telephone number", "The final noun でんわばんごう is the main idea; Takeshi specifies whose number.", "たけしさんの、でんわばんごう。", [["たけしさん", "Takeshi"], ["の", "Takeshi’s"], ["でんわばんごう", "telephone number · main noun"]]),
+      practiceTiles("japanese-teacher", "Build: “a Japanese-language teacher”", "Put the field before の.", ["にほんご", "の", "せんせい"], ["は", "がくせい", "です。", "なん"], "にほんごの せんせい", "The field specifies the kind of teacher.", "にほんごの、せんせい。", [["にほんご", "Japanese language"], ["の", "of / specialising in"], ["せんせい", "teacher"]]),
+      practiceTiles("mari-friend", "Build: “Mari’s friend”", "Connect the owner and main noun.", ["まりさん", "の", "ともだち"], ["は", "せんせい", "か。", "なん"], "まりさんの ともだち", "The person before の identifies whose friend is meant.", "まりさんの、ともだち。", [["まりさん", "Mari"], ["の", "Mari’s"], ["ともだち", "friend"]]),
+      practiceChoice("main-university", "にほんの だいがく", "What kind of thing is the complete phrase?", ["A university", "Japan", "A Japanese person", "A university student"], "a university in Japan", "The final noun だいがく is the main idea; にほん specifies its location or association.", "にほんの、だいがく。", [["にほん", "Japan"], ["の", "in / associated with"], ["だいがく", "university · main noun"]]),
+      practiceTiles("school-student", "Build: “a student at Seoul University”", "Create the affiliation phrase.", ["ソウルだいがく", "の", "がくせい"], ["せんせい", "は", "なん", "です。"], "ソウルだいがくの がくせい", "The institution comes before の; the student remains the main idea.", "ソウルだいがくの、がくせい。", [["ソウルだいがく", "Seoul University"], ["の", "at / affiliated with"], ["がくせい", "student"]]),
+      practiceChoice("read-major", "けんさんの せんこう", "Choose the natural meaning.", ["Ken’s major", "a major named Ken", "Ken’s teacher", "a Japanese major"], "Ken’s major", "A person before の commonly marks possession or association.", "けんさんの、せんこう。", [["けんさん", "Ken"], ["の", "Ken’s"], ["せんこう", "major"]])
+    ],
+    family: [
+      practiceChoice("older-sister", "みかさんの おねえさん", "Who is this?", ["Mika’s older sister", "Mika’s younger sister", "Mika’s mother", "Mika’s friend"], "Mika’s older sister", "おねえさん identifies an older sister; の tells you whose.", "みかさんの、おねえさん。", [["みかさんの", "Mika’s"], ["おねえさん", "older sister"]]),
+      practiceChoice("younger-brother", "Which word means “younger brother”?", "Choose the family word.", ["おとうと", "おにいさん", "いもうと", "おとうさん"], "おとうと", "おとうと means younger brother; おにいさん means older brother.", "おとうと。", [["おとうと", "younger brother"]]),
+      practiceTiles("father-doctor", "Build: “Aoi’s father is a doctor.”", "Make the family phrase the topic.", ["あおいさんの", "おとうさんは", "いしゃ", "です。"], ["おかあさんは", "かんごし", "なんさい", "か。"], "あおいさんの おとうさんは いしゃです。", "Aoi’s father is the full topic; doctor supplies the occupation.", "あおいさんの、おとうさんは、いしゃです。", [["あおいさんの", "Aoi’s"], ["おとうさん", "father"], ["いしゃ", "doctor"]]),
+      practiceChoice("listen-sister", "What did Ren say about his younger sister?", "Listen and choose both details.", ["She is a high-school student", "She is a nurse", "She is a graduate student", "She is an office worker"], "いもうと · こうこうせい", "The topic is Ren’s younger sister; こうこうせい gives her school identity.", "れんさんの、いもうとは、こうこうせいです。", [["いもうと", "younger sister"], ["こうこうせい", "high-school student"]], true),
+      practiceChoice("mother-age", "おかあさんは よんじゅうはっさいです。", "How old is the mother?", ["48", "45", "18", "Fourth year"], "48 years old", "よんじゅうはっさい is 48 years old; はち changes to はっ before さい.", "おかあさんは、よんじゅうはっさいです。", [["よんじゅう", "forty"], ["はっさい", "eight years old · sound change"]]),
+      practiceTiles("brother-student", "Build: “Ken’s older brother is a graduate student.”", "Construct the family description.", ["けんさんの", "おにいさんは", "だいがくいんせい", "です。"], ["おとうとは", "だいがくせい", "なん", "か。"], "けんさんの おにいさんは だいがくいんせいです。", "The family noun phrase becomes the topic before the school identity.", "けんさんの、おにいさんは、だいがくいんせいです。", [["けんさんの", "Ken’s"], ["おにいさん", "older brother"], ["だいがくいんせい", "graduate student"]])
+    ],
+    ageYear: [
+      practiceInput("age-18-listen", "How old is the person?", "Listen and enter digits only.", ["18"], "18 years old · じゅうはっさい", "Eight changes to はっ before the age counter さい.", "じゅうはっさいです。", "Age", "numeric", [["じゅう", "ten"], ["はっさい", "eight years old · sound change"]]),
+      practiceInput("age-21-listen", "Enter the age you hear.", "Type digits only.", ["21"], "21 years old · にじゅういっさい", "One changes to いっ before さい.", "にじゅういっさいです。", "Age", "numeric", [["にじゅう", "twenty"], ["いっさい", "one year old · sound change"]]),
+      practiceChoice("year-two", "The answer is にねんせいです。", "Which English meaning fits?", ["Second-year student", "Two years old", "Two o’clock", "Second major"], "second-year student", "ねんせい counts school years, not age or time.", "にねんせいです。", [["に", "two"], ["ねんせい", "year student"]]),
+      practiceChoice("age-20", "Which complete answer means “I am 20 years old”?", "Choose the special form.", ["はたちです。", "にじゅうさいです。", "にじゅうねんせいです。", "はちじです。"], "はたちです。", "Age 20 uses the special word はたち.", "はたちです。", [["はたち", "20 years old · special word"], ["です", "am"]]),
+      practiceTiles("age-question", "Ask Mei how old she is.", "Build the question using her name.", ["めいさんは", "なんさい", "です", "か。"], ["なんねんせい", "なんじ", "はたち", "ね。"], "めいさんは なんさいですか。", "なんさい asks a person’s age; the name plus は makes Mei the topic.", "めいさんは、なんさいですか。", [["めいさん", "Mei"], ["は", "topic marker · pronounced wa"], ["なんさい", "how old · what age"], ["ですか", "are you? · polite question"]]),
+      practiceTiles("year-question", "Ask Mei which school year she is in.", "Build the question using her name.", ["めいさんは", "なんねんせい", "です", "か。"], ["なんさい", "なんじ", "はたち", "ね。"], "めいさんは なんねんせいですか。", "なんねんせい asks which year at school.", "めいさんは、なんねんせいですか。", [["めいさん", "Mei"], ["なんねんせい", "what school year"], ["ですか", "are you?"]]),
+      practiceChoice("year-six", "ろくねんせいです。", "What information is being given?", ["The person is a sixth-year student", "The person is six years old", "It is six o’clock", "The number is six"], "sixth-year student", "ろくねんせい is a school-year identity.", "ろくねんせいです。", [["ろく", "six"], ["ねんせい", "year student"]])
+    ],
+    phone: [
+      practiceInput("phone-4159", "Enter the telephone digits.", "Listen and type four digits.", ["4159"], "4159", "Telephone numbers are decoded one digit at a time.", "よん、いち、ご、きゅう", "Four digits", "numeric", [["よん", "4"], ["いち", "1"], ["ご", "5"], ["きゅう", "9"]]),
+      practiceInput("phone-2839547", "Enter the complete telephone number.", "Hyphens are optional.", ["2839547", "283-9547"], "283-9547", "Each digit is independent; なな and きゅう remain easy to distinguish.", "に、はち、さん、きゅう、ご、よん、なな", "283-9547", "tel", [["に", "2"], ["はち", "8"], ["さん", "3"], ["きゅう", "9"], ["ご", "5"], ["よん", "4"], ["なな", "7"]]),
+      practiceTiles("confirm-4159", "Confirm: “4159, right?”", "Build the short confirmation.", ["4159", "です", "ね。"], ["か。", "なんばん", "の", "いいえ"], "4159ですね。", "ね invites the other person to confirm what you heard.", "よん、いち、ご、きゅう、ですね。", [["4159", "digits heard"], ["です", "is"], ["ね", "right? · confirmation"]]),
+      practiceChoice("confirm-reply", "Someone repeats your number correctly with ですね。", "How do you confirm it?", ["はい、そうです。", "そうですか。", "いいえ、なんさいです。", "なんばんですか。"], "はい、そうです。", "はい、そうです confirms that the repeated number is correct.", "はい、そうです。", [["はい", "yes"], ["そうです", "that’s right"]]),
+      practiceChoice("phone-question", "Which question asks for a telephone number?", "Choose the complete question.", ["でんわばんごうは なんばんですか。", "でんわばんごうは なんじですか。", "なんさいですか。", "せんこうは なんですか。"], "でんわばんごうは なんばんですか。", "The topic says telephone number and なんばん asks which number.", "でんわばんごうは、なんばんですか。", [["でんわばんごう", "telephone number"], ["なんばん", "what number"], ["ですか", "is it?"]]),
+      practiceInput("phone-6072", "What number did you hear?", "Type the four digits.", ["6072"], "6072", "Zero may be pronounced ゼロ; the other digits retain their ordinary telephone readings.", "ろく、ゼロ、なな、に", "Four digits", "numeric", [["ろく", "6"], ["ゼロ", "0"], ["なな", "7"], ["に", "2"]])
+    ],
+    time: [
+      practiceInput("time-730", "What time did you hear?", "Enter digits with a colon.", ["7:30", "07:30"], "7:30 a.m. · ごぜん しちじはん", "ごぜん marks a.m.; しちじ is seven o’clock and はん adds half past.", "ごぜん、しちじはんです。", "7:30", "text", [["ごぜん", "a.m."], ["しちじ", "seven o’clock"], ["はん", "half past"]]),
+      practiceInput("time-400", "Enter the time you hear.", "Use digits and a colon.", ["4:00", "04:00", "4"], "4:00 · よじ", "Four o’clock uses the special reading よじ.", "よじです。", "4:00", "text", [["よじ", "four o’clock · special reading"]]),
+      practiceChoice("time-nine", "The clock shows 9:00.", "Which answer is standard?", ["くじです。", "きゅうじです。", "くさいです。", "きゅうねんせいです。"], "くじです。", "Nine o’clock uses くじ rather than きゅうじ.", "くじです。", [["くじ", "nine o’clock"], ["です", "is"]]),
+      practiceTiles("time-london", "Ask: “What time is it now in London?”", "Build the city-time question.", ["ロンドンは", "いま", "なんじ", "です", "か。"], ["なんさい", "なんばん", "ごご", "ね。"], "ロンドンは いま なんじですか。", "The city becomes the topic; いま なんじ asks the current time.", "ロンドンは、いま、なんじですか。", [["ロンドン", "London"], ["は", "topic marker"], ["いま", "now"], ["なんじ", "what time"], ["ですか", "is it?"]]),
+      practiceChoice("time-pm", "It is 6:00 p.m. in London.", "Choose the complete answer.", ["ごご ろくじです。", "ごぜん ろくじです。", "ろくねんせいです。", "ごご ろくさいです。"], "ごご ろくじです。", "ごご marks p.m.; ろくじ is six o’clock.", "ごご、ろくじです。", [["ごご", "p.m."], ["ろくじ", "six o’clock"]]),
+      practiceChoice("time-noon", "The clock shows 12:30.", "Which answer fits?", ["じゅうにじはんです。", "にじゅうはんです。", "じゅうにさいです。", "じゅうにねんせいです。"], "じゅうにじはんです。", "じゅうにじ is twelve o’clock and はん adds half past.", "じゅうにじはんです。", [["じゅうにじ", "twelve o’clock"], ["はん", "half past"]])
+    ],
+    integrated: [
+      practiceChoice("meet-response", "Ren says: はじめまして。れんです。", "Choose a natural response.", ["はじめまして。あおいです。よろしくおねがいします。", "ごちそうさまでした。", "なんじですか。", "ただいま。"], "はじめまして。あおいです。よろしくおねがいします。", "Mirror the first-meeting opener, give your identity, and close courteously.", "はじめまして。あおいです。よろしくおねがいします。", [["はじめまして", "nice to meet you"], ["あおいです", "I’m Aoi"], ["よろしくおねがいします", "courteous close"]]),
+      practiceChoice("listen-profile", "What did Sora tell you?", "Listen and choose the complete profile.", ["Sora is a Korean third-year economics major", "Sora is a Japanese economics teacher", "Sora is a second-year biology major", "Sora is a Korean nurse"], "Korean · third year · economics", "The three short sentences continue describing the same person.", "かんこくじんです。さんねんせいです。せんこうは、けいざいです。", [["かんこくじん", "Korean person"], ["さんねんせい", "third-year student"], ["けいざい", "economics"]], true),
+      practiceTiles("mission-major", "Ask Kai what his major is.", "Use his name and build the question.", ["かいさんの", "せんこうは", "なん", "です", "か。"], ["なんさい", "なんじ", "がくせい", "ね。"], "かいさんの せんこうは なんですか。", "The name identifies whose major; なん marks the unknown information.", "かいさんの、せんこうは、なんですか。", [["かいさんの", "Kai’s"], ["せんこう", "major"], ["なん", "what"], ["ですか", "is it?"]]),
+      practiceChoice("mission-acknowledge", "Kai says his major is engineering.", "How do you naturally acknowledge the new information?", ["そうですか。", "そうです。", "いいえ、こうがくです。", "なんさいですか。"], "そうですか。", "そうですか receives new information as “I see.”", "そうですか。", [["そうですか", "I see / is that so?"]]),
+      practiceInput("mission-phone", "A new classmate gives a telephone number.", "Listen and type the four digits.", ["7315"], "7315", "Decode the number one digit at a time rather than memorising an earlier recording.", "なな、さん、いち、ご", "Four digits", "numeric", [["なな", "7"], ["さん", "3"], ["いち", "1"], ["ご", "5"]]),
+      practiceTiles("mission-close", "Thank the classmate and close warmly.", "Build a natural short ending after exchanging details.", ["ありがとうございます。", "よろしくおねがいします。"], ["なんさいですか。", "いいえ。", "いただきます。", "ただいま。"], "ありがとうございます。よろしくおねがいします。", "Thanks acknowledges the help or information; よろしく preserves goodwill for the new relationship.", "ありがとうございます。よろしくおねがいします。", [["ありがとうございます", "thank you · polite"], ["よろしくおねがいします", "please treat me kindly"]])
+    ]
+  };
+
+  const PRACTICE_FAMILY_IDS = {
+    greetings: ["greet-time", "greet-courtesy", "greet-home", "greet-meal"],
+    firstMeeting: ["open-situation", "open-listen", "open-build", "open-response"],
+    introductions: ["identity-meaning", "identity-build", "identity-omit", "identity-other", "intro-listen", "intro-build", "identity-flex"],
+    personalInfo: ["people-nationality", "people-work", "people-build", "people-major", "people-school", "people-transfer"],
+    questions: ["ask-yes-no", "ask-major", "ask-year", "ask-listen-age"],
+    socialUsage: ["natural-san", "natural-order", "natural-address", "natural-anou", "natural-sou", "natural-nan-nani", "natural-sensei"],
+    nounConnections: ["connect-main", "connect-build", "connect-possess", "connect-sentence", "connect-nested"],
+    family: ["connect-family", "connect-family-build", "details-family-listen"],
+    ageYear: ["details-age", "details-year", "details-age-listen", "mission-ask", "mission-age"],
+    phone: ["ask-phone-kind", "details-phone", "details-phone-long", "details-confirm", "mission-phone", "mission-confirm"],
+    time: ["details-time", "details-time-listen", "details-seven", "details-world-time"],
+    integrated: ["mission-greet", "mission-address", "mission-understand", "mission-close"]
+  };
+  const PRACTICE_FAMILY_BY_ID = Object.fromEntries(Object.entries(PRACTICE_FAMILY_IDS).flatMap(([family, ids]) => ids.map(id => [id, family])));
+  const PRACTICE_VARIANT_KEYS_BY_ID = Object.fromEntries([
+    [["greet-time"], ["morning-teacher", "day-classmate"]],
+    [["greet-courtesy"], ["thanks-response"]],
+    [["greet-home"], ["return-home", "listen-leaving"]],
+    [["greet-meal"], ["before-meal"]],
+    [["open-situation"], ["opener-new", "purpose-yoroshiku"]],
+    [["open-listen"], ["listen-name", "purpose-yoroshiku"]],
+    [["open-build"], ["intro-aki", "intro-kana"]],
+    [["open-response"], ["reply-yuna"]],
+    [["identity-meaning", "identity-build", "identity-other"], ["identity-sora", "plural-context"]],
+    [["identity-omit"], ["omit-topic"]],
+    [["intro-listen"], ["listen-kai"]],
+    [["intro-build"], ["intro-yuna", "intro-mei"]],
+    [["identity-flex"], ["plural-context"]],
+    [["people-nationality", "people-transfer"], ["nationality-korea"]],
+    [["people-work", "people-build"], ["listen-lawyer", "office-worker"]],
+    [["people-major"], ["major-history", "engineer-major"]],
+    [["people-school"], ["school-graduate"]],
+    [["ask-yes-no"], ["answer-negative", "answer-positive"]],
+    [["ask-major"], ["ask-major-alt"]],
+    [["ask-year"], ["question-from-year"]],
+    [["ask-listen-age"], ["question-from-age"]],
+    [["ask-phone-kind"], ["phone-question"]],
+    [["natural-san", "natural-order"], ["own-name"]],
+    [["natural-address"], ["address-aoi"]],
+    [["natural-anou"], ["anou-interrupt"]],
+    [["natural-sou"], ["sou-confirm", "sou-agree"]],
+    [["natural-nan-nani"], ["nan-before-desu"]],
+    [["natural-sensei"], ["title-professor"]],
+    [["connect-main", "connect-nested"], ["main-phone", "main-university"]],
+    [["connect-build"], ["japanese-teacher", "school-student"]],
+    [["connect-possess"], ["mari-friend", "read-major"]],
+    [["connect-sentence"], ["school-student"]],
+    [["connect-family"], ["older-sister", "younger-brother", "listen-sister"]],
+    [["connect-family-build", "details-family-listen"], ["father-doctor", "mother-age", "brother-student"]],
+    [["details-age", "details-age-listen", "mission-age"], ["age-18-listen", "age-21-listen", "age-20"]],
+    [["details-year"], ["year-two", "year-question", "year-six"]],
+    [["mission-ask"], ["age-question", "age-20"]],
+    [["details-phone", "details-phone-long", "mission-phone"], ["phone-4159", "phone-2839547", "phone-6072"]],
+    [["details-confirm", "mission-confirm"], ["confirm-4159", "confirm-reply"]],
+    [["details-time", "details-time-listen"], ["time-730", "time-400", "time-nine", "time-noon"]],
+    [["details-seven", "details-world-time"], ["time-nine", "time-london", "time-pm", "time-noon"]],
+    [["mission-greet"], ["meet-response"]],
+    [["mission-address"], ["mission-major"]],
+    [["mission-understand"], ["listen-profile"]],
+    [["mission-close"], ["mission-acknowledge", "mission-close"]]
+  ].flatMap(([ids, keys]) => ids.map(id => [id, keys])));
+
   const ALL_ACTIVITIES = STAGES.flatMap((stage, stageIndex) => stage.activities.map((activity, activityIndex) => ({ ...activity, stageIndex, activityIndex })));
   const GRADED_ACTIVITIES = ALL_ACTIVITIES.filter(activity => activity.type !== "teach");
 
   function defaultState() {
     return {
       version: VERSION, unlockedStage: 0, currentStage: 0, total: 0, correct: 0, streak: 0, bestStreak: 0,
-      activities: {}, recent: [], viewedGuides: [], profile: { name: "", home: "", role: "", field: "", year: "", age: "" }, savedAt: 0
+      activities: {}, recent: [], recentFamilies: [], variantHistory: {}, viewedGuides: [], profile: { name: "", home: "", role: "", field: "", year: "", age: "" }, savedAt: 0
     };
   }
 
@@ -538,7 +715,7 @@
     const fallback = defaultState();
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (saved && saved.version === VERSION) return { ...fallback, ...saved, activities: { ...(saved.activities || {}) }, profile: { ...fallback.profile, ...(saved.profile || {}) } };
+      if (saved && saved.version === VERSION) return { ...fallback, ...saved, activities: { ...(saved.activities || {}) }, recentFamilies: [...(saved.recentFamilies || [])], variantHistory: { ...(saved.variantHistory || {}) }, profile: { ...fallback.profile, ...(saved.profile || {}) } };
     } catch (error) {
       console.warn("Could not load guided-lesson progress.", error);
     }
@@ -783,7 +960,7 @@
   function showFeedback(correct) {
     const feedback = $("#lessonFeedback");
     feedback.className = `feedback lesson-feedback show ${correct ? "good" : "bad"}`;
-    const breakdown = ANSWER_BREAKDOWNS[currentActivity.id] || [];
+    const breakdown = currentActivity.breakdown || ANSWER_BREAKDOWNS[currentActivity.id] || [];
     const breakdownMarkup = breakdown.length ? `<div class="lesson-answer-breakdown"><span class="lesson-breakdown-label">Answer breakdown</span><div class="lesson-breakdown-pieces">${breakdown.map(([piece, meaning]) => `<span class="lesson-breakdown-piece"><strong>${escapeHtml(piece)}</strong><small>${escapeHtml(meaning)}</small></span>`).join("")}</div></div>` : "";
     feedback.innerHTML = `<strong>${correct ? "Correct" : "Build this memory"}</strong><div class="meta"><span class="lesson-correction">${escapeHtml(currentActivity.correction || "Review the model")}</span>${breakdownMarkup}<span class="lesson-feedback-explanation">${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span></div>`;
   }
@@ -813,6 +990,15 @@
     }
     state.recent.push(activity.id);
     if (state.recent.length > 15) state.recent.shift();
+    if (activity.practiceFamily) {
+      state.recentFamilies.push(activity.practiceFamily);
+      if (state.recentFamilies.length > 12) state.recentFamilies.shift();
+      if (activity.variantKey) {
+        const history = state.variantHistory[activity.practiceFamily] || [];
+        history.push(activity.variantKey);
+        state.variantHistory[activity.practiceFamily] = history.slice(-4);
+      }
+    }
     saveState();
   }
 
@@ -909,11 +1095,39 @@
     renderLearn();
   }
 
+  function practiceFamily(activity) {
+    return PRACTICE_FAMILY_BY_ID[activity.id] || activity.id;
+  }
+
+  function buildPracticeVariant(activity, sourceMode = "practice") {
+    const family = practiceFamily(activity);
+    const familyVariants = PRACTICE_FAMILIES[family] || [];
+    const allowedKeys = PRACTICE_VARIANT_KEYS_BY_ID[activity.id];
+    const variants = allowedKeys ? familyVariants.filter(variant => allowedKeys.includes(variant.key)) : familyVariants;
+    if (!variants.length) return activity;
+    const recentVariants = new Set((state.variantHistory[family] || []).slice(-3));
+    const available = variants.filter(variant => !recentVariants.has(variant.key));
+    const variant = shuffle(available.length ? available : variants)[0];
+    const skill = variant.listenOnly || variant.type === "input" ? "Listening" : variant.type === "tiles" ? "Production" : activity.skill;
+    return {
+      ...activity,
+      ...variant,
+      id: activity.id,
+      stageIndex: activity.stageIndex,
+      activityIndex: activity.activityIndex,
+      practiceFamily: family,
+      variantKey: variant.key,
+      skill,
+      kicker: sourceMode === "checkpoint" ? "Checkpoint · transfer" : "Practice · new example"
+    };
+  }
+
   function selectPracticeActivity() {
     const pool = completedGraded();
     if (!pool.length) return null;
     const recent = new Set(state.recent.slice(-4));
-    const filtered = pool.filter(activity => !recent.has(activity.id));
+    const recentFamilies = new Set(state.recentFamilies.slice(-3));
+    const filtered = pool.filter(activity => !recent.has(activity.id) && !recentFamilies.has(practiceFamily(activity)));
     const candidates = filtered.length ? filtered : pool;
     const now = Date.now();
     return candidates.map(activity => {
@@ -932,7 +1146,7 @@
       renderEmptyMode("Practice opens after your first retrieval activity", "Start the Learn journey so the app has something meaningful to adapt.", "Start learning");
       return;
     }
-    renderActivity(activity);
+    renderActivity(buildPracticeVariant(activity));
   }
 
   function startCheckpoint() {
@@ -941,7 +1155,12 @@
       renderEmptyMode("Checkpoint needs a little more material", "Complete at least five retrieval activities in Learn first.", "Continue learning");
       return;
     }
-    checkpointQueue = shuffle(pool).slice(0, Math.min(10, pool.length));
+    const representatives = new Map();
+    shuffle(pool).forEach(activity => {
+      const family = practiceFamily(activity);
+      if (!representatives.has(family)) representatives.set(family, activity);
+    });
+    checkpointQueue = shuffle([...representatives.values()]).slice(0, Math.min(10, representatives.size)).map(activity => buildPracticeVariant(activity, "checkpoint"));
     checkpointIndex = 0;
     checkpointCorrect = 0;
     renderActivity(checkpointQueue[0]);
