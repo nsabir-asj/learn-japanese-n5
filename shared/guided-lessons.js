@@ -724,7 +724,13 @@
 
   let state = loadState();
   state.unlockedStage = clamp(Number(state.unlockedStage) || 0, 0, STAGES.length - 1);
+  const savedUnlockedStage = state.unlockedStage;
+  reconcileUnlockedStages();
   state.currentStage = clamp(Number(state.currentStage) || 0, 0, state.unlockedStage);
+  if (state.unlockedStage !== savedUnlockedStage) {
+    state.savedAt = Date.now();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
   let mode = "learn";
   let currentActivity = null;
   let currentAnswered = false;
@@ -748,6 +754,7 @@
   }
 
   function saveState() {
+    reconcileUnlockedStages();
     state.savedAt = Date.now();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     renderTopStats();
@@ -756,6 +763,12 @@
 
   function stageComplete(stageIndex) {
     return STAGES[stageIndex].activities.every(activity => activityState(activity).completed);
+  }
+
+  function reconcileUnlockedStages() {
+    let earnedStage = 0;
+    while (earnedStage < STAGES.length - 1 && stageComplete(earnedStage)) earnedStage++;
+    state.unlockedStage = Math.max(state.unlockedStage, earnedStage);
   }
 
   function completedGraded() {
