@@ -5,83 +5,209 @@
   const VERSION = 1;
   const STAGES = [
     {
-      id: "greetings", name: "Greetings & courtesy", description: "The expressions that make first conversations possible.",
+      id: "lesson1-greetings", name: "Lesson 1 · Greetings & courtesy", description: "Complete social expressions for meeting, leaving, returning, and sharing a meal.",
       words: [
-        ["ohayou", "おはよう", "ohayou", "good morning"],
+        ["ohayou", "おはよう", "ohayou", "good morning (casual)"],
+        ["ohayou-gozaimasu", "おはようございます", "ohayou gozaimasu", "good morning (polite)"],
         ["konnichiwa", "こんにちは", "konnichiwa", "hello / good afternoon"],
         ["konbanwa", "こんばんは", "konbanwa", "good evening"],
-        ["arigatou", "ありがとう", "arigatou", "thank you"],
-        ["sumimasen", "すみません", "sumimasen", "excuse me / sorry"],
-        ["gomen-nasai", "ごめんなさい", "gomen nasai", "I’m sorry"],
-        ["onegaishimasu", "おねがいします", "onegaishimasu", "please"],
-        ["hai", "はい", "hai", "yes"],
-        ["iie", "いいえ", "iie", "no"],
         ["sayounara", "さようなら", "sayounara", "goodbye"],
-        ["mata-ne", "またね", "mata ne", "see you"],
-        ["hajimemashite", "はじめまして", "hajimemashite", "nice to meet you"]
+        ["oyasumi-nasai", "おやすみなさい", "oyasumi nasai", "good night"],
+        ["arigatou", "ありがとう", "arigatou", "thank you (casual)"],
+        ["arigatou-gozaimasu", "ありがとうございます", "arigatou gozaimasu", "thank you (polite)"],
+        ["sumimasen", "すみません", "sumimasen", "excuse me / sorry"],
+        ["ittekimasu", "いってきます", "ittekimasu", "I’m leaving and will return"],
+        ["itterasshai", "いってらっしゃい", "itterasshai", "go and come back safely"],
+        ["tadaima", "ただいま", "tadaima", "I’m home"],
+        ["okaeri-nasai", "おかえりなさい", "okaeri nasai", "welcome home"],
+        ["itadakimasu", "いただきます", "itadakimasu", "said gratefully before eating"],
+        ["gochisousama-deshita", "ごちそうさまでした", "gochisousama deshita", "thank you for the meal"],
+        ["hajimemashite", "はじめまして", "hajimemashite", "nice to meet you"],
+        ["yoroshiku-onegaishimasu", "よろしくおねがいします", "yoroshiku onegaishimasu", "please treat me kindly"],
+        ["anou", "あのう", "anou", "um / excuse me"],
+        ["hai", "はい", "hai", "yes"],
+        ["sou-desu", "そうです", "sou desu", "that’s right"],
+        ["sou-desu-ka", "そうですか", "sou desu ka", "I see / is that so?"]
       ]
     },
     {
-      id: "conversation", name: "People & conversation", description: "Core words for introducing yourself and understanding others.",
+      id: "lesson1-school", name: "Lesson 1 · School & people", description: "The identities and relationships used in a first introduction.",
       words: [
-        ["watashi", "わたし", "watashi", "I / me"],
-        ["namae", "なまえ", "namae", "name"],
-        ["tomodachi", "ともだち", "tomodachi", "friend"],
-        ["kazoku", "かぞく", "kazoku", "family"],
-        ["hito", "ひと", "hito", "person"],
-        ["sensei", "せんせい", "sensei", "teacher"],
+        ["daigaku", "だいがく", "daigaku", "college / university"],
+        ["koukou", "こうこう", "koukou", "high school"],
         ["gakusei", "がくせい", "gakusei", "student"],
+        ["daigakusei", "だいがくせい", "daigakusei", "college student"],
+        ["ryuugakusei", "りゅうがくせい", "ryuugakusei", "international student"],
+        ["sensei", "せんせい", "sensei", "teacher / professor"],
+        ["suffix-nensei", "～ねんせい", "nensei", "year student"],
+        ["ichinensei", "いちねんせい", "ichinensei", "first-year student"],
+        ["senkou", "せんこう", "senkou", "major / field of study"],
+        ["watashi", "わたし", "watashi", "I / me"],
+        ["tomodachi", "ともだち", "tomodachi", "friend"],
+        ["suffix-san", "～さん", "san", "Mr. / Ms. (name suffix)"],
+        ["suffix-jin", "～じん", "jin", "person from / nationality suffix"],
+        ["nihonjin", "にほんじん", "nihonjin", "Japanese person"],
+        ["namae", "なまえ", "namae", "name"]
+      ]
+    },
+    {
+      id: "lesson1-details", name: "Lesson 1 · Time, details & countries", description: "Ask and understand time, age, telephone details, language, and origin.",
+      words: [
+        ["ima", "いま", "ima", "now"],
+        ["gozen", "ごぜん", "gozen", "a.m. / before noon"],
+        ["gogo", "ごご", "gogo", "p.m. / afternoon"],
+        ["suffix-ji", "～じ", "ji", "o’clock / hour suffix"],
+        ["ichiji", "いちじ", "ichiji", "one o’clock"],
+        ["han", "はん", "han", "half"],
+        ["nijihan", "にじはん", "nijihan", "half past two"],
+        ["nihon", "にほん", "nihon", "Japan"],
+        ["amerika", "アメリカ", "amerika", "United States / America"],
+        ["suffix-go", "～ご", "go", "language suffix"],
         ["nihongo", "にほんご", "nihongo", "Japanese language"],
+        ["suffix-sai", "～さい", "sai", "years old / age suffix"],
+        ["denwa", "でんわ", "denwa", "telephone"],
+        ["suffix-ban", "～ばん", "ban", "number suffix"],
+        ["bangou", "ばんごう", "bangou", "number"],
+        ["nan-nani", "なん／なに", "nan / nani", "what"],
+        ["igirisu", "イギリス", "igirisu", "Britain"],
+        ["oosutoraria", "オーストラリア", "oosutoraria", "Australia"],
+        ["kankoku", "かんこく", "kankoku", "Korea"],
+        ["kanada", "カナダ", "kanada", "Canada"],
+        ["chuugoku", "ちゅうごく", "chuugoku", "China"],
+        ["indo", "インド", "indo", "India"],
+        ["ejiputo", "エジプト", "ejiputo", "Egypt"],
+        ["firipin", "フィリピン", "firipin", "Philippines"]
+      ]
+    },
+    {
+      id: "lesson1-life", name: "Lesson 1 · Majors, work & family", description: "Describe what people study, what they do, and how they are related.",
+      words: [
+        ["ajia-kenkyuu", "アジアけんきゅう", "ajia kenkyuu", "Asian studies"],
+        ["keizai", "けいざい", "keizai", "economics"],
+        ["kougaku", "こうがく", "kougaku", "engineering"],
+        ["kokusai-kankei", "こくさいかんけい", "kokusai kankei", "international relations"],
+        ["konpyuutaa", "コンピューター", "konpyuutaa", "computer"],
+        ["seiji", "せいじ", "seiji", "politics"],
+        ["seibutsugaku", "せいぶつがく", "seibutsugaku", "biology"],
+        ["bijinesu", "ビジネス", "bijinesu", "business"],
+        ["bungaku", "ぶんがく", "bungaku", "literature"],
+        ["rekishi", "れきし", "rekishi", "history"],
+        ["isha", "いしゃ", "isha", "doctor"],
+        ["kaishain", "かいしゃいん", "kaishain", "office worker"],
+        ["kangoshi", "かんごし", "kangoshi", "nurse"],
+        ["koukousei", "こうこうせい", "koukousei", "high school student"],
+        ["shufu", "しゅふ", "shufu", "homemaker"],
+        ["daigakuinsei", "だいがくいんせい", "daigakuinsei", "graduate student"],
+        ["bengoshi", "べんごし", "bengoshi", "lawyer"],
+        ["okaasan", "おかあさん", "okaasan", "mother"],
+        ["otousan", "おとうさん", "otousan", "father"],
+        ["oneesan", "おねえさん", "oneesan", "older sister"],
+        ["oniisan", "おにいさん", "oniisan", "older brother"],
+        ["imouto", "いもうと", "imouto", "younger sister"],
+        ["otouto", "おとうと", "otouto", "younger brother"]
+      ]
+    },
+    {
+      id: "lesson2-pointing", name: "Lesson 2 · Pointing & places", description: "Identify things and people, distinguish distance, and ask where something is.",
+      words: [
+        ["kore", "これ", "kore", "this one"],
+        ["sore", "それ", "sore", "that one"],
+        ["are", "あれ", "are", "that one over there"],
+        ["dore", "どれ", "dore", "which one"],
+        ["kono", "この", "kono", "this (before a noun)"],
+        ["sono", "その", "sono", "that (before a noun)"],
+        ["ano", "あの", "ano", "that over there (before a noun)"],
+        ["dono", "どの", "dono", "which (before a noun)"],
+        ["koko", "ここ", "koko", "here"],
+        ["soko", "そこ", "soko", "there"],
+        ["asoko", "あそこ", "asoko", "over there"],
+        ["doko", "どこ", "doko", "where?"],
+        ["dare", "だれ", "dare", "who"],
+        ["ginkou", "ぎんこう", "ginkou", "bank"],
+        ["konbini", "コンビニ", "konbini", "convenience store"],
+        ["toire", "トイレ", "toire", "toilet / restroom"],
+        ["toshokan", "としょかん", "toshokan", "library"],
+        ["yuubinkyoku", "ゆうびんきょく", "yuubinkyoku", "post office"]
+      ]
+    },
+    {
+      id: "lesson2-things", name: "Lesson 2 · Food & belongings", description: "High-use objects and foods for identifying belongings and ordering a meal.",
+      words: [
+        ["oishii", "おいしい", "oishii", "delicious"],
+        ["sakana", "さかな", "sakana", "fish"],
+        ["tonkatsu", "とんかつ", "tonkatsu", "pork cutlet"],
+        ["niku", "にく", "niku", "meat"],
+        ["menyuu", "メニュー", "menyuu", "menu"],
+        ["yasai", "やさい", "yasai", "vegetable"],
+        ["kasa", "かさ", "kasa", "umbrella"],
+        ["kaban", "かばん", "kaban", "bag"],
+        ["kutsu", "くつ", "kutsu", "shoes"],
+        ["saifu", "さいふ", "saifu", "wallet"],
+        ["jiinzu", "ジーンズ", "jiinzu", "jeans"],
+        ["jitensha", "じてんしゃ", "jitensha", "bicycle"],
+        ["shinbun", "しんぶん", "shinbun", "newspaper"],
+        ["sumaho", "スマホ", "sumaho", "smartphone / mobile phone"],
+        ["tiishatsu", "Tシャツ", "tiishatsu", "T-shirt"],
+        ["tokei", "とけい", "tokei", "watch / clock"],
+        ["nooto", "ノート", "nooto", "notebook"],
+        ["pen", "ペン", "pen", "pen"],
+        ["boushi", "ぼうし", "boushi", "hat / cap"],
+        ["hon", "ほん", "hon", "book"]
+      ]
+    },
+    {
+      id: "lesson2-shopping", name: "Lesson 2 · Shopping language", description: "Ask prices and complete a simple store or restaurant exchange.",
+      words: [
         ["eigo", "えいご", "eigo", "English language"],
+        ["ikura", "いくら", "ikura", "how much?"],
+        ["suffix-en", "～えん", "en", "yen / currency suffix"],
+        ["takai", "たかい", "takai", "expensive / high"],
+        ["irasshaimase", "いらっしゃいませ", "irasshaimase", "welcome to our store"],
+        ["onegaishimasu", "おねがいします", "onegaishimasu", "please / a request"],
+        ["kudasai", "ください", "kudasai", "please give me"],
+        ["jaa", "じゃあ", "jaa", "then / in that case"],
+        ["douzo", "どうぞ", "douzo", "please / here it is"],
+        ["doumo", "どうも", "doumo", "thanks / very much"]
+      ]
+    },
+    {
+      id: "practical-extras", name: "Practical extras · Daily essentials", description: "High-frequency language for understanding, routines, meals, and everyday conversation.",
+      words: [
+        ["iie", "いいえ", "iie", "no"],
+        ["gomen-nasai", "ごめんなさい", "gomen nasai", "I’m sorry"],
+        ["mata-ne", "またね", "mata ne", "see you"],
         ["wakarimasu", "わかります", "wakarimasu", "I understand"],
         ["wakarimasen", "わかりません", "wakarimasen", "I don’t understand"],
-        ["daijoubu", "だいじょうぶ", "daijoubu", "okay / all right"]
-      ]
-    },
-    {
-      id: "daily", name: "Everyday routine", description: "High-frequency time and action words used throughout the day.",
-      words: [
+        ["daijoubu", "だいじょうぶ", "daijoubu", "okay / all right"],
+        ["kazoku", "かぞく", "kazoku", "family"],
+        ["hito", "ひと", "hito", "person"],
         ["kyou", "きょう", "kyou", "today"],
         ["ashita", "あした", "ashita", "tomorrow"],
         ["kinou", "きのう", "kinou", "yesterday"],
-        ["ima", "いま", "ima", "now"],
         ["asa", "あさ", "asa", "morning"],
         ["hiru", "ひる", "hiru", "noon / daytime"],
         ["yoru", "よる", "yoru", "night"],
-        ["jikan", "じかん", "jikan", "time"],
+        ["jikan", "じかん", "jikan", "time / duration"],
         ["iku", "いく", "iku", "to go"],
         ["kuru", "くる", "kuru", "to come"],
         ["kaeru", "かえる", "kaeru", "to return home"],
-        ["shigoto", "しごと", "shigoto", "work / job"]
-      ]
-    },
-    {
-      id: "food", name: "Food & shopping", description: "Useful words for meals, cafés, stores, and simple purchases.",
-      words: [
+        ["shigoto", "しごと", "shigoto", "work / job"],
         ["mizu", "みず", "mizu", "water"],
         ["ocha", "おちゃ", "ocha", "tea"],
         ["gohan", "ごはん", "gohan", "meal / cooked rice"],
         ["asagohan", "あさごはん", "asagohan", "breakfast"],
         ["taberu", "たべる", "taberu", "to eat"],
         ["nomu", "のむ", "nomu", "to drink"],
-        ["kudasai", "ください", "kudasai", "please give me"],
-        ["ikura", "いくら", "ikura", "how much?"],
-        ["oishii", "おいしい", "oishii", "delicious"],
-        ["mise", "みせ", "mise", "shop / store"],
-        ["konbini", "コンビニ", "konbini", "convenience store"],
-        ["toire", "トイレ", "toire", "toilet / restroom"]
+        ["mise", "みせ", "mise", "shop / store"]
       ]
     },
     {
-      id: "travel", name: "Getting around", description: "Practical location and transport words for navigating daily life.",
+      id: "practical-navigation", name: "Practical extras · Getting around", description: "Essential transport and direction words for navigating outside the classroom.",
       words: [
         ["eki", "えき", "eki", "station"],
         ["densha", "でんしゃ", "densha", "train"],
         ["basu", "バス", "basu", "bus"],
         ["kuruma", "くるま", "kuruma", "car"],
-        ["koko", "ここ", "koko", "here"],
-        ["soko", "そこ", "soko", "there"],
-        ["doko", "どこ", "doko", "where?"],
         ["migi", "みぎ", "migi", "right"],
         ["hidari", "ひだり", "hidari", "left"],
         ["massugu", "まっすぐ", "massugu", "straight ahead"],
@@ -95,7 +221,6 @@
     stageName: stage.name, stageIndex, order
   })));
   const $ = selector => document.querySelector(selector);
-  const choose = values => values[Math.floor(Math.random() * values.length)];
   const shuffle = values => [...values].sort(() => Math.random() - .5);
   const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 
@@ -217,7 +342,7 @@
     panel.id = "panel-vocabulary";
     panel.innerHTML = `
       <div class="vocab-setup card">
-        <div><h2>Useful vocabulary</h2><p class="muted">Starts with greetings and courtesy, then unlocks everyday conversation, routines, food, shopping, and travel.</p></div>
+        <div><h2>Lesson 1–2 vocabulary</h2><p class="muted">Covers the complete Lesson 1 and Lesson 2 vocabulary, followed by practical daily and navigation extras.</p></div>
         <label><span>Question format</span><select id="vocabQuestionFormat"><option value="written">Written Japanese</option><option value="spoken">Spoken Japanese</option><option value="both">Both</option></select><small id="vocabFormatHint" aria-live="polite"></small></label>
         <label class="vocab-pace"><span>New-word pace: <strong id="vocabPaceName">Balanced</strong></span><input id="vocabPace" type="range" min="10" max="90" step="10"><span class="vocab-pace-labels"><span>More review</span><span>More new</span></span></label>
       </div>
@@ -239,7 +364,7 @@
         <div class="card"><h2>Vocabulary progress</h2><div class="vocab-progress-grid"><div class="mini"><strong id="vocabTotal">0</strong><span class="tiny">answers</span></div><div class="mini"><strong id="vocabAccuracy">—</strong><span class="tiny">accuracy</span></div><div class="mini"><strong id="vocabIntroduced">0</strong><span class="tiny">introduced</span></div><div class="mini"><strong id="vocabMastered">0</strong><span class="tiny">mastered</span></div><div class="mini"><strong id="vocabWeak">0</strong><span class="tiny">weak</span></div><div class="mini"><strong id="vocabBestStreak">0</strong><span class="tiny">best streak</span></div></div></div>
         <div class="card vocab-playback"><div><h2>Pronunciation</h2><p class="muted">Voice selection is shared with Word Reading and Numbers.</p></div><div><label class="toggle-line"><input type="checkbox" id="vocabAutoPronounce"> Automatically pronounce revealed words</label><button class="ghost" id="vocabManageVoices" type="button">Manage voices</button></div></div>
       </div>
-      <div class="card vocab-curriculum-card"><h2>Everyday curriculum</h2><p class="muted">Each stage opens after every word in the previous stage has been introduced and its average mastery reaches 35%.</p><div class="vocab-stages" id="vocabStages"></div></div>`;
+      <div class="card vocab-curriculum-card"><h2>Lesson vocabulary curriculum</h2><p class="muted">Lesson 1 comes first, then Lesson 2 and practical extras. Each stage opens after every word in the previous stage has been introduced and its average mastery reaches 35%.</p><div class="vocab-stages" id="vocabStages"></div></div>`;
     const panelAnchor = $("#panel-wordprogress");
     if (panelAnchor) panelAnchor.before(panel); else $(".wrap").appendChild(panel);
 
@@ -249,7 +374,7 @@
     if (wordProgressGrid) {
       const vocabularyProgress = document.createElement("div");
       vocabularyProgress.className = "card vocab-progress-detail-card";
-      vocabularyProgress.innerHTML = `<div class="vocab-progress-detail-heading"><div><h2>Vocabulary comprehension</h2><p class="muted">Meaning mastery is tracked separately from reading and shared across all three launchers.</p></div><span class="data-badge" id="vocabProgressStage">Greetings & courtesy</span></div><div class="vocab-progress-grid"><div class="mini"><strong id="vocabProgressTotal">0</strong><span class="tiny">answers</span></div><div class="mini"><strong id="vocabProgressAccuracy">—</strong><span class="tiny">accuracy</span></div><div class="mini"><strong id="vocabProgressIntroduced">0</strong><span class="tiny">introduced</span></div><div class="mini"><strong id="vocabProgressMastered">0</strong><span class="tiny">mastered</span></div><div class="mini"><strong id="vocabProgressWeak">0</strong><span class="tiny">weak</span></div><div class="mini"><strong id="vocabProgressBestStreak">0</strong><span class="tiny">best streak</span></div></div>`;
+      vocabularyProgress.innerHTML = `<div class="vocab-progress-detail-heading"><div><h2>Vocabulary comprehension</h2><p class="muted">Meaning mastery is tracked separately from reading and shared across all three launchers.</p></div><span class="data-badge" id="vocabProgressStage">Lesson 1 · Greetings & courtesy</span></div><div class="vocab-progress-grid"><div class="mini"><strong id="vocabProgressTotal">0</strong><span class="tiny">answers</span></div><div class="mini"><strong id="vocabProgressAccuracy">—</strong><span class="tiny">accuracy</span></div><div class="mini"><strong id="vocabProgressIntroduced">0</strong><span class="tiny">introduced</span></div><div class="mini"><strong id="vocabProgressMastered">0</strong><span class="tiny">mastered</span></div><div class="mini"><strong id="vocabProgressWeak">0</strong><span class="tiny">weak</span></div><div class="mini"><strong id="vocabProgressBestStreak">0</strong><span class="tiny">best streak</span></div></div>`;
       wordProgressGrid.insertAdjacentElement("afterend", vocabularyProgress);
     }
 
@@ -297,10 +422,16 @@
   }
 
   function makeChoices(word) {
-    const sameStage = WORDS.filter(candidate => candidate.id !== word.id && candidate.stageIndex === word.stageIndex);
-    const other = WORDS.filter(candidate => candidate.id !== word.id && candidate.stageIndex !== word.stageIndex);
-    const distractors = shuffle(sameStage).slice(0, 3);
-    while (distractors.length < 3) distractors.push(choose(other.filter(candidate => !distractors.includes(candidate))));
+    const sameStage = shuffle(WORDS.filter(candidate => candidate.id !== word.id && candidate.stageIndex === word.stageIndex));
+    const other = shuffle(WORDS.filter(candidate => candidate.id !== word.id && candidate.stageIndex !== word.stageIndex));
+    const distractors = [];
+    const meanings = new Set([word.meaning]);
+    [...sameStage, ...other].some(candidate => {
+      if (meanings.has(candidate.meaning)) return false;
+      distractors.push(candidate);
+      meanings.add(candidate.meaning);
+      return distractors.length === 3;
+    });
     return shuffle([word, ...distractors]);
   }
 
