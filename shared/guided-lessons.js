@@ -5,6 +5,7 @@
   const SPEECH_STORAGE_KEY = "kanaSprintSpeechV1";
   const VERSION = 1;
   const REVIEW_INTERVALS = [2 * 60000, 24 * 60 * 60000, 3 * 24 * 60 * 60000, 7 * 24 * 60 * 60000, 14 * 24 * 60 * 60000, 30 * 24 * 60 * 60000];
+  const PRACTICE_SESSION_LENGTH = 6;
   const $ = selector => document.querySelector(selector);
   const shuffle = values => {
     const shuffled = [...values];
@@ -800,6 +801,11 @@
   let checkpointQueue = [];
   let checkpointIndex = 0;
   let checkpointCorrect = 0;
+  let checkpointResults = [];
+  let practiceIndex = 0;
+  let practiceCorrect = 0;
+  let practiceResults = [];
+  let practiceSessionComplete = false;
   let speechVoices = [];
   let emptyNextMode = null;
 
@@ -910,9 +916,12 @@
       ? activity.activityIndex / stage.activities.length * 100
       : mode === "checkpoint" && checkpointQueue.length
         ? checkpointIndex / checkpointQueue.length * 100
-        : stageCompleted / stage.activities.length * 100;
+        : mode === "practice"
+          ? practiceIndex / PRACTICE_SESSION_LENGTH * 100
+          : stageCompleted / stage.activities.length * 100;
     $("#lessonStageProgress").style.width = `${stageProgress}%`;
-    $("#lessonQuestionCount").textContent = mode === "checkpoint" ? `Question ${checkpointIndex + 1} of ${checkpointQueue.length}` : mode === "practice" ? `${progress.seen} previous ${progress.seen === 1 ? "attempt" : "attempts"}` : `Activity ${activity.activityIndex + 1} of ${stage.activities.length}`;
+    const previousAttempts = `${progress.seen} previous ${progress.seen === 1 ? "attempt" : "attempts"}`;
+    $("#lessonQuestionCount").textContent = mode === "checkpoint" ? `Question ${checkpointIndex + 1} of ${checkpointQueue.length}` : mode === "practice" ? `Review ${practiceIndex + 1} of ${PRACTICE_SESSION_LENGTH} · ${previousAttempts}` : `Activity ${activity.activityIndex + 1} of ${stage.activities.length}`;
     $("#lessonSessionTitle").textContent = stage.outcome;
     $("#lessonSessionCopy").textContent = activity.explanation || activity.instruction || "Retrieve the idea in a new form before moving on.";
     if (activity.type === "teach") renderTeach(activity);
@@ -990,14 +999,19 @@
 
   function promptMarkup(activity) {
     const context = activity.context ? `<div class="lesson-context">${escapeHtml(activity.context)}</div>` : "";
-    const listening = hasPromptAudio(activity) ? `<button class="lesson-listen-button" type="button" data-listen aria-label="Replay question audio" title="Replay question audio">🔊</button>` : "";
+    const listening = hasPromptAudio(activity) ? `<div class="lesson-listen-controls"><button class="lesson-listen-button" type="button" data-listen aria-label="Replay question audio at normal speed" title="Replay question audio at normal speed">🔊<small>Normal</small></button><button class="ghost lesson-listen-slow" type="button" data-listen-slow>0.7× Slow</button></div>` : "";
     return `${context}<div class="lesson-prompt">${listening}<span class="lesson-prompt-label">Your task</span><div>${escapeHtml(activity.prompt || "Choose the best answer.")}</div></div>`;
+  }
+
+  function bindPromptAudio(activity) {
+    $("#lessonActivity").querySelector("[data-listen]")?.addEventListener("click", () => speakJapanese(activity.audioText));
+    $("#lessonActivity").querySelector("[data-listen-slow]")?.addEventListener("click", () => speakJapanese(activity.audioText, .68));
   }
 
   function renderChoice(activity) {
     const displayedOptions = shuffle(activity.options.map((option, originalIndex) => ({ option, originalIndex })));
     $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + `<div class="lesson-choice-grid">${displayedOptions.map(({ option, originalIndex }, displayIndex) => `<button class="lesson-choice" data-choice="${originalIndex}" data-key="${displayIndex + 1}" type="button"><span class="lesson-choice-number">${displayIndex + 1}</span><span>${escapeHtml(option)}</span></button>`).join("")}</div>`;
-    $("#lessonActivity").querySelector("[data-listen]")?.addEventListener("click", () => speakJapanese(activity.audioText));
+    bindPromptAudio(activity);
     $("#lessonActivity").querySelectorAll("[data-choice]").forEach(button => button.addEventListener("click", () => gradeAnswer(Number(button.dataset.choice) === activity.answer, Number(button.dataset.choice))));
     $("#lessonDontKnow").classList.remove("hidden");
     $("#lessonKeyboardHint").textContent = hasPromptAudio(activity) ? "Keyboard: 1–4 choose an answer. Replay the question as needed." : "Keyboard: 1–4 choose an answer. Pronunciation appears after you answer.";
@@ -1060,7 +1074,7 @@
 
   function renderInput(activity) {
     $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + `<input class="lesson-answer-input" id="lessonAnswerInput" inputmode="${activity.inputMode || "text"}" autocomplete="off" spellcheck="false" placeholder="${escapeHtml(activity.placeholder || "Type your answer")}" />`;
-    $("#lessonActivity").querySelector("[data-listen]")?.addEventListener("click", () => speakJapanese(activity.audioText));
+    bindPromptAudio(activity);
     $("#lessonSubmit").classList.remove("hidden");
     $("#lessonDontKnow").classList.remove("hidden");
     $("#lessonKeyboardHint").textContent = "Type what you heard. Press Enter to check.";
@@ -1142,7 +1156,14 @@
       });
     }
     const wasCorrection = correctingAnswer;
-    if (!wasCorrection) updateResult(currentActivity, correct);
+    if (!wasCorrection) {
+      updateResult(currentActivity, correct);
+      if (mode === "practice") {
+        practiceResults.push({ correct, skill: currentActivity.skill, independent: currentActivity.type === "tiles" && !currentUsedSupport });
+        if (correct) practiceCorrect++;
+      }
+      if (mode === "checkpoint") checkpointResults.push({ correct, skill: currentActivity.skill });
+    }
     else correctionAttempts++;
     showFeedback(correct, selectedChoice, wasCorrection && correct);
     ["#lessonDontKnow", "#lessonClear", "#lessonSubmit"].forEach(selector => $(selector).classList.add("hidden"));
@@ -1321,6 +1342,45 @@
     renderActivity(buildPracticeVariant(activity));
   }
 
+  function startPracticeSession() {
+    practiceIndex = 0;
+    practiceCorrect = 0;
+    practiceResults = [];
+    practiceSessionComplete = false;
+    renderPractice();
+  }
+
+  function advancePractice() {
+    if (practiceSessionComplete) {
+      startPracticeSession();
+      return;
+    }
+    practiceIndex++;
+    if (practiceIndex >= PRACTICE_SESSION_LENGTH) {
+      renderPracticeSummary();
+      return;
+    }
+    renderPractice();
+  }
+
+  function renderPracticeSummary() {
+    clearControls();
+    $("#lessonTrainer").classList.add("summary-state");
+    currentActivity = null;
+    practiceSessionComplete = true;
+    const corrected = practiceResults.filter(result => !result.correct).length;
+    const independent = practiceResults.filter(result => result.independent && result.correct).length;
+    const firstPass = Math.round(practiceCorrect / PRACTICE_SESSION_LENGTH * 100);
+    $("#lessonStageProgress").style.width = "100%";
+    $("#lessonQuestionCount").textContent = "Review session complete";
+    $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><span class="lesson-activity-kicker">Six focused reviews</span><div class="lesson-checkpoint-score">${firstPass}%</div><h2>${firstPass >= 85 ? "Strong first-pass recall" : firstPass >= 65 ? "Useful retrieval completed" : "Corrections are becoming memories"}</h2><p>${practiceCorrect} of ${PRACTICE_SESSION_LENGTH} were correct before feedback. ${corrected ? `${corrected} ${corrected === 1 ? "idea was" : "ideas were"} corrected from memory before continuing.` : "No corrective retries were needed."}</p><div class="lesson-stage-summary-stats"><div class="mini"><strong>${practiceCorrect}/${PRACTICE_SESSION_LENGTH}</strong><span class="tiny">first-pass correct</span></div><div class="mini"><strong>${corrected}</strong><span class="tiny">corrective retries</span></div><div class="mini"><strong>${independent}</strong><span class="tiny">independent builds</span></div></div></div>`;
+    $("#lessonNext").textContent = "Start another 6-review session";
+    $("#lessonNext").classList.remove("hidden");
+    $("#lessonSessionTitle").textContent = "A useful stopping point";
+    $("#lessonSessionCopy").textContent = "Six reviews are enough for one focused round. Stop here or begin another session if your attention still feels fresh.";
+    $("#lessonKeyboardHint").textContent = "Short, repeated sessions usually beat one long review session.";
+  }
+
   function startCheckpoint() {
     const pool = completedGraded();
     if (pool.length < 5) {
@@ -1335,6 +1395,7 @@
     checkpointQueue = shuffle([...representatives.values()]).slice(0, Math.min(10, representatives.size)).map(activity => buildPracticeVariant(activity, "checkpoint"));
     checkpointIndex = 0;
     checkpointCorrect = 0;
+    checkpointResults = [];
     renderActivity(checkpointQueue[0]);
   }
 
@@ -1352,11 +1413,27 @@
     $("#lessonTrainer").classList.add("summary-state");
     currentActivity = null;
     const percent = Math.round(checkpointCorrect / checkpointQueue.length * 100);
+    const checkpointSkills = [...new Set(checkpointResults.map(result => result.skill))].map(skill => {
+      const results = checkpointResults.filter(result => result.skill === skill);
+      const correct = results.filter(result => result.correct).length;
+      const labels = {
+        Conversation: "Choose natural conversational responses",
+        Grammar: "Build the key sentence patterns",
+        Listening: "Understand spoken Japanese details",
+        Production: "Produce Japanese without a word bank",
+        Details: "Exchange ages, numbers, and time",
+        Vocabulary: "Recognise useful personal vocabulary"
+      };
+      return { skill, label: labels[skill] || skill, correct, total: results.length };
+    });
+    const outcomeMarkup = checkpointSkills.map(result => `<div class="lesson-checkpoint-outcome ${result.correct === result.total ? "ready" : "review"}"><span>${result.correct === result.total ? "✓" : "↻"}</span><div><strong>${escapeHtml(result.label)}</strong><small>${result.correct}/${result.total} first-pass correct · ${result.correct === result.total ? "ready" : "review recommended"}</small></div></div>`).join("");
     $("#lessonStageProgress").style.width = `${percent}%`;
     $("#lessonQuestionCount").textContent = "Checkpoint complete";
-    $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><span class="lesson-activity-kicker">Mixed retrieval</span><div class="lesson-checkpoint-score">${percent}%</div><h2>${percent >= 85 ? "Ready for conversation" : percent >= 65 ? "A solid foundation" : "Useful memories are forming"}</h2><p>${checkpointCorrect} of ${checkpointQueue.length} correct. Every missed idea has been scheduled to return in Practice.</p></div>`;
+    $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><span class="lesson-activity-kicker">Mixed retrieval</span><div class="lesson-checkpoint-score">${percent}%</div><h2>${percent >= 85 ? "Ready for conversation" : percent >= 65 ? "A solid foundation" : "Useful memories are forming"}</h2><p>${checkpointCorrect} of ${checkpointQueue.length} were correct before feedback. Every missed idea has been scheduled to return in Practice.</p><div class="lesson-checkpoint-outcomes">${outcomeMarkup}</div></div>`;
     $("#lessonNext").textContent = "Run another checkpoint";
     $("#lessonNext").classList.remove("hidden");
+    $("#lessonSessionTitle").textContent = "Use the can-do results, not only the percentage";
+    $("#lessonSessionCopy").textContent = "Ready outcomes transferred on the first attempt. Review outcomes were corrected and are already scheduled to return in Practice.";
     $("#lessonKeyboardHint").textContent = "A new checkpoint changes the question order and interleaves different skills.";
   }
 
@@ -1390,7 +1467,7 @@
       if (stageCursor === null) stageCursor = firstIncompleteIndex(state.currentStage);
       renderLearn();
     }
-    if (mode === "practice") renderPractice();
+    if (mode === "practice") startPracticeSession();
     if (mode === "checkpoint") startCheckpoint();
     renderRoadmap();
   }
@@ -1403,7 +1480,7 @@
       return;
     }
     if (mode === "learn") advanceLearn();
-    else if (mode === "practice") renderPractice();
+    else if (mode === "practice") advancePractice();
     else if (mode === "checkpoint") {
       if (!checkpointQueue.length || checkpointIndex >= checkpointQueue.length) startCheckpoint();
       else advanceCheckpoint();
@@ -1411,7 +1488,7 @@
   }
 
   function skillScores() {
-    const skills = ["Conversation", "Grammar", "Listening", "Production", "Details"];
+    const skills = ["Conversation", "Grammar", "Listening", "Production", "Vocabulary", "Details"];
     return skills.map(skill => {
       const activities = GRADED_ACTIVITIES.filter(activity => activity.skill === skill && activityState(activity).completed);
       return { skill, score: Math.round(masteryAverage(activities)), count: activities.length };
@@ -1487,12 +1564,12 @@
     return "speechSynthesis" in window && "SpeechSynthesisUtterance" in window && japaneseVoices().length > 0;
   }
 
-  function speakJapanese(text) {
+  function speakJapanese(text, rateOverride = null) {
     if (!text || !japaneseSpeechReady()) return false;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "ja-JP";
-    utterance.rate = Number(speechPreferences().rate) || .85;
+    utterance.rate = rateOverride || Number(speechPreferences().rate) || .85;
     const voice = selectedJapaneseVoice();
     if (voice) utterance.voice = voice;
     window.speechSynthesis.speak(utterance);
@@ -1507,7 +1584,7 @@
   }
 
   function refreshActivityAudioControls() {
-    document.querySelectorAll("[data-listen], [data-answer-audio]").forEach(button => {
+    document.querySelectorAll("[data-listen], [data-listen-slow], [data-answer-audio]").forEach(button => {
       button.disabled = !japaneseSpeechReady();
     });
   }
