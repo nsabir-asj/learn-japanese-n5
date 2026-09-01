@@ -1035,23 +1035,28 @@
     tileBankRevealed = mode === "learn";
     currentUsedSupport = tileBankRevealed;
     const extraNote = currentDistractorCount ? `<div class="lesson-tile-note"><strong>Choose only what you need.</strong> Some tiles are extras.</div>` : "";
-    const independentRecall = mode === "learn" ? "" : `<div class="lesson-independent-recall" id="lessonIndependentRecall"><span>Independent recall</span><input class="lesson-answer-input" id="lessonRecallInput" autocomplete="off" spellcheck="false" placeholder="Type the complete Japanese answer" /><p>${mode === "practice" ? "Try from memory first. You can open the word bank if you need it." : "Type without a word bank so the checkpoint measures recall."}</p>${mode === "practice" ? `<button class="ghost" type="button" data-show-word-bank>Use word bank</button>` : ""}</div>`;
-    $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + independentRecall + `<div class="lesson-tiles ${tileBankRevealed ? "" : "hidden"}" id="lessonTileBuilder">${extraNote}<div class="lesson-tile-answer" id="lessonTileAnswer"></div><div class="lesson-tile-bank" id="lessonTileBank"></div></div>`;
+    const oralRecall = mode === "learn" ? "" : `<div class="lesson-independent-recall" id="lessonIndependentRecall"><span>Say it first</span><p>Say the complete Japanese answer aloud. No Japanese keyboard is needed.</p><div class="actions"><button class="big-button" type="button" data-spoken-recall>I said it — verify</button><button class="ghost" type="button" data-show-word-bank>I need the tiles</button></div><small>${mode === "checkpoint" ? "The checkpoint counts “I need the tiles” as assisted recall." : "Either choice opens the same scrambled verification tiles."}</small></div>`;
+    $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + oralRecall + `<div class="lesson-tiles ${tileBankRevealed ? "" : "hidden"}" id="lessonTileBuilder">${extraNote}<div class="lesson-tile-answer" id="lessonTileAnswer"></div><div class="lesson-tile-bank" id="lessonTileBank"></div></div>`;
     if (tileBankRevealed) renderTileControls();
-    $("#lessonActivity").querySelector("[data-show-word-bank]")?.addEventListener("click", revealTileBank);
-    $("#lessonClear").classList.remove("hidden");
-    $("#lessonSubmit").classList.remove("hidden");
-    $("#lessonDontKnow").classList.remove("hidden");
-    $("#lessonKeyboardHint").textContent = mode === "checkpoint" ? "Type from memory. The checkpoint does not provide a word bank." : mode === "practice" ? "Type from memory for stronger practice, or use the word bank when needed." : currentDistractorCount ? "Build from meaning. Extra tiles can remain in the bank." : "Build from meaning. Click an answer tile to return it to the bank.";
-    setTimeout(() => $("#lessonRecallInput")?.focus(), 0);
+    $("#lessonActivity").querySelector("[data-spoken-recall]")?.addEventListener("click", () => revealTileBank(false));
+    $("#lessonActivity").querySelector("[data-show-word-bank]")?.addEventListener("click", () => revealTileBank(true));
+    if (tileBankRevealed) {
+      $("#lessonClear").classList.remove("hidden");
+      $("#lessonSubmit").classList.remove("hidden");
+      $("#lessonDontKnow").classList.remove("hidden");
+    }
+    $("#lessonKeyboardHint").textContent = mode === "checkpoint" ? "Say the answer aloud, then verify it with scrambled tiles." : mode === "practice" ? "Speaking first strengthens recall; tiles verify the sentence without Japanese typing." : currentDistractorCount ? "Build from meaning. Extra tiles can remain in the bank." : "Build from meaning. Click an answer tile to return it to the bank.";
   }
 
-  function revealTileBank() {
+  function revealTileBank(usedSupport) {
     tileBankRevealed = true;
-    currentUsedSupport = true;
+    currentUsedSupport = usedSupport;
     $("#lessonIndependentRecall")?.classList.add("hidden");
     $("#lessonTileBuilder")?.classList.remove("hidden");
     renderTileControls();
+    $("#lessonClear").classList.remove("hidden");
+    $("#lessonSubmit").classList.remove("hidden");
+    $("#lessonDontKnow").classList.remove("hidden");
   }
 
   function renderTileControls() {
@@ -1158,11 +1163,12 @@
     const wasCorrection = correctingAnswer;
     if (!wasCorrection) {
       updateResult(currentActivity, correct);
+      const scoredCorrect = correct && !(currentActivity.type === "tiles" && currentUsedSupport && mode !== "learn");
       if (mode === "practice") {
-        practiceResults.push({ correct, skill: currentActivity.skill, independent: currentActivity.type === "tiles" && !currentUsedSupport });
-        if (correct) practiceCorrect++;
+        practiceResults.push({ correct: scoredCorrect, answeredCorrect: correct, assisted: currentActivity.type === "tiles" && currentUsedSupport, skill: currentActivity.skill, independent: currentActivity.type === "tiles" && !currentUsedSupport });
+        if (scoredCorrect) practiceCorrect++;
       }
-      if (mode === "checkpoint") checkpointResults.push({ correct, skill: currentActivity.skill });
+      if (mode === "checkpoint") checkpointResults.push({ correct: scoredCorrect, skill: currentActivity.skill });
     }
     else correctionAttempts++;
     showFeedback(correct, selectedChoice, wasCorrection && correct);
@@ -1180,7 +1186,7 @@
       $("#lessonRetry").classList.remove("hidden");
       $("#lessonKeyboardHint").textContent = "Read the correction once, then correct the answer from memory before continuing.";
     }
-    if (!wasCorrection && mode === "checkpoint" && correct) checkpointCorrect++;
+    if (!wasCorrection && mode === "checkpoint" && correct && !(currentActivity.type === "tiles" && currentUsedSupport)) checkpointCorrect++;
     if (currentActivity.audioText && correct) speakJapanese(currentActivity.audioText);
   }
 
@@ -1201,7 +1207,8 @@
   function submitCurrent() {
     if (!currentActivity || currentAnswered) return;
     if (currentActivity.type === "tiles") {
-      const actual = tileBankRevealed ? normalize(tileSelection.map(token => token.text).join("")) : normalize($("#lessonRecallInput")?.value || "");
+      if (!tileBankRevealed) return;
+      const actual = normalize(tileSelection.map(token => token.text).join(""));
       const expected = normalize(currentActivity.answer.join(""));
       gradeAnswer(actual === expected);
     } else if (currentActivity.type === "input") {
@@ -1368,12 +1375,13 @@
     $("#lessonTrainer").classList.add("summary-state");
     currentActivity = null;
     practiceSessionComplete = true;
-    const corrected = practiceResults.filter(result => !result.correct).length;
+    const corrected = practiceResults.filter(result => result.answeredCorrect === false).length;
+    const assisted = practiceResults.filter(result => result.assisted && result.answeredCorrect).length;
     const independent = practiceResults.filter(result => result.independent && result.correct).length;
     const firstPass = Math.round(practiceCorrect / PRACTICE_SESSION_LENGTH * 100);
     $("#lessonStageProgress").style.width = "100%";
     $("#lessonQuestionCount").textContent = "Review session complete";
-    $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><span class="lesson-activity-kicker">Six focused reviews</span><div class="lesson-checkpoint-score">${firstPass}%</div><h2>${firstPass >= 85 ? "Strong first-pass recall" : firstPass >= 65 ? "Useful retrieval completed" : "Corrections are becoming memories"}</h2><p>${practiceCorrect} of ${PRACTICE_SESSION_LENGTH} were correct before feedback. ${corrected ? `${corrected} ${corrected === 1 ? "idea was" : "ideas were"} corrected from memory before continuing.` : "No corrective retries were needed."}</p><div class="lesson-stage-summary-stats"><div class="mini"><strong>${practiceCorrect}/${PRACTICE_SESSION_LENGTH}</strong><span class="tiny">first-pass correct</span></div><div class="mini"><strong>${corrected}</strong><span class="tiny">corrective retries</span></div><div class="mini"><strong>${independent}</strong><span class="tiny">independent builds</span></div></div></div>`;
+    $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><span class="lesson-activity-kicker">Six focused reviews</span><div class="lesson-checkpoint-score">${firstPass}%</div><h2>${firstPass >= 85 ? "Strong first-pass recall" : firstPass >= 65 ? "Useful retrieval completed" : "Corrections are becoming memories"}</h2><p>${practiceCorrect} of ${PRACTICE_SESSION_LENGTH} were recalled before feedback or assistance. ${corrected ? `${corrected} ${corrected === 1 ? "idea was" : "ideas were"} corrected before continuing.` : "No corrective retries were needed."}${assisted ? ` ${assisted} ${assisted === 1 ? "answer used" : "answers used"} the tile hint.` : ""}</p><div class="lesson-stage-summary-stats"><div class="mini"><strong>${practiceCorrect}/${PRACTICE_SESSION_LENGTH}</strong><span class="tiny">first-pass recall</span></div><div class="mini"><strong>${corrected}</strong><span class="tiny">corrective retries</span></div><div class="mini"><strong>${independent}</strong><span class="tiny">spoken then verified</span></div></div></div>`;
     $("#lessonNext").textContent = "Start another 6-review session";
     $("#lessonNext").classList.remove("hidden");
     $("#lessonSessionTitle").textContent = "A useful stopping point";
@@ -1612,14 +1620,8 @@
   $("#lessonRetry").addEventListener("click", startCorrectiveRetry);
   $("#lessonSubmit").addEventListener("click", submitCurrent);
   $("#lessonClear").addEventListener("click", () => {
-    if (currentActivity?.type === "tiles" && !tileBankRevealed) {
-      const input = $("#lessonRecallInput");
-      if (input) input.value = "";
-      input?.focus();
-    } else {
-      tileSelection = [];
-      renderTileControls();
-    }
+    tileSelection = [];
+    renderTileControls();
   });
   $("#lessonDontKnow").addEventListener("click", () => gradeAnswer(false));
   $("#lessonProfileForm").addEventListener("submit", saveProfile);
