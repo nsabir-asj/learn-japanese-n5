@@ -789,8 +789,9 @@
   let mode = "learn";
   let currentActivity = null;
   let currentAnswered = false;
-  let correctingAnswer = false;
-  let correctionAttempts = 0;
+  let currentIsRecovery = false;
+  let learnRecoveryQueue = [];
+  let practiceRecoveryQueue = [];
   let stageCursor = null;
   let replayingStage = false;
   let tileSelection = [];
@@ -803,7 +804,6 @@
   let checkpointCorrect = 0;
   let checkpointResults = [];
   let practiceIndex = 0;
-  let practiceCorrect = 0;
   let practiceResults = [];
   let practiceSessionComplete = false;
   let speechVoices = [];
@@ -891,8 +891,8 @@
   }
 
   function clearControls() {
-    ["#lessonDontKnow", "#lessonClear", "#lessonSubmit", "#lessonRetry", "#lessonNext"].forEach(selector => $(selector).classList.add("hidden"));
-    $("#lessonTrainer").classList.remove("awaiting-answer", "summary-state", "correcting-answer");
+    ["#lessonDontKnow", "#lessonClear", "#lessonSubmit", "#lessonNext"].forEach(selector => $(selector).classList.add("hidden"));
+    $("#lessonTrainer").classList.remove("awaiting-answer", "summary-state");
     $("#lessonFeedback").className = "feedback lesson-feedback";
     $("#lessonFeedback").innerHTML = "";
     currentAnswered = false;
@@ -905,8 +905,7 @@
   function renderActivity(activity) {
     emptyNextMode = null;
     currentActivity = activity;
-    correctingAnswer = false;
-    correctionAttempts = 0;
+    currentIsRecovery = Boolean(activity.recoveryOf);
     clearControls();
     $("#lessonNext").innerHTML = `${mode === "practice" ? "Next review" : mode === "checkpoint" ? "Next question" : "Continue"} <kbd>Enter</kbd>`;
     const progress = activityState(activity);
@@ -921,7 +920,7 @@
           : stageCompleted / stage.activities.length * 100;
     $("#lessonStageProgress").style.width = `${stageProgress}%`;
     const previousAttempts = `${progress.seen} previous ${progress.seen === 1 ? "attempt" : "attempts"}`;
-    $("#lessonQuestionCount").textContent = mode === "checkpoint" ? `Question ${checkpointIndex + 1} of ${checkpointQueue.length}` : mode === "practice" ? `Review ${practiceIndex + 1} of ${PRACTICE_SESSION_LENGTH} · ${previousAttempts}` : `Activity ${activity.activityIndex + 1} of ${stage.activities.length}`;
+    $("#lessonQuestionCount").textContent = currentIsRecovery ? "Delayed memory check" : mode === "checkpoint" ? `Question ${checkpointIndex + 1} of ${checkpointQueue.length}` : mode === "practice" ? `Review ${practiceIndex + 1} of ${PRACTICE_SESSION_LENGTH} · ${previousAttempts}` : `Activity ${activity.activityIndex + 1} of ${stage.activities.length}`;
     $("#lessonSessionTitle").textContent = stage.outcome;
     $("#lessonSessionCopy").textContent = activity.explanation || activity.instruction || "Retrieve the idea in a new form before moving on.";
     if (activity.type === "teach") renderTeach(activity);
@@ -935,7 +934,7 @@
 
   function activityHeading(activity) {
     const stage = STAGES[activity.stageIndex];
-    const origin = mode !== "learn" && stage ? `<span class="lesson-activity-origin">Stage ${activity.stageIndex + 1} of ${STAGES.length} · ${escapeHtml(stage.title)} · ${escapeHtml(activity.skill)}</span>` : "";
+    const origin = (mode !== "learn" || currentIsRecovery) && stage ? `<span class="lesson-activity-origin">Stage ${activity.stageIndex + 1} of ${STAGES.length} · ${escapeHtml(stage.title)} · ${escapeHtml(activity.skill)}</span>` : "";
     return `<div class="lesson-activity-heading"><span class="lesson-activity-kicker">${activity.kicker}</span>${origin}<h2>${activity.title}</h2>${activity.instruction ? `<p>${activity.instruction}</p>` : ""}</div>`;
   }
 
@@ -1091,21 +1090,22 @@
     return currentActivity.options?.[selectedChoice] || "";
   }
 
-  function mistakeExplanation(selectedChoice) {
-    if (selectedChoice === null || selectedChoice === undefined) return "You revealed the answer. Read it once, then retrieve it yourself.";
+  function mistakeExplanation(selectedChoice, revealed) {
+    if (revealed) return "You revealed the answer. Read the contrast once; the concept will return after other material.";
+    if (selectedChoice === null || selectedChoice === undefined) return "Your response did not match the model. Compare the order and meaning with the answer below.";
     const selected = selectedAnswerText(selectedChoice);
     const targeted = currentActivity.mistakes?.[selectedChoice];
     return targeted || COMMON_MISTAKE_GUIDANCE[selected] || `You chose “${selected}”. Compare its meaning or conversational job with the correct answer below.`;
   }
 
-  function showFeedback(correct, selectedChoice = null, corrected = false) {
+  function showFeedback(correct, selectedChoice = null, corrected = false, revealed = false) {
     const feedback = $("#lessonFeedback");
     feedback.className = `feedback lesson-feedback show ${correct ? "good" : "bad"}`;
     const breakdown = currentActivity.breakdown || ANSWER_BREAKDOWNS[currentActivity.id] || [];
     const breakdownMarkup = breakdown.length ? `<div class="lesson-answer-breakdown"><span class="lesson-breakdown-label">Answer breakdown</span><div class="lesson-breakdown-pieces">${breakdown.map(([piece, meaning]) => `<span class="lesson-breakdown-piece"><strong>${escapeHtml(piece)}</strong><small>${escapeHtml(meaning)}</small></span>`).join("")}</div></div>` : "";
     const answerAudio = currentActivity.audioText && !hasPromptAudio(currentActivity) ? `<button class="ghost lesson-answer-audio" type="button" data-answer-audio>🔊 Hear answer</button>` : "";
-    const diagnosis = correct ? "" : `<span class="lesson-mistake-diagnosis">${escapeHtml(mistakeExplanation(selectedChoice))}</span>`;
-    const heading = corrected ? "Corrected from memory" : correct ? "Correct" : "Build this memory";
+    const diagnosis = correct ? "" : `<span class="lesson-mistake-diagnosis">${escapeHtml(mistakeExplanation(selectedChoice, revealed))}</span>`;
+    const heading = corrected ? "Recovered after a delay" : correct ? "Correct" : "Build this memory";
     feedback.innerHTML = `<strong>${heading}</strong><div class="meta">${diagnosis}<span class="lesson-correction">${escapeHtml(currentActivity.correction || "Review the model")}</span>${breakdownMarkup}<span class="lesson-feedback-explanation">${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span>${answerAudio}</div>`;
     feedback.querySelector("[data-answer-audio]")?.addEventListener("click", () => speakJapanese(currentActivity.audioText));
     refreshActivityAudioControls();
@@ -1148,7 +1148,25 @@
     saveState();
   }
 
-  function gradeAnswer(correct, selectedChoice = null) {
+  function sourceActivityFor(activity) {
+    const sourceId = activity.recoveryOf || activity.id;
+    return ALL_ACTIVITIES.find(candidate => candidate.id === sourceId) || activity;
+  }
+
+  function scheduleDelayedRecovery(activity) {
+    if (mode === "checkpoint") return;
+    const source = sourceActivityFor(activity);
+    if (mode === "learn") {
+      if (!learnRecoveryQueue.some(entry => entry.source.id === source.id)) learnRecoveryQueue.push({ source, remaining: 3, avoidVariantKey: activity.variantKey || "" });
+      return;
+    }
+    if (mode === "practice" && !currentIsRecovery) {
+      const dueIndex = Math.min(PRACTICE_SESSION_LENGTH - 1, practiceIndex + 3);
+      if (!practiceRecoveryQueue.some(entry => entry.source.id === source.id)) practiceRecoveryQueue.push({ source, dueIndex, avoidVariantKey: activity.variantKey || "" });
+    }
+  }
+
+  function gradeAnswer(correct, selectedChoice = null, revealed = false) {
     if (!currentActivity || currentAnswered || currentActivity.type === "teach") return;
     currentAnswered = true;
     $("#lessonTrainer").classList.remove("awaiting-answer");
@@ -1160,48 +1178,22 @@
         else if (index === selectedChoice) button.classList.add("wrong");
       });
     }
-    const wasCorrection = correctingAnswer;
-    if (!wasCorrection) {
-      updateResult(currentActivity, correct);
-      const scoredCorrect = correct && !(currentActivity.type === "tiles" && currentUsedSupport && mode !== "learn");
-      if (mode === "practice") {
-        practiceResults.push({ correct: scoredCorrect, answeredCorrect: correct, assisted: currentActivity.type === "tiles" && currentUsedSupport, skill: currentActivity.skill, independent: currentActivity.type === "tiles" && !currentUsedSupport });
-        if (scoredCorrect) practiceCorrect++;
-      }
-      if (mode === "checkpoint") checkpointResults.push({ correct: scoredCorrect, skill: currentActivity.skill });
+    updateResult(currentActivity, correct);
+    const scoredCorrect = correct && !(currentActivity.type === "tiles" && currentUsedSupport && mode !== "learn");
+    const conceptId = currentActivity.recoveryOf || currentActivity.id;
+    if (mode === "practice") {
+      practiceResults.push({ correct: scoredCorrect, answeredCorrect: correct, assisted: currentActivity.type === "tiles" && currentUsedSupport, skill: currentActivity.skill, independent: currentActivity.type === "tiles" && !currentUsedSupport, recovery: currentIsRecovery, conceptId });
     }
-    else correctionAttempts++;
-    showFeedback(correct, selectedChoice, wasCorrection && correct);
+    if (mode === "checkpoint") checkpointResults.push({ correct: scoredCorrect, skill: currentActivity.skill });
+    if (!correct) scheduleDelayedRecovery(currentActivity);
+    showFeedback(correct, selectedChoice, currentIsRecovery && correct, revealed);
     ["#lessonDontKnow", "#lessonClear", "#lessonSubmit"].forEach(selector => $(selector).classList.add("hidden"));
-    if (correct) {
-      if (wasCorrection) {
-        const progress = activityState(currentActivity);
-        progress.corrected = (progress.corrected || 0) + 1;
-        saveState();
-        $("#lessonKeyboardHint").textContent = "Correction complete. Continue when the answer feels clear.";
-      }
-      correctingAnswer = false;
-      $("#lessonNext").classList.remove("hidden");
-    } else {
-      $("#lessonRetry").classList.remove("hidden");
-      $("#lessonKeyboardHint").textContent = "Read the correction once, then correct the answer from memory before continuing.";
-    }
-    if (!wasCorrection && mode === "checkpoint" && correct && !(currentActivity.type === "tiles" && currentUsedSupport)) checkpointCorrect++;
+    $("#lessonNext").classList.remove("hidden");
+    if (correct && currentIsRecovery) $("#lessonKeyboardHint").textContent = "Recovered after other material. That is stronger evidence than an immediate repeat.";
+    else if (!correct && mode === "checkpoint") $("#lessonKeyboardHint").textContent = "The checkpoint keeps your first attempt and sends this idea to later Practice.";
+    else if (!correct) $("#lessonKeyboardHint").textContent = "Continue now. This concept will return after other material in a changed example.";
+    if (mode === "checkpoint" && scoredCorrect) checkpointCorrect++;
     if (currentActivity.audioText && correct) speakJapanese(currentActivity.audioText);
-  }
-
-  function startCorrectiveRetry() {
-    if (!currentActivity) return;
-    const activity = currentActivity;
-    correctingAnswer = true;
-    clearControls();
-    correctingAnswer = true;
-    $("#lessonTrainer").classList.add("correcting-answer", "awaiting-answer");
-    if (activity.type === "choice") renderChoice(activity);
-    if (activity.type === "tiles") renderTiles(activity);
-    if (activity.type === "input") renderInput(activity);
-    $("#lessonActivity").insertAdjacentHTML("afterbegin", `<div class="lesson-correction-banner"><strong>Correct it from memory</strong><span>This retry teaches the idea and does not change your original score.</span></div>`);
-    $("#lessonKeyboardHint").textContent = "Answer again without looking back at the correction.";
   }
 
   function submitCurrent() {
@@ -1275,6 +1267,11 @@
 
   function advanceLearn() {
     const stage = STAGES[state.currentStage];
+    if (currentIsRecovery) {
+      currentIsRecovery = false;
+      renderLearn();
+      return;
+    }
     if (stageCursor >= stage.activities.length) {
       if (state.currentStage < STAGES.length - 1) {
         state.unlockedStage = Math.max(state.unlockedStage, state.currentStage + 1);
@@ -1292,6 +1289,13 @@
       const nextIncomplete = stage.activities.findIndex((activity, index) => index > stageCursor && !activityState(activity).completed);
       stageCursor = nextIncomplete < 0 ? stage.activities.length : nextIncomplete;
     }
+    learnRecoveryQueue.forEach(entry => entry.remaining--);
+    const dueIndex = learnRecoveryQueue.findIndex(entry => entry.remaining <= 0);
+    if (dueIndex >= 0) {
+      const [entry] = learnRecoveryQueue.splice(dueIndex, 1);
+      renderActivity(buildRecoveryActivity(entry.source, "learn", entry.avoidVariantKey));
+      return;
+    }
     renderLearn();
   }
 
@@ -1299,15 +1303,16 @@
     return PRACTICE_FAMILY_BY_ID[activity.id] || activity.id;
   }
 
-  function buildPracticeVariant(activity, sourceMode = "practice") {
+  function buildPracticeVariant(activity, sourceMode = "practice", excludedVariantKey = "") {
     const family = practiceFamily(activity);
     const familyVariants = PRACTICE_FAMILIES[family] || [];
     const allowedKeys = PRACTICE_VARIANT_KEYS_BY_ID[activity.id];
     const variants = allowedKeys ? familyVariants.filter(variant => allowedKeys.includes(variant.key)) : familyVariants;
     if (!variants.length) return activity;
     const recentVariants = new Set((state.variantHistory[family] || []).slice(-3));
-    const available = variants.filter(variant => !recentVariants.has(variant.key));
-    const variant = shuffle(available.length ? available : variants)[0];
+    const available = variants.filter(variant => !recentVariants.has(variant.key) && variant.key !== excludedVariantKey);
+    const changedFallback = variants.filter(variant => variant.key !== excludedVariantKey);
+    const variant = shuffle(available.length ? available : changedFallback.length ? changedFallback : variants)[0];
     const skill = variant.listenOnly || variant.type === "input" ? "Listening" : variant.type === "tiles" ? "Production" : activity.skill;
     return {
       ...activity,
@@ -1318,8 +1323,14 @@
       practiceFamily: family,
       variantKey: variant.key,
       skill,
-      kicker: sourceMode === "checkpoint" ? "Checkpoint · transfer" : "Practice · new example"
+      kicker: sourceMode === "checkpoint" ? "Checkpoint · transfer" : sourceMode === "recovery" || sourceMode === "learn" ? "Memory check · changed example" : "Practice · new example"
     };
+  }
+
+  function buildRecoveryActivity(activity, sourceMode, excludedVariantKey = "") {
+    const variant = buildPracticeVariant(activity, sourceMode === "learn" ? "learn" : "recovery", excludedVariantKey);
+    const changed = variant !== activity && (!excludedVariantKey || variant.variantKey !== excludedVariantKey);
+    return { ...variant, recoveryOf: activity.id, kicker: changed ? "Memory check · changed example" : "Memory check · delayed recall" };
   }
 
   function selectPracticeActivity() {
@@ -1341,6 +1352,12 @@
   }
 
   function renderPractice() {
+    const recoveryIndex = practiceRecoveryQueue.findIndex(entry => entry.dueIndex <= practiceIndex);
+    if (recoveryIndex >= 0) {
+      const [entry] = practiceRecoveryQueue.splice(recoveryIndex, 1);
+      renderActivity(buildRecoveryActivity(entry.source, "practice", entry.avoidVariantKey));
+      return;
+    }
     const activity = selectPracticeActivity();
     if (!activity) {
       renderEmptyMode("Practice opens after your first retrieval activity", "Start the Learn journey so the app has something meaningful to adapt.", "Start learning");
@@ -1351,9 +1368,9 @@
 
   function startPracticeSession() {
     practiceIndex = 0;
-    practiceCorrect = 0;
     practiceResults = [];
     practiceSessionComplete = false;
+    practiceRecoveryQueue.forEach(entry => { entry.dueIndex = Math.min(entry.dueIndex, 2); });
     renderPractice();
   }
 
@@ -1375,13 +1392,19 @@
     $("#lessonTrainer").classList.add("summary-state");
     currentActivity = null;
     practiceSessionComplete = true;
-    const corrected = practiceResults.filter(result => result.answeredCorrect === false).length;
+    const originalResults = practiceResults.filter(result => !result.recovery);
+    const recoveryResults = practiceResults.filter(result => result.recovery);
+    const firstPassCorrect = originalResults.filter(result => result.correct).length;
+    const firstPassTotal = originalResults.length;
+    const recoveredConcepts = new Set(recoveryResults.filter(result => result.correct).map(result => result.conceptId));
+    const missedConcepts = new Set(originalResults.filter(result => !result.correct).map(result => result.conceptId));
+    const unresolved = [...missedConcepts].filter(conceptId => !recoveredConcepts.has(conceptId)).length;
+    const recovered = [...recoveredConcepts].filter(conceptId => missedConcepts.has(conceptId)).length;
     const assisted = practiceResults.filter(result => result.assisted && result.answeredCorrect).length;
-    const independent = practiceResults.filter(result => result.independent && result.correct).length;
-    const firstPass = Math.round(practiceCorrect / PRACTICE_SESSION_LENGTH * 100);
+    const firstPass = firstPassTotal ? Math.round(firstPassCorrect / firstPassTotal * 100) : 0;
     $("#lessonStageProgress").style.width = "100%";
     $("#lessonQuestionCount").textContent = "Review session complete";
-    $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><span class="lesson-activity-kicker">Six focused reviews</span><div class="lesson-checkpoint-score">${firstPass}%</div><h2>${firstPass >= 85 ? "Strong first-pass recall" : firstPass >= 65 ? "Useful retrieval completed" : "Corrections are becoming memories"}</h2><p>${practiceCorrect} of ${PRACTICE_SESSION_LENGTH} were recalled before feedback or assistance. ${corrected ? `${corrected} ${corrected === 1 ? "idea was" : "ideas were"} corrected before continuing.` : "No corrective retries were needed."}${assisted ? ` ${assisted} ${assisted === 1 ? "answer used" : "answers used"} the tile hint.` : ""}</p><div class="lesson-stage-summary-stats"><div class="mini"><strong>${practiceCorrect}/${PRACTICE_SESSION_LENGTH}</strong><span class="tiny">first-pass recall</span></div><div class="mini"><strong>${corrected}</strong><span class="tiny">corrective retries</span></div><div class="mini"><strong>${independent}</strong><span class="tiny">spoken then verified</span></div></div></div>`;
+    $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><span class="lesson-activity-kicker">Six focused reviews</span><div class="lesson-checkpoint-score">${firstPass}%</div><h2>${firstPass >= 85 ? "Strong first-pass recall" : firstPass >= 65 ? "Useful retrieval completed" : recovered ? "Some memories recovered" : "Useful practice completed"}</h2><p>${firstPassCorrect} of ${firstPassTotal} new review prompts were recalled before feedback or assistance. ${recovered ? recovered === 1 ? "One missed concept returned later and was recovered." : `${recovered} missed concepts returned later and were recovered.` : "Missed concepts were not repeated immediately."}${assisted ? ` ${assisted} ${assisted === 1 ? "answer used" : "answers used"} the tile hint.` : ""}</p><div class="lesson-stage-summary-stats"><div class="mini"><strong>${firstPassCorrect}/${firstPassTotal}</strong><span class="tiny">first-pass recall</span></div><div class="mini"><strong>${recovered}</strong><span class="tiny">recovered later</span></div><div class="mini"><strong>${unresolved}</strong><span class="tiny">still needs review</span></div></div></div>`;
     $("#lessonNext").textContent = "Start another 6-review session";
     $("#lessonNext").classList.remove("hidden");
     $("#lessonSessionTitle").textContent = "A useful stopping point";
@@ -1617,13 +1640,12 @@
 
   document.querySelectorAll(".lesson-mode").forEach(button => button.addEventListener("click", () => setMode(button.dataset.mode)));
   $("#lessonNext").addEventListener("click", advance);
-  $("#lessonRetry").addEventListener("click", startCorrectiveRetry);
   $("#lessonSubmit").addEventListener("click", submitCurrent);
   $("#lessonClear").addEventListener("click", () => {
     tileSelection = [];
     renderTileControls();
   });
-  $("#lessonDontKnow").addEventListener("click", () => gradeAnswer(false));
+  $("#lessonDontKnow").addEventListener("click", () => gradeAnswer(false, null, true));
   $("#lessonProfileForm").addEventListener("submit", saveProfile);
   $("#lessonTestSpeech").addEventListener("click", () => speakJapanese("はじめまして。よろしくおねがいします。"));
   document.addEventListener("keydown", event => {
@@ -1637,7 +1659,6 @@
     if (event.target instanceof HTMLButtonElement || event.target instanceof HTMLSelectElement) return;
     event.preventDefault();
     if (!$("#lessonNext").classList.contains("hidden")) advance();
-    else if (!$("#lessonRetry").classList.contains("hidden")) startCorrectiveRetry();
     else if (!$("#lessonSubmit").classList.contains("hidden")) submitCurrent();
   });
 
