@@ -430,6 +430,42 @@
     }
   ];
 
+  const STAGE_WRAPUPS = [
+    {
+      challenge: "You meet Haru for the first time. Open politely, give your name, and close with goodwill.",
+      turns: [["Haru", "はじめまして。はるです。"], ["You", "はじめまして。［your name］です。よろしくおねがいします。"]]
+    },
+    {
+      challenge: "A new classmate introduces herself. Introduce yourself and say that you are a student.",
+      turns: [["Emi", "はじめまして。えみです。"], ["You", "はじめまして。［your name］です。がくせいです。よろしくおねがいします。"]]
+    },
+    {
+      challenge: "Introduce Mika to a classmate: she is Japanese and an international student.",
+      turns: [["You", "みかさんは にほんじんの りゅうがくせいです。"], ["Classmate", "そうですか。"]]
+    },
+    {
+      challenge: "Ask Rina what her major is, listen to her answer, and acknowledge it naturally.",
+      turns: [["You", "りなさんの せんこうは なんですか。"], ["Rina", "けいざいです。"], ["You", "そうですか。"]],
+      coreMilestone: true
+    },
+    {
+      challenge: "Get Professor Yamashita’s attention, address him respectfully, and ask if he teaches Japanese.",
+      turns: [["You", "あのう、やましたせんせいは にほんごの せんせいですか。"], ["Yamashita", "はい、そうです。"]]
+    },
+    {
+      challenge: "Ask whose friend Mari is, then answer that she is Yuki’s friend.",
+      turns: [["You", "まりさんは だれの ともだちですか。"], ["Classmate", "ゆきさんの ともだちです。"]]
+    },
+    {
+      challenge: "Ask a classmate’s school year, then repeat the answer to confirm that you heard correctly.",
+      turns: [["You", "なんねんせいですか。"], ["Classmate", "よねんせいです。"], ["You", "よねんせいですね。"]]
+    },
+    {
+      challenge: "Repeat your side of the first-meeting conversation without looking at the lesson models.",
+      turns: [["You", "はじめまして。［your name］です。"], ["You", "せんこうは なんですか。"], ["You", "そうですか。よろしくおねがいします。"]]
+    }
+  ];
+
   const ANSWER_BREAKDOWNS = {
     "greet-time": [["こんばんは", "good evening · used after the day has turned to evening"]],
     "greet-courtesy": [["すみません", "excuse me / I’m sorry · gets attention, apologises, or shows indebtedness"]],
@@ -786,6 +822,20 @@
     return STAGES[stageIndex].activities.every(activity => activityState(activity).completed);
   }
 
+  function retentionState(activity) {
+    if (activity.type === "teach") return "covered";
+    const progress = activityState(activity);
+    if (!progress.completed) return "new";
+    if (progress.lastWasCorrect && progress.correct >= 3 && progress.interval >= 2 && progress.mastery >= 60) return "secure";
+    return "learning";
+  }
+
+  function stageRetention(stage) {
+    const graded = stage.activities.filter(activity => activity.type !== "teach");
+    const secure = graded.filter(activity => retentionState(activity) === "secure").length;
+    return { secure, total: graded.length };
+  }
+
   function reconcileUnlockedStages() {
     let earnedStage = 0;
     while (earnedStage < STAGES.length - 1 && stageComplete(earnedStage)) earnedStage++;
@@ -818,9 +868,12 @@
     $("#lessonStageCount").textContent = `Stage ${state.currentStage + 1} of ${STAGES.length}`;
     $("#lessonRoadmap").innerHTML = STAGES.map((stage, index) => {
       const complete = stageComplete(index);
+      const retention = stageRetention(stage);
+      const secure = complete && retention.secure === retention.total;
       const locked = index > state.unlockedStage;
       const current = index === state.currentStage && mode === "learn";
-      return `<button class="lesson-roadmap-step ${complete ? "complete" : ""} ${current ? "active" : ""}" data-stage="${index}" type="button" ${locked ? "disabled" : ""}><span class="lesson-roadmap-number">${complete ? "✓" : index + 1}</span><span class="lesson-roadmap-copy"><strong>${stage.title}</strong><span>${stage.short}</span></span><span class="lesson-roadmap-status">${locked ? "Locked" : complete ? "Complete" : current ? "Now" : "Open"}</span></button>`;
+      const status = locked ? "Locked" : secure ? "Secure" : complete ? `Covered · ${retention.secure}/${retention.total} secure` : current ? "Now" : "Open";
+      return `<button class="lesson-roadmap-step ${complete ? "covered" : ""} ${secure ? "secure" : ""} ${current ? "active" : ""}" data-stage="${index}" type="button" ${locked ? "disabled" : ""}><span class="lesson-roadmap-number">${complete ? "✓" : index + 1}</span><span class="lesson-roadmap-copy"><strong>${stage.title}</strong><span>${stage.short}</span></span><span class="lesson-roadmap-status">${status}</span></button>`;
     }).join("");
     $("#lessonRoadmap").querySelectorAll("[data-stage]").forEach(button => button.addEventListener("click", () => {
       state.currentStage = Number(button.dataset.stage);
@@ -1165,15 +1218,31 @@
     currentActivity = null;
     const stage = STAGES[stageIndex];
     const graded = stage.activities.filter(activity => activity.type !== "teach");
+    const retention = stageRetention(stage);
+    const wrapup = STAGE_WRAPUPS[stageIndex];
     const average = Math.round(masteryAverage(graded));
     const correct = graded.reduce((sum, activity) => sum + activityState(activity).correct, 0);
     const attempts = graded.reduce((sum, activity) => sum + activityState(activity).seen, 0);
     $("#lessonStageProgress").style.width = "100%";
-    $("#lessonQuestionCount").textContent = "Stage complete";
-    $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><div class="lesson-stage-summary-icon">✓</div><span class="lesson-activity-kicker">Stage complete</span><h2>${stage.title}</h2><p>${stage.outcome} Weak ideas are already scheduled to return in Practice after some variety.</p><div class="lesson-stage-summary-stats"><div class="mini"><strong>${average}%</strong><span class="tiny">current mastery</span></div><div class="mini"><strong>${attempts ? Math.round(correct / attempts * 100) : 0}%</strong><span class="tiny">first-pass accuracy</span></div><div class="mini"><strong>${graded.length}</strong><span class="tiny">retrieval activities</span></div></div></div>`;
+    $("#lessonQuestionCount").textContent = "Stage covered";
+    const modelTurns = wrapup?.turns.map(([speaker, text]) => {
+      const personalized = text.replace("［your name］", `［${state.profile.name || "your name"}］`);
+      return `<div class="lesson-stage-turn"><span>${escapeHtml(speaker)}</span><strong>${escapeHtml(personalized)}</strong></div>`;
+    }).join("") || "";
+    const milestone = wrapup?.coreMilestone ? `<div class="lesson-core-milestone"><strong>Core conversation ready</strong><span>You can now greet, introduce yourself, ask a personal question, and acknowledge the answer. The remaining stages expand your range.</span></div>` : "";
+    const challenge = wrapup ? `<div class="lesson-stage-challenge"><span>Conversation check</span><p>${escapeHtml(wrapup.challenge)}</p><small>Say your response aloud before revealing the model.</small><button class="ghost" type="button" data-reveal-stage-model>Reveal model</button><div class="lesson-stage-model" hidden>${modelTurns}</div></div>` : "";
+    $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><div class="lesson-stage-summary-icon">✓</div><span class="lesson-activity-kicker">Stage covered</span><h2>${stage.title}</h2><p>${stage.outcome} Coverage opens the next stage; durable recall continues through Practice.</p>${milestone}<div class="lesson-stage-summary-stats"><div class="mini"><strong>${average}%</strong><span class="tiny">current mastery</span></div><div class="mini"><strong>${attempts ? Math.round(correct / attempts * 100) : 0}%</strong><span class="tiny">first-pass accuracy</span></div><div class="mini"><strong>${retention.secure}/${retention.total}</strong><span class="tiny">secure after delay</span></div></div>${challenge}</div>`;
+    $("#lessonActivity").querySelector("[data-reveal-stage-model]")?.addEventListener("click", event => {
+      const model = $("#lessonActivity").querySelector(".lesson-stage-model");
+      if (!model) return;
+      model.hidden = false;
+      event.currentTarget.classList.add("hidden");
+    });
     $("#lessonNext").textContent = stageIndex < STAGES.length - 1 ? "Open next stage" : "View lesson progress";
     $("#lessonNext").classList.remove("hidden");
-    $("#lessonKeyboardHint").textContent = "Completion opens the next conversational job; mastery continues to grow through delayed review.";
+    $("#lessonSessionTitle").textContent = wrapup?.coreMilestone ? "Your core conversation is ready" : "Turn this stage into conversation";
+    $("#lessonSessionCopy").textContent = "Produce the conversation check before revealing its model. Practice will return weak ideas in new combinations after a delay.";
+    $("#lessonKeyboardHint").textContent = "Coverage opens the next conversational job; secure status requires successful delayed recall.";
   }
 
   function advanceLearn() {
