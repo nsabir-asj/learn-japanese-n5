@@ -314,7 +314,7 @@
         },
         {
           id: "details-phone", type: "input", skill: "Listening", kicker: "Audio-only details", title: "Enter the telephone digits.", prompt: "Listen and type only the four digits.",
-          audioText: "さん、ぜろ、はち、よん", answers: ["3084"], inputMode: "numeric", placeholder: "Four digits", correction: "3084",
+          audioText: "さん、ぜろ、はち、よん", answers: ["3084"], inputMode: "numeric", placeholder: "XXXX", correction: "3084",
           explanation: "Telephone numbers are read one digit at a time. Replaying is allowed because the skill is accurate decoding, not memory for the recording."
         },
         {
@@ -324,17 +324,17 @@
         },
         {
           id: "details-time-listen", type: "input", skill: "Listening", kicker: "Hear a complete time", title: "What time did you hear?", prompt: "Enter the time using digits and a colon.",
-          audioText: "ごぜん、くじはんです。", answers: ["9:30", "09:30"], inputMode: "text", placeholder: "9:30", correction: "9:30 a.m. · ごぜん くじはん",
+          audioText: "ごぜん、くじはんです。", answers: ["9:30", "09:30"], inputMode: "text", placeholder: "HH:MM", correction: "9:30 a.m. · ごぜん くじはん",
           explanation: "ごぜん signals a.m.; くじ is nine o’clock and はん adds half past."
         },
         {
           id: "details-age-listen", type: "input", skill: "Listening", kicker: "Decode an age", title: "How old is the person?", prompt: "Listen and enter only the age in digits.",
-          audioText: "さんじゅうごさいです。", answers: ["35"], inputMode: "numeric", placeholder: "Age", correction: "35 years old · さんじゅうごさい",
+          audioText: "さんじゅうごさいです。", answers: ["35"], inputMode: "numeric", placeholder: "Enter a number", correction: "35 years old · さんじゅうごさい",
           explanation: "Age attaches さい to the number. Important sound changes return through Practice rather than being memorised as an isolated chart."
         },
         {
           id: "details-phone-long", type: "input", skill: "Listening", kicker: "Longer telephone decoding", title: "Enter the complete telephone number.", prompt: "Listen to each digit. Hyphens are optional.",
-          audioText: "はち、ろく、なな、ご、さん、ぜろ、きゅう", answers: ["8675309", "867-5309"], inputMode: "tel", placeholder: "867-5309", correction: "867-5309",
+          audioText: "はち、ろく、なな、ご、さん、ぜろ、きゅう", answers: ["8675309", "867-5309"], inputMode: "tel", placeholder: "XXX-XXXX", correction: "867-5309",
           explanation: "Telephone numbers are decoded one digit at a time. Seven is often なな and nine is often きゅう because they are easy to distinguish."
         },
         {
@@ -395,7 +395,7 @@
         },
         {
           id: "mission-phone", type: "input", skill: "Listening", kicker: "Mission · exchange details", title: "Aoi shares her telephone number.", prompt: "Listen and type the four digits.",
-          audioText: "に、よん、ろく、はち", answers: ["2468"], inputMode: "numeric", placeholder: "Four digits", correction: "2468",
+          audioText: "に、よん、ろく、はち", answers: ["2468"], inputMode: "numeric", placeholder: "XXXX", correction: "2468",
           explanation: "Decode each telephone digit independently. Replaying remains available because accurate listening is the target."
         },
         {
@@ -604,8 +604,8 @@
       practiceTiles("brother-student", "Build: “Ken’s older brother is a graduate student.”", "Construct the family description.", ["けんさんの", "おにいさんは", "だいがくいんせい", "です。"], ["おとうとは", "だいがくせい", "なん", "か。"], "けんさんの おにいさんは だいがくいんせいです。", "The family noun phrase becomes the topic before the school identity.", "けんさんの、おにいさんは、だいがくいんせいです。", [["けんさんの", "Ken’s"], ["おにいさん", "older brother"], ["だいがくいんせい", "graduate student"]])
     ],
     ageYear: [
-      practiceInput("age-18-listen", "How old is the person?", "Listen and enter digits only.", ["18"], "18 years old · じゅうはっさい", "Eight changes to はっ before the age counter さい.", "じゅうはっさいです。", "Age", "numeric", [["じゅう", "ten"], ["はっさい", "eight years old · sound change"]]),
-      practiceInput("age-21-listen", "Enter the age you hear.", "Type digits only.", ["21"], "21 years old · にじゅういっさい", "One changes to いっ before さい.", "にじゅういっさいです。", "Age", "numeric", [["にじゅう", "twenty"], ["いっさい", "one year old · sound change"]]),
+      practiceInput("age-18-listen", "How old is the person?", "Listen and enter digits only.", ["18"], "18 years old · じゅうはっさい", "Eight changes to はっ before the age counter さい.", "じゅうはっさいです。", "Enter a number", "numeric", [["じゅう", "ten"], ["はっさい", "eight years old · sound change"]]),
+      practiceInput("age-21-listen", "Enter the age you hear.", "Type digits only.", ["21"], "21 years old · にじゅういっさい", "One changes to いっ before さい.", "にじゅういっさいです。", "Enter a number", "numeric", [["にじゅう", "twenty"], ["いっさい", "one year old · sound change"]]),
       practiceChoice("year-two", "The answer is にねんせいです。", "Which English meaning fits?", ["Second-year student", "Two years old", "Two o’clock", "Second major"], "second-year student", "ねんせい counts school years, not age or time.", "にねんせいです。", [["に", "two"], ["ねんせい", "year student"]]),
       practiceChoice("age-20", "Which complete answer means “I am 20 years old”?", "Choose the special form.", ["はたちです。", "にじゅうさいです。", "にじゅうねんせいです。", "はちじです。"], "はたちです。", "Age 20 uses the special word はたち.", "はたちです。", [["はたち", "20 years old · special word"], ["です", "am"]]),
       practiceTiles("age-question", "Ask Mei how old she is.", "Build the question using her name.", ["めいさんは", "なんさい", "です", "か。"], ["なんねんせい", "なんじ", "はたち", "ね。"], "めいさんは なんさいですか。", "なんさい asks a person’s age; the name plus は makes Mei the topic.", "めいさんは、なんさいですか。", [["めいさん", "Mei"], ["は", "topic marker · pronounced wa"], ["なんさい", "how old · what age"], ["ですか", "are you? · polite question"]]),
@@ -613,16 +613,16 @@
       practiceChoice("year-six", "ろくねんせいです。", "What information is being given?", ["The person is a sixth-year student", "The person is six years old", "It is six o’clock", "The number is six"], "sixth-year student", "ろくねんせい is a school-year identity.", "ろくねんせいです。", [["ろく", "six"], ["ねんせい", "year student"]])
     ],
     phone: [
-      practiceInput("phone-4159", "Enter the telephone digits.", "Listen and type four digits.", ["4159"], "4159", "Telephone numbers are decoded one digit at a time.", "よん、いち、ご、きゅう", "Four digits", "numeric", [["よん", "4"], ["いち", "1"], ["ご", "5"], ["きゅう", "9"]]),
-      practiceInput("phone-2839547", "Enter the complete telephone number.", "Hyphens are optional.", ["2839547", "283-9547"], "283-9547", "Each digit is independent; なな and きゅう remain easy to distinguish.", "に、はち、さん、きゅう、ご、よん、なな", "283-9547", "tel", [["に", "2"], ["はち", "8"], ["さん", "3"], ["きゅう", "9"], ["ご", "5"], ["よん", "4"], ["なな", "7"]]),
+      practiceInput("phone-4159", "Enter the telephone digits.", "Listen and type four digits.", ["4159"], "4159", "Telephone numbers are decoded one digit at a time.", "よん、いち、ご、きゅう", "XXXX", "numeric", [["よん", "4"], ["いち", "1"], ["ご", "5"], ["きゅう", "9"]]),
+      practiceInput("phone-2839547", "Enter the complete telephone number.", "Hyphens are optional.", ["2839547", "283-9547"], "283-9547", "Each digit is independent; なな and きゅう remain easy to distinguish.", "に、はち、さん、きゅう、ご、よん、なな", "XXX-XXXX", "tel", [["に", "2"], ["はち", "8"], ["さん", "3"], ["きゅう", "9"], ["ご", "5"], ["よん", "4"], ["なな", "7"]]),
       practiceTiles("confirm-4159", "Confirm: “4159, right?”", "Build the short confirmation.", ["4159", "です", "ね。"], ["か。", "なんばん", "の", "いいえ"], "4159ですね。", "ね invites the other person to confirm what you heard.", "よん、いち、ご、きゅう、ですね。", [["4159", "digits heard"], ["です", "is"], ["ね", "right? · confirmation"]]),
       practiceChoice("confirm-reply", "Someone repeats your number correctly with ですね。", "How do you confirm it?", ["はい、そうです。", "そうですか。", "いいえ、なんさいです。", "なんばんですか。"], "はい、そうです。", "はい、そうです confirms that the repeated number is correct.", "はい、そうです。", [["はい", "yes"], ["そうです", "that’s right"]]),
       practiceChoice("phone-question", "Which question asks for a telephone number?", "Choose the complete question.", ["でんわばんごうは なんばんですか。", "でんわばんごうは なんじですか。", "なんさいですか。", "せんこうは なんですか。"], "でんわばんごうは なんばんですか。", "The topic says telephone number and なんばん asks which number.", "でんわばんごうは、なんばんですか。", [["でんわばんごう", "telephone number"], ["なんばん", "what number"], ["ですか", "is it?"]]),
-      practiceInput("phone-6072", "What number did you hear?", "Type the four digits.", ["6072"], "6072", "Zero may be pronounced ゼロ; the other digits retain their ordinary telephone readings.", "ろく、ゼロ、なな、に", "Four digits", "numeric", [["ろく", "6"], ["ゼロ", "0"], ["なな", "7"], ["に", "2"]])
+      practiceInput("phone-6072", "What number did you hear?", "Type the four digits.", ["6072"], "6072", "Zero may be pronounced ゼロ; the other digits retain their ordinary telephone readings.", "ろく、ゼロ、なな、に", "XXXX", "numeric", [["ろく", "6"], ["ゼロ", "0"], ["なな", "7"], ["に", "2"]])
     ],
     time: [
-      practiceInput("time-730", "What time did you hear?", "Enter digits with a colon.", ["7:30", "07:30"], "7:30 a.m. · ごぜん しちじはん", "ごぜん marks a.m.; しちじ is seven o’clock and はん adds half past.", "ごぜん、しちじはんです。", "7:30", "text", [["ごぜん", "a.m."], ["しちじ", "seven o’clock"], ["はん", "half past"]]),
-      practiceInput("time-400", "Enter the time you hear.", "Use digits and a colon.", ["4:00", "04:00", "4"], "4:00 · よじ", "Four o’clock uses the special reading よじ.", "よじです。", "4:00", "text", [["よじ", "four o’clock · special reading"]]),
+      practiceInput("time-730", "What time did you hear?", "Enter digits with a colon.", ["7:30", "07:30"], "7:30 a.m. · ごぜん しちじはん", "ごぜん marks a.m.; しちじ is seven o’clock and はん adds half past.", "ごぜん、しちじはんです。", "HH:MM", "text", [["ごぜん", "a.m."], ["しちじ", "seven o’clock"], ["はん", "half past"]]),
+      practiceInput("time-400", "Enter the time you hear.", "Use digits and a colon.", ["4:00", "04:00", "4"], "4:00 · よじ", "Four o’clock uses the special reading よじ.", "よじです。", "HH:MM", "text", [["よじ", "four o’clock · special reading"]]),
       practiceChoice("time-nine", "The clock shows 9:00.", "Which answer is standard?", ["くじです。", "きゅうじです。", "くさいです。", "きゅうねんせいです。"], "くじです。", "Nine o’clock uses くじ rather than きゅうじ.", "くじです。", [["くじ", "nine o’clock"], ["です", "is"]]),
       practiceTiles("time-london", "Ask: “What time is it now in London?”", "Build the city-time question.", ["ロンドンは", "いま", "なんじ", "です", "か。"], ["なんさい", "なんばん", "ごご", "ね。"], "ロンドンは いま なんじですか。", "The city becomes the topic; いま なんじ asks the current time.", "ロンドンは、いま、なんじですか。", [["ロンドン", "London"], ["は", "topic marker"], ["いま", "now"], ["なんじ", "what time"], ["ですか", "is it?"]]),
       practiceChoice("time-pm", "It is 6:00 p.m. in London.", "Choose the complete answer.", ["ごご ろくじです。", "ごぜん ろくじです。", "ろくねんせいです。", "ごご ろくさいです。"], "ごご ろくじです。", "ごご marks p.m.; ろくじ is six o’clock.", "ごご、ろくじです。", [["ごご", "p.m."], ["ろくじ", "six o’clock"]]),
@@ -633,7 +633,7 @@
       practiceChoice("listen-profile", "What did Sora tell you?", "Listen and choose the complete profile.", ["Sora is a Korean third-year economics major", "Sora is a Japanese economics teacher", "Sora is a second-year biology major", "Sora is a Korean nurse"], "Korean · third year · economics", "The three short sentences continue describing the same person.", "かんこくじんです。さんねんせいです。せんこうは、けいざいです。", [["かんこくじん", "Korean person"], ["さんねんせい", "third-year student"], ["けいざい", "economics"]], true),
       practiceTiles("mission-major", "Ask Kai what his major is.", "Use his name and build the question.", ["かいさんの", "せんこうは", "なん", "です", "か。"], ["なんさい", "なんじ", "がくせい", "ね。"], "かいさんの せんこうは なんですか。", "The name identifies whose major; なん marks the unknown information.", "かいさんの、せんこうは、なんですか。", [["かいさんの", "Kai’s"], ["せんこう", "major"], ["なん", "what"], ["ですか", "is it?"]]),
       practiceChoice("mission-acknowledge", "Kai says his major is engineering.", "How do you naturally acknowledge the new information?", ["そうですか。", "そうです。", "いいえ、こうがくです。", "なんさいですか。"], "そうですか。", "そうですか receives new information as “I see.”", "そうですか。", [["そうですか", "I see / is that so?"]]),
-      practiceInput("mission-phone", "A new classmate gives a telephone number.", "Listen and type the four digits.", ["7315"], "7315", "Decode the number one digit at a time rather than memorising an earlier recording.", "なな、さん、いち、ご", "Four digits", "numeric", [["なな", "7"], ["さん", "3"], ["いち", "1"], ["ご", "5"]]),
+      practiceInput("mission-phone", "A new classmate gives a telephone number.", "Listen and type the four digits.", ["7315"], "7315", "Decode the number one digit at a time rather than memorising an earlier recording.", "なな、さん、いち、ご", "XXXX", "numeric", [["なな", "7"], ["さん", "3"], ["いち", "1"], ["ご", "5"]]),
       practiceTiles("mission-close", "Thank the classmate and close warmly.", "Build a natural short ending after exchanging details.", ["ありがとうございます。", "よろしくおねがいします。"], ["なんさいですか。", "いいえ。", "いただきます。", "ただいま。"], "ありがとうございます。よろしくおねがいします。", "Thanks acknowledges the help or information; よろしく preserves goodwill for the new relationship.", "ありがとうございます。よろしくおねがいします。", [["ありがとうございます", "thank you · polite"], ["よろしくおねがいします", "please treat me kindly"]])
     ]
   };
@@ -742,7 +742,6 @@
   let checkpointQueue = [];
   let checkpointIndex = 0;
   let checkpointCorrect = 0;
-  let currentAudioText = "";
   let speechVoices = [];
   let emptyNextMode = null;
 
@@ -794,7 +793,7 @@
   }
 
   function renderRoadmap() {
-    $("#lessonStageCount").textContent = `${state.currentStage + 1} / ${STAGES.length}`;
+    $("#lessonStageCount").textContent = `Stage ${state.currentStage + 1} of ${STAGES.length}`;
     $("#lessonRoadmap").innerHTML = STAGES.map((stage, index) => {
       const complete = stageComplete(index);
       const locked = index > state.unlockedStage;
@@ -822,7 +821,6 @@
   function renderActivity(activity) {
     emptyNextMode = null;
     currentActivity = activity;
-    currentAudioText = activity.audioText || "";
     clearControls();
     $("#lessonNext").innerHTML = `${mode === "practice" ? "Next review" : mode === "checkpoint" ? "Next question" : "Continue"} <kbd>Enter</kbd>`;
     const progress = activityState(activity);
@@ -834,20 +832,21 @@
         ? checkpointIndex / checkpointQueue.length * 100
         : stageCompleted / stage.activities.length * 100;
     $("#lessonStageProgress").style.width = `${stageProgress}%`;
-    $("#lessonQuestionCount").textContent = mode === "checkpoint" ? `Question ${checkpointIndex + 1} of ${checkpointQueue.length}` : mode === "practice" ? `${progress.seen} previous attempts` : `Activity ${activity.activityIndex + 1} of ${stage.activities.length}`;
+    $("#lessonQuestionCount").textContent = mode === "checkpoint" ? `Question ${checkpointIndex + 1} of ${checkpointQueue.length}` : mode === "practice" ? `${progress.seen} previous ${progress.seen === 1 ? "attempt" : "attempts"}` : `Activity ${activity.activityIndex + 1} of ${stage.activities.length}`;
     $("#lessonSessionTitle").textContent = stage.outcome;
     $("#lessonSessionCopy").textContent = activity.explanation || activity.instruction || "Retrieve the idea in a new form before moving on.";
-    $("#lessonReplay").disabled = !currentAudioText || !japaneseSpeechReady();
-
     if (activity.type === "teach") renderTeach(activity);
     if (activity.type === "choice") renderChoice(activity);
     if (activity.type === "tiles") renderTiles(activity);
     if (activity.type === "input") renderInput(activity);
+    refreshActivityAudioControls();
     if (activity.audioText && (activity.listenOnly || activity.type === "input")) setTimeout(() => speakJapanese(activity.audioText), 120);
   }
 
   function activityHeading(activity) {
-    return `<div class="lesson-activity-heading"><span class="lesson-activity-kicker">${activity.kicker}</span><h2>${activity.title}</h2>${activity.instruction ? `<p>${activity.instruction}</p>` : ""}</div>`;
+    const stage = STAGES[activity.stageIndex];
+    const origin = mode !== "learn" && stage ? `<span class="lesson-activity-origin">Stage ${activity.stageIndex + 1} of ${STAGES.length} · ${escapeHtml(stage.title)} · ${escapeHtml(activity.skill)}</span>` : "";
+    return `<div class="lesson-activity-heading"><span class="lesson-activity-kicker">${activity.kicker}</span>${origin}<h2>${activity.title}</h2>${activity.instruction ? `<p>${activity.instruction}</p>` : ""}</div>`;
   }
 
   function renderTeach(activity) {
@@ -904,9 +903,13 @@
     return `<div class="lesson-model"><div class="lesson-model-row"><span>Your introduction</span><strong>はじめまして。［${escapeHtml(state.profile.name || "your name")}］です。</strong></div>${details.filter(detail => detail[0] !== "Name").map(detail => `<div class="lesson-model-row"><span>${escapeHtml(detail[0])}</span><strong>${escapeHtml(detail[1])}</strong></div>`).join("")}</div><div class="lesson-rule">Say your real information aloud before choosing Aoi’s next response. The app keeps these details only in this browser.</div>`;
   }
 
+  function hasPromptAudio(activity) {
+    return Boolean(activity.audioText && (activity.listenOnly || activity.type === "input"));
+  }
+
   function promptMarkup(activity) {
     const context = activity.context ? `<div class="lesson-context">${escapeHtml(activity.context)}</div>` : "";
-    const listening = activity.listenOnly ? `<button class="lesson-listen-button" type="button" data-listen aria-label="Play Japanese again">🔊</button>` : "";
+    const listening = hasPromptAudio(activity) ? `<button class="lesson-listen-button" type="button" data-listen aria-label="Replay question audio" title="Replay question audio">🔊</button>` : "";
     return `${context}<div class="lesson-prompt">${listening}<span class="lesson-prompt-label">Your task</span><div>${escapeHtml(activity.prompt || "Choose the best answer.")}</div></div>`;
   }
 
@@ -916,7 +919,7 @@
     $("#lessonActivity").querySelector("[data-listen]")?.addEventListener("click", () => speakJapanese(activity.audioText));
     $("#lessonActivity").querySelectorAll("[data-choice]").forEach(button => button.addEventListener("click", () => gradeAnswer(Number(button.dataset.choice) === activity.answer, Number(button.dataset.choice))));
     $("#lessonDontKnow").classList.remove("hidden");
-    $("#lessonKeyboardHint").textContent = "Keyboard: 1–4 choose an answer. Replays do not reduce mastery.";
+    $("#lessonKeyboardHint").textContent = hasPromptAudio(activity) ? "Keyboard: 1–4 choose an answer. Replay the question as needed." : "Keyboard: 1–4 choose an answer. Pronunciation appears after you answer.";
   }
 
   function renderTiles(activity) {
@@ -975,7 +978,10 @@
     feedback.className = `feedback lesson-feedback show ${correct ? "good" : "bad"}`;
     const breakdown = currentActivity.breakdown || ANSWER_BREAKDOWNS[currentActivity.id] || [];
     const breakdownMarkup = breakdown.length ? `<div class="lesson-answer-breakdown"><span class="lesson-breakdown-label">Answer breakdown</span><div class="lesson-breakdown-pieces">${breakdown.map(([piece, meaning]) => `<span class="lesson-breakdown-piece"><strong>${escapeHtml(piece)}</strong><small>${escapeHtml(meaning)}</small></span>`).join("")}</div></div>` : "";
-    feedback.innerHTML = `<strong>${correct ? "Correct" : "Build this memory"}</strong><div class="meta"><span class="lesson-correction">${escapeHtml(currentActivity.correction || "Review the model")}</span>${breakdownMarkup}<span class="lesson-feedback-explanation">${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span></div>`;
+    const answerAudio = currentActivity.audioText && !hasPromptAudio(currentActivity) ? `<button class="ghost lesson-answer-audio" type="button" data-answer-audio>🔊 Hear answer</button>` : "";
+    feedback.innerHTML = `<strong>${correct ? "Correct" : "Build this memory"}</strong><div class="meta"><span class="lesson-correction">${escapeHtml(currentActivity.correction || "Review the model")}</span>${breakdownMarkup}<span class="lesson-feedback-explanation">${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span>${answerAudio}</div>`;
+    feedback.querySelector("[data-answer-audio]")?.addEventListener("click", () => speakJapanese(currentActivity.audioText));
+    refreshActivityAudioControls();
   }
 
   function updateResult(activity, correct) {
@@ -1072,7 +1078,6 @@
   function renderStageSummary(stageIndex) {
     clearControls();
     currentActivity = null;
-    currentAudioText = "";
     const stage = STAGES[stageIndex];
     const graded = stage.activities.filter(activity => activity.type !== "teach");
     const average = Math.round(masteryAverage(graded));
@@ -1191,7 +1196,6 @@
   function renderCheckpointSummary() {
     clearControls();
     currentActivity = null;
-    currentAudioText = "";
     const percent = Math.round(checkpointCorrect / checkpointQueue.length * 100);
     $("#lessonStageProgress").style.width = `${percent}%`;
     $("#lessonQuestionCount").textContent = "Checkpoint complete";
@@ -1205,7 +1209,6 @@
     emptyNextMode = "learn";
     clearControls();
     currentActivity = null;
-    currentAudioText = "";
     $("#lessonStageProgress").style.width = "0%";
     $("#lessonQuestionCount").textContent = "Not enough material yet";
     $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><div class="lesson-stage-summary-icon">→</div><h2>${title}</h2><p>${copy}</p></div>`;
@@ -1220,6 +1223,7 @@
     mode = nextMode;
     $("#lessonProgressPanel").classList.toggle("hidden", mode !== "progress");
     $("#lessonWorkspace").classList.toggle("hidden", mode === "progress");
+    $("#lessonWorkspace").classList.toggle("lesson-focused-workspace", mode === "practice" || mode === "checkpoint");
     document.querySelectorAll(".lesson-mode").forEach(button => button.classList.toggle("active", button.dataset.mode === mode));
     if (mode === "progress") {
       renderProgressPanel();
@@ -1343,7 +1347,13 @@
     if (!("speechSynthesis" in window)) return;
     speechVoices = window.speechSynthesis.getVoices();
     renderSpeechStatus();
-    $("#lessonReplay").disabled = !currentAudioText || !japaneseSpeechReady();
+    refreshActivityAudioControls();
+  }
+
+  function refreshActivityAudioControls() {
+    document.querySelectorAll("[data-listen], [data-answer-audio]").forEach(button => {
+      button.disabled = !japaneseSpeechReady();
+    });
   }
 
   function renderSpeechStatus() {
@@ -1369,7 +1379,6 @@
   $("#lessonSubmit").addEventListener("click", submitCurrent);
   $("#lessonClear").addEventListener("click", () => { tileSelection = []; renderTileControls(); });
   $("#lessonDontKnow").addEventListener("click", () => gradeAnswer(false));
-  $("#lessonReplay").addEventListener("click", () => speakJapanese(currentAudioText));
   $("#lessonProfileForm").addEventListener("submit", saveProfile);
   $("#lessonTestSpeech").addEventListener("click", () => speakJapanese("はじめまして。よろしくおねがいします。"));
   document.addEventListener("keydown", event => {
