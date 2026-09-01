@@ -811,6 +811,7 @@
 
   function clearControls() {
     ["#lessonDontKnow", "#lessonClear", "#lessonSubmit", "#lessonNext"].forEach(selector => $(selector).classList.add("hidden"));
+    $("#lessonTrainer").classList.remove("awaiting-answer");
     $("#lessonFeedback").className = "feedback lesson-feedback";
     $("#lessonFeedback").innerHTML = "";
     currentAnswered = false;
@@ -839,6 +840,7 @@
     if (activity.type === "choice") renderChoice(activity);
     if (activity.type === "tiles") renderTiles(activity);
     if (activity.type === "input") renderInput(activity);
+    $("#lessonTrainer").classList.toggle("awaiting-answer", ["choice", "tiles", "input"].includes(activity.type));
     refreshActivityAudioControls();
     if (activity.audioText && (activity.listenOnly || activity.type === "input")) setTimeout(() => speakJapanese(activity.audioText), 120);
   }
@@ -1024,6 +1026,7 @@
   function gradeAnswer(correct, selectedChoice = null) {
     if (!currentActivity || currentAnswered || currentActivity.type === "teach") return;
     currentAnswered = true;
+    $("#lessonTrainer").classList.remove("awaiting-answer");
     if (currentActivity.type === "choice") {
       $("#lessonActivity").querySelectorAll("[data-choice]").forEach(button => {
         button.disabled = true;
