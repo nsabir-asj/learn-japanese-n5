@@ -811,7 +811,7 @@
 
   function clearControls() {
     ["#lessonDontKnow", "#lessonClear", "#lessonSubmit", "#lessonNext"].forEach(selector => $(selector).classList.add("hidden"));
-    $("#lessonTrainer").classList.remove("awaiting-answer");
+    $("#lessonTrainer").classList.remove("awaiting-answer", "summary-state");
     $("#lessonFeedback").className = "feedback lesson-feedback";
     $("#lessonFeedback").innerHTML = "";
     currentAnswered = false;
@@ -1080,6 +1080,7 @@
 
   function renderStageSummary(stageIndex) {
     clearControls();
+    $("#lessonTrainer").classList.add("summary-state");
     currentActivity = null;
     const stage = STAGES[stageIndex];
     const graded = stage.activities.filter(activity => activity.type !== "teach");
@@ -1198,6 +1199,7 @@
 
   function renderCheckpointSummary() {
     clearControls();
+    $("#lessonTrainer").classList.add("summary-state");
     currentActivity = null;
     const percent = Math.round(checkpointCorrect / checkpointQueue.length * 100);
     $("#lessonStageProgress").style.width = `${percent}%`;
@@ -1211,6 +1213,7 @@
   function renderEmptyMode(title, copy, buttonLabel) {
     emptyNextMode = "learn";
     clearControls();
+    $("#lessonTrainer").classList.add("summary-state");
     currentActivity = null;
     $("#lessonStageProgress").style.width = "0%";
     $("#lessonQuestionCount").textContent = "Not enough material yet";
