@@ -17,6 +17,24 @@
   const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
   const normalize = value => String(value ?? "").toLowerCase().trim().replace(/[\s。、・,.!?！？:：'’_-]+/g, "").replace(/ō/g, "ou");
+  const COMMON_MISTAKE_GUIDANCE = {
+    "いただきます。": "いただきます belongs before eating, not after the meal.",
+    "ごちそうさまでした。": "ごちそうさまでした belongs after eating, when expressing appreciation for the meal.",
+    "ただいま。": "ただいま is said by the person returning home.",
+    "おかえりなさい。": "おかえりなさい is said to welcome somebody back home.",
+    "いってきます。": "いってきます is said by the person leaving home and expecting to return.",
+    "いってらっしゃい。": "いってらっしゃい is the response to the person who is leaving.",
+    "そうです。": "そうです confirms that something is correct; it does not normally acknowledge new information.",
+    "そうですか。": "そうですか receives new information as “I see” or “is that so?”; it does not directly confirm a repeated fact.",
+    "なんさい": "なんさい asks a person’s age.",
+    "なんねんせい": "なんねんせい asks which school year somebody is in.",
+    "なんじ": "なんじ asks the time.",
+    "なんばん": "なんばん asks which number.",
+    "か。": "か turns a sentence into a question; it does not provide the missing information by itself.",
+    "ね。": "ね asks for agreement or confirmation rather than introducing a neutral information question.",
+    "ごぜん": "ごぜん marks a.m., before noon.",
+    "ごご": "ごご marks p.m., after noon."
+  };
 
   const STAGES = [
     {
@@ -734,10 +752,14 @@
   let mode = "learn";
   let currentActivity = null;
   let currentAnswered = false;
+  let correctingAnswer = false;
+  let correctionAttempts = 0;
   let stageCursor = null;
   let replayingStage = false;
   let tileSelection = [];
   let tileBank = [];
+  let tileBankRevealed = true;
+  let currentUsedSupport = false;
   let currentDistractorCount = 0;
   let checkpointQueue = [];
   let checkpointIndex = 0;
@@ -810,18 +832,22 @@
   }
 
   function clearControls() {
-    ["#lessonDontKnow", "#lessonClear", "#lessonSubmit", "#lessonNext"].forEach(selector => $(selector).classList.add("hidden"));
-    $("#lessonTrainer").classList.remove("awaiting-answer", "summary-state");
+    ["#lessonDontKnow", "#lessonClear", "#lessonSubmit", "#lessonRetry", "#lessonNext"].forEach(selector => $(selector).classList.add("hidden"));
+    $("#lessonTrainer").classList.remove("awaiting-answer", "summary-state", "correcting-answer");
     $("#lessonFeedback").className = "feedback lesson-feedback";
     $("#lessonFeedback").innerHTML = "";
     currentAnswered = false;
     tileSelection = [];
     tileBank = [];
+    tileBankRevealed = true;
+    currentUsedSupport = false;
   }
 
   function renderActivity(activity) {
     emptyNextMode = null;
     currentActivity = activity;
+    correctingAnswer = false;
+    correctionAttempts = 0;
     clearControls();
     $("#lessonNext").innerHTML = `${mode === "practice" ? "Next review" : mode === "checkpoint" ? "Next question" : "Continue"} <kbd>Enter</kbd>`;
     const progress = activityState(activity);
@@ -939,13 +965,26 @@
       const secondPosition = answerPositions[1];
       [tileBank[firstPosition], tileBank[secondPosition]] = [tileBank[secondPosition], tileBank[firstPosition]];
     }
+    tileBankRevealed = mode === "learn";
+    currentUsedSupport = tileBankRevealed;
     const extraNote = currentDistractorCount ? `<div class="lesson-tile-note"><strong>Choose only what you need.</strong> Some tiles are extras.</div>` : "";
-    $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + `<div class="lesson-tiles">${extraNote}<div class="lesson-tile-answer" id="lessonTileAnswer"></div><div class="lesson-tile-bank" id="lessonTileBank"></div></div>`;
-    renderTileControls();
+    const independentRecall = mode === "learn" ? "" : `<div class="lesson-independent-recall" id="lessonIndependentRecall"><span>Independent recall</span><input class="lesson-answer-input" id="lessonRecallInput" autocomplete="off" spellcheck="false" placeholder="Type the complete Japanese answer" /><p>${mode === "practice" ? "Try from memory first. You can open the word bank if you need it." : "Type without a word bank so the checkpoint measures recall."}</p>${mode === "practice" ? `<button class="ghost" type="button" data-show-word-bank>Use word bank</button>` : ""}</div>`;
+    $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + independentRecall + `<div class="lesson-tiles ${tileBankRevealed ? "" : "hidden"}" id="lessonTileBuilder">${extraNote}<div class="lesson-tile-answer" id="lessonTileAnswer"></div><div class="lesson-tile-bank" id="lessonTileBank"></div></div>`;
+    if (tileBankRevealed) renderTileControls();
+    $("#lessonActivity").querySelector("[data-show-word-bank]")?.addEventListener("click", revealTileBank);
     $("#lessonClear").classList.remove("hidden");
     $("#lessonSubmit").classList.remove("hidden");
     $("#lessonDontKnow").classList.remove("hidden");
-    $("#lessonKeyboardHint").textContent = currentDistractorCount ? "Build from meaning. Extra tiles can remain in the bank." : "Build from meaning. Click an answer tile to return it to the bank.";
+    $("#lessonKeyboardHint").textContent = mode === "checkpoint" ? "Type from memory. The checkpoint does not provide a word bank." : mode === "practice" ? "Type from memory for stronger practice, or use the word bank when needed." : currentDistractorCount ? "Build from meaning. Extra tiles can remain in the bank." : "Build from meaning. Click an answer tile to return it to the bank.";
+    setTimeout(() => $("#lessonRecallInput")?.focus(), 0);
+  }
+
+  function revealTileBank() {
+    tileBankRevealed = true;
+    currentUsedSupport = true;
+    $("#lessonIndependentRecall")?.classList.add("hidden");
+    $("#lessonTileBuilder")?.classList.remove("hidden");
+    renderTileControls();
   }
 
   function renderTileControls() {
@@ -975,13 +1014,27 @@
     setTimeout(() => $("#lessonAnswerInput")?.focus(), 0);
   }
 
-  function showFeedback(correct) {
+  function selectedAnswerText(selectedChoice) {
+    if (currentActivity?.type !== "choice" || selectedChoice === null || selectedChoice === undefined) return "";
+    return currentActivity.options?.[selectedChoice] || "";
+  }
+
+  function mistakeExplanation(selectedChoice) {
+    if (selectedChoice === null || selectedChoice === undefined) return "You revealed the answer. Read it once, then retrieve it yourself.";
+    const selected = selectedAnswerText(selectedChoice);
+    const targeted = currentActivity.mistakes?.[selectedChoice];
+    return targeted || COMMON_MISTAKE_GUIDANCE[selected] || `You chose “${selected}”. Compare its meaning or conversational job with the correct answer below.`;
+  }
+
+  function showFeedback(correct, selectedChoice = null, corrected = false) {
     const feedback = $("#lessonFeedback");
     feedback.className = `feedback lesson-feedback show ${correct ? "good" : "bad"}`;
     const breakdown = currentActivity.breakdown || ANSWER_BREAKDOWNS[currentActivity.id] || [];
     const breakdownMarkup = breakdown.length ? `<div class="lesson-answer-breakdown"><span class="lesson-breakdown-label">Answer breakdown</span><div class="lesson-breakdown-pieces">${breakdown.map(([piece, meaning]) => `<span class="lesson-breakdown-piece"><strong>${escapeHtml(piece)}</strong><small>${escapeHtml(meaning)}</small></span>`).join("")}</div></div>` : "";
     const answerAudio = currentActivity.audioText && !hasPromptAudio(currentActivity) ? `<button class="ghost lesson-answer-audio" type="button" data-answer-audio>🔊 Hear answer</button>` : "";
-    feedback.innerHTML = `<strong>${correct ? "Correct" : "Build this memory"}</strong><div class="meta"><span class="lesson-correction">${escapeHtml(currentActivity.correction || "Review the model")}</span>${breakdownMarkup}<span class="lesson-feedback-explanation">${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span>${answerAudio}</div>`;
+    const diagnosis = correct ? "" : `<span class="lesson-mistake-diagnosis">${escapeHtml(mistakeExplanation(selectedChoice))}</span>`;
+    const heading = corrected ? "Corrected from memory" : correct ? "Correct" : "Build this memory";
+    feedback.innerHTML = `<strong>${heading}</strong><div class="meta">${diagnosis}<span class="lesson-correction">${escapeHtml(currentActivity.correction || "Review the model")}</span>${breakdownMarkup}<span class="lesson-feedback-explanation">${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span>${answerAudio}</div>`;
     feedback.querySelector("[data-answer-audio]")?.addEventListener("click", () => speakJapanese(currentActivity.audioText));
     refreshActivityAudioControls();
   }
@@ -996,7 +1049,7 @@
     if (correct) {
       progress.correct++;
       progress.interval = Math.min(REVIEW_INTERVALS.length - 1, progress.interval + 1);
-      const gain = activity.type === "choice" ? 15 : activity.type === "tiles" && currentDistractorCount ? 26 : 22;
+      const gain = activity.type === "choice" ? 15 : activity.type === "tiles" ? currentUsedSupport ? 20 : 32 : 22;
       progress.mastery = Math.min(100, progress.mastery + Math.max(7, gain * (1 - progress.mastery / 140)));
       progress.dueAt = Date.now() + REVIEW_INTERVALS[progress.interval];
       state.correct++;
@@ -1035,18 +1088,46 @@
         else if (index === selectedChoice) button.classList.add("wrong");
       });
     }
-    updateResult(currentActivity, correct);
-    showFeedback(correct);
+    const wasCorrection = correctingAnswer;
+    if (!wasCorrection) updateResult(currentActivity, correct);
+    else correctionAttempts++;
+    showFeedback(correct, selectedChoice, wasCorrection && correct);
     ["#lessonDontKnow", "#lessonClear", "#lessonSubmit"].forEach(selector => $(selector).classList.add("hidden"));
-    $("#lessonNext").classList.remove("hidden");
-    if (mode === "checkpoint" && correct) checkpointCorrect++;
+    if (correct) {
+      if (wasCorrection) {
+        const progress = activityState(currentActivity);
+        progress.corrected = (progress.corrected || 0) + 1;
+        saveState();
+        $("#lessonKeyboardHint").textContent = "Correction complete. Continue when the answer feels clear.";
+      }
+      correctingAnswer = false;
+      $("#lessonNext").classList.remove("hidden");
+    } else {
+      $("#lessonRetry").classList.remove("hidden");
+      $("#lessonKeyboardHint").textContent = "Read the correction once, then correct the answer from memory before continuing.";
+    }
+    if (!wasCorrection && mode === "checkpoint" && correct) checkpointCorrect++;
     if (currentActivity.audioText && correct) speakJapanese(currentActivity.audioText);
+  }
+
+  function startCorrectiveRetry() {
+    if (!currentActivity) return;
+    const activity = currentActivity;
+    correctingAnswer = true;
+    clearControls();
+    correctingAnswer = true;
+    $("#lessonTrainer").classList.add("correcting-answer", "awaiting-answer");
+    if (activity.type === "choice") renderChoice(activity);
+    if (activity.type === "tiles") renderTiles(activity);
+    if (activity.type === "input") renderInput(activity);
+    $("#lessonActivity").insertAdjacentHTML("afterbegin", `<div class="lesson-correction-banner"><strong>Correct it from memory</strong><span>This retry teaches the idea and does not change your original score.</span></div>`);
+    $("#lessonKeyboardHint").textContent = "Answer again without looking back at the correction.";
   }
 
   function submitCurrent() {
     if (!currentActivity || currentAnswered) return;
     if (currentActivity.type === "tiles") {
-      const actual = normalize(tileSelection.map(token => token.text).join(""));
+      const actual = tileBankRevealed ? normalize(tileSelection.map(token => token.text).join("")) : normalize($("#lessonRecallInput")?.value || "");
       const expected = normalize(currentActivity.answer.join(""));
       gradeAnswer(actual === expected);
     } else if (currentActivity.type === "input") {
@@ -1382,8 +1463,18 @@
 
   document.querySelectorAll(".lesson-mode").forEach(button => button.addEventListener("click", () => setMode(button.dataset.mode)));
   $("#lessonNext").addEventListener("click", advance);
+  $("#lessonRetry").addEventListener("click", startCorrectiveRetry);
   $("#lessonSubmit").addEventListener("click", submitCurrent);
-  $("#lessonClear").addEventListener("click", () => { tileSelection = []; renderTileControls(); });
+  $("#lessonClear").addEventListener("click", () => {
+    if (currentActivity?.type === "tiles" && !tileBankRevealed) {
+      const input = $("#lessonRecallInput");
+      if (input) input.value = "";
+      input?.focus();
+    } else {
+      tileSelection = [];
+      renderTileControls();
+    }
+  });
   $("#lessonDontKnow").addEventListener("click", () => gradeAnswer(false));
   $("#lessonProfileForm").addEventListener("submit", saveProfile);
   $("#lessonTestSpeech").addEventListener("click", () => speakJapanese("はじめまして。よろしくおねがいします。"));
@@ -1398,6 +1489,7 @@
     if (event.target instanceof HTMLButtonElement || event.target instanceof HTMLSelectElement) return;
     event.preventDefault();
     if (!$("#lessonNext").classList.contains("hidden")) advance();
+    else if (!$("#lessonRetry").classList.contains("hidden")) startCorrectiveRetry();
     else if (!$("#lessonSubmit").classList.contains("hidden")) submitCurrent();
   });
 
