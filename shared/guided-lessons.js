@@ -797,7 +797,6 @@
   let tileSelection = [];
   let tileBank = [];
   let tileBankRevealed = true;
-  let currentUsedSupport = false;
   let currentDistractorCount = 0;
   let checkpointQueue = [];
   let checkpointIndex = 0;
@@ -899,7 +898,6 @@
     tileSelection = [];
     tileBank = [];
     tileBankRevealed = true;
-    currentUsedSupport = false;
   }
 
   function renderActivity(activity) {
@@ -989,7 +987,7 @@
       state.profile.year && ["School year", state.profile.year], state.profile.age && ["Age", state.profile.age]
     ].filter(Boolean);
     if (!details.length) return `<div class="lesson-rule"><strong>Your side of the mission:</strong> answer with your real details aloud. You can save optional practice details under Progress.</div>`;
-    return `<div class="lesson-model"><div class="lesson-model-row"><span>Your introduction</span><strong>はじめまして。［${escapeHtml(state.profile.name || "your name")}］です。</strong></div>${details.filter(detail => detail[0] !== "Name").map(detail => `<div class="lesson-model-row"><span>${escapeHtml(detail[0])}</span><strong>${escapeHtml(detail[1])}</strong></div>`).join("")}</div><div class="lesson-rule">Say your real information aloud before choosing Aoi’s next response. The app keeps these details only in this browser.</div>`;
+    return `<div class="lesson-model"><div class="lesson-model-row"><span>Your introduction</span><strong>はじめまして。［${escapeHtml(state.profile.name || "your name")}］です。</strong></div>${details.filter(detail => detail[0] !== "Name").map(detail => `<div class="lesson-model-row"><span>${escapeHtml(detail[0])}</span><strong>${escapeHtml(detail[1])}</strong></div>`).join("")}</div><div class="lesson-rule">Think through or say your introduction aloud before choosing Aoi’s next response. Speaking is optional and is not scored. The app keeps these details only in this browser.</div>`;
   }
 
   function hasPromptAudio(activity) {
@@ -1032,24 +1030,21 @@
       [tileBank[firstPosition], tileBank[secondPosition]] = [tileBank[secondPosition], tileBank[firstPosition]];
     }
     tileBankRevealed = mode === "learn";
-    currentUsedSupport = tileBankRevealed;
     const extraNote = currentDistractorCount ? `<div class="lesson-tile-note"><strong>Choose only what you need.</strong> Some tiles are extras.</div>` : "";
-    const oralRecall = mode === "learn" ? "" : `<div class="lesson-independent-recall" id="lessonIndependentRecall"><span>Say it first</span><p>Say the complete Japanese answer aloud. No Japanese keyboard is needed.</p><div class="actions"><button class="big-button" type="button" data-spoken-recall>I said it — verify</button><button class="ghost" type="button" data-show-word-bank>I need the tiles</button></div><small>${mode === "checkpoint" ? "The checkpoint counts “I need the tiles” as assisted recall." : "Either choice opens the same scrambled verification tiles."}</small></div>`;
+    const oralRecall = mode === "learn" ? "" : `<div class="lesson-independent-recall" id="lessonIndependentRecall"><span>Recall first</span><p>Think it or say it aloud before revealing the tiles.</p><div class="actions"><button class="big-button" type="button" data-show-word-bank>Show scrambled tiles</button></div><small>The app scores only the sentence you build from the tiles.</small></div>`;
     $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + oralRecall + `<div class="lesson-tiles ${tileBankRevealed ? "" : "hidden"}" id="lessonTileBuilder">${extraNote}<div class="lesson-tile-answer" id="lessonTileAnswer"></div><div class="lesson-tile-bank" id="lessonTileBank"></div></div>`;
     if (tileBankRevealed) renderTileControls();
-    $("#lessonActivity").querySelector("[data-spoken-recall]")?.addEventListener("click", () => revealTileBank(false));
-    $("#lessonActivity").querySelector("[data-show-word-bank]")?.addEventListener("click", () => revealTileBank(true));
+    $("#lessonActivity").querySelector("[data-show-word-bank]")?.addEventListener("click", revealTileBank);
     if (tileBankRevealed) {
       $("#lessonClear").classList.remove("hidden");
       $("#lessonSubmit").classList.remove("hidden");
       $("#lessonDontKnow").classList.remove("hidden");
     }
-    $("#lessonKeyboardHint").textContent = mode === "checkpoint" ? "Say the answer aloud, then verify it with scrambled tiles." : mode === "practice" ? "Speaking first strengthens recall; tiles verify the sentence without Japanese typing." : currentDistractorCount ? "Build from meaning. Extra tiles can remain in the bank." : "Build from meaning. Click an answer tile to return it to the bank.";
+    $("#lessonKeyboardHint").textContent = mode === "checkpoint" ? "Recall the answer, then build it from scrambled tiles." : mode === "practice" ? "Recall first if you can; the tile-built sentence is what gets scored." : currentDistractorCount ? "Build from meaning. Extra tiles can remain in the bank." : "Build from meaning. Click an answer tile to return it to the bank.";
   }
 
-  function revealTileBank(usedSupport) {
+  function revealTileBank() {
     tileBankRevealed = true;
-    currentUsedSupport = usedSupport;
     $("#lessonIndependentRecall")?.classList.add("hidden");
     $("#lessonTileBuilder")?.classList.remove("hidden");
     renderTileControls();
@@ -1121,7 +1116,7 @@
     if (correct) {
       progress.correct++;
       progress.interval = Math.min(REVIEW_INTERVALS.length - 1, progress.interval + 1);
-      const gain = activity.type === "choice" ? 15 : activity.type === "tiles" ? currentUsedSupport ? 20 : 32 : 22;
+      const gain = activity.type === "choice" ? 15 : activity.type === "tiles" ? 20 : 22;
       progress.mastery = Math.min(100, progress.mastery + Math.max(7, gain * (1 - progress.mastery / 140)));
       progress.dueAt = Date.now() + REVIEW_INTERVALS[progress.interval];
       state.correct++;
@@ -1179,10 +1174,10 @@
       });
     }
     updateResult(currentActivity, correct);
-    const scoredCorrect = correct && !(currentActivity.type === "tiles" && currentUsedSupport && mode !== "learn");
+    const scoredCorrect = correct;
     const conceptId = currentActivity.recoveryOf || currentActivity.id;
     if (mode === "practice") {
-      practiceResults.push({ correct: scoredCorrect, answeredCorrect: correct, assisted: currentActivity.type === "tiles" && currentUsedSupport, skill: currentActivity.skill, independent: currentActivity.type === "tiles" && !currentUsedSupport, recovery: currentIsRecovery, conceptId });
+      practiceResults.push({ correct: scoredCorrect, skill: currentActivity.skill, recovery: currentIsRecovery, conceptId });
     }
     if (mode === "checkpoint") checkpointResults.push({ correct: scoredCorrect, skill: currentActivity.skill });
     if (!correct) scheduleDelayedRecovery(currentActivity);
@@ -1250,7 +1245,7 @@
       return `<div class="lesson-stage-turn"><span>${escapeHtml(speaker)}</span><strong>${escapeHtml(personalized)}</strong></div>`;
     }).join("") || "";
     const milestone = wrapup?.coreMilestone ? `<div class="lesson-core-milestone"><strong>Core conversation ready</strong><span>You can now greet, introduce yourself, ask a personal question, and acknowledge the answer. The remaining stages expand your range.</span></div>` : "";
-    const challenge = wrapup ? `<div class="lesson-stage-challenge"><span>Conversation check</span><p>${escapeHtml(wrapup.challenge)}</p><small>Say your response aloud before revealing the model.</small><button class="ghost" type="button" data-reveal-stage-model>Reveal model</button><div class="lesson-stage-model" hidden>${modelTurns}</div></div>` : "";
+    const challenge = wrapup ? `<div class="lesson-stage-challenge"><span>Conversation check</span><p>${escapeHtml(wrapup.challenge)}</p><small>Think it or say it aloud before revealing the model. This reflection is not scored.</small><button class="ghost" type="button" data-reveal-stage-model>Reveal model</button><div class="lesson-stage-model" hidden>${modelTurns}</div></div>` : "";
     $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><div class="lesson-stage-summary-icon">✓</div><span class="lesson-activity-kicker">Stage covered</span><h2>${stage.title}</h2><p>${stage.outcome} Coverage opens the next stage; durable recall continues through Practice.</p>${milestone}<div class="lesson-stage-summary-stats"><div class="mini"><strong>${average}%</strong><span class="tiny">current mastery</span></div><div class="mini"><strong>${attempts ? Math.round(correct / attempts * 100) : 0}%</strong><span class="tiny">first-pass accuracy</span></div><div class="mini"><strong>${retention.secure}/${retention.total}</strong><span class="tiny">secure after delay</span></div></div>${challenge}</div>`;
     $("#lessonActivity").querySelector("[data-reveal-stage-model]")?.addEventListener("click", event => {
       const model = $("#lessonActivity").querySelector(".lesson-stage-model");
@@ -1400,11 +1395,10 @@
     const missedConcepts = new Set(originalResults.filter(result => !result.correct).map(result => result.conceptId));
     const unresolved = [...missedConcepts].filter(conceptId => !recoveredConcepts.has(conceptId)).length;
     const recovered = [...recoveredConcepts].filter(conceptId => missedConcepts.has(conceptId)).length;
-    const assisted = practiceResults.filter(result => result.assisted && result.answeredCorrect).length;
     const firstPass = firstPassTotal ? Math.round(firstPassCorrect / firstPassTotal * 100) : 0;
     $("#lessonStageProgress").style.width = "100%";
     $("#lessonQuestionCount").textContent = "Review session complete";
-    $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><span class="lesson-activity-kicker">Six focused reviews</span><div class="lesson-checkpoint-score">${firstPass}%</div><h2>${firstPass >= 85 ? "Strong first-pass recall" : firstPass >= 65 ? "Useful retrieval completed" : recovered ? "Some memories recovered" : "Useful practice completed"}</h2><p>${firstPassCorrect} of ${firstPassTotal} new review prompts were recalled before feedback or assistance. ${recovered ? recovered === 1 ? "One missed concept returned later and was recovered." : `${recovered} missed concepts returned later and were recovered.` : "Missed concepts were not repeated immediately."}${assisted ? ` ${assisted} ${assisted === 1 ? "answer used" : "answers used"} the tile hint.` : ""}</p><div class="lesson-stage-summary-stats"><div class="mini"><strong>${firstPassCorrect}/${firstPassTotal}</strong><span class="tiny">first-pass recall</span></div><div class="mini"><strong>${recovered}</strong><span class="tiny">recovered later</span></div><div class="mini"><strong>${unresolved}</strong><span class="tiny">still needs review</span></div></div></div>`;
+    $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><span class="lesson-activity-kicker">Six focused reviews</span><div class="lesson-checkpoint-score">${firstPass}%</div><h2>${firstPass >= 85 ? "Strong first-pass recall" : firstPass >= 65 ? "Useful retrieval completed" : recovered ? "Some memories recovered" : "Useful practice completed"}</h2><p>${firstPassCorrect} of ${firstPassTotal} new review prompts were correct before feedback. ${recovered ? recovered === 1 ? "One missed concept returned later and was recovered." : `${recovered} missed concepts returned later and were recovered.` : "Missed concepts were not repeated immediately."}</p><div class="lesson-stage-summary-stats"><div class="mini"><strong>${firstPassCorrect}/${firstPassTotal}</strong><span class="tiny">first-pass correct</span></div><div class="mini"><strong>${recovered}</strong><span class="tiny">recovered later</span></div><div class="mini"><strong>${unresolved}</strong><span class="tiny">still needs review</span></div></div></div>`;
     $("#lessonNext").textContent = "Start another 6-review session";
     $("#lessonNext").classList.remove("hidden");
     $("#lessonSessionTitle").textContent = "A useful stopping point";
@@ -1451,7 +1445,7 @@
         Conversation: "Choose natural conversational responses",
         Grammar: "Build the key sentence patterns",
         Listening: "Understand spoken Japanese details",
-        Production: "Produce Japanese without a word bank",
+        Production: "Build Japanese sentences from scrambled chunks",
         Details: "Exchange ages, numbers, and time",
         Vocabulary: "Recognise useful personal vocabulary"
       };
@@ -1493,7 +1487,7 @@
       renderProgressPanel();
       return;
     }
-    $("#lessonModeLabel").textContent = mode === "learn" ? "Learn · guided retrieval" : mode === "practice" ? "Practice · adaptive review" : "Checkpoint · unaided mix";
+    $("#lessonModeLabel").textContent = mode === "learn" ? "Learn · guided retrieval" : mode === "practice" ? "Practice · adaptive review" : "Checkpoint · mixed transfer";
     if (mode === "learn") {
       if (stageCursor === null) stageCursor = firstIncompleteIndex(state.currentStage);
       renderLearn();
