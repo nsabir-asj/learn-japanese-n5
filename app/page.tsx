@@ -5,5 +5,5 @@ export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   await requireChatGPTUser('/');
-  redirect('/trainer/kana_sprint.html');
+  redirect('/trainer/index.html');
 }

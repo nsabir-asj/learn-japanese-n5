@@ -15,12 +15,16 @@
   const headerPill=document.querySelector("header .pill");
   const headerActions=document.createElement("div");
   headerActions.className="header-actions";
+  const homeLink=document.createElement("a");
+  homeLink.className="ghost header-link-button";
+  homeLink.href="./index.html";
+  homeLink.textContent="Home";
   const guidedLessonsLink=document.createElement("a");
   guidedLessonsLink.className="ghost header-link-button";
   guidedLessonsLink.href="./guided_lessons.html";
   guidedLessonsLink.textContent="Guided Lessons";
   headerPill.replaceWith(headerActions);
-  headerActions.append(guidedLessonsLink,headerPill);
+  headerActions.append(homeLink,guidedLessonsLink,headerPill);
   document.querySelector("#panel-learn .typing-hint").textContent="A likely adjacent-key or reversed-letter typo offers a brief retry. Other mistakes continue to the normal correction flow.";
   document.querySelector("#panel-rehearse .typing-hint").textContent="Likely adjacent-key or reversed-letter typo → brief retry. Otherwise: hard font → standard reference → rescue if still wrong.";
   document.querySelector("#panel-words .typing-hint").textContent="After recognition, the answer, meaning, and a complete romaji spelling guide appear. Press Enter again for the next word.";

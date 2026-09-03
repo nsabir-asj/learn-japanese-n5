@@ -9,10 +9,11 @@ Three offline, adaptive reading trainers and one guided language-learning experi
 
 All three trainers share the same interface and learning system. Hiragana and Katakana keep their own mastery records; Kana Mix reads and updates both sets.
 
-## Start the trainers
+## Start practicing
 
-No installation or web server is needed. Open either file directly in a modern browser:
+No installation or web server is needed. Open `index.html` for the activity launcher, or open any trainer directly in a modern browser:
 
+- `index.html`
 - `hiragana_sprint.html`
 - `katakana_sprint.html`
 - `kana_sprint.html`
@@ -173,6 +174,7 @@ Pronunciation uses the browser's built-in Web Speech API and does not require an
 
 ```text
 Japanese-N5-lessons/
+├── index.html                  Main standalone activity launcher
 ├── hiragana_sprint.html       Hiragana launcher
 ├── katakana_sprint.html       Katakana launcher
 ├── kana_sprint.html           Combined Kana Mix launcher
@@ -181,6 +183,7 @@ Japanese-N5-lessons/
 ├── shared/
 │   ├── kana-sprint.js         Shared trainer and adaptive logic
 │   ├── kana-sprint.css        Shared interface styles
+│   ├── home.css               Main activity-launcher styles
 │   ├── guided-lesson-loader.js  Loads the requested lesson data and player
 │   ├── guided-lesson-player.js  Shared retrieval, review, and progress engine
 │   ├── guided-lessons-catalog.js  Catalog progress and lesson cards
