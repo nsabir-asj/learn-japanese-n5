@@ -565,16 +565,16 @@
   };
 
   const practiceChoice = (key, title, prompt, options, correction, explanation, audioText = "", breakdown = [], listenOnly = false) => ({
-    key, type: "choice", title, prompt, options, answer: 0, correction, explanation, audioText, breakdown, listenOnly
+    key, type: "choice", title, prompt, options, answer: 0, correction, explanation, audioText, breakdown, listenOnly, audioRole: listenOnly ? "prompt" : "feedback"
   });
   const practiceTiles = (key, title, prompt, answer, distractors, correction, explanation, audioText = "", breakdown = []) => ({
-    key, type: "tiles", title, prompt, tokens: answer, answer, distractors, correction, explanation, audioText, breakdown
+    key, type: "tiles", title, prompt, tokens: answer, answer, distractors, correction, explanation, audioText, breakdown, audioRole: "feedback"
   });
   const practiceInput = (key, title, prompt, answers, correction, explanation, audioText, placeholder, inputMode = "text", breakdown = []) => ({
-    key, type: "input", title, prompt, answers, correction, explanation, audioText, placeholder, inputMode, breakdown
+    key, type: "input", title, prompt, answers, correction, explanation, audioText, placeholder, inputMode, breakdown, audioRole: "prompt"
   });
   const practiceRepair = (key, title, prompt, options, correction, explanation, audioText = "", breakdown = []) => ({
-    key, type: "repair", title, prompt, options, answer: 0, correction, explanation, audioText, breakdown, skill: "Grammar"
+    key, type: "repair", title, prompt, options, answer: 0, correction, explanation, audioText, breakdown, skill: "Grammar", audioRole: "feedback"
   });
   const inScenario = (activity, scenarioKey, context) => ({ ...activity, scenarioKey, context });
 
@@ -793,6 +793,7 @@
     stages: STAGES,
     answerBreakdowns: ANSWER_BREAKDOWNS,
     guideBreakdowns: GUIDE_BREAKDOWNS,
+    stageWrapups: STAGE_WRAPUPS,
     practiceFamilies: PRACTICE_FAMILIES,
     practiceFamilyIds: PRACTICE_FAMILY_IDS,
     practiceFamilyById: PRACTICE_FAMILY_BY_ID,

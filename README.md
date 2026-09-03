@@ -76,6 +76,8 @@ The number scheduler tracks patterns rather than memorizing individual generated
 
 Each idea moves from a concise model to retrieval through situational choices, audio-only comprehension, sentence construction, error repair, typed numeric details, and a mixed checkpoint. Expandable examples explain both the full sentence meaning and each meaningful piece. Practice draws from curated concept families across settings such as orientation, clubs, dorms, libraries, and language exchanges; recent families, prompt variants, and scenarios are temporarily excluded. A delayed recovery changes both the example and its setting when another suitable scenario is available. Checkpoints sample distinct concept families for broader transfer. Correct recall expands the next review interval from minutes to days and weeks; a lapse schedules a near-term related example without immediately repeating the same prompt.
 
+Audio has an explicit assessment role. Listening comprehension and numeric dictation play it as the prompt; sentence construction, grammar, and error repair make pronunciation available only after the learner submits an answer.
+
 General number construction remains in Kana Mix. Guided Lesson 1 links to that foundation and teaches only the contextual forms needed for ages, school years, telephone digits, and time. Japanese pronunciation reads the universal voice and speed saved in **Settings & Data**.
 
 ### Learning pace

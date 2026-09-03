@@ -31,6 +31,7 @@
     stages: STAGES,
     answerBreakdowns: ANSWER_BREAKDOWNS,
     guideBreakdowns: GUIDE_BREAKDOWNS,
+    stageWrapups: STAGE_WRAPUPS,
     practiceFamilies: PRACTICE_FAMILIES,
     practiceFamilyIds: PRACTICE_FAMILY_IDS,
     practiceFamilyById: PRACTICE_FAMILY_BY_ID,
@@ -225,7 +226,7 @@
     if (activity.type === "input") renderInput(activity);
     $("#lessonTrainer").classList.toggle("awaiting-answer", ["choice", "repair", "tiles", "input"].includes(activity.type));
     refreshActivityAudioControls();
-    if (activity.audioText && (activity.listenOnly || activity.type === "input")) setTimeout(() => speakJapanese(activity.audioText), 120);
+    if (hasPromptAudio(activity)) setTimeout(() => speakJapanese(activity.audioText), 120);
   }
 
   function activityHeading(activity) {
@@ -288,8 +289,15 @@
     return `<div class="lesson-model"><div class="lesson-model-row"><span>Your introduction</span><strong>はじめまして。［${escapeHtml(state.profile.name || "your name")}］です。</strong></div>${details.filter(detail => detail[0] !== "Name").map(detail => `<div class="lesson-model-row"><span>${escapeHtml(detail[0])}</span><strong>${escapeHtml(detail[1])}</strong></div>`).join("")}</div><div class="lesson-rule">Think through or say your introduction aloud before choosing Aoi’s next response. Speaking is optional and is not scored. The app keeps these details only in this browser.</div>`;
   }
 
+  function activityAudioRole(activity) {
+    if (!activity.audioText) return "none";
+    if (activity.audioRole) return activity.audioRole;
+    if (activity.type === "input" || (activity.type === "choice" && activity.listenOnly)) return "prompt";
+    return "feedback";
+  }
+
   function hasPromptAudio(activity) {
-    return Boolean(activity.audioText && (activity.listenOnly || activity.type === "input"));
+    return activityAudioRole(activity) === "prompt";
   }
 
   function promptMarkup(activity) {
@@ -402,7 +410,7 @@
     feedback.className = `feedback lesson-feedback show ${correct ? "good" : "bad"}`;
     const breakdown = currentActivity.breakdown || ANSWER_BREAKDOWNS[currentActivity.id] || [];
     const breakdownMarkup = breakdown.length ? `<div class="lesson-answer-breakdown"><span class="lesson-breakdown-label">Answer breakdown</span><div class="lesson-breakdown-pieces">${breakdown.map(([piece, meaning]) => `<span class="lesson-breakdown-piece"><strong>${escapeHtml(piece)}</strong><small>${escapeHtml(meaning)}</small></span>`).join("")}</div></div>` : "";
-    const answerAudio = currentActivity.audioText && !hasPromptAudio(currentActivity) ? `<button class="ghost lesson-answer-audio" type="button" data-answer-audio>🔊 Hear answer</button>` : "";
+    const answerAudio = activityAudioRole(currentActivity) === "feedback" ? `<button class="ghost lesson-answer-audio" type="button" data-answer-audio>🔊 Hear answer</button>` : "";
     const diagnosis = correct ? "" : `<span class="lesson-mistake-diagnosis">${escapeHtml(mistakeExplanation(selectedChoice, revealed))}</span>`;
     const heading = corrected ? "Recovered after a delay" : correct ? "Correct" : "Build this memory";
     feedback.innerHTML = `<strong>${heading}</strong><div class="meta">${diagnosis}<span class="lesson-correction">${escapeHtml(currentActivity.correction || "Review the model")}</span>${breakdownMarkup}<span class="lesson-feedback-explanation">${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span>${answerAudio}</div>`;
@@ -617,7 +625,8 @@
     const available = variants.filter(variant => !recentVariants.has(variant.key) && variant.key !== excludedVariantKey && !recentScenarios.has(variant.scenarioKey || variant.key) && (variant.scenarioKey || variant.key) !== excludedScenarioKey);
     const changedFallback = variants.filter(variant => variant.key !== excludedVariantKey && (variant.scenarioKey || variant.key) !== excludedScenarioKey);
     const variant = shuffle(available.length ? available : changedFallback.length ? changedFallback : variants)[0];
-    const skill = variant.skill || (variant.listenOnly || variant.type === "input" ? "Listening" : variant.type === "tiles" ? "Production" : activity.skill);
+    const variantAudioRole = variant.audioRole || (variant.type === "input" || (variant.type === "choice" && variant.listenOnly) ? "prompt" : variant.audioText ? "feedback" : "none");
+    const skill = variant.skill || (variantAudioRole === "prompt" ? "Listening" : variant.type === "tiles" ? "Production" : activity.skill);
     return {
       ...activity,
       ...variant,
@@ -627,6 +636,8 @@
       practiceFamily: family,
       variantKey: variant.key,
       scenarioKey: variant.scenarioKey || variant.key,
+      audioRole: variantAudioRole,
+      listenOnly: variantAudioRole === "prompt",
       skill,
       kicker: sourceMode === "checkpoint" ? "Checkpoint · transfer" : sourceMode === "recovery" || sourceMode === "learn" ? "Memory check · changed example" : "Practice · new example"
     };
