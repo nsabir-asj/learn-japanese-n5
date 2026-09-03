@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const target = path.join(root, 'public', 'trainer');
-const directories = ['assets', 'fonts', 'lessons', 'shared'];
+const directories = ['assets', 'fonts', 'guided', 'lessons', 'shared'];
 
 if (!target.startsWith(path.join(root, 'public') + path.sep)) {
   throw new Error('Refusing to prepare assets outside public/.');

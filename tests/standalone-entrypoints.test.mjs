@@ -12,6 +12,8 @@ const entrypoints = [
   'kana_sprint.html',
   'guided_lessons.html',
   'guided_lesson.html',
+  'guided/index.html',
+  'guided/player.html',
 ];
 
 test('standalone HTML entrypoints only reference files that exist', () => {
@@ -33,7 +35,7 @@ test('the root launcher links to every learning experience', () => {
     './hiragana_sprint.html',
     './katakana_sprint.html',
     './kana_sprint.html',
-    './guided_lessons.html',
+    './guided/index.html',
   ]) {
     assert.match(html, new RegExp(`href="${target.replace('.', '\\.')}"`));
   }

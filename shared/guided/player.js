@@ -5,7 +5,7 @@
   const lessonId = String(Number(requestedLesson));
   const LESSON = window.GUIDED_LESSONS?.[lessonId];
   if (!LESSON) {
-    window.location.replace("./guided_lessons.html");
+    window.location.replace("./index.html");
     return;
   }
   const STORAGE_KEY = LESSON.storageKey;

@@ -893,7 +893,7 @@
     foundation: {
       title: "Number foundation",
       copy: "General number fluency stays in Kana Mix. This lesson only teaches how numbers behave in ages, school years, phone numbers, and time.",
-      href: "./kana_sprint.html#numbers",
+      href: "../kana_sprint.html#numbers",
       label: "Review numbers in Kana Mix"
     },
     storageKey: "kanaSprintGuidedLessonsV1",

@@ -47,7 +47,7 @@
         <div><strong>${progress.mastery}%</strong><span>mastery</span></div>
         <div><strong>${progress.due}</strong><span>due</span></div>
       </div>
-      <a class="big-button lesson-catalog-action" href="./guided_lesson.html?lesson=${encodeURIComponent(lesson.id)}">${action}</a>
+      <a class="big-button lesson-catalog-action" href="./player.html?lesson=${encodeURIComponent(lesson.id)}">${action}</a>
     </article>`;
   }).join("");
 })();

@@ -3,45 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Guided Japanese Lessons</title>
-<link rel="stylesheet" href="./shared/kana-sprint.css?v=20260829-2" />
-<link rel="stylesheet" href="./shared/guided-lessons.css?v=20260903-6" />
-<script defer src="./shared/progress-sync.js?v=20260903-1"></script>
-<script defer src="./lessons/guided/lesson-01.js?v=20260903-4"></script>
-<script defer src="./shared/guided-lessons-catalog.js?v=20260903-1"></script>
+<meta http-equiv="refresh" content="0;url=./guided/index.html" />
+<title>Opening guided lessons…</title>
+<script>window.location.replace("./guided/index.html" + window.location.search + window.location.hash);</script>
 </head>
-<body>
-  <div class="wrap lesson-wrap lesson-catalog-wrap">
-    <header class="lesson-header lesson-catalog-header">
-      <div>
-        <div class="lesson-eyebrow">Guided Japanese</div>
-        <h1>Choose a lesson</h1>
-        <p class="subtitle">Follow a structured conversation journey, then return for varied practice and checkpoints.</p>
-      </div>
-      <div class="lesson-header-actions">
-        <a class="ghost lesson-link-button" href="./index.html">Home</a>
-        <a class="ghost lesson-link-button" href="./kana_sprint.html">Kana Mix</a>
-        <span class="pill">Standalone · offline · auto-saved</span>
-      </div>
-    </header>
-
-    <main>
-      <section class="lesson-catalog-summary" aria-label="Curriculum summary">
-        <div class="stat"><strong id="catalogAvailable">0</strong><span>lessons available</span></div>
-        <div class="stat"><strong id="catalogCompleted">0</strong><span>journeys completed</span></div>
-        <div class="stat"><strong id="catalogDue">0</strong><span>reviews due</span></div>
-      </section>
-
-      <section class="lesson-catalog-section">
-        <div class="data-heading">
-          <div>
-            <h2>Your lessons</h2>
-            <p class="muted">Each lesson keeps its own journey, mastery, practice history, and checkpoint results.</p>
-          </div>
-        </div>
-        <div class="lesson-catalog-grid" id="lessonCatalog"></div>
-      </section>
-    </main>
-  </div>
-</body>
+<body><p><a href="./guided/index.html">Open guided lessons</a></p></body>
 </html>

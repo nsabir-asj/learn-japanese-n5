@@ -17,11 +17,11 @@ No installation or web server is needed. Open `index.html` for the activity laun
 - `hiragana_sprint.html`
 - `katakana_sprint.html`
 - `kana_sprint.html`
-- `guided_lessons.html`
+- `guided/index.html`
 
-`guided_lessons.html` is the lesson catalog. It opens individual lessons through the reusable `guided_lesson.html?lesson=1` player.
+`guided/index.html` is the lesson catalog. It opens individual lessons through the reusable `guided/player.html?lesson=1` player. The former root filenames remain as compatibility redirects for existing bookmarks.
 
-Keep the `shared`, `lessons`, and `fonts` folders beside the HTML files. Moving only an HTML file will prevent the trainer from loading.
+Keep the repository folders together. The standalone pages load their scripts, lesson content, fonts, and assets through relative paths.
 
 ### Test the Sites build locally
 
@@ -84,7 +84,7 @@ The number scheduler tracks patterns rather than memorizing individual generated
 
 ### Guided lessons
 
-`guided_lessons.html` is the curriculum catalog, while `guided_lesson.html?lesson=1` loads Lesson 1 in the shared lesson player. Lesson 1 turns beginner vocabulary and grammar into a cumulative first-conversation journey with eight stages organized by learning purpose rather than textbook page order: situational greetings; introductions; useful school, work, nationality, and major vocabulary; questions; natural names and titles; noun relationships with `の`; family, age, time, and telephone details; and a mixed conversation mission.
+`guided/index.html` is the curriculum catalog, while `guided/player.html?lesson=1` loads Lesson 1 in the shared lesson player. Lesson 1 turns beginner vocabulary and grammar into a cumulative first-conversation journey with eight stages organized by learning purpose rather than textbook page order: situational greetings; introductions; useful school, work, nationality, and major vocabulary; questions; natural names and titles; noun relationships with `の`; family, age, time, and telephone details; and a mixed conversation mission.
 
 Each idea moves from a concise model to retrieval through situational choices, audio-only comprehension, sentence construction, error repair, typed numeric details, and a mixed checkpoint. Expandable examples explain both the full sentence meaning and each meaningful piece. Practice draws from curated concept families across settings such as orientation, clubs, dorms, libraries, and language exchanges; recent families, prompt variants, and scenarios are temporarily excluded. A delayed recovery changes both the example and its setting when another suitable scenario is available. Checkpoints sample distinct concept families for broader transfer. Correct recall expands the next review interval from minutes to days and weeks; a lapse schedules a near-term related example without immediately repeating the same prompt.
 
@@ -178,16 +178,20 @@ Japanese-N5-lessons/
 ├── hiragana_sprint.html       Hiragana launcher
 ├── katakana_sprint.html       Katakana launcher
 ├── kana_sprint.html           Combined Kana Mix launcher
-├── guided_lessons.html        Guided-lesson catalog
-├── guided_lesson.html         Reusable single-lesson player
+├── guided_lessons.html        Compatibility redirect to guided catalog
+├── guided_lesson.html         Compatibility redirect to guided player
+├── guided/
+│   ├── index.html             Guided-lesson catalog
+│   └── player.html            Reusable single-lesson player
 ├── shared/
 │   ├── kana-sprint.js         Shared trainer and adaptive logic
 │   ├── kana-sprint.css        Shared interface styles
 │   ├── home.css               Main activity-launcher styles
-│   ├── guided-lesson-loader.js  Loads the requested lesson data and player
-│   ├── guided-lesson-player.js  Shared retrieval, review, and progress engine
-│   ├── guided-lessons-catalog.js  Catalog progress and lesson cards
-│   ├── guided-lessons.css     Guided-lesson interface styles
+│   ├── guided/
+│   │   ├── loader.js          Loads the requested lesson data and player
+│   │   ├── player.js          Shared retrieval, review, and progress engine
+│   │   ├── catalog.js         Catalog progress and lesson cards
+│   │   └── styles.css         Guided-lesson interface styles
 │   ├── number-sprint.js       Shared number course and adaptive logic
 │   ├── number-sprint.css      Number-course interface styles
 │   ├── kana-mnemonic-preferences.json  Selected mnemonic index
