@@ -28,6 +28,7 @@
   const normalize = value => String(value ?? "").toLowerCase().trim().replace(/[\s。、・,.!?！？:：'’_-]+/g, "").replace(/ō/g, "ou");
   const {
     commonMistakeGuidance: COMMON_MISTAKE_GUIDANCE,
+    choiceGlosses: CHOICE_GLOSSES = {},
     stages: STAGES,
     answerBreakdowns: ANSWER_BREAKDOWNS,
     guideBreakdowns: GUIDE_BREAKDOWNS,
@@ -397,6 +398,22 @@
     return currentActivity.options?.[selectedChoice] || "";
   }
 
+  function optionGloss(choiceIndex) {
+    if (choiceIndex === null || choiceIndex === undefined) return "";
+    return currentActivity.optionGlosses?.[choiceIndex] || CHOICE_GLOSSES[currentActivity.options?.[choiceIndex]] || "";
+  }
+
+  function answerContrastMarkup(selectedChoice, revealed) {
+    if (revealed || !["choice", "repair"].includes(currentActivity?.type) || selectedChoice === null || selectedChoice === undefined) return "";
+    const selected = selectedAnswerText(selectedChoice);
+    const selectedGloss = optionGloss(selectedChoice);
+    if (!selectedGloss) return "";
+    const answerIndex = Number(currentActivity.answer ?? 0);
+    const answer = currentActivity.options?.[answerIndex] || currentActivity.correction || "Review the model";
+    const answerGloss = optionGloss(answerIndex);
+    return `<div class="lesson-answer-contrast"><div class="lesson-answer-contrast-item wrong"><span>Your answer</span><strong>${escapeHtml(selected)}</strong><small>${escapeHtml(selectedGloss)}</small></div><div class="lesson-answer-contrast-item correct"><span>Correct answer</span><strong>${escapeHtml(answer)}</strong>${answerGloss ? `<small>${escapeHtml(answerGloss)}</small>` : ""}</div></div>`;
+  }
+
   function mistakeExplanation(selectedChoice, revealed) {
     if (revealed) return "You revealed the answer. Read the contrast once; the concept will return after other material.";
     if (selectedChoice === null || selectedChoice === undefined) return "Your response did not match the model. Compare the order and meaning with the answer below.";
@@ -411,9 +428,14 @@
     const breakdown = currentActivity.breakdown || ANSWER_BREAKDOWNS[currentActivity.id] || [];
     const breakdownMarkup = breakdown.length ? `<div class="lesson-answer-breakdown"><span class="lesson-breakdown-label">Answer breakdown</span><div class="lesson-breakdown-pieces">${breakdown.map(([piece, meaning]) => `<span class="lesson-breakdown-piece"><strong>${escapeHtml(piece)}</strong><small>${escapeHtml(meaning)}</small></span>`).join("")}</div></div>` : "";
     const answerAudio = activityAudioRole(currentActivity) === "feedback" ? `<button class="ghost lesson-answer-audio" type="button" data-answer-audio>🔊 Hear answer</button>` : "";
-    const diagnosis = correct ? "" : `<span class="lesson-mistake-diagnosis">${escapeHtml(mistakeExplanation(selectedChoice, revealed))}</span>`;
+    const contrastMarkup = correct ? "" : answerContrastMarkup(selectedChoice, revealed);
+    const selected = selectedAnswerText(selectedChoice);
+    const diagnosisText = contrastMarkup ? currentActivity.mistakes?.[selectedChoice] || COMMON_MISTAKE_GUIDANCE[selected] || "" : mistakeExplanation(selectedChoice, revealed);
+    const diagnosis = correct || !diagnosisText ? "" : `<span class="lesson-mistake-diagnosis">${escapeHtml(diagnosisText)}</span>`;
+    const correction = contrastMarkup ? "" : `<span class="lesson-correction">${escapeHtml(currentActivity.correction || "Review the model")}</span>`;
+    const explanationLabel = contrastMarkup ? "<b>Key difference:</b> " : "";
     const heading = corrected ? "Recovered after a delay" : correct ? "Correct" : "Build this memory";
-    feedback.innerHTML = `<strong>${heading}</strong><div class="meta">${diagnosis}<span class="lesson-correction">${escapeHtml(currentActivity.correction || "Review the model")}</span>${breakdownMarkup}<span class="lesson-feedback-explanation">${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span>${answerAudio}</div>`;
+    feedback.innerHTML = `<strong>${heading}</strong><div class="meta">${contrastMarkup}${diagnosis}${correction}${breakdownMarkup}<span class="lesson-feedback-explanation">${explanationLabel}${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span>${answerAudio}</div>`;
     feedback.querySelector("[data-answer-audio]")?.addEventListener("click", () => speakJapanese(currentActivity.audioText));
     refreshActivityAudioControls();
   }
