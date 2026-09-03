@@ -70,7 +70,7 @@
           id: "open-response", type: "choice", skill: "Conversation", kicker: "Respond naturally", title: "A new classmate introduces herself.",
           context: "めい：はじめまして。めいです。よろしくおねがいします。", prompt: "Which reply best continues the meeting?",
           options: ["はじめまして。けんです。よろしくおねがいします。", "いいえ、ちがいます。", "ごちそうさまでした。", "おやすみなさい。"], answer: 0,
-          correction: "はじめまして。けんです。よろしくおねがいします。", explanation: "Mirror the first-meeting structure while supplying your own name."
+          correction: "はじめまして。けんです。よろしくおねがいします。", explanation: "Mirror the first-meeting structure while supplying your own name.", audioText: "はじめまして。けんです。よろしくおねがいします。"
         }
       ]
     },
@@ -218,7 +218,7 @@
         {
           id: "natural-order", type: "choice", skill: "Culture", kicker: "Read a Japanese name", title: "たなか あおい", prompt: "Which part is normally the family name?",
           options: ["たなか", "あおい", "Both are titles", "Japanese names have no family name"], answer: 0,
-          correction: "たなか · family name", explanation: "Japanese names normally put the family name before the given name. Aoi is the given name here."
+          correction: "たなか · family name", explanation: "Japanese names normally put the family name before the given name. Aoi is the given name here.", audioText: "たなか あおい"
         },
         {
           id: "natural-address", type: "choice", skill: "Conversation", kicker: "Avoid unnecessary あなた", title: "You are speaking directly to Aoi.", prompt: "Which question sounds most natural?",
@@ -565,16 +565,16 @@
   };
 
   const practiceChoice = (key, title, prompt, options, correction, explanation, audioText = "", breakdown = [], listenOnly = false) => ({
-    key, type: "choice", title, prompt, options, answer: 0, correction, explanation, audioText, breakdown, listenOnly, audioRole: listenOnly ? "prompt" : "feedback"
+    key, type: "choice", title, prompt, options, answer: 0, correction, explanation, audioText: audioText || (listenOnly ? "" : correction), breakdown, listenOnly, audioRole: listenOnly ? "prompt" : "feedback"
   });
   const practiceTiles = (key, title, prompt, answer, distractors, correction, explanation, audioText = "", breakdown = []) => ({
-    key, type: "tiles", title, prompt, tokens: answer, answer, distractors, correction, explanation, audioText, breakdown, audioRole: "feedback"
+    key, type: "tiles", title, prompt, tokens: answer, answer, distractors, correction, explanation, audioText: audioText || correction, breakdown, audioRole: "feedback"
   });
   const practiceInput = (key, title, prompt, answers, correction, explanation, audioText, placeholder, inputMode = "text", breakdown = []) => ({
     key, type: "input", title, prompt, answers, correction, explanation, audioText, placeholder, inputMode, breakdown, audioRole: "prompt"
   });
   const practiceRepair = (key, title, prompt, options, correction, explanation, audioText = "", breakdown = []) => ({
-    key, type: "repair", title, prompt, options, answer: 0, correction, explanation, audioText, breakdown, skill: "Grammar", audioRole: "feedback"
+    key, type: "repair", title, prompt, options, answer: 0, correction, explanation, audioText: audioText || correction, breakdown, skill: "Grammar", audioRole: "feedback"
   });
   const inScenario = (activity, scenarioKey, context) => ({ ...activity, scenarioKey, context });
 
@@ -672,7 +672,7 @@
       practiceTiles("year-question", "Ask Mei which school year she is in.", "Build the question using her name.", ["めいさんは", "なんねんせい", "です", "か。"], ["なんさい", "なんじ", "はたち", "ね。"], "めいさんは なんねんせいですか。", "なんねんせい asks which year at school.", "めいさんは、なんねんせいですか。", [["めいさん", "Mei"], ["なんねんせい", "what school year"], ["ですか", "are you?"]]),
       practiceChoice("year-six", "ろくねんせいです。", "What information is being given?", ["The person is a sixth-year student", "The person is six years old", "It is six o’clock", "The number is six"], "sixth-year student", "ろくねんせい is a school-year identity.", "ろくねんせいです。", [["ろく", "six"], ["ねんせい", "year student"]]),
       inScenario(practiceTiles("club-age-omar", "Ask Omar’s age on the club registration form.", "Build the polite spoken question.", ["オマルさんは", "なんさい", "です", "か。"], ["なんねんせい", "なんじ", "はたち"], "オマルさんは なんさいですか。", "なんさい requests age; Omar’s name establishes whose age you mean."), "club-registration", "Sports club registration · One required detail is missing."),
-      inScenario(practiceChoice("orientation-year-mina", "Mina answers: いちねんせいです。", "What detail did she give?", ["She is a first-year student", "She is one year old", "It is one o’clock", "Her number is one"], "first-year student", "ねんせい identifies a school year."), "orientation", "New-student orientation · Everyone shares their year of study.")
+      inScenario(practiceChoice("orientation-year-mina", "Mina answers: いちねんせいです。", "What detail did she give?", ["She is a first-year student", "She is one year old", "It is one o’clock", "Her number is one"], "first-year student", "ねんせい identifies a school year.", "いちねんせいです。"), "orientation", "New-student orientation · Everyone shares their year of study.")
     ],
     phone: [
       practiceInput("phone-4159", "Enter the telephone digits.", "Listen and type four digits.", ["4159"], "4159", "Telephone numbers are decoded one digit at a time.", "よん、いち、ご、きゅう", "XXXX", "numeric", [["よん", "4"], ["いち", "1"], ["ご", "5"], ["きゅう", "9"]]),
