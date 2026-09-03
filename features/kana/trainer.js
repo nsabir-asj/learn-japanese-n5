@@ -188,7 +188,7 @@
 
   function buildGroupedNavigation(){
     const nav=document.querySelector(".tabs");
-    const hasNumberPractice=Boolean(document.querySelector('script[src*="number-sprint.js"]'));
+    const hasNumberPractice=Boolean(document.querySelector('script[src*="/numbers.js"]'));
     const groupDefinitions=[
       {id:"kana",label:"Kana practice",tabs:["learn","rehearse","mnemonics","kanaprogress"]},
       {id:"words",label:hasNumberPractice?"Words & numbers":"Word practice",tabs:["words","numbers","wordprogress"]},

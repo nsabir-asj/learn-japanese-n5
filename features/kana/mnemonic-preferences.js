@@ -4,7 +4,7 @@
   // Offline bridge for the canonical JSON index. The launchers are designed
   // to open through file://, where fetching a sibling JSON file is blocked by
   // browser security. Keep this generated data synchronized with
-  // shared/kana-mnemonic-preferences.json.
+  // features/kana/mnemonic-preferences.json.
   const rows = [
     ["え","hiragana","e","leafpiece","Edge of a cliff","assets/local-mnemonics/leafpiece/hiragana/e-full.webp","assets/local-mnemonics/leafpiece/hiragana/e-visual.webp"],
     ["す","hiragana","su","leafpiece","Soup ladle","assets/local-mnemonics/leafpiece/hiragana/su-full.webp","assets/local-mnemonics/leafpiece/hiragana/su-visual.webp"],

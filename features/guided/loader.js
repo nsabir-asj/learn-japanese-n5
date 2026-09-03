@@ -10,10 +10,10 @@
 
   const version = "20260904-2";
   const lessonScript = document.createElement("script");
-  lessonScript.src = `../lessons/guided/lesson-${String(lessonNumber).padStart(2, "0")}.js?v=${version}`;
+  lessonScript.src = `../content/guided/lesson-${String(lessonNumber).padStart(2, "0")}.js?v=${version}`;
   lessonScript.onload = () => {
     const playerScript = document.createElement("script");
-    playerScript.src = `../shared/guided/player.js?v=${version}`;
+    playerScript.src = `../features/guided/player.js?v=${version}`;
     document.head.appendChild(playerScript);
   };
   lessonScript.onerror = () => window.location.replace("../index.html#guided-lessons");

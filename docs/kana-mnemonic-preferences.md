@@ -3,7 +3,7 @@
 These are the user's preferred alternatives from the supplied
 `Japanese_Kana_Mnemonic_Chart.png` (the chart credits LeafPiece). They are a
 decision log and are indexed for the trainer in
-`shared/kana-mnemonic-preferences.json`.
+`features/kana/mnemonic-preferences.json`.
 
 ## Preferred alternatives
 

@@ -118,7 +118,7 @@ The **Mnemonics** tab separates two memory aids that may tell different stories:
 
 The supplied Tofugu charts are third-party artwork. The originals live locally under `assets/local-mnemonics/sources/tofugu/`, while generated crops belong under `assets/local-mnemonics/tofugu/`; the generated crops are committed for this private, offline-ready repository, while the originals remain ignored. Keep the repository private unless you have redistribution permission. To regenerate them, run `scripts/crop_tofugu_mnemonics.py` with the two source paths and (optionally) `--output assets/local-mnemonics/tofugu`. The utility validates the 3300×2550 source size, the 46-panel Hiragana/Katakana layouts, duplicate/missing assignments, and writes a manifest with the crop coordinates. The application code and mapping remain usable without the original source files.
 
-The separate user-supplied LeafPiece original is kept locally under `assets/local-mnemonics/sources/leafpiece/`, and its generated cards under `assets/local-mnemonics/leafpiece/`. The selected Pictografix original and generated panels follow the same pattern under `sources/pictografix/` and `pictografix/`. LeafPiece visual hints retain the complete card and use deterministic white caption masks (recorded in its local manifest); the full crops remain untouched for answer-stage mnemonics. The selected alternatives are indexed in `shared/kana-mnemonic-preferences.json` and are the active artwork for the trainer; when a kana has multiple retained picks, the latest option is shown. The JavaScript bridge keeps this working when the launchers are opened directly through `file://`. The runtime source registry mirrors the provenance entries needed by the information dialog; the canonical source URLs, artwork credits, and rights notes remain recorded in `docs/mnemonic-artwork-sources.md`.
+The separate user-supplied LeafPiece original is kept locally under `assets/local-mnemonics/sources/leafpiece/`, and its generated cards under `assets/local-mnemonics/leafpiece/`. The selected Pictografix original and generated panels follow the same pattern under `sources/pictografix/` and `pictografix/`. LeafPiece visual hints retain the complete card and use deterministic white caption masks (recorded in its local manifest); the full crops remain untouched for answer-stage mnemonics. The selected alternatives are indexed in `features/kana/mnemonic-preferences.json` and are the active artwork for the trainer; when a kana has multiple retained picks, the latest option is shown. The JavaScript bridge keeps this working when the launchers are opened directly through `file://`. The runtime source registry mirrors the provenance entries needed by the information dialog; the canonical source URLs, artwork credits, and rights notes remain recorded in `docs/mnemonic-artwork-sources.md`.
 
 ### Progress
 
@@ -180,33 +180,40 @@ Japanese-N5-lessons/
 ├── kana_sprint.html           Combined Kana Mix launcher
 ├── guided/
 │   └── player.html            Reusable single-lesson player
-├── shared/
-│   ├── kana-sprint.js         Shared trainer and adaptive logic
-│   ├── kana-sprint.css        Shared interface styles
-│   ├── home.css               Main activity-launcher styles
+├── features/
+│   ├── home/
+│   │   └── styles.css         Main activity-launcher styles
 │   ├── guided/
 │   │   ├── loader.js          Loads the requested lesson data and player
-│   │   ├── player.js          Shared retrieval, review, and progress engine
+│   │   ├── player.js          Retrieval, review, and progress engine
 │   │   └── styles.css         Guided-lesson interface styles
-│   ├── number-sprint.js       Shared number course and adaptive logic
-│   ├── number-sprint.css      Number-course interface styles
-│   ├── kana-mnemonic-preferences.json  Selected mnemonic index
-│   ├── kana-mnemonic-preferences.js  Offline bridge for the JSON index
-│   └── kana-mnemonic-assets.js  Local-art mapping with text fallback
+│   └── kana/
+│       ├── trainer.js         Shared trainer and adaptive logic
+│       ├── trainer.css        Shared trainer interface styles
+│       ├── vocabulary.js      Vocabulary practice logic
+│       ├── vocabulary.css     Vocabulary interface styles
+│       ├── numbers.js         Number-course logic
+│       ├── numbers.css        Number-course interface styles
+│       ├── hiragana-fonts.css Hiragana font definitions
+│       ├── katakana-fonts.css Katakana font definitions
+│       ├── mnemonic-preferences.json  Selected mnemonic index
+│       ├── mnemonic-preferences.js    Offline bridge for the index
+│       └── mnemonic-assets.js         Local-art mapping with text fallback
+├── content/
+│   ├── guided/
+│   │   └── lesson-01.js       Lesson 1 metadata, stages, and question pools
+│   └── kana/
+│       ├── hiragana.js        Hiragana curriculum and vocabulary
+│       ├── katakana.js        Katakana curriculum and vocabulary
+│       └── kana-mix.js        Combined curriculum and progress bridge
+├── shared/
+│   └── progress-sync.js       Browser-to-D1 progress synchronization
 ├── scripts/
 │   ├── crop_tofugu_mnemonics.py  Deterministic Tofugu crop/validation utility
 │   ├── crop_leafpiece_mnemonics.py  LeafPiece reference crop utility
 │   └── crop_pictografix_mnemonics.py  Selected Pictografix crop utility
 ├── assets/
 │   └── local-mnemonics/       Ignored source-organized chart crops
-├── lessons/
-│   ├── guided/
-│   │   └── lesson-01.js       Lesson 1 metadata, stages, and question pools
-│   ├── hiragana-data.js       Hiragana curriculum and vocabulary
-│   ├── hiragana-fonts.css     Hiragana font definitions
-│   ├── katakana-data.js       Katakana curriculum and vocabulary
-│   ├── kana-mix-data.js       Combined curriculum and progress bridge
-│   └── katakana-fonts.css     Katakana font definitions
 └── fonts/                     Offline font files and licences
 ```
 

@@ -29,5 +29,5 @@ python scripts/crop_tofugu_mnemonics.py \
 Generate the LeafPiece and selected Pictografix cards by passing the matching
 file from `assets/local-mnemonics/sources/` to their crop utilities. The
 trainer uses the selected panels through
-`shared/kana-mnemonic-preferences.json` and falls back to the JSON cue, then
+`features/kana/mnemonic-preferences.json` and falls back to the JSON cue, then
 the built-in text mnemonic, when local artwork is unavailable.

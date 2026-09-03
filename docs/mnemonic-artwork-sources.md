@@ -25,5 +25,5 @@ works offline; the original source charts remain local-only.
   document with the exact license, attribution text, and any required notice,
   and review the bundled assets before publishing.
 - Runtime selection data belongs in
-  `shared/kana-mnemonic-preferences.json`; source URLs and rights information
+  `features/kana/mnemonic-preferences.json`; source URLs and rights information
   belong here rather than in that lookup index.

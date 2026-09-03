@@ -13,6 +13,11 @@ const entrypoints = [
   'guided/player.html',
 ];
 
+const stylesheetsWithLocalAssets = [
+  'features/kana/hiragana-fonts.css',
+  'features/kana/katakana-fonts.css',
+];
+
 test('standalone HTML entrypoints only reference files that exist', () => {
   for (const entrypoint of entrypoints) {
     const htmlPath = resolve(root, entrypoint);
@@ -36,4 +41,25 @@ test('the root launcher links to every learning experience', () => {
   ]) {
     assert.ok(html.includes(`href="${target}"`), `root launcher does not link to ${target}`);
   }
+});
+
+test('stylesheet asset references remain valid after source moves', () => {
+  for (const stylesheet of stylesheetsWithLocalAssets) {
+    const cssPath = resolve(root, stylesheet);
+    const css = readFileSync(cssPath, 'utf8');
+    const references = [...css.matchAll(/url\(["']?(\.{1,2}\/[^"')?#]+)/g)];
+
+    for (const [, reference] of references) {
+      const target = resolve(dirname(cssPath), reference);
+      assert.ok(existsSync(target), `${stylesheet} references missing file ${reference}`);
+    }
+  }
+});
+
+test('frontend implementation is separated into features and content', () => {
+  assert.ok(existsSync(resolve(root, 'features/kana/trainer.js')));
+  assert.ok(existsSync(resolve(root, 'features/guided/player.js')));
+  assert.ok(existsSync(resolve(root, 'content/kana/hiragana.js')));
+  assert.ok(existsSync(resolve(root, 'content/guided/lesson-01.js')));
+  assert.ok(!existsSync(resolve(root, 'lessons')));
 });
