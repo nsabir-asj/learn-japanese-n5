@@ -21,7 +21,7 @@
   homeLink.textContent="Home";
   const guidedLessonsLink=document.createElement("a");
   guidedLessonsLink.className="ghost header-link-button";
-  guidedLessonsLink.href="./guided/index.html";
+  guidedLessonsLink.href="./index.html#guided-lessons";
   guidedLessonsLink.textContent="Guided Lessons";
   headerPill.replaceWith(headerActions);
   headerActions.append(homeLink,guidedLessonsLink,headerPill);

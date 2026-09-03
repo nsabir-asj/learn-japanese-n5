@@ -10,9 +10,6 @@ const entrypoints = [
   'hiragana_sprint.html',
   'katakana_sprint.html',
   'kana_sprint.html',
-  'guided_lessons.html',
-  'guided_lesson.html',
-  'guided/index.html',
   'guided/player.html',
 ];
 
@@ -35,8 +32,8 @@ test('the root launcher links to every learning experience', () => {
     './hiragana_sprint.html',
     './katakana_sprint.html',
     './kana_sprint.html',
-    './guided/index.html',
+    './guided/player.html?lesson=1',
   ]) {
-    assert.match(html, new RegExp(`href="${target.replace('.', '\\.')}"`));
+    assert.ok(html.includes(`href="${target}"`), `root launcher does not link to ${target}`);
   }
 });
