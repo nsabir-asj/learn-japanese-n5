@@ -140,6 +140,10 @@ Kana Mix merges the two script records when it opens. Every mixed answer is then
 
 This data belongs to that browser and computer. It is **not** saved as a file in this project folder. Clearing browser data, using another browser, or changing how the files are opened can make the saved progress unavailable.
 
+When the app is run through its Sites build, the same records remain in local storage for immediate startup and offline use, and are also synchronized to D1 for the signed-in user. D1 assigns an increasing revision to each accepted update. A device sends the revision it last received; if another device has already advanced it, the server merges independently updated learning items before issuing the next revision. Local changes that cannot be uploaded remain queued and retry after reconnection.
+
+The hosted origin cannot automatically read progress belonging to a `file://` page or another origin. To migrate existing progress, export a complete backup from the old copy and import it into the hosted copy. The imported local-storage updates are then queued for D1 automatically.
+
 For a portable backup, open **Settings & Data** and select **Export all progress**. The complete backup includes every available Hiragana, Katakana, Kana Mix, word, vocabulary, number, guided-lesson, mnemonic, font, voice, and app-settings record. Importing first shows a dated summary and only restores the listed areas after confirmation.
 
 Older trainer-specific and number-only backup files remain supported under **Advanced component backups**.
