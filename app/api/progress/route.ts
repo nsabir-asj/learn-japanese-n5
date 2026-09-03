@@ -160,14 +160,22 @@ export async function POST(request: Request) {
       .run();
 
     if ((result.meta.changes ?? 0) === 1) {
-      return Response.json({
+      const response: {
+        revision: number;
+        updatedAt: number;
+        conflicted: boolean;
+        stores?: Record<string, unknown>;
+      } = {
         revision: nextRevision,
         updatedAt: now,
-        stores: Object.fromEntries(
-          Object.entries(stores).map(([key, entry]) => [key, entry.value]),
-        ),
         conflicted,
-      });
+      };
+      if (conflicted) {
+        response.stores = Object.fromEntries(
+          Object.entries(stores).map(([key, entry]) => [key, entry.value]),
+        );
+      }
+      return Response.json(response);
     }
   }
 
