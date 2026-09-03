@@ -22,6 +22,17 @@ No installation or web server is needed. Open either file directly in a modern b
 
 Keep the `shared`, `lessons`, and `fonts` folders beside the HTML files. Moving only an HTML file will prevent the trainer from loading.
 
+### Test the Sites build locally
+
+The Sites build requires Node.js 22.13 or newer. Install dependencies and start the development server:
+
+```powershell
+npm install
+npm run dev
+```
+
+The development command prepares the static trainer assets, applies any pending migrations to the project-local D1 database, and starts the site at `http://localhost:3000/`. The Sites development server signs the browser in as a stable simulated user so two browsers can exercise the same cloud-progress record. Local D1 data remains under the ignored `.wrangler` directory.
+
 ## Practice modes
 
 ### Learn

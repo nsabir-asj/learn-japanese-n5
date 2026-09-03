@@ -8,10 +8,11 @@
   },
   "scripts": {
     "prepare:site": "node scripts/prepare-site-assets.mjs",
-    "dev": "npm run prepare:site && vinext dev",
+    "dev": "npm run prepare:site && npm run db:local && vinext dev",
     "build": "npm run prepare:site && vinext build",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "db:generate": "drizzle-kit generate",
+    "db:local": "wrangler d1 migrations apply DB --local --config wrangler.local.jsonc --persist-to .wrangler/state",
     "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
