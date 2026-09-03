@@ -15,3 +15,15 @@
 !/assets/local-mnemonics/pictografix/
 scripts/__pycache__/
 work-*.jpg
+
+# Sites build and local preview output.
+/node_modules/
+/dist/
+/.vinext/
+/.next/
+/.wrangler/
+/public/trainer/
+/next-env.d.ts
+/tsconfig.tsbuildinfo
+.env*
+npm-debug.log*
