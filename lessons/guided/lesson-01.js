@@ -637,6 +637,41 @@
     ]
   };
 
+  const REPAIR_FEEDBACK = {
+    "repair-self-san": {
+      optionGlosses: ["I’m Leo.", "I am Mr./Ms. Leo · unnatural self-honorific", "I am Professor Leo · changes the identity", "You are Leo."],
+      mistakes: ["", "さん shows respect to another person, so attaching it to your own name sounds unnatural.", "せんせい identifies or addresses a teacher; it should not be added to an ordinary self-introduction.", "あなたは makes ‘you’ the topic, so this identifies the listener as Leo rather than introducing yourself."]
+    },
+    "repair-student-topic": {
+      optionGlosses: ["I am a student.", "(They) are my student · a different relationship", "Am I a student? · direct/plain question", "I am a student · with an unnatural self-honorific"],
+      mistakes: ["", "わたしの modifies がくせい, producing ‘my student’ rather than making ‘I’ the topic.", "か changes the statement into a question, and this bare form does not match the polite introduction being repaired.", "さん is not normally attached to わたし or to your own identity."]
+    },
+    "repair-nationality": {
+      optionGlosses: ["Sam is Canadian.", "Sam’s Canadian person · incomplete for this meaning", "Is Sam Canada?", "No coherent nationality description"],
+      mistakes: ["", "の connects Sam possessively to the next noun; it does not mark Sam as the person being identified.", "カナダ names the country itself, and か turns the sentence into a question. The target needs カナダじんです.", "じん must attach to a country name, while さん attaches respectfully to a person’s name; both suffixes are attached to the wrong words here."]
+    },
+    "repair-major-nan": {
+      optionGlosses: ["What is your major?", "What is your major? · intended meaning, wrong reading here", "No complete A の B relationship", "How old is the major? · semantically mismatched"],
+      mistakes: ["", "何 has the same basic meaning, but it is normally pronounced なん before です in this question pattern.", "の must connect two nouns; placing なん after it does not complete a natural noun phrase here.", "なんさい asks a person’s age, so it does not match the topic せんこう, ‘major.’"]
+    },
+    "repair-professor-title": {
+      optionGlosses: ["Professor Sato", "Professor Sato · with two titles stacked", "Teacher, you… · impersonal and unnatural here", "Mr./Ms. Sato · with さん repeated"],
+      mistakes: ["", "さん and せんせい are both titles. Use せんせい by itself after the professor’s name.", "あなた is usually avoided when the person’s name and title are known; it also omits Sato’s name.", "Repeating さん does not add politeness; it duplicates the same title."]
+    },
+    "repair-affiliation-order": {
+      optionGlosses: ["a student at Seoul University", "a student’s Seoul University · describes the university", "No grammatical A の B noun phrase", "No noun relationship; さん treats the university like a person"],
+      mistakes: ["", "In A の B, B is the main noun. Ending with ソウルだいがく makes this a kind of university, not a kind of student.", "は cannot be inserted between the specifying noun and の; keep ソウルだいがくの together.", "さん is a respectful title for people, not a connector after a university name. Use の to link the institution to がくせい."]
+    },
+    "repair-family-topic": {
+      optionGlosses: ["Nora’s father is a doctor.", "Nora is her father’s doctor · reverses who is the doctor", "(Someone) is Nora’s father’s doctor · a different relationship", "No coherent family relationship"],
+      mistakes: ["", "は makes Nora the topic, while おとうさんの いしゃ describes her father’s doctor. This makes Nora the doctor instead of her father.", "The second の makes いしゃ belong to Nora’s father; it never states that the father himself is a doctor.", "さん is repeated after Nora’s name, and の is missing between Nora and おとうさん."]
+    },
+    "repair-nine-oclock": {
+      optionGlosses: ["It is nine o’clock · standard clock reading", "It is nine o’clock · intended meaning, wrong reading", "No standard age or time expression", "It is ninth year / a ninth-year student"],
+      mistakes: ["", "Nine uses the special clock reading くじ. The ordinary number reading きゅう does not carry over before じ.", "く is the special sound used in くじ, but it cannot be combined with the age counter さい this way.", "ねんせい expresses a school year, not a clock time; this changes the category of information."]
+    }
+  };
+
   const practiceChoice = (key, title, prompt, options, correction, explanation, audioText = "", breakdown = [], listenOnly = false) => ({
     key, type: "choice", title, prompt, options, answer: 0, correction, explanation, audioText: audioText || (listenOnly ? "" : correction), breakdown, listenOnly, audioRole: listenOnly ? "prompt" : "feedback"
   });
@@ -647,7 +682,7 @@
     key, type: "input", title, prompt, answers, correction, explanation, audioText, placeholder, inputMode, breakdown, audioRole: "prompt"
   });
   const practiceRepair = (key, title, prompt, options, correction, explanation, audioText = "", breakdown = []) => ({
-    key, type: "repair", title, prompt, options, answer: 0, correction, explanation, audioText: audioText || correction, breakdown, skill: "Grammar", audioRole: "feedback"
+    key, type: "repair", title, prompt, options, answer: 0, correction, explanation, audioText: audioText || correction, breakdown, skill: "Grammar", audioRole: "feedback", ...(REPAIR_FEEDBACK[key] || {})
   });
   const inScenario = (activity, scenarioKey, context) => ({ ...activity, scenarioKey, context });
 
