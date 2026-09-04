@@ -614,6 +614,10 @@
 
   function renderProgress() {
     if (!$("#vocabTotal")) return;
+    const setOptionalText = (selector, value) => {
+      const element = $(selector);
+      if (element) element.textContent = value;
+    };
     const introduced = introducedWords();
     const mastered = introduced.filter(word => itemState(word).mastery >= 72);
     const weak = introduced.filter(word => itemState(word).wrong > 0 && (itemState(word).lastWasCorrect === false || itemState(word).mastery < 40));
@@ -623,15 +627,15 @@
     $("#vocabMastered").textContent = mastered.length;
     $("#vocabWeak").textContent = weak.length;
     $("#vocabBestStreak").textContent = state.bestStreak;
-    $("#vocabProgressTotal").textContent = state.total;
-    $("#vocabProgressAccuracy").textContent = state.total ? `${Math.round(state.correct / state.total * 100)}%` : "—";
-    $("#vocabProgressIntroduced").textContent = `${introduced.length} / ${WORDS.length}`;
-    $("#vocabProgressMastered").textContent = mastered.length;
-    $("#vocabProgressWeak").textContent = weak.length;
-    $("#vocabProgressBestStreak").textContent = state.bestStreak;
+    setOptionalText("#vocabProgressTotal", state.total);
+    setOptionalText("#vocabProgressAccuracy", state.total ? `${Math.round(state.correct / state.total * 100)}%` : "—");
+    setOptionalText("#vocabProgressIntroduced", `${introduced.length} / ${WORDS.length}`);
+    setOptionalText("#vocabProgressMastered", mastered.length);
+    setOptionalText("#vocabProgressWeak", weak.length);
+    setOptionalText("#vocabProgressBestStreak", state.bestStreak);
     $("#vocabPaceName").textContent = paceLabel();
     const unlocked = unlockedStageIndex();
-    $("#vocabProgressStage").textContent = STAGES[unlocked].name;
+    setOptionalText("#vocabProgressStage", STAGES[unlocked].name);
     $("#vocabStages").innerHTML = STAGES.map((stage, index) => {
       const words = stageWords(index);
       const introducedCount = words.filter(word => itemState(word).introduced).length;
