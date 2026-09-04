@@ -2,8 +2,9 @@
 .activity-header{align-items:flex-start}
 .activity-eyebrow{margin:0 0 7px;color:#9ccbff;font-size:.78rem;font-weight:850;letter-spacing:.11em;text-transform:uppercase}
 .activity-header .header-actions{max-width:470px}
-.activity-status{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:14px 0;border:1px solid var(--line);border-radius:15px;background:linear-gradient(120deg,rgba(88,166,255,.08),rgba(163,113,247,.045),var(--panel));padding:13px 16px}
-.activity-status>div{display:grid;gap:3px}.activity-status span{color:var(--muted);font-size:.78rem}.activity-status strong{font-size:1rem}.activity-streak{text-align:right}.activity-streak strong{font-size:1.35rem;color:#b9dcff}
+.activity-status{display:grid;grid-template-columns:minmax(180px,.8fr) minmax(420px,2fr);align-items:center;gap:20px;margin:14px 0;border:1px solid var(--line);border-radius:15px;background:linear-gradient(120deg,rgba(88,166,255,.08),rgba(163,113,247,.045),var(--panel));padding:13px 16px}
+.activity-status-heading{display:grid;gap:3px}.activity-status-heading small{min-height:1.2em;color:#9ccbff;font-size:.72rem}.activity-status span{color:var(--muted);font-size:.72rem}.activity-status strong{font-size:1rem}.activity-status-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:8px}.activity-stat{display:grid;gap:3px;border-left:1px solid var(--line);padding-left:12px}.activity-stat strong{font-size:1.18rem;color:#b9dcff}
 .activity-internal-tabs{display:none}
 .standalone-activity .panel{display:none}.standalone-activity .panel.active{display:block}
-@media(max-width:760px){.activity-header{display:grid}.activity-header .header-actions{justify-content:flex-start}.activity-status{align-items:flex-start}.activity-streak{min-width:92px}}
+@media(max-width:900px){.activity-status{grid-template-columns:1fr}.activity-stat:first-child{border-left:0;padding-left:0}}
+@media(max-width:760px){.activity-header{display:grid}.activity-header .header-actions{justify-content:flex-start}.activity-status{align-items:flex-start}.activity-status-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.activity-stat:nth-child(odd){border-left:0;padding-left:0}}

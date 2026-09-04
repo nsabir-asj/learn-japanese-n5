@@ -32,12 +32,40 @@
     let score = 100 - clamp(Number(progress.mastery) || 0, 0, 100);
     score += Math.min(18, errorRate * 18);
     if (progress.lastWasCorrect === false) score += 22;
+    const recent = Array.isArray(progress.recentResults) ? progress.recentResults.slice(-6) : [];
+    if (recent.length) {
+      const recentAccuracy = recent.filter(Boolean).length / recent.length;
+      score += (1 - recentAccuracy) * 24;
+    }
     return score + clamp(Number(randomValue) || 0, 0, 1) * 24;
+  }
+
+  function reviewIsDue(progress, questionNumber, now = Date.now()) {
+    if (!progress || !(Number(progress.seen) > 0)) return true;
+    const dueQuestion = Number(progress.dueQuestion) || 0;
+    const dueAt = Number(progress.dueAt) || 0;
+    return (dueQuestion > 0 && dueQuestion <= questionNumber) || (dueAt > 0 && dueAt <= now);
+  }
+
+  function nextReviewSchedule(mastery, correct, questionNumber, now = Date.now()) {
+    const normalized = clamp(Number(mastery) || 0, 0, 100);
+    if (!correct) return { dueQuestion: questionNumber + 2, dueAt: now + 60000 };
+    if (normalized < 40) return { dueQuestion: questionNumber + 4, dueAt: now + 10 * 60000 };
+    if (normalized < 72) return { dueQuestion: questionNumber + 8, dueAt: now + 90 * 60000 };
+    return { dueQuestion: questionNumber + 14, dueAt: now + 12 * 60 * 60000 };
+  }
+
+  function recentAccuracy(results) {
+    const recent = Array.isArray(results) ? results.slice(-8) : [];
+    return recent.length ? recent.filter(Boolean).length / recent.length : null;
   }
 
   globalThis.KANA_SPRINT_VOCABULARY_SCHEDULER = {
     choiceCountForMastery,
     nextIntroductionDecision,
+    nextReviewSchedule,
+    recentAccuracy,
+    reviewIsDue,
     reviewScore,
     stageIsReady
   };

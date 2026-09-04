@@ -49,3 +49,21 @@ test('historical mistakes add only a bounded review bias', () => {
   assert.equal(recovered, 28);
   assert.equal(recentMistake, 50);
 });
+
+test('recent performance makes review priority responsive', () => {
+  const recovered = scheduler.reviewScore({ mastery: 70, seen: 20, wrong: 8, lastWasCorrect: true, recentResults: [true, true, true, true] }, 0);
+  const slipping = scheduler.reviewScore({ mastery: 70, seen: 20, wrong: 8, lastWasCorrect: true, recentResults: [false, false, true, false] }, 0);
+  assert.ok(slipping > recovered);
+  assert.equal(scheduler.recentAccuracy([true, false, true, true]), .75);
+});
+
+test('short-term spacing is based on completed question count', () => {
+  const missed = scheduler.nextReviewSchedule(20, false, 10, 1000);
+  const learning = scheduler.nextReviewSchedule(25, true, 10, 1000);
+  const mastered = scheduler.nextReviewSchedule(90, true, 10, 1000);
+  assert.equal(missed.dueQuestion, 12);
+  assert.equal(learning.dueQuestion, 14);
+  assert.equal(mastered.dueQuestion, 24);
+  assert.equal(scheduler.reviewIsDue({ seen: 1, dueQuestion: 12, dueAt: 999999 }, 11, 2000), false);
+  assert.equal(scheduler.reviewIsDue({ seen: 1, dueQuestion: 12, dueAt: 999999 }, 12, 2000), true);
+});

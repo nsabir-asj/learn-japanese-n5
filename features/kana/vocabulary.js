@@ -241,6 +241,20 @@
     ["eki", "densha", "basu", "kuruma", "jitensha"],
     ["migi", "hidari", "massugu", "iriguchi", "deguchi"]
   ];
+  const CONTEXT_PROMPTS = {
+    "sumimasen": "You need to get a stranger’s attention politely. What do you say?",
+    "itadakimasu": "You are about to begin a meal. What do you say?",
+    "gochisousama-deshita": "You have just finished a meal. What do you say?",
+    "ittekimasu": "You are leaving home and expect to return. What do you say?",
+    "itterasshai": "Someone at home is leaving and will return. What do you say to them?",
+    "tadaima": "You have just arrived back home. What do you say?",
+    "okaeri-nasai": "Someone has just returned home. What do you say to welcome them?",
+    "onegaishimasu": "You are politely making a request. Which expression fits?",
+    "kudasai": "You want the shop clerk to give you a specific item. Which expression fits?",
+    "douzo": "You are offering an item or inviting someone to go ahead. What do you say?",
+    "irasshaimase": "A customer enters your shop. What do you say?",
+    "sou-desu-ka": "Someone tells you new information and you respond, ‘I see.’ What do you say?"
+  };
   const CONTRASTS_BY_ID = new Map();
   CONTRAST_GROUPS.forEach((group, groupIndex) => group.forEach(id => {
     if (!CONTRASTS_BY_ID.has(id)) CONTRASTS_BY_ID.set(id, new Set());
@@ -250,11 +264,16 @@
   const shuffle = values => [...values].sort(() => Math.random() - .5);
   const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
   const Scheduler = window.KANA_SPRINT_VOCABULARY_SCHEDULER;
+  const MODE_KEYS = ["written", "spoken", "recall"];
+
+  function emptyModeProgress() {
+    return { seen: 0, correct: 0, wrong: 0, mastery: 0, lastWasCorrect: null, lastSeen: 0, dueAt: 0, dueQuestion: 0, recentResults: [] };
+  }
 
   function defaultState() {
     return {
       version: VERSION, total: 0, correct: 0, streak: 0, bestStreak: 0,
-      questionFormat: "both", pace: 50, newWordCredit: 0, unlockedStage: 0,
+      questionFormat: "mixed", pace: 50, newWordCredit: 0, unlockedStage: 0,
       autoPronounce: true, items: {}, recent: [], savedAt: 0
     };
   }
@@ -262,12 +281,34 @@
   function itemState(word) {
     if (!state.items[word.id]) state.items[word.id] = {
       introduced: false, seen: 0, correct: 0, wrong: 0, mastery: 0,
-      lastWasCorrect: null, lastSeen: 0, dueAt: 0, recentDistractors: [], confusions: {}
+      lastWasCorrect: null, lastSeen: 0, dueAt: 0, recentDistractors: [], confusions: {}, modes: {}
     };
     const progress = state.items[word.id];
     if (!Array.isArray(progress.recentDistractors)) progress.recentDistractors = [];
     if (!progress.confusions || typeof progress.confusions !== "object") progress.confusions = {};
+    if (!progress.modes || typeof progress.modes !== "object") {
+      progress.modes = { written: { ...emptyModeProgress(), seen: Number(progress.seen) || 0, correct: Number(progress.correct) || 0, wrong: Number(progress.wrong) || 0, mastery: Number(progress.mastery) || 0, lastWasCorrect: progress.lastWasCorrect ?? null, lastSeen: Number(progress.lastSeen) || 0, dueAt: Number(progress.dueAt) || 0 } };
+    }
+    MODE_KEYS.forEach(mode => {
+      progress.modes[mode] = { ...emptyModeProgress(), ...(progress.modes[mode] || {}) };
+      if (!Array.isArray(progress.modes[mode].recentResults)) progress.modes[mode].recentResults = [];
+    });
     return progress;
+  }
+
+  function modeState(word, mode) { return itemState(word).modes[mode]; }
+
+  function refreshAggregate(progress) {
+    const attempted = MODE_KEYS.map(mode => progress.modes[mode]).filter(mode => mode.seen > 0);
+    progress.seen = attempted.reduce((sum, mode) => sum + mode.seen, 0);
+    progress.correct = attempted.reduce((sum, mode) => sum + mode.correct, 0);
+    progress.wrong = attempted.reduce((sum, mode) => sum + mode.wrong, 0);
+    progress.mastery = attempted.length ? attempted.reduce((sum, mode) => sum + mode.mastery, 0) / attempted.length : 0;
+    progress.lastSeen = Math.max(0, ...attempted.map(mode => mode.lastSeen));
+    const latest = attempted.sort((a, b) => b.lastSeen - a.lastSeen)[0];
+    progress.lastWasCorrect = latest?.lastWasCorrect ?? null;
+    const dueTimes = attempted.map(mode => mode.dueAt).filter(Boolean);
+    progress.dueAt = dueTimes.length ? Math.min(...dueTimes) : 0;
   }
 
   function loadState() {
@@ -284,7 +325,8 @@
   }
 
   let state = loadState();
-  if (!["written", "spoken", "both"].includes(state.questionFormat)) state.questionFormat = "both";
+  if (state.questionFormat === "both") state.questionFormat = "mixed";
+  if (!["written", "spoken", "recall", "mixed"].includes(state.questionFormat)) state.questionFormat = "mixed";
   state.pace = clamp(Number(state.pace) || 50, 10, 90);
   state.newWordCredit = clamp(Number(state.newWordCredit) || 0, 0, 1);
   const previouslyReachedStage = WORDS.reduce((highest, word) => state.items[word.id]?.introduced ? Math.max(highest, word.stageIndex) : highest, 0);
@@ -294,6 +336,12 @@
   let questionNumber = 0;
   let lastFormat = "";
   let currentChoiceIds = [];
+  let currentMode = "written";
+  let currentContext = "";
+  let currentReason = "Getting ready";
+  let troubleMode = false;
+  const sessionStartedTotal = state.total;
+  const sessionStartedCorrect = state.correct;
 
   function saveState() {
     unlockedStageIndex();
@@ -327,46 +375,88 @@
     return "New-first";
   }
 
+  function allowedModes() {
+    if (state.questionFormat === "written") return ["written"];
+    if (state.questionFormat === "spoken") return japaneseSpeechReady() ? ["spoken"] : ["written"];
+    if (state.questionFormat === "recall") return ["recall"];
+    return japaneseSpeechReady() ? MODE_KEYS : ["written", "recall"];
+  }
+
+  function modeLabel(mode) {
+    return { written: "reading", spoken: "listening", recall: "recall" }[mode] || mode;
+  }
+
+  function weakWords() {
+    return introducedWords().filter(word => allowedModes().some(mode => {
+      const progress = modeState(word, mode);
+      const recentAccuracy = Scheduler.recentAccuracy(progress.recentResults);
+      return progress.wrong > 0 && (progress.lastWasCorrect === false || progress.mastery < 40 || (recentAccuracy !== null && recentAccuracy < .6));
+    }));
+  }
+
+  function dueModes(word, now = Date.now()) {
+    return allowedModes().filter(mode => {
+      const progress = modeState(word, mode);
+      return progress.seen > 0 && Scheduler.reviewIsDue(progress, state.total, now);
+    });
+  }
+
+  function chooseMode(word, onlyDue = false) {
+    const modes = onlyDue ? dueModes(word) : allowedModes();
+    return [...modes].sort((left, right) => {
+      const a = modeState(word, left);
+      const b = modeState(word, right);
+      if ((a.seen === 0) !== (b.seen === 0)) return a.seen === 0 ? -1 : 1;
+      return Scheduler.reviewScore(b, 0) - Scheduler.reviewScore(a, 0);
+    })[0] || "written";
+  }
+
   function selectWord() {
     const stageIndex = unlockedStageIndex();
     const unseen = stageWords(stageIndex).filter(word => !itemState(word).introduced)
       .sort((a, b) => a.order - b.order);
     const introduced = introducedWords();
-    if (!introduced.length && unseen.length) return { word: unseen[0], introduce: true };
-    const now = Date.now();
+    if (!introduced.length && unseen.length) return { word: unseen[0], mode: allowedModes()[0], introduce: true, reason: "Introducing the first word" };
     const recent = new Set(state.recent.slice(-5));
-    const due = introduced.filter(word => {
-      const progress = itemState(word);
-      return progress.dueAt && progress.dueAt <= now;
-    });
-    if (due.length) return { word: selectReviewWord(due, recent), introduce: false };
+    const trouble = troubleMode ? weakWords() : [];
+    if (troubleMode && !trouble.length) troubleMode = false;
+    if (trouble.length) return { ...selectReviewWord(trouble, recent, false), introduce: false, reason: "Trouble-word review" };
+    const due = introduced.filter(word => dueModes(word).length);
+    if (due.length) return { ...selectReviewWord(due, recent, true), introduce: false, reason: "Due review" };
     if (unseen.length) {
       const decision = Scheduler.nextIntroductionDecision(state.pace, state.newWordCredit);
       state.newWordCredit = decision.credit;
-      if (decision.introduce) return { word: unseen[0], introduce: true };
+      if (decision.introduce) return { word: unseen[0], mode: allowedModes()[0], introduce: true, reason: "Introducing a new word" };
+      const scheduled = introduced.filter(word => allowedModes().some(mode => modeState(word, mode).seen > 0));
+      if (scheduled.length) return { ...selectReviewWord(scheduled, recent, false), introduce: false, reason: "Adaptive review" };
+      return { word: unseen[0], mode: allowedModes()[0], introduce: true, reason: "Building the review pool" };
     }
-    return { word: selectReviewWord(introduced, recent), introduce: false };
+    return { ...selectReviewWord(introduced, recent, false), introduce: false, reason: "Reviewing the current stage" };
   }
 
-  function selectReviewWord(words, recent) {
+  function selectReviewWord(words, recent, onlyDue) {
     let candidates = words.filter(word => !recent.has(word.id));
     if (!candidates.length) candidates = words;
     const scored = candidates.map(word => {
-      const progress = itemState(word);
-      return { word, score: Scheduler.reviewScore(progress) };
+      const mode = chooseMode(word, onlyDue);
+      return { word, mode, score: Scheduler.reviewScore(modeState(word, mode)) };
     }).sort((a, b) => b.score - a.score);
-    return scored[0]?.word || null;
+    return scored[0] || { word: null, mode: "written" };
   }
 
   function japaneseSpeechReady() {
     return Boolean(window.KANA_SPRINT_SPEECH?.hasJapaneseVoice?.());
   }
   function speak(word) { return window.KANA_SPRINT_SPEECH?.speakJapanese?.(word.jp); }
-  function nextQuestionFormat() {
-    if (!japaneseSpeechReady() || state.questionFormat === "written") return "written";
-    if (state.questionFormat === "spoken") return "spoken";
-    lastFormat = lastFormat === "spoken" ? "written" : "spoken";
-    return lastFormat;
+  function nextQuestionFormat(word, preferredMode) {
+    if (preferredMode && allowedModes().includes(preferredMode)) return preferredMode;
+    const modes = allowedModes();
+    const weakest = [...modes].sort((left, right) => modeState(word, left).mastery - modeState(word, right).mastery);
+    const minimum = modeState(word, weakest[0]).mastery;
+    const tied = weakest.filter(mode => modeState(word, mode).mastery === minimum);
+    const next = tied.find(mode => mode !== lastFormat) || tied[0] || modes[0];
+    lastFormat = next;
+    return next;
   }
 
   function buildUI() {
@@ -382,13 +472,8 @@
     panel.className = "panel";
     panel.id = "panel-vocabulary";
     panel.innerHTML = `
-      <div class="vocab-setup card">
-        <div><h2>Lesson 1–2 vocabulary</h2><p class="muted">Covers the complete Lesson 1 and Lesson 2 vocabulary, followed by practical daily and navigation extras.</p></div>
-        <label><span>Question format</span><select id="vocabQuestionFormat"><option value="written">Written Japanese</option><option value="spoken">Spoken Japanese</option><option value="both">Both</option></select><small id="vocabFormatHint" aria-live="polite"></small></label>
-        <label class="vocab-pace"><span>New-word pace: <strong id="vocabPaceName">Balanced</strong></span><input id="vocabPace" type="range" min="10" max="90" step="10"><span class="vocab-pace-labels"><span>More review</span><span>More new</span></span></label>
-      </div>
       <div class="trainer vocab-trainer" data-trainer="vocabulary">
-        <div class="trainer-top"><div class="mode-tag"><span class="dot"></span><span>Vocabulary • everyday meaning</span></div><div class="tiny" id="vocabCount">Question 1</div></div>
+        <div class="trainer-top"><div class="mode-tag"><span class="dot"></span><span id="vocabPracticeMode">Vocabulary • adaptive practice</span></div><div class="tiny" id="vocabCount">Question 1</div></div>
         <div class="vocab-introduction hidden" id="vocabIntroduction"></div>
         <div id="vocabQuestion">
           <div class="question">
@@ -401,11 +486,20 @@
         </div>
         <div class="footer-actions"><div class="actions"><button class="ghost" id="vocabDontKnow">I don’t know</button><button class="ghost hidden" id="vocabNext">Next <kbd>Enter</kbd></button></div><span class="tiny" id="vocabKeyboardHint">Use <kbd>1</kbd>–<kbd>4</kbd> to choose an answer.</span></div>
       </div>
+      <details class="card vocab-setup-card">
+        <summary><span><strong>Session controls</strong><small id="vocabPaceStatus">Balanced introduction and review</small></span><span aria-hidden="true">⌄</span></summary>
+        <div class="vocab-setup">
+          <div><h2>Lesson 1–2 vocabulary</h2><p class="muted">Tune the current practice session. Voice selection and data tools remain in Settings &amp; Data.</p></div>
+          <label><span>Question direction</span><select id="vocabQuestionFormat"><option value="mixed">Mixed practice</option><option value="written">Japanese text → English</option><option value="spoken">Spoken Japanese → English</option><option value="recall">English → Japanese</option></select><small id="vocabFormatHint" aria-live="polite"></small></label>
+          <label class="vocab-pace"><span>New-word pace: <strong id="vocabPaceName">Balanced</strong></span><input id="vocabPace" type="range" min="10" max="90" step="10"><span class="vocab-pace-labels"><span>More review</span><span>More new</span></span></label>
+          <div class="vocab-inline-playback"><label class="toggle-line"><input type="checkbox" id="vocabAutoPronounce"> Automatically pronounce revealed words</label><button class="ghost" id="vocabManageVoices" type="button">Manage voices</button></div>
+        </div>
+      </details>
       <div class="vocab-below">
-        <div class="card"><h2>Vocabulary progress</h2><div class="vocab-progress-grid"><div class="mini"><strong id="vocabTotal">0</strong><span class="tiny">answers</span></div><div class="mini"><strong id="vocabAccuracy">—</strong><span class="tiny">accuracy</span></div><div class="mini"><strong id="vocabIntroduced">0</strong><span class="tiny">introduced</span></div><div class="mini"><strong id="vocabMastered">0</strong><span class="tiny">mastered</span></div><div class="mini"><strong id="vocabWeak">0</strong><span class="tiny">weak</span></div><div class="mini"><strong id="vocabBestStreak">0</strong><span class="tiny">best streak</span></div></div></div>
-        <div class="card vocab-playback"><div><h2>Pronunciation</h2><p class="muted">Voice selection is shared with Word Reading and Numbers.</p></div><div><label class="toggle-line"><input type="checkbox" id="vocabAutoPronounce"> Automatically pronounce revealed words</label><button class="ghost" id="vocabManageVoices" type="button">Manage voices</button></div></div>
+        <div class="card"><h2>Mastery by direction</h2><p class="muted">Reading, listening, and recall now improve independently.</p><div class="vocab-direction-grid"><div><span>Japanese → English</span><strong id="vocabWrittenMastery">0%</strong><small id="vocabWrittenRecent">Not practised</small></div><div><span>Listening</span><strong id="vocabSpokenMastery">0%</strong><small id="vocabSpokenRecent">Not practised</small></div><div><span>English → Japanese</span><strong id="vocabRecallMastery">0%</strong><small id="vocabRecallRecent">Not practised</small></div></div></div>
+        <div class="card vocab-trouble-card"><div class="vocab-section-heading"><div><h2>Trouble words</h2><p class="muted">Recent misses matter more than old mistakes.</p></div><button class="ghost" id="vocabReviewTrouble" type="button">Review trouble words</button></div><div class="vocab-trouble-list" id="vocabTroubleList"></div></div>
       </div>
-      <div class="card vocab-curriculum-card"><h2>Lesson vocabulary curriculum</h2><p class="muted">Lesson 1 comes first, then Lesson 2 and practical extras. Each stage opens after every word in the previous stage has been introduced and its average mastery reaches 35%.</p><div class="vocab-stages" id="vocabStages"></div></div>`;
+      <details class="card vocab-curriculum-card"><summary><span><strong>Lesson vocabulary curriculum</strong><small id="vocabCurriculumSummary">Stage 1 of ${STAGES.length}</small></span><span aria-hidden="true">⌄</span></summary><p class="muted">Lesson 1 comes first, then Lesson 2 and practical extras. Each stage opens after every word in the previous stage has been introduced and its average mastery reaches 35%.</p><div class="vocab-stages" id="vocabStages"></div></details>`;
     const panelAnchor = $("#panel-wordprogress");
     if (panelAnchor) panelAnchor.before(panel); else $(".wrap").appendChild(panel);
 
@@ -429,13 +523,19 @@
   function updateFormatAvailability() {
     const select = $("#vocabQuestionFormat");
     const ready = japaneseSpeechReady();
-    ["spoken", "both"].forEach(value => { select.querySelector(`option[value="${value}"]`).disabled = !ready; });
-    if (!ready && state.questionFormat !== "written") {
-      state.questionFormat = "written";
-      select.value = "written";
+    select.querySelector('option[value="spoken"]').disabled = !ready;
+    if (!ready && state.questionFormat === "spoken") {
+      state.questionFormat = "mixed";
+      select.value = "mixed";
       saveState();
     }
-    $("#vocabFormatHint").textContent = ready ? "" : "Listening options require a Japanese voice in Settings & Data.";
+    const hints = {
+      written: "Build recognition from Japanese text.",
+      spoken: ready ? "Listen without seeing the Japanese prompt." : "Listening requires a Japanese voice in Settings & Data.",
+      recall: "Recall questions use similar-looking and similar-sounding Japanese choices.",
+      mixed: ready ? "Mixed practice rotates through all three directions." : "Mixed practice uses reading and recall until a Japanese voice is available."
+    };
+    $("#vocabFormatHint").textContent = hints[state.questionFormat];
   }
 
   function switchToVocabulary() {
@@ -445,8 +545,9 @@
     if (!current) nextQuestion();
   }
 
-  function beginIntroduction(word) {
+  function beginIntroduction(word, preferredMode = "written") {
     current = word;
+    currentMode = preferredMode;
     phase = "introduction";
     $("#vocabQuestion").classList.add("hidden");
     $("#vocabIntroduction").classList.remove("hidden");
@@ -455,12 +556,14 @@
     $("#vocabIntroduction").innerHTML = `<span class="vocab-new-badge">New everyday expression</span><div class="vocab-intro-japanese">${word.jp}</div><strong>${word.romaji}</strong><div class="vocab-intro-meaning">${word.meaning}</div><span class="tiny">${word.stageName}</span><div class="actions"><button class="ghost" id="vocabIntroSpeech" type="button">🔊 Hear it</button><button class="big-button" id="vocabStartCheck" type="button">Practice this word</button></div>`;
     $("#vocabIntroSpeech").disabled = !japaneseSpeechReady();
     $("#vocabIntroSpeech").addEventListener("click", () => speak(word));
-    $("#vocabStartCheck").addEventListener("click", () => showQuestion(word));
+    $("#vocabStartCheck").addEventListener("click", () => showQuestion(word, preferredMode));
     if (japaneseSpeechReady()) setTimeout(() => speak(word), 100);
+    $("#vocabPracticeMode").textContent = "Vocabulary • new expression";
+    publishDashboard();
   }
 
-  function choiceCountFor(word) {
-    return Scheduler.choiceCountForMastery(itemState(word).mastery);
+  function choiceCountFor(word, mode = currentMode) {
+    return Scheduler.choiceCountForMastery(modeState(word, mode).mastery);
   }
 
   function editSimilarity(left, right) {
@@ -489,13 +592,14 @@
 
   function distractorScore(word, candidate, format) {
     const progress = itemState(word);
-    const challenge = progress.mastery < 40 ? .35 : progress.mastery < 72 ? .7 : 1;
+    const direction = modeState(word, format);
+    const challenge = direction.mastery < 40 ? .35 : direction.mastery < 72 ? .7 : 1;
     const recentIndex = progress.recentDistractors.lastIndexOf(candidate.id);
     const confusionCount = Number(progress.confusions[candidate.id]) || 0;
     let score = sharedContrastGroups(word, candidate) * (45 + 40 * challenge);
     if (candidate.stageIndex === word.stageIndex) score += 32;
     if (state.items[candidate.id]?.introduced) score += 12;
-    score += editSimilarity(format === "spoken" ? word.romaji : word.jp, format === "spoken" ? candidate.romaji : candidate.jp) * (format === "spoken" ? 18 + 28 * challenge : 10 + 20 * challenge);
+    score += editSimilarity(format === "spoken" ? word.romaji : word.jp, format === "spoken" ? candidate.romaji : candidate.jp) * (format === "spoken" || format === "recall" ? 28 + 34 * challenge : 10 + 20 * challenge);
     score += Math.min(54, confusionCount * 18);
     if (recentIndex >= 0) {
       const recency = progress.recentDistractors.length - recentIndex;
@@ -505,23 +609,24 @@
   }
 
   function makeChoices(word, format) {
-    const count = choiceCountFor(word);
-    const meanings = new Set([word.meaning]);
+    const count = choiceCountFor(word, format);
+    const answerValue = candidate => format === "recall" ? candidate.jp : candidate.meaning;
+    const answers = new Set([answerValue(word)]);
     const ranked = WORDS
-      .filter(candidate => candidate.id !== word.id && candidate.meaning !== word.meaning)
+      .filter(candidate => candidate.id !== word.id && answerValue(candidate) !== answerValue(word))
       .map(candidate => ({ candidate, score: distractorScore(word, candidate, format) }))
       .sort((a, b) => b.score - a.score);
     const distractors = [];
     for (const { candidate } of ranked) {
-      if (meanings.has(candidate.meaning)) continue;
+      if (answers.has(answerValue(candidate))) continue;
       distractors.push(candidate);
-      meanings.add(candidate.meaning);
+      answers.add(answerValue(candidate));
       if (distractors.length === count - 1) break;
     }
     return shuffle([word, ...distractors]);
   }
 
-  function showQuestion(word) {
+  function showQuestion(word, preferredMode) {
     current = word;
     phase = "question";
     questionNumber++;
@@ -532,12 +637,17 @@
     $("#vocabFeedback").innerHTML = "";
     $("#vocabNext").classList.add("hidden");
     $("#vocabDontKnow").classList.remove("hidden");
-    const format = nextQuestionFormat();
+    const format = nextQuestionFormat(word, preferredMode);
+    currentMode = format;
     const spoken = format === "spoken";
-    $("#vocabPrompt").textContent = word.jp;
+    const recall = format === "recall";
+    currentContext = recall && CONTEXT_PROMPTS[word.id] && Math.random() < .65 ? CONTEXT_PROMPTS[word.id] : "";
+    $("#vocabPrompt").textContent = recall ? (currentContext || word.meaning) : word.jp;
+    $("#vocabPrompt").classList.toggle("vocab-recall-prompt", recall);
     $("#vocabPrompt").classList.toggle("hidden", spoken);
     $("#vocabAudioPrompt").classList.toggle("hidden", !spoken);
-    $("#vocabQuestionLabel").textContent = spoken ? "Listen and choose the English meaning" : "Choose the English meaning";
+    $("#vocabQuestionLabel").textContent = spoken ? "Listen and choose the English meaning" : recall ? (currentContext ? "Choose the expression that fits this situation" : "Choose the Japanese expression") : "Choose the English meaning";
+    $("#vocabPracticeMode").textContent = `Vocabulary • ${modeLabel(format)}${currentContext ? " in context" : ""}`;
     const options = $("#vocabOptions");
     options.innerHTML = "";
     const choices = makeChoices(word, format);
@@ -548,37 +658,43 @@
       const button = document.createElement("button");
       button.className = "vocab-choice";
       button.dataset.id = choice.id;
-      button.innerHTML = `<span>${index + 1}</span><strong>${choice.meaning}</strong>`;
+      button.innerHTML = recall ? `<span>${index + 1}</span><span class="vocab-choice-japanese"><strong>${choice.jp}</strong><small>${choice.romaji}</small></span>` : `<span>${index + 1}</span><strong>${choice.meaning}</strong>`;
       button.addEventListener("click", () => answer(choice.id));
       options.appendChild(button);
     });
     if (spoken) setTimeout(() => speak(word), 100);
+    publishDashboard();
   }
 
   function applyResult(correct, selectedId) {
     const progress = itemState(current);
+    const direction = modeState(current, currentMode);
     progress.introduced = true;
     const distractorIds = currentChoiceIds.filter(id => id !== current.id);
     progress.recentDistractors.push(...distractorIds);
     progress.recentDistractors = progress.recentDistractors.slice(-16);
     if (!correct && selectedId) progress.confusions[selectedId] = (Number(progress.confusions[selectedId]) || 0) + 1;
-    progress.seen++;
-    progress.lastSeen = Date.now();
-    progress.lastWasCorrect = correct;
+    direction.seen++;
+    direction.lastSeen = Date.now();
+    direction.lastWasCorrect = correct;
+    direction.recentResults.push(correct);
+    direction.recentResults = direction.recentResults.slice(-8);
     state.total++;
     if (correct) {
-      progress.correct++;
-      progress.mastery = Math.min(100, progress.mastery + Math.max(6, 20 * (1 - progress.mastery / 140)));
-      progress.dueAt = Date.now() + (progress.mastery < 40 ? 10 : progress.mastery < 70 ? 90 : 720) * 60000;
+      direction.correct++;
+      direction.mastery = Math.min(100, direction.mastery + Math.max(6, 20 * (1 - direction.mastery / 140)));
       state.correct++;
       state.streak++;
       state.bestStreak = Math.max(state.bestStreak, state.streak);
     } else {
-      progress.wrong++;
-      progress.mastery = Math.max(0, progress.mastery - 12);
-      progress.dueAt = Date.now() + 60000;
+      direction.wrong++;
+      direction.mastery = Math.max(0, direction.mastery - 12);
       state.streak = 0;
     }
+    Object.assign(direction, Scheduler.nextReviewSchedule(direction.mastery, correct, state.total));
+    refreshAggregate(progress);
+    const questionsUntilReview = Math.max(0, direction.dueQuestion - state.total);
+    currentReason = correct ? `${modeLabel(currentMode)} strengthened · returns in ${questionsUntilReview} questions` : `${modeLabel(currentMode)} needs attention · returns soon`;
     state.recent.push(current.id);
     if (state.recent.length > 12) state.recent.shift();
     saveState();
@@ -609,24 +725,76 @@
     window.KANA_SPRINT_SPEECH?.stop?.();
     const selected = selectWord();
     if (!selected?.word) return;
-    if (selected.introduce) beginIntroduction(selected.word); else showQuestion(selected.word);
+    currentReason = selected.reason || "Adaptive review";
+    if (selected.introduce) beginIntroduction(selected.word, selected.mode); else showQuestion(selected.word, selected.mode);
+  }
+
+  function averageModeMastery(mode, words = introducedWords()) {
+    return words.length ? Math.round(words.reduce((sum, word) => sum + modeState(word, mode).mastery, 0) / words.length) : 0;
+  }
+
+  function recentModeAccuracy(mode, words = introducedWords()) {
+    const results = words.flatMap(word => modeState(word, mode).recentResults).slice(-24);
+    return Scheduler.recentAccuracy(results);
+  }
+
+  function isMastered(word) {
+    const written = modeState(word, "written");
+    const spoken = modeState(word, "spoken");
+    const recall = modeState(word, "recall");
+    return written.mastery >= 72 && recall.mastery >= 72 && (!spoken.seen || spoken.mastery >= 72);
+  }
+
+  function dueReviewCount() {
+    return introducedWords().reduce((count, word) => count + dueModes(word).length, 0);
+  }
+
+  function paceStatus() {
+    if (troubleMode) return "Focused review of recent trouble words";
+    const stage = unlockedStageIndex();
+    const unseen = stageWords(stage).filter(word => !itemState(word).introduced).length;
+    const due = dueReviewCount();
+    if (due) return `${due} review${due === 1 ? "" : "s"} due now`;
+    if (unseen) return `${paceLabel()} pace · ${unseen} new in this stage`;
+    if (stage < STAGES.length - 1) return "Reviewing until the next stage is ready";
+    return "Curriculum introduced · strengthening recall";
+  }
+
+  function publishDashboard() {
+    if (document.body.dataset.activity !== "vocabulary") return;
+    const introduced = introducedWords();
+    const mastered = introduced.filter(isMastered);
+    const sessionTotal = Math.max(0, state.total - sessionStartedTotal);
+    const sessionCorrect = Math.max(0, state.correct - sessionStartedCorrect);
+    const unlocked = unlockedStageIndex();
+    window.dispatchEvent(new CustomEvent("kana-sprint-activity-status", { detail: {
+      note: currentReason,
+      metrics: [
+        { label: "Stage", value: `${unlocked + 1} / ${STAGES.length}` },
+        { label: "Streak", value: state.streak },
+        { label: "Session accuracy", value: sessionTotal ? `${Math.round(sessionCorrect / sessionTotal * 100)}%` : "—" },
+        { label: "Due now", value: dueReviewCount() },
+        { label: "Mastered", value: `${mastered.length} / ${WORDS.length}` },
+        { label: "Challenge", value: `${current ? choiceCountFor(current, currentMode) : 4} choices` }
+      ]
+    } }));
   }
 
   function renderProgress() {
-    if (!$("#vocabTotal")) return;
     const setOptionalText = (selector, value) => {
       const element = $(selector);
       if (element) element.textContent = value;
     };
+    if (!$("#vocabStages")) return;
     const introduced = introducedWords();
-    const mastered = introduced.filter(word => itemState(word).mastery >= 72);
-    const weak = introduced.filter(word => itemState(word).wrong > 0 && (itemState(word).lastWasCorrect === false || itemState(word).mastery < 40));
-    $("#vocabTotal").textContent = state.total;
-    $("#vocabAccuracy").textContent = state.total ? `${Math.round(state.correct / state.total * 100)}%` : "—";
-    $("#vocabIntroduced").textContent = `${introduced.length} / ${WORDS.length}`;
-    $("#vocabMastered").textContent = mastered.length;
-    $("#vocabWeak").textContent = weak.length;
-    $("#vocabBestStreak").textContent = state.bestStreak;
+    const mastered = introduced.filter(isMastered);
+    const weak = weakWords();
+    setOptionalText("#vocabTotal", state.total);
+    setOptionalText("#vocabAccuracy", state.total ? `${Math.round(state.correct / state.total * 100)}%` : "—");
+    setOptionalText("#vocabIntroduced", `${introduced.length} / ${WORDS.length}`);
+    setOptionalText("#vocabMastered", mastered.length);
+    setOptionalText("#vocabWeak", weak.length);
+    setOptionalText("#vocabBestStreak", state.bestStreak);
     setOptionalText("#vocabProgressTotal", state.total);
     setOptionalText("#vocabProgressAccuracy", state.total ? `${Math.round(state.correct / state.total * 100)}%` : "—");
     setOptionalText("#vocabProgressIntroduced", `${introduced.length} / ${WORDS.length}`);
@@ -635,7 +803,22 @@
     setOptionalText("#vocabProgressBestStreak", state.bestStreak);
     $("#vocabPaceName").textContent = paceLabel();
     const unlocked = unlockedStageIndex();
+    setOptionalText("#vocabPaceStatus", paceStatus());
+    setOptionalText("#vocabCurriculumSummary", `Stage ${unlocked + 1} of ${STAGES.length} · ${introduced.length} introduced`);
     setOptionalText("#vocabProgressStage", STAGES[unlocked].name);
+    MODE_KEYS.forEach(mode => {
+      const capitalized = mode[0].toUpperCase() + mode.slice(1);
+      const recent = recentModeAccuracy(mode, introduced);
+      setOptionalText(`#vocab${capitalized}Mastery`, `${averageModeMastery(mode, introduced)}%`);
+      setOptionalText(`#vocab${capitalized}Recent`, recent === null ? "Not practised" : `${Math.round(recent * 100)}% recent accuracy`);
+    });
+    const troubleList = $("#vocabTroubleList");
+    if (troubleList) troubleList.innerHTML = weak.length ? weak.slice(0, 6).map(word => `<div class="vocab-trouble-word"><span><strong>${word.jp}</strong><small>${word.meaning}</small></span><span class="vocab-mode-chips"><i title="Reading mastery">R ${Math.round(modeState(word, "written").mastery)}</i><i title="Listening mastery">L ${Math.round(modeState(word, "spoken").mastery)}</i><i title="Recall mastery">↩ ${Math.round(modeState(word, "recall").mastery)}</i></span></div>`).join("") : `<p class="muted vocab-empty-state">No trouble words yet. Recent misses will appear here.</p>`;
+    const troubleButton = $("#vocabReviewTrouble");
+    if (troubleButton) {
+      troubleButton.disabled = !weak.length;
+      troubleButton.textContent = troubleMode ? "Return to adaptive practice" : "Review trouble words";
+    }
     $("#vocabStages").innerHTML = STAGES.map((stage, index) => {
       const words = stageWords(index);
       const introducedCount = words.filter(word => itemState(word).introduced).length;
@@ -643,6 +826,7 @@
       const status = index < unlocked ? "Complete" : index === unlocked ? "Current" : "Locked";
       return `<div class="vocab-stage ${index > unlocked ? "locked" : ""}"><span class="vocab-stage-number">${index + 1}</span><div><strong>${stage.name}</strong><p>${stage.description}</p><div class="vocab-stage-meter"><span style="width:${average}%"></span></div><small>${introducedCount} / ${words.length} introduced · ${average}% average mastery</small></div><span class="vocab-stage-status">${status}</span></div>`;
     }).join("");
+    publishDashboard();
   }
 
   function publishStreak() {
@@ -658,9 +842,16 @@
   $("#vocabQuestionSpeech").addEventListener("click", () => { if (current) speak(current); });
   $("#vocabDontKnow").addEventListener("click", () => answer("", true));
   $("#vocabNext").addEventListener("click", nextQuestion);
+  $("#vocabReviewTrouble").addEventListener("click", () => {
+    troubleMode = !troubleMode;
+    current = null;
+    nextQuestion();
+    renderProgress();
+  });
   $("#vocabManageVoices").addEventListener("click", () => window.KANA_SPRINT_SPEECH?.openSettings?.());
   $("#vocabQuestionFormat").addEventListener("change", event => {
     state.questionFormat = event.target.value;
+    updateFormatAvailability();
     saveState();
     current = null;
     nextQuestion();

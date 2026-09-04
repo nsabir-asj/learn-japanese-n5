@@ -11,8 +11,8 @@
       <div class="header-actions"><a class="ghost header-link-button" href="./index.html">Home</a><a class="ghost header-link-button" href="./settings.html">Settings &amp; Data</a><span class="pill">Standalone · offline-ready · auto-saved</span></div>
     </header>
     <section class="activity-status" aria-label="Current activity status">
-      <div><span>Current activity</span><strong>${title}</strong></div>
-      <div class="activity-streak"><span id="activityStreakLabel">Current streak</span><strong id="activityStreak">0</strong></div>
+      <div class="activity-status-heading"><span>Current activity</span><strong>${title}</strong><small id="activityStatusNote"></small></div>
+      <div class="activity-status-metrics" id="activityStatusMetrics"><div class="activity-stat"><span id="activityStreakLabel">Current streak</span><strong id="activityStreak">0</strong></div></div>
     </section>
     <nav class="tabs activity-internal-tabs" aria-hidden="true"><div class="tab-group" data-nav-group="words"><div class="tab-group-tabs"></div></div></nav>
   </div>`;
@@ -35,5 +35,14 @@
     const label = document.querySelector("#activityStreakLabel");
     if (streak) streak.textContent = Number(detail.current) || 0;
     if (label) label.textContent = detail.label || `${activity} streak`;
+  });
+
+  window.addEventListener("kana-sprint-activity-status", event => {
+    const detail = event.detail || {};
+    const metrics = document.querySelector("#activityStatusMetrics");
+    const note = document.querySelector("#activityStatusNote");
+    if (note) note.textContent = detail.note || "";
+    if (!metrics || !Array.isArray(detail.metrics)) return;
+    metrics.innerHTML = detail.metrics.map(metric => `<div class="activity-stat"><span>${metric.label}</span><strong>${metric.value}</strong></div>`).join("");
   });
 })();
