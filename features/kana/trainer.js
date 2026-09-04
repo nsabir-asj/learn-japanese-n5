@@ -1,6 +1,11 @@
 (() => {
   "use strict";
 
+  if (location.hash === "#vocabulary" || location.hash === "#numbers") {
+    location.replace(location.hash === "#vocabulary" ? "./vocabulary.html" : "./numbers.html");
+    return;
+  }
+
   const LESSON = window.KANA_SPRINT_LESSON;
   if (!LESSON) throw new Error("Kana Sprint lesson data was not loaded.");
   const MNEMONIC_ASSETS = window.KANA_SPRINT_MNEMONIC_ASSETS || {};
@@ -19,8 +24,12 @@
   homeLink.className="ghost header-link-button";
   homeLink.href="./index.html";
   homeLink.textContent="Home";
+  const settingsLink=document.createElement("a");
+  settingsLink.className="ghost header-link-button";
+  settingsLink.href="./settings.html";
+  settingsLink.textContent="Settings & Data";
   headerPill.replaceWith(headerActions);
-  headerActions.append(homeLink,headerPill);
+  headerActions.append(homeLink,settingsLink,headerPill);
   document.querySelector("#panel-learn .typing-hint").textContent="A likely adjacent-key or reversed-letter typo offers a brief retry. Other mistakes continue to the normal correction flow.";
   document.querySelector("#panel-rehearse .typing-hint").textContent="Likely adjacent-key or reversed-letter typo → brief retry. Otherwise: hard font → standard reference → rescue if still wrong.";
   document.querySelector("#panel-words .typing-hint").textContent="After recognition, the answer, meaning, and a complete romaji spelling guide appear. Press Enter again for the next word.";
@@ -130,18 +139,19 @@
     progressGrid.remove();
 
     const tab=document.createElement("button");
-    tab.className="tab";tab.dataset.tab="settingsdata";tab.textContent="Settings & Data";
+    tab.className="tab";tab.dataset.tab="settingsdata";tab.textContent="Trainer Settings";
     document.querySelector(".tabs").appendChild(tab);
 
     const panel=document.createElement("section");
     panel.className="panel";panel.id="panel-settingsdata";
     panel.innerHTML=`<div class="data-layout">
+      <div class="card data-primary-card"><div class="data-heading"><div><h2>Global Settings & Data</h2><p class="muted">Shared voices, complete backups, component data, and app-wide reset controls now live in one place.</p></div><a class="big-button header-link-button" href="./settings.html">Open Settings & Data</a></div></div>
       <details class="details-card data-details practice-font-settings" id="practiceFontSettings">
         <summary><span class="font-settings-title"><strong>Practice fonts</strong><span id="fontSettingsSummary">Standard font is always enabled</span></span></summary>
         <div class="details-body" id="practiceFontSettingsBody"></div>
       </details>
       <div id="speechVoiceSettingsSlot"></div>
-      <div class="card data-primary-card">
+      <div class="card data-primary-card hidden">
         <div class="data-heading"><div><h2>Progress backup</h2><p class="muted">One file can carry your kana, word, number, mnemonic, font, voice, and app settings to another browser or computer.</p></div><span class="data-badge">Complete backup</span></div>
         <div class="save-status"><span class="save-dot"></span><div><strong>Progress saves automatically on this device</strong><div class="tiny" id="lastSaved">Not saved yet</div></div></div>
         <div class="actions data-primary-actions"><button class="big-button" id="exportAllProgress">Export all progress</button><button class="ghost" id="importAllProgressBtn">Choose backup to import</button><input id="importAllProgressFile" type="file" accept=".json,application/json" class="hidden"></div>
@@ -164,11 +174,12 @@
         </div>
       </details>
       <details class="details-card data-details danger-zone">
-        <summary>Reset progress</summary>
-        <div class="details-body"><p class="muted">Reset actions cannot be undone. Export a complete backup first if you may want this progress later.</p><div class="actions"><button class="ghost danger" id="resetProgress">Reset current trainer</button><button class="ghost danger hidden" id="numberReset">Reset numbers</button><button class="ghost danger" id="resetAllProgress">Reset all app data</button></div></div>
+        <summary>Reset current trainer</summary>
+        <div class="details-body"><p class="muted">This cannot be undone. Export the current trainer first if you may want this progress later.</p><div class="actions"><button class="ghost danger" id="resetProgress">Reset current trainer</button><button class="ghost danger hidden" id="numberReset">Reset numbers</button><button class="ghost danger hidden" id="resetAllProgress">Reset all app data</button></div></div>
       </details>
     </div>`;
     document.querySelector(".wrap").appendChild(panel);
+    wordDetails.classList.add("hidden");
     panel.querySelector("#speechVoiceSettingsSlot").replaceWith(wordDetails);
 
     const fontTab=document.querySelector('.tab[data-tab="fonts"]');
@@ -669,9 +680,7 @@
     },
     stop:stopSpeech,
     openSettings(){
-      switchTab("settingsdata");
-      const settings=$("#speechVoiceSettings");
-      if(settings){settings.open=true;setTimeout(()=>settings.scrollIntoView({behavior:"smooth",block:"start"}),0)}
+      location.href="./settings.html#speech";
     }
   };
 
@@ -785,7 +794,7 @@
     note.append("This question used ");
     const fontName=document.createElement("strong");fontName.textContent=`${font.label} · ${font.difficulty}`;
     note.append(fontName,". Optional fonts can be changed in ");
-    const location=document.createElement("strong");location.textContent="Settings & Data → Practice fonts";
+    const location=document.createElement("strong");location.textContent="Trainer Settings → Practice fonts";
     note.append(location,". ");
     const manage=document.createElement("button");manage.type="button";manage.className="font-management-link";manage.textContent="Manage practice fonts";
     manage.addEventListener("click",()=>openFontSettings(font.id));

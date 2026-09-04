@@ -293,7 +293,7 @@
           <div class="feedback" id="numberFeedback"></div>
           <div class="rescue-wrap" id="numberRescue"><div class="rescue-title">Choose the correct answer</div><div class="number-rescue-options" id="numberOptions"></div></div>
         </div>
-        <div class="footer-actions"><div class="number-actions"><button class="ghost" id="numberDontKnow">I don't know</button><button class="ghost number-hidden" id="numberNext">Next <kbd>Enter</kbd></button></div><span class="tiny">Progress is shared between Hiragana Sprint and Kana Mix.</span></div>
+        <div class="footer-actions"><div class="number-actions"><button class="ghost" id="numberDontKnow">I don't know</button><button class="ghost number-hidden" id="numberNext">Next <kbd>Enter</kbd></button></div><span class="tiny">Number progress is saved independently and follows you between sessions.</span></div>
       </div>
       <div class="number-layout">
         <div class="card">
@@ -323,8 +323,8 @@
     const panelAnchor = $("#panel-kanaprogress");
     if (panelAnchor) panelAnchor.before(panel);
     else $(".wrap").appendChild(panel);
-    $("#numberDataTools").classList.remove("hidden");
-    $("#numberReset").classList.remove("hidden");
+    $("#numberDataTools")?.classList.remove("hidden");
+    $("#numberReset")?.classList.remove("hidden");
     tab.addEventListener("click", switchToNumbers);
     document.querySelectorAll('.tab:not([data-tab="numbers"])').forEach(other => {
       other.addEventListener("click", () => panel.classList.remove("active"));
@@ -381,7 +381,8 @@
     $("#numberMastered").textContent = available.filter(concept => state.concepts[concept.id].mastery >= 72).length;
     $("#numberWeak").textContent = introduced.filter(concept => state.concepts[concept.id].mastery < 55).length;
     $("#numberPaceName").textContent = paceName();
-    $("#numberSaveStatus").textContent = state.savedAt ? `Auto-saved ${new Date(state.savedAt).toLocaleString()}` : "Number progress auto-saves in this browser.";
+    const saveStatus = $("#numberSaveStatus");
+    if (saveStatus) saveStatus.textContent = state.savedAt ? `Auto-saved ${new Date(state.savedAt).toLocaleString()}` : "Number progress auto-saves in this browser.";
     $("#numberConcepts").innerHTML = available.map(concept => {
       const progress = state.concepts[concept.id];
       return `<div class="number-concept"><strong>${concept.name}</strong><div class="number-concept-meter"><span style="width:${progress.mastery}%"></span></div><span class="tiny">${Math.round(progress.mastery)}% · ${progress.seen} tries</span></div>`;
@@ -621,13 +622,13 @@
     $("#numberManageVoices").addEventListener("click", () => window.KANA_SPRINT_SPEECH?.openSettings());
     $("#numberQuestionSpeech").addEventListener("click", () => { if (current?.direction === "audio" && phase === "question") speakJapanese(current.hiragana); });
     window.addEventListener("kana-sprint-speech-voices-changed", updateDirectionAvailability);
-    $("#numberExport").addEventListener("click", exportProgress);
-    $("#numberImport").addEventListener("click", () => $("#numberImportFile").click());
-    $("#numberImportFile").addEventListener("change", event => {
-      if (event.target.files[0]) importProgress(event.target.files[0]);
+    $("#numberExport")?.addEventListener("click", exportProgress);
+    $("#numberImport")?.addEventListener("click", () => $("#numberImportFile")?.click());
+    $("#numberImportFile")?.addEventListener("change", event => {
+      if (event.target.files?.[0]) importProgress(event.target.files[0]);
       event.target.value = "";
     });
-    $("#numberReset").addEventListener("click", () => {
+    $("#numberReset")?.addEventListener("click", () => {
       if (!confirm("Reset only number-learning progress? Kana and word progress will stay unchanged.")) return;
       localStorage.removeItem(STORAGE_KEY);
       state = defaultState();
@@ -645,5 +646,5 @@
   wireEvents();
   renderProgress();
   window.KANA_SPRINT_SYNC_RANGE?.($("#numberPace"));
-  if (location.hash === "#numbers") switchToNumbers();
+  if (location.hash === "#numbers" || document.body.dataset.activity === "numbers") switchToNumbers();
 })();

@@ -892,8 +892,8 @@
     available: true,
     foundation: {
       title: "Number foundation",
-      copy: "General number fluency stays in Kana Mix. This lesson only teaches how numbers behave in ages, school years, phone numbers, and time.",
-      href: "../kana_sprint.html#numbers",
+      copy: "General number fluency has its own focused practice page. This lesson only teaches how numbers behave in ages, school years, phone numbers, and time.",
+      href: "../numbers.html",
       label: "Review numbers in Kana Mix"
     },
     storageKey: "kanaSprintGuidedLessonsV1",

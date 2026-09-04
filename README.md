@@ -68,15 +68,15 @@ If Japanese speech is available in the browser, the trainer can pronounce the wo
 
 ### Vocabulary
 
-The universal **Vocabulary** tab practises Japanese-to-English comprehension separately from word reading. New expressions are taught with their Japanese form, romaji, English meaning, and pronunciation before the first graded question. Answers use four meaning choices so legitimate English synonyms do not become false typing errors; number keys **1–4** are supported.
+The dedicated **Vocabulary** page practises Japanese-to-English comprehension separately from kana word reading. New expressions are taught with their Japanese form, romaji, English meaning, and pronunciation before the first graded question. Answers adapt from four to six and then eight meaning choices as each word's mastery grows; number keys **1–8** are supported. Distractors favor useful semantic and sound contrasts, rotate over time, and remember the learner's previous confusions.
 
-The curriculum covers the complete vocabulary lists and useful expressions from Genki Lesson 1 and Lesson 2: greetings, school and personal information, countries, majors, occupations, family, time, demonstratives, places, food, belongings, prices, and shopping language. Practical-extras stages preserve the app’s existing everyday vocabulary and add high-frequency comprehension, routine, food, transport, and direction words. A later stage opens only after every expression in the current stage has been introduced and the stage reaches 35% average mastery. The saved pace control changes how quickly new expressions appear without skipping this order. Written, spoken, and alternating question formats use the universal voice selected in **Settings & Data**.
+The curriculum covers the complete vocabulary lists and useful expressions from Genki Lesson 1 and Lesson 2: greetings, school and personal information, countries, majors, occupations, family, time, demonstratives, places, food, belongings, prices, and shopping language. Practical-extras stages preserve the app’s existing everyday vocabulary and add high-frequency comprehension, routine, food, transport, and direction words. A later stage opens permanently only after every expression in the current stage has been introduced, attempted, and the stage reaches 35% average mastery. The saved pace control changes how quickly new expressions appear without skipping this order. Written, spoken, and alternating question formats use the universal voice selected in **Settings & Data**.
 
-Vocabulary mastery, accuracy, weak items, streak, and curriculum position are stored independently from word-reading mastery and shared by Hiragana Sprint, Katakana Sprint, and Kana Mix. The grouped **Progress** tab shows both word-reading and vocabulary-comprehension summaries.
+Vocabulary mastery, accuracy, weak items, streak, and curriculum position are stored independently from word-reading mastery. The homepage links directly to the focused Vocabulary course.
 
 ### Numbers
 
-Hiragana Sprint and Kana Mix include the same **Numbers** tab; Katakana Sprint stays focused on katakana. The course begins with 0–10, then covers teens, tens, hundreds, thousands, irregular readings such as `sanbyaku`, `roppyaku`, `happyaku`, `sanzen`, and `hassen`, and the Japanese 10,000 unit `man`.
+The dedicated **Numbers** page begins with 0–10, then covers teens, tens, hundreds, thousands, irregular readings such as `sanbyaku`, `roppyaku`, `happyaku`, `sanzen`, and `hassen`, and the Japanese 10,000 unit `man`.
 
 New number patterns are explained before the first graded question. Practice can run from digits to a romaji reading, from a hiragana reading to digits, or in both directions. Correct and corrected answers show the number, kanji, hiragana, romaji, and a component-by-component breakdown. Japanese speech uses the voice selected in Word mode when available.
 
@@ -90,17 +90,17 @@ Each idea moves from a concise model to retrieval through situational choices, a
 
 Audio has an explicit assessment role. Listening comprehension and numeric dictation play it as the prompt; sentence construction, grammar, and error repair make pronunciation available only after the learner submits an answer.
 
-General number construction remains in Kana Mix. Guided Lesson 1 links to that foundation and teaches only the contextual forms needed for ages, school years, telephone digits, and time. Japanese pronunciation reads the universal voice and speed saved in **Settings & Data**.
+General number construction stays on the focused Numbers page. Guided Lesson 1 links to that foundation and teaches only the contextual forms needed for ages, school years, telephone digits, and time. Japanese pronunciation reads the universal voice and speed saved in **Settings & Data**.
 
 ### Learning pace
 
-Learn, Rehearse, and Words each have a saved seven-position pace control. Learn adjusts how often a not-yet-introduced kana and mnemonic appear within unlocked rows, Rehearse adjusts assessment coverage of the selected set, and Words adjusts new vocabulary frequency. The fastest **New-first** setting chooses new material whenever possible. Scheduled mistake and mnemonic-recall checks always take priority, and a pace control stops affecting selection once its current pool is fully introduced or assessed.
+Learn, Rehearse, and Words each have a saved pace control. Learn adjusts how often a not-yet-introduced kana and mnemonic appear within unlocked rows, Rehearse adjusts assessment coverage of the selected set, and Words adjusts new vocabulary frequency from review-heavy to new-first. Vocabulary reviews that are due take priority; otherwise its pace is applied as a stable new-word proportion, with **New-first** choosing new material whenever no review is due. A pace control stops affecting selection once its current pool is fully introduced or assessed.
 
 After the P-row reaches 72 average mastery and combination rows become available, Learn automatically uses one pace step faster without changing the saved slider setting. If the slider is already at **New-first**, Combo sprint keeps new kana first and accelerates combination-row unlocking: every combination must be introduced and attempted unaided, at least two thirds must be recalled correctly, and recent row accuracy must reach 72%. Weak combinations remain in adaptive review after the next row unlocks.
 
 ### Fonts
 
-Standard print is always enabled. Additional handwriting-style fonts can be selected for all practice modes from the expandable **Practice fonts** manager in **Settings & Data**. Harder fonts award slightly more mastery for a correct first attempt.
+Standard print is always enabled. Additional handwriting-style fonts can be selected for all kana practice modes from the expandable **Practice fonts** manager in **Trainer Settings**. Harder fonts award slightly more mastery for a correct first attempt.
 
 When a difficult-font answer is wrong, the standard form appears beside it for one more attempt. The correction identifies the font and links directly to its highlighted entry in the font manager. Rescue choices appear only if that comparison attempt is also wrong.
 
@@ -122,9 +122,9 @@ The separate user-supplied LeafPiece original is kept locally under `assets/loca
 
 ### Progress
 
-The two grouped **Progress** tabs show kana mastery, weak items, common confusions, font recognition, curriculum status, word-reading statistics, and a separate vocabulary-comprehension summary.
+The two grouped **Progress** tabs in each kana trainer show kana mastery, weak items, common confusions, font recognition, curriculum status, and word-reading statistics. Vocabulary and Numbers show their own progress beside their focused practice surfaces.
 
-The top streak box follows the active practice mode: Kana in Learn and Rehearse, Words in Word mode, and Numbers in Number mode. Each mode keeps an independent streak, so a mistake in one activity does not reset the others. The highlight begins with gentle rewards at 5 and 15, then becomes more prominent at 25, 50, 75, 100, 150, and 200 consecutive correct answers. The 200+ tier uses the legendary purple-gold style. Kana Progress and Word Progress include the complete milestone guide and show their current and best streaks; Number Progress keeps the live streak in the header and shows the best number streak in its summary.
+The top streak box follows the active kana practice mode: Kana in Learn and Rehearse, and Words in Word mode. Vocabulary and Numbers keep independent streaks on their own pages, so a mistake in one activity does not reset the others. The kana highlight begins with gentle rewards at 5 and 15, then becomes more prominent at 25, 50, 75, 100, 150, and 200 consecutive correct answers. The 200+ tier uses the legendary purple-gold style.
 
 ## Answering questions
 
@@ -190,9 +190,9 @@ Japanese-N5-lessons/
 │   └── kana/
 │       ├── trainer.js         Shared trainer and adaptive logic
 │       ├── trainer.css        Shared trainer interface styles
-│       ├── vocabulary.js      Vocabulary practice logic
+│       ├── vocabulary.js      Dedicated vocabulary practice logic
 │       ├── vocabulary.css     Vocabulary interface styles
-│       ├── numbers.js         Number-course logic
+│       ├── numbers.js         Dedicated number-course logic
 │       ├── numbers.css        Number-course interface styles
 │       ├── hiragana-fonts.css Hiragana font definitions
 │       ├── katakana-fonts.css Katakana font definitions

@@ -27,10 +27,10 @@ test('retains independently updated progress items', () => {
 test('does not move monotonic totals backwards', () => {
   assert.deepEqual(
     mergeProgressValue(
-      { total: 12, correct: 10, bestStreak: 7 },
-      { total: 9, correct: 8, bestStreak: 5 },
+      { total: 12, correct: 10, bestStreak: 7, unlockedStage: 3 },
+      { total: 9, correct: 8, bestStreak: 5, unlockedStage: 2 },
     ),
-    { total: 12, correct: 10, bestStreak: 7 },
+    { total: 12, correct: 10, bestStreak: 7, unlockedStage: 3 },
   );
 });
 

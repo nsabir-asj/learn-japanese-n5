@@ -10,6 +10,9 @@ const entrypoints = [
   'hiragana_sprint.html',
   'katakana_sprint.html',
   'kana_sprint.html',
+  'vocabulary.html',
+  'numbers.html',
+  'settings.html',
   'guided/player.html',
 ];
 
@@ -37,6 +40,9 @@ test('the root launcher links to every learning experience', () => {
     './hiragana_sprint.html',
     './katakana_sprint.html',
     './kana_sprint.html',
+    './vocabulary.html',
+    './numbers.html',
+    './settings.html',
     './guided/player.html?lesson=1',
   ]) {
     assert.ok(html.includes(`href="${target}"`), `root launcher does not link to ${target}`);

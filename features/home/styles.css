@@ -23,18 +23,26 @@ body {
 h1 { max-width: 750px; margin: 0; font-size: clamp(2.2rem, 6vw, 4.4rem); line-height: 1.02; letter-spacing: -.055em; }
 .intro { max-width: 720px; margin: 18px 0 0; color: #b8c3cf; font-size: 1.05rem; line-height: 1.65; }
 .status { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.025); color: var(--muted); padding: 9px 13px; font-size: .82rem; white-space: nowrap; }
+.home-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.settings-link { display: inline-flex; align-items: center; min-height: 38px; border: 1px solid #465363; border-radius: 11px; background: rgba(88,166,255,.08); color: #c9e2ff; padding: 8px 12px; font-size: .84rem; font-weight: 800; text-decoration: none; }
+.settings-link:hover { border-color: #6c89a8; background: rgba(88,166,255,.14); }
+.settings-link:focus-visible { outline: 3px solid rgba(88,166,255,.5); outline-offset: 3px; }
 section + section { margin-top: 44px; }
 .section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; margin-bottom: 16px; }
 .section-heading h2 { margin: 0; font-size: 1.55rem; letter-spacing: -.025em; }
 .section-heading > p { max-width: 590px; margin: 0; color: var(--muted); line-height: 1.55; }
 .activity-grid { display: grid; gap: 14px; }
 .activity-grid-sprints { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.activity-grid-foundations { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .activity-card { position: relative; display: grid; min-width: 0; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(145deg, rgba(28,36,48,.96), rgba(22,27,34,.96)); color: var(--text); padding: 22px; text-decoration: none; box-shadow: 0 18px 55px rgba(0,0,0,.18); transition: transform .16s ease, border-color .16s ease, background .16s ease; }
 .activity-card:hover { transform: translateY(-3px); border-color: #637083; background: linear-gradient(145deg, #202a37, #181e27); }
 .activity-card:focus-visible { outline: 3px solid rgba(88,166,255,.5); outline-offset: 3px; }
 .kana-mark, .kana-pair { display: flex; align-items: center; min-height: 94px; margin-bottom: 18px; font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif; font-size: 4.8rem; font-weight: 600; line-height: 1; }
 .kana-pair { gap: 4px; }
 .kana-pair span:last-child { color: #d2baff; transform: translateY(10px); }
+.foundation-mark { display: flex; align-items: center; min-height: 94px; margin-bottom: 18px; color: #8fd7b0; font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif; font-size: 3.7rem; font-weight: 700; line-height: 1; }
+.numbers-card .foundation-mark { color: #f1c76d; font-family: ui-monospace,"Cascadia Mono","Segoe UI Mono",monospace; }
+.vocabulary-card { background: linear-gradient(145deg,rgba(63,185,80,.09),rgba(22,27,34,.96)); }.numbers-card { background: linear-gradient(145deg,rgba(210,153,34,.1),rgba(22,27,34,.96)); }
 .hiragana-card .kana-mark { color: #9ccbff; }
 .katakana-card .kana-mark { color: #d2baff; }
 .activity-copy { display: grid; gap: 8px; }
@@ -51,9 +59,9 @@ section + section { margin-top: 44px; }
 @media (max-width: 820px) {
   .home-header, .section-heading { align-items: flex-start; flex-direction: column; }
   .home-header { gap: 18px; margin-bottom: 38px; }
-  .activity-grid-sprints { grid-template-columns: 1fr; }
+  .activity-grid-sprints, .activity-grid-foundations { grid-template-columns: 1fr; }
   .activity-card { grid-template-columns: 86px minmax(0,1fr) auto; align-items: center; gap: 18px; }
-  .kana-mark, .kana-pair { min-height: 0; margin: 0; font-size: 3.5rem; }
+  .kana-mark, .kana-pair, .foundation-mark { min-height: 0; margin: 0; font-size: 3.5rem; }
   .activity-copy > span { min-height: 0; }
   .card-action { margin: 0; white-space: nowrap; }
 }
@@ -62,7 +70,7 @@ section + section { margin-top: 44px; }
   .home-shell { width: min(100% - 24px, 1100px); padding-top: 28px; }
   .status { white-space: normal; }
   .activity-card, .lesson-card { grid-template-columns: 64px minmax(0,1fr); padding: 18px; }
-  .kana-mark, .kana-pair { font-size: 2.8rem; }
+  .kana-mark, .kana-pair, .foundation-mark { font-size: 2.8rem; }
   .lesson-number { width: 56px; height: 56px; border-radius: 15px; }
   .card-action { grid-column: 2; margin-top: 9px; }
 }

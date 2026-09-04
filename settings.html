@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="Speech, backup, synchronization, and data settings for Japanese N5 Practice." />
+<title>Settings &amp; Data — Japanese N5 Practice</title>
+<link rel="stylesheet" href="./features/kana/trainer.css?v=20260904-1" />
+<link rel="stylesheet" href="./features/settings/settings.css?v=20260904-1" />
+<script defer src="./shared/progress-sync.js?v=20260903-1"></script>
+<script defer src="./shared/speech.js?v=20260904-1"></script>
+<script defer src="./features/settings/settings.js?v=20260904-1"></script>
+</head>
+<body>
+  <main class="settings-shell">
+    <header class="settings-header">
+      <div><p class="settings-eyebrow">Japanese N5 Practice</p><h1>Settings &amp; Data</h1><p class="subtitle">Manage shared pronunciation, portable backups, and saved learning progress.</p></div>
+      <div class="header-actions"><a class="ghost header-link-button" href="./index.html">Home</a><a class="ghost header-link-button" href="./vocabulary.html">Vocabulary</a><a class="ghost header-link-button" href="./numbers.html">Numbers</a><span class="pill">Checking saved progress…</span></div>
+    </header>
+
+    <div class="settings-layout">
+      <section class="card settings-card" id="speech">
+        <h2>Speech &amp; voices</h2>
+        <p class="muted">One voice setup is shared by kana reading, Vocabulary, Numbers, and guided lessons.</p>
+        <div class="speech-status-card" id="globalSpeechStatus"><strong>Checking speech voices…</strong><span>Waiting for the browser to report available voices.</span></div>
+        <div class="settings-form">
+          <label><span>Japanese voice</span><select id="globalJapaneseVoice"></select></label>
+          <label><span>English voice</span><select id="globalEnglishVoice"></select></label>
+          <label><span>Pronunciation speed</span><select id="globalSpeechRate"><option value="0.75">Slow</option><option value="0.85">Clear</option><option value="1">Normal</option></select></label>
+          <label class="toggle-line"><input type="checkbox" id="globalSpeechContinue" /> Let pronunciation finish after moving to the next question</label>
+          <div class="actions"><button class="ghost" id="testGlobalJapanese">Test Japanese voice</button><button class="ghost" id="testGlobalEnglish">Test English voice</button></div>
+        </div>
+      </section>
+
+      <div class="settings-grid">
+        <section class="card settings-card">
+          <h2>Saved progress</h2>
+          <p class="muted">These areas share the same records no matter which practice page you open.</p>
+          <div class="data-overview" id="dataOverview"></div>
+        </section>
+        <section class="card settings-card">
+          <h2>Complete backup</h2>
+          <p class="muted">Carry all recognized progress and shared settings to another browser or computer in one file.</p>
+          <div class="actions"><button class="big-button" id="exportAll">Export all progress</button><button class="ghost" id="chooseBackup">Choose backup to import</button><input class="hidden" id="backupFile" type="file" accept=".json,application/json" /></div>
+          <div class="callout backup-preview" id="backupStatus">Choose a complete backup to preview it before anything is replaced.</div>
+          <button class="big-button hidden" id="restoreBackup">Restore this backup</button>
+        </section>
+      </div>
+
+      <details class="details-card" id="components">
+        <summary>Advanced component backups</summary>
+        <div class="details-body">
+          <p class="muted">Export, restore, or reset one learning area without affecting the others.</p>
+          <div class="component-manager">
+            <label><span>Learning area</span><select id="componentStore"><option value="hiragana-sprint-v3">Hiragana</option><option value="katakana-sprint-v1">Katakana</option><option value="kana-sprint-mix-v1">Kana Mix</option><option value="kanaSprintVocabularyV1">Vocabulary</option><option value="kanaSprintNumbersV1">Numbers</option><option value="kanaSprintGuidedLessonsV1">Guided lessons</option><option value="kanaSprintSpeechV1">Speech &amp; voices</option></select></label>
+            <div class="actions"><button class="ghost" id="exportComponent">Export selected</button><button class="ghost" id="chooseComponent">Import component</button><input class="hidden" id="componentFile" type="file" accept=".json,application/json" /><button class="ghost danger" id="resetComponent">Reset selected</button></div>
+          </div>
+          <div class="callout" id="componentStatus">Component backups contain only the selected learning area.</div>
+        </div>
+      </details>
+
+      <details class="details-card danger-card">
+        <summary>Reset all app data</summary>
+        <div class="details-body"><p class="muted">This permanently removes every recognized progress record and shared preference from this device. Export a complete backup first if you may want it later.</p><button class="ghost danger" id="resetAll">Reset all app data</button><div class="callout" id="resetStatus">No data has been changed.</div></div>
+      </details>
+    </div>
+  </main>
+</body>
+</html>

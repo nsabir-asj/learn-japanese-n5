@@ -220,23 +220,54 @@
     id: word[0], jp: word[1], romaji: word[2], meaning: word[3], stageId: stage.id,
     stageName: stage.name, stageIndex, order
   })));
+  const CONTRAST_GROUPS = [
+    ["ohayou", "ohayou-gozaimasu", "konnichiwa", "konbanwa", "sayounara", "oyasumi-nasai", "mata-ne"],
+    ["arigatou", "arigatou-gozaimasu", "sumimasen", "gomen-nasai", "doumo"],
+    ["ittekimasu", "itterasshai", "tadaima", "okaeri-nasai"],
+    ["itadakimasu", "gochisousama-deshita", "irasshaimase", "onegaishimasu", "kudasai", "douzo"],
+    ["daigaku", "koukou", "gakusei", "daigakusei", "ryuugakusei", "koukousei", "daigakuinsei", "sensei"],
+    ["ajia-kenkyuu", "keizai", "kougaku", "kokusai-kankei", "seiji", "seibutsugaku", "bijinesu", "bungaku", "rekishi"],
+    ["isha", "kaishain", "kangoshi", "shufu", "bengoshi", "sensei"],
+    ["okaasan", "otousan", "oneesan", "oniisan", "imouto", "otouto", "kazoku"],
+    ["kore", "sore", "are", "dore"],
+    ["kono", "sono", "ano", "dono"],
+    ["koko", "soko", "asoko", "doko"],
+    ["ginkou", "konbini", "toire", "toshokan", "yuubinkyoku", "mise", "eki"],
+    ["sakana", "tonkatsu", "niku", "yasai", "mizu", "ocha", "gohan", "asagohan"],
+    ["kasa", "kaban", "kutsu", "saifu", "jiinzu", "jitensha", "shinbun", "sumaho", "tiishatsu", "tokei", "nooto", "pen", "boushi", "hon"],
+    ["kyou", "ashita", "kinou", "ima"],
+    ["asa", "hiru", "yoru", "gozen", "gogo"],
+    ["iku", "kuru", "kaeru"],
+    ["eki", "densha", "basu", "kuruma", "jitensha"],
+    ["migi", "hidari", "massugu", "iriguchi", "deguchi"]
+  ];
+  const CONTRASTS_BY_ID = new Map();
+  CONTRAST_GROUPS.forEach((group, groupIndex) => group.forEach(id => {
+    if (!CONTRASTS_BY_ID.has(id)) CONTRASTS_BY_ID.set(id, new Set());
+    CONTRASTS_BY_ID.get(id).add(groupIndex);
+  }));
   const $ = selector => document.querySelector(selector);
   const shuffle = values => [...values].sort(() => Math.random() - .5);
   const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
+  const Scheduler = window.KANA_SPRINT_VOCABULARY_SCHEDULER;
 
   function defaultState() {
     return {
       version: VERSION, total: 0, correct: 0, streak: 0, bestStreak: 0,
-      questionFormat: "both", pace: 50, autoPronounce: true, items: {}, recent: [], savedAt: 0
+      questionFormat: "both", pace: 50, newWordCredit: 0, unlockedStage: 0,
+      autoPronounce: true, items: {}, recent: [], savedAt: 0
     };
   }
 
   function itemState(word) {
     if (!state.items[word.id]) state.items[word.id] = {
       introduced: false, seen: 0, correct: 0, wrong: 0, mastery: 0,
-      lastWasCorrect: null, lastSeen: 0, dueAt: 0
+      lastWasCorrect: null, lastSeen: 0, dueAt: 0, recentDistractors: [], confusions: {}
     };
-    return state.items[word.id];
+    const progress = state.items[word.id];
+    if (!Array.isArray(progress.recentDistractors)) progress.recentDistractors = [];
+    if (!progress.confusions || typeof progress.confusions !== "object") progress.confusions = {};
+    return progress;
   }
 
   function loadState() {
@@ -255,13 +286,17 @@
   let state = loadState();
   if (!["written", "spoken", "both"].includes(state.questionFormat)) state.questionFormat = "both";
   state.pace = clamp(Number(state.pace) || 50, 10, 90);
+  state.newWordCredit = clamp(Number(state.newWordCredit) || 0, 0, 1);
+  const previouslyReachedStage = WORDS.reduce((highest, word) => state.items[word.id]?.introduced ? Math.max(highest, word.stageIndex) : highest, 0);
+  state.unlockedStage = clamp(Math.max(Number(state.unlockedStage) || 0, previouslyReachedStage), 0, STAGES.length - 1);
   let current = null;
   let phase = "idle";
   let questionNumber = 0;
   let lastFormat = "";
-  let sinceNew = 0;
+  let currentChoiceIds = [];
 
   function saveState() {
+    unlockedStageIndex();
     state.savedAt = Date.now();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     renderProgress();
@@ -275,11 +310,12 @@
   }
   function stageReady(index) {
     const words = stageWords(index);
-    return words.every(word => itemState(word).introduced) && stageAverage(index) >= 35;
+    return Scheduler.stageIsReady(words.map(word => itemState(word)));
   }
   function unlockedStageIndex() {
-    let index = 0;
+    let index = clamp(Number(state.unlockedStage) || 0, 0, STAGES.length - 1);
     while (index < STAGES.length - 1 && stageReady(index)) index++;
+    state.unlockedStage = Math.max(Number(state.unlockedStage) || 0, index);
     return index;
   }
   function introducedWords() { return WORDS.filter(word => itemState(word).introduced); }
@@ -296,25 +332,30 @@
     const unseen = stageWords(stageIndex).filter(word => !itemState(word).introduced)
       .sort((a, b) => a.order - b.order);
     const introduced = introducedWords();
-    const newShare = state.pace / 100;
-    if (unseen.length && (!introduced.length || sinceNew >= 3 || Math.random() < newShare)) {
-      sinceNew = 0;
-      return { word: unseen[0], introduce: true };
-    }
-    sinceNew++;
-    const recent = new Set(state.recent.slice(-5));
-    let candidates = introduced.filter(word => !recent.has(word.id));
-    if (!candidates.length) candidates = introduced;
-    if (!candidates.length && unseen.length) return { word: unseen[0], introduce: true };
+    if (!introduced.length && unseen.length) return { word: unseen[0], introduce: true };
     const now = Date.now();
+    const recent = new Set(state.recent.slice(-5));
+    const due = introduced.filter(word => {
+      const progress = itemState(word);
+      return progress.dueAt && progress.dueAt <= now;
+    });
+    if (due.length) return { word: selectReviewWord(due, recent), introduce: false };
+    if (unseen.length) {
+      const decision = Scheduler.nextIntroductionDecision(state.pace, state.newWordCredit);
+      state.newWordCredit = decision.credit;
+      if (decision.introduce) return { word: unseen[0], introduce: true };
+    }
+    return { word: selectReviewWord(introduced, recent), introduce: false };
+  }
+
+  function selectReviewWord(words, recent) {
+    let candidates = words.filter(word => !recent.has(word.id));
+    if (!candidates.length) candidates = words;
     const scored = candidates.map(word => {
       const progress = itemState(word);
-      let score = (100 - progress.mastery) + progress.wrong * 7 + Math.random() * 24;
-      if (progress.lastWasCorrect === false) score += 22;
-      if (progress.dueAt && progress.dueAt <= now) score += 16;
-      return { word, score };
+      return { word, score: Scheduler.reviewScore(progress) };
     }).sort((a, b) => b.score - a.score);
-    return { word: scored[0].word, introduce: false };
+    return scored[0]?.word || null;
   }
 
   function japaneseSpeechReady() {
@@ -358,7 +399,7 @@
           <div class="vocab-options" id="vocabOptions"></div>
           <div class="feedback" id="vocabFeedback"></div>
         </div>
-        <div class="footer-actions"><div class="actions"><button class="ghost" id="vocabDontKnow">I don’t know</button><button class="ghost hidden" id="vocabNext">Next <kbd>Enter</kbd></button></div><span class="tiny">Use <kbd>1</kbd>–<kbd>4</kbd> to choose an answer.</span></div>
+        <div class="footer-actions"><div class="actions"><button class="ghost" id="vocabDontKnow">I don’t know</button><button class="ghost hidden" id="vocabNext">Next <kbd>Enter</kbd></button></div><span class="tiny" id="vocabKeyboardHint">Use <kbd>1</kbd>–<kbd>4</kbd> to choose an answer.</span></div>
       </div>
       <div class="vocab-below">
         <div class="card"><h2>Vocabulary progress</h2><div class="vocab-progress-grid"><div class="mini"><strong id="vocabTotal">0</strong><span class="tiny">answers</span></div><div class="mini"><strong id="vocabAccuracy">—</strong><span class="tiny">accuracy</span></div><div class="mini"><strong id="vocabIntroduced">0</strong><span class="tiny">introduced</span></div><div class="mini"><strong id="vocabMastered">0</strong><span class="tiny">mastered</span></div><div class="mini"><strong id="vocabWeak">0</strong><span class="tiny">weak</span></div><div class="mini"><strong id="vocabBestStreak">0</strong><span class="tiny">best streak</span></div></div></div>
@@ -374,7 +415,7 @@
     if (wordProgressGrid) {
       const vocabularyProgress = document.createElement("div");
       vocabularyProgress.className = "card vocab-progress-detail-card";
-      vocabularyProgress.innerHTML = `<div class="vocab-progress-detail-heading"><div><h2>Vocabulary comprehension</h2><p class="muted">Meaning mastery is tracked separately from reading and shared across all three launchers.</p></div><span class="data-badge" id="vocabProgressStage">Lesson 1 · Greetings & courtesy</span></div><div class="vocab-progress-grid"><div class="mini"><strong id="vocabProgressTotal">0</strong><span class="tiny">answers</span></div><div class="mini"><strong id="vocabProgressAccuracy">—</strong><span class="tiny">accuracy</span></div><div class="mini"><strong id="vocabProgressIntroduced">0</strong><span class="tiny">introduced</span></div><div class="mini"><strong id="vocabProgressMastered">0</strong><span class="tiny">mastered</span></div><div class="mini"><strong id="vocabProgressWeak">0</strong><span class="tiny">weak</span></div><div class="mini"><strong id="vocabProgressBestStreak">0</strong><span class="tiny">best streak</span></div></div>`;
+      vocabularyProgress.innerHTML = `<div class="vocab-progress-detail-heading"><div><h2>Vocabulary comprehension</h2><p class="muted">Meaning mastery is tracked separately from kana word reading.</p></div><span class="data-badge" id="vocabProgressStage">Lesson 1 · Greetings & courtesy</span></div><div class="vocab-progress-grid"><div class="mini"><strong id="vocabProgressTotal">0</strong><span class="tiny">answers</span></div><div class="mini"><strong id="vocabProgressAccuracy">—</strong><span class="tiny">accuracy</span></div><div class="mini"><strong id="vocabProgressIntroduced">0</strong><span class="tiny">introduced</span></div><div class="mini"><strong id="vocabProgressMastered">0</strong><span class="tiny">mastered</span></div><div class="mini"><strong id="vocabProgressWeak">0</strong><span class="tiny">weak</span></div><div class="mini"><strong id="vocabProgressBestStreak">0</strong><span class="tiny">best streak</span></div></div>`;
       wordProgressGrid.insertAdjacentElement("afterend", vocabularyProgress);
     }
 
@@ -407,9 +448,6 @@
   function beginIntroduction(word) {
     current = word;
     phase = "introduction";
-    const progress = itemState(word);
-    progress.introduced = true;
-    saveState();
     $("#vocabQuestion").classList.add("hidden");
     $("#vocabIntroduction").classList.remove("hidden");
     $("#vocabDontKnow").classList.add("hidden");
@@ -421,17 +459,65 @@
     if (japaneseSpeechReady()) setTimeout(() => speak(word), 100);
   }
 
-  function makeChoices(word) {
-    const sameStage = shuffle(WORDS.filter(candidate => candidate.id !== word.id && candidate.stageIndex === word.stageIndex));
-    const other = shuffle(WORDS.filter(candidate => candidate.id !== word.id && candidate.stageIndex !== word.stageIndex));
-    const distractors = [];
+  function choiceCountFor(word) {
+    return Scheduler.choiceCountForMastery(itemState(word).mastery);
+  }
+
+  function editSimilarity(left, right) {
+    const a = left.toLowerCase().replace(/[^a-z\u3040-\u30ff]/g, "");
+    const b = right.toLowerCase().replace(/[^a-z\u3040-\u30ff]/g, "");
+    if (!a.length || !b.length) return 0;
+    const row = Array.from({ length: b.length + 1 }, (_, index) => index);
+    for (let i = 1; i <= a.length; i++) {
+      let diagonal = row[0];
+      row[0] = i;
+      for (let j = 1; j <= b.length; j++) {
+        const above = row[j];
+        row[j] = Math.min(row[j] + 1, row[j - 1] + 1, diagonal + (a[i - 1] === b[j - 1] ? 0 : 1));
+        diagonal = above;
+      }
+    }
+    return 1 - row[b.length] / Math.max(a.length, b.length);
+  }
+
+  function sharedContrastGroups(left, right) {
+    const leftGroups = CONTRASTS_BY_ID.get(left.id);
+    const rightGroups = CONTRASTS_BY_ID.get(right.id);
+    if (!leftGroups || !rightGroups) return 0;
+    return [...leftGroups].filter(group => rightGroups.has(group)).length;
+  }
+
+  function distractorScore(word, candidate, format) {
+    const progress = itemState(word);
+    const challenge = progress.mastery < 40 ? .35 : progress.mastery < 72 ? .7 : 1;
+    const recentIndex = progress.recentDistractors.lastIndexOf(candidate.id);
+    const confusionCount = Number(progress.confusions[candidate.id]) || 0;
+    let score = sharedContrastGroups(word, candidate) * (45 + 40 * challenge);
+    if (candidate.stageIndex === word.stageIndex) score += 32;
+    if (state.items[candidate.id]?.introduced) score += 12;
+    score += editSimilarity(format === "spoken" ? word.romaji : word.jp, format === "spoken" ? candidate.romaji : candidate.jp) * (format === "spoken" ? 18 + 28 * challenge : 10 + 20 * challenge);
+    score += Math.min(54, confusionCount * 18);
+    if (recentIndex >= 0) {
+      const recency = progress.recentDistractors.length - recentIndex;
+      score -= Math.max(55, 130 - recency * 8);
+    }
+    return score + Math.random() * 18;
+  }
+
+  function makeChoices(word, format) {
+    const count = choiceCountFor(word);
     const meanings = new Set([word.meaning]);
-    [...sameStage, ...other].some(candidate => {
-      if (meanings.has(candidate.meaning)) return false;
+    const ranked = WORDS
+      .filter(candidate => candidate.id !== word.id && candidate.meaning !== word.meaning)
+      .map(candidate => ({ candidate, score: distractorScore(word, candidate, format) }))
+      .sort((a, b) => b.score - a.score);
+    const distractors = [];
+    for (const { candidate } of ranked) {
+      if (meanings.has(candidate.meaning)) continue;
       distractors.push(candidate);
       meanings.add(candidate.meaning);
-      return distractors.length === 3;
-    });
+      if (distractors.length === count - 1) break;
+    }
     return shuffle([word, ...distractors]);
   }
 
@@ -454,7 +540,11 @@
     $("#vocabQuestionLabel").textContent = spoken ? "Listen and choose the English meaning" : "Choose the English meaning";
     const options = $("#vocabOptions");
     options.innerHTML = "";
-    makeChoices(word).forEach((choice, index) => {
+    const choices = makeChoices(word, format);
+    currentChoiceIds = choices.map(choice => choice.id);
+    options.dataset.count = String(choices.length);
+    $("#vocabKeyboardHint").innerHTML = `Use <kbd>1</kbd>–<kbd>${choices.length}</kbd> to choose an answer.`;
+    choices.forEach((choice, index) => {
       const button = document.createElement("button");
       button.className = "vocab-choice";
       button.dataset.id = choice.id;
@@ -465,8 +555,13 @@
     if (spoken) setTimeout(() => speak(word), 100);
   }
 
-  function applyResult(correct) {
+  function applyResult(correct, selectedId) {
     const progress = itemState(current);
+    progress.introduced = true;
+    const distractorIds = currentChoiceIds.filter(id => id !== current.id);
+    progress.recentDistractors.push(...distractorIds);
+    progress.recentDistractors = progress.recentDistractors.slice(-16);
+    if (!correct && selectedId) progress.confusions[selectedId] = (Number(progress.confusions[selectedId]) || 0) + 1;
     progress.seen++;
     progress.lastSeen = Date.now();
     progress.lastWasCorrect = correct;
@@ -493,7 +588,7 @@
     if (phase !== "question" || !current) return;
     phase = "answered";
     const correct = !unknown && selectedId === current.id;
-    applyResult(correct);
+    applyResult(correct, selectedId);
     [...$("#vocabOptions").children].forEach(button => {
       button.disabled = true;
       if (button.dataset.id === current.id) button.classList.add("correct");
@@ -513,7 +608,7 @@
   function nextQuestion() {
     window.KANA_SPRINT_SPEECH?.stop?.();
     const selected = selectWord();
-    if (!selected) return;
+    if (!selected?.word) return;
     if (selected.introduce) beginIntroduction(selected.word); else showQuestion(selected.word);
   }
 
@@ -573,10 +668,10 @@
   document.addEventListener("keydown", event => {
     if (!$("#panel-vocabulary").classList.contains("active")) return;
     if (event.key === "Enter" && phase === "answered") { event.preventDefault(); nextQuestion(); return; }
-    if (/^[1-4]$/.test(event.key) && phase === "question") {
+    if (/^[1-8]$/.test(event.key) && phase === "question") {
       const button = $("#vocabOptions").children[Number(event.key) - 1];
       if (button) { event.preventDefault(); button.click(); }
     }
   });
-  if (location.hash === "#vocabulary") switchToVocabulary();
+  if (location.hash === "#vocabulary" || document.body.dataset.activity === "vocabulary") switchToVocabulary();
 })();
