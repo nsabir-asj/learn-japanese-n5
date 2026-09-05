@@ -139,17 +139,13 @@
     progressGrid.remove();
 
     const tab=document.createElement("button");
-    tab.className="tab";tab.dataset.tab="settingsdata";tab.textContent="Trainer Settings";
+    tab.className="tab";tab.dataset.tab="settingsdata";tab.textContent="Settings";
     document.querySelector(".tabs").appendChild(tab);
 
     const panel=document.createElement("section");
     panel.className="panel";panel.id="panel-settingsdata";
     panel.innerHTML=`<div class="data-layout">
       <div class="card data-primary-card"><div class="data-heading"><div><h2>Global Settings & Data</h2><p class="muted">Shared voices, complete backups, component data, and app-wide reset controls now live in one place.</p></div><a class="big-button header-link-button" href="./settings.html">Open Settings & Data</a></div></div>
-      <details class="details-card data-details practice-font-settings" id="practiceFontSettings">
-        <summary><span class="font-settings-title"><strong>Practice fonts</strong><span id="fontSettingsSummary">Standard font is always enabled</span></span></summary>
-        <div class="details-body" id="practiceFontSettingsBody"></div>
-      </details>
       <div id="speechVoiceSettingsSlot"></div>
       <div class="card data-primary-card hidden">
         <div class="data-heading"><div><h2>Progress backup</h2><p class="muted">One file can carry your kana, word, number, mnemonic, font, voice, and app settings to another browser or computer.</p></div><span class="data-badge">Complete backup</span></div>
@@ -182,18 +178,6 @@
     wordDetails.classList.add("hidden");
     panel.querySelector("#speechVoiceSettingsSlot").replaceWith(wordDetails);
 
-    const fontTab=document.querySelector('.tab[data-tab="fonts"]');
-    const fontPanel=document.querySelector("#panel-fonts");
-    const fontSettingsBody=panel.querySelector("#practiceFontSettingsBody");
-    if(fontTab)fontTab.remove();
-    if(fontPanel&&fontSettingsBody){
-      [...fontPanel.children].forEach((block,index)=>{
-        block.classList.add("font-settings-block");
-        if(index)block.style.marginTop="14px";
-        fontSettingsBody.appendChild(block);
-      });
-      fontPanel.remove();
-    }
   }
   buildDataPanel();
 
@@ -203,7 +187,7 @@
     const groupDefinitions=[
       {id:"kana",label:"Kana practice",tabs:["learn","rehearse","mnemonics","kanaprogress"]},
       {id:"words",label:hasNumberPractice?"Words & numbers":"Word practice",tabs:["words","numbers","wordprogress"]},
-      {id:"manage",label:"Manage",tabs:["settingsdata"]}
+      {id:"manage",label:"Manage",tabs:["fonts","settingsdata"]}
     ];
     const existingTabs=new Map([...nav.querySelectorAll(":scope > .tab")].map(tab=>[tab.dataset.tab,tab]));
     const wordTab=existingTabs.get("words");if(wordTab)wordTab.textContent="Word Reading";
@@ -794,7 +778,7 @@
     note.append("This question used ");
     const fontName=document.createElement("strong");fontName.textContent=`${font.label} · ${font.difficulty}`;
     note.append(fontName,". Optional fonts can be changed in ");
-    const location=document.createElement("strong");location.textContent="Trainer Settings → Practice fonts";
+    const location=document.createElement("strong");location.textContent="Manage → Fonts";
     note.append(location,". ");
     const manage=document.createElement("button");manage.type="button";manage.className="font-management-link";manage.textContent="Manage practice fonts";
     manage.addEventListener("click",()=>openFontSettings(font.id));
@@ -802,10 +786,10 @@
   }
 
   function openFontSettings(fontId=""){
-    switchTab("settingsdata");
-    const settings=$("#practiceFontSettings");
+    switchTab("fonts");
+    const settings=$("#panel-fonts");
     if(!settings)return;
-    settings.open=true;renderFontTab();
+    renderFontTab();
     requestAnimationFrame(()=>{
       const card=fontId?document.querySelector(`[data-font-card="${fontId}"]`):settings;
       if(!card)return;
@@ -2268,7 +2252,7 @@
   function updateAllUI(){
     updateTopStats();updateRehearseSummary();updateWordSummary();renderProgress();renderCurriculum();updateLastSaved();
     renderScriptBalance();renderPaceControls();
-    if(currentTab==="settingsdata")renderFontTab();
+    if(currentTab==="fonts")renderFontTab();
     if(currentTab==="mnemonics")renderMnemonicTab();
   }
 
@@ -2284,7 +2268,7 @@
     if(tab==="rehearse"){if(!sessions.rehearse.current)nextKanaQuestion("rehearse");else if(!sessions.rehearse.introduction)focusInput("rehearse")}
     if(tab==="words"){if(!sessions.words.current)nextWordQuestion();else focusInput("words")}
     if(tab==="mnemonics")renderMnemonicTab();
-    if(tab==="kanaprogress"||tab==="wordprogress"||tab==="settingsdata")updateAllUI();
+    if(tab==="kanaprogress"||tab==="wordprogress"||tab==="fonts"||tab==="settingsdata")updateAllUI();
   }
 
   function exportProgress(){
@@ -2587,6 +2571,6 @@
   if(speechSupported)window.speechSynthesis.addEventListener("voiceschanged",refreshSpeechVoices);
   updateAllUI();
   const initialHash=location.hash.slice(1);
-  if(["learn","rehearse","words","mnemonics","kanaprogress","wordprogress","settingsdata"].includes(initialHash))switchTab(initialHash);
+  if(["learn","rehearse","words","mnemonics","fonts","kanaprogress","wordprogress","settingsdata"].includes(initialHash))switchTab(initialHash);
   else nextKanaQuestion("learn");
 })();

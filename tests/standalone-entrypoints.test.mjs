@@ -56,6 +56,13 @@ test('the compact Kana Mix icon uses the launcher card class', () => {
   assert.match(css, /\.mix-card \.kana-pair/);
 });
 
+test('all kana sprints expose separate Fonts and Settings management tabs', () => {
+  const trainer = readFileSync(resolve(root, 'features/kana/trainer.js'), 'utf8');
+  assert.match(trainer, /label:"Manage",tabs:\["fonts","settingsdata"\]/);
+  assert.match(trainer, /dataset\.tab="settingsdata";tab\.textContent="Settings"/);
+  assert.doesNotMatch(trainer, /practiceFontSettingsBody/);
+});
+
 test('stylesheet asset references remain valid after source moves', () => {
   for (const stylesheet of stylesheetsWithLocalAssets) {
     const cssPath = resolve(root, stylesheet);
