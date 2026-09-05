@@ -49,6 +49,13 @@ test('the root launcher links to every learning experience', () => {
   }
 });
 
+test('the compact Kana Mix icon uses the launcher card class', () => {
+  const html = readFileSync(resolve(root, 'index.html'), 'utf8');
+  const css = readFileSync(resolve(root, 'features/home/styles.css'), 'utf8');
+  assert.match(html, /class="activity-card mix-card"/);
+  assert.match(css, /\.mix-card \.kana-pair/);
+});
+
 test('stylesheet asset references remain valid after source moves', () => {
   for (const stylesheet of stylesheetsWithLocalAssets) {
     const cssPath = resolve(root, stylesheet);

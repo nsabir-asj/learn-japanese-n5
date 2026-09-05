@@ -62,8 +62,8 @@ section + section { margin-top: 44px; }
   .activity-grid-sprints, .activity-grid-foundations { grid-template-columns: 1fr; }
   .activity-card { grid-template-columns: 86px minmax(0,1fr) auto; align-items: center; gap: 18px; }
   .kana-mark, .kana-pair, .foundation-mark { min-height: 0; margin: 0; font-size: 3.5rem; }
-  .kana-mix-card .kana-pair { gap: 0; font-size: 2.35rem; }
-  .kana-mix-card .kana-pair span:last-child { transform: translateY(6px); }
+  .mix-card .kana-pair { gap: 0; font-size: 2.35rem; }
+  .mix-card .kana-pair span:last-child { transform: translateY(6px); }
   .activity-copy > span { min-height: 0; }
   .card-action { margin: 0; white-space: nowrap; }
 }
@@ -73,8 +73,8 @@ section + section { margin-top: 44px; }
   .status { white-space: normal; }
   .activity-card, .lesson-card { grid-template-columns: 64px minmax(0,1fr); padding: 18px; }
   .kana-mark, .kana-pair, .foundation-mark { font-size: 2.8rem; }
-  .kana-mix-card .kana-pair { font-size: 1.9rem; }
-  .kana-mix-card .kana-pair span:last-child { transform: translateY(4px); }
+  .mix-card .kana-pair { font-size: 1.9rem; }
+  .mix-card .kana-pair span:last-child { transform: translateY(4px); }
   .lesson-number { width: 56px; height: 56px; border-radius: 15px; }
   .card-action { grid-column: 2; margin-top: 9px; }
 }
