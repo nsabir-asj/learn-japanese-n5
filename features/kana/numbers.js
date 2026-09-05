@@ -75,6 +75,8 @@
   }
 
   let state = loadState();
+  let sessionStartTotal = state.total;
+  let sessionStartCorrect = state.correct;
   let current = null;
   let phase = "question";
   let pendingIntroduction = null;
@@ -357,7 +359,7 @@
   function switchToNumbers() {
     document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab.dataset.tab === "numbers"));
     document.querySelectorAll(".panel").forEach(panel => panel.classList.toggle("active", panel.id === "panel-numbers"));
-    publishStreakContext();
+    publishActivityStatus();
     if (!current && !pendingIntroduction) nextQuestion();
     setTimeout(() => $("#numberInput")?.focus(), 0);
   }
@@ -387,11 +389,48 @@
       const progress = state.concepts[concept.id];
       return `<div class="number-concept"><strong>${concept.name}</strong><div class="number-concept-meter"><span style="width:${progress.mastery}%"></span></div><span class="tiny">${Math.round(progress.mastery)}% · ${progress.seen} tries</span></div>`;
     }).join("");
-    if ($("#panel-numbers")?.classList.contains("active")) publishStreakContext();
+    if (document.body.dataset.activity === "numbers") publishActivityStatus();
+    else if ($("#panel-numbers")?.classList.contains("active")) publishStreakContext();
   }
 
   function publishStreakContext() {
     window.dispatchEvent(new CustomEvent("kana-sprint-streak-context", { detail: { current: state.streak, best: state.bestStreak } }));
+  }
+
+  function directionLabel(direction = state.direction) {
+    return {
+      reading: "Digits → reading",
+      digits: "Reading → digits",
+      audio: "Listening → digits",
+      mixed: "Two-way mix",
+      all: "All directions"
+    }[direction] || "Adaptive";
+  }
+
+  function publishActivityStatus() {
+    if (document.body.dataset.activity !== "numbers") return;
+    const available = availableConcepts();
+    const introduced = available.filter(concept => state.concepts[concept.id].seen > 0);
+    const mastered = available.filter(concept => state.concepts[concept.id].mastery >= 72);
+    const sessionTotal = Math.max(0, state.total - sessionStartTotal);
+    const sessionCorrect = Math.max(0, state.correct - sessionStartCorrect);
+    const range = RANGES.find(item => item.value === state.range)?.label || `0–${state.range.toLocaleString()}`;
+    const note = pendingIntroduction
+      ? `Learning ${pendingIntroduction.name}`
+      : current
+        ? `Question ${questionNumber} · ${current.concept.name}`
+        : "Adaptive number practice";
+    window.dispatchEvent(new CustomEvent("kana-sprint-activity-status", { detail: {
+      note,
+      metrics: [
+        { label: "Range", value: range },
+        { label: "Direction", value: directionLabel() },
+        { label: "Current streak", value: state.streak },
+        { label: "Session accuracy", value: sessionTotal ? `${Math.round(sessionCorrect / sessionTotal * 100)}%` : "—" },
+        { label: "Introduced", value: `${introduced.length}/${available.length}` },
+        { label: "Mastered", value: `${mastered.length}/${available.length}` }
+      ]
+    } }));
   }
 
   function setFeedback(html, tone = "") {
@@ -432,6 +471,7 @@
     $("#numberIntroSpeech").addEventListener("click", () => speakJapanese(exampleReading));
     $("#numberDontKnow").classList.add("number-hidden");
     $("#numberNext").classList.add("number-hidden");
+    publishActivityStatus();
   }
 
   function beginAfterIntroduction() {
@@ -462,6 +502,7 @@
     $("#numberCount").textContent = `Question ${questionNumber}`;
     if (asksFromAudio) setTimeout(() => speakJapanese(current.hiragana), 100);
     setTimeout(() => input.focus(), 0);
+    publishActivityStatus();
   }
 
   function updateMastery(correct) {
@@ -582,6 +623,8 @@
         if (!imported || imported.version !== VERSION || !imported.concepts) throw new Error("Invalid file");
         const fallback = defaultState();
         state = { ...fallback, ...imported, concepts: { ...fallback.concepts, ...imported.concepts } };
+        sessionStartTotal = state.total;
+        sessionStartCorrect = state.correct;
         saveState();
         $("#numberRange").value = state.range;
         $("#numberDirection").value = state.direction;
@@ -632,6 +675,8 @@
       if (!confirm("Reset only number-learning progress? Kana and word progress will stay unchanged.")) return;
       localStorage.removeItem(STORAGE_KEY);
       state = defaultState();
+      sessionStartTotal = 0;
+      sessionStartCorrect = 0;
       $("#numberRange").value = state.range;
       $("#numberDirection").value = state.direction;
       updateDirectionAvailability();
