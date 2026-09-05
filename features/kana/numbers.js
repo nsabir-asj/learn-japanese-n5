@@ -75,8 +75,7 @@
   }
 
   let state = loadState();
-  let sessionStartTotal = state.total;
-  let sessionStartCorrect = state.correct;
+  let sessionStartMastery = Object.fromEntries(CONCEPTS.map(concept => [concept.id, state.concepts[concept.id].mastery]));
   let current = null;
   let phase = "question";
   let pendingIntroduction = null;
@@ -309,17 +308,6 @@
           <div class="number-direction-hint" id="numberDirectionHint" aria-live="polite"></div>
           <div class="number-playback-settings"><label class="toggle-line"><input type="checkbox" id="numberSpeechAuto"> Automatically pronounce revealed readings</label><button class="ghost" id="numberManageVoices" type="button">Manage voices</button></div>
         </div>
-        <div class="card">
-          <h2>Number progress</h2>
-          <div class="number-progress-grid">
-            <div class="mini"><strong id="numberTotal">0</strong><span class="tiny">answers</span></div>
-            <div class="mini"><strong id="numberAccuracy">—</strong><span class="tiny">accuracy</span></div>
-            <div class="mini"><strong id="numberIntroduced">0 / 0</strong><span class="tiny">patterns introduced</span></div>
-            <div class="mini"><strong id="numberMastered">0</strong><span class="tiny">patterns mastered</span></div>
-            <div class="mini"><strong id="numberWeak">0</strong><span class="tiny">weak patterns</span></div>
-            <div class="mini"><strong id="numberBestStreak">0</strong><span class="tiny">best streak</span></div>
-          </div>
-        </div>
       </div>
       <div class="card" style="margin-top:14px"><h2>Pattern mastery</h2><div class="number-concepts" id="numberConcepts"></div></div>`;
     const panelAnchor = $("#panel-kanaprogress");
@@ -373,15 +361,8 @@
   }
 
   function renderProgress() {
-    if (!$("#numberTotal")) return;
+    if (!$("#numberConcepts")) return;
     const available = availableConcepts();
-    const introduced = available.filter(concept => state.concepts[concept.id].seen > 0);
-    $("#numberTotal").textContent = state.total;
-    $("#numberAccuracy").textContent = state.total ? `${Math.round(state.correct / state.total * 100)}%` : "—";
-    $("#numberBestStreak").textContent = state.bestStreak;
-    $("#numberIntroduced").textContent = `${introduced.length} / ${available.length}`;
-    $("#numberMastered").textContent = available.filter(concept => state.concepts[concept.id].mastery >= 72).length;
-    $("#numberWeak").textContent = introduced.filter(concept => state.concepts[concept.id].mastery < 55).length;
     $("#numberPaceName").textContent = paceName();
     const saveStatus = $("#numberSaveStatus");
     if (saveStatus) saveStatus.textContent = state.savedAt ? `Auto-saved ${new Date(state.savedAt).toLocaleString()}` : "Number progress auto-saves in this browser.";
@@ -397,24 +378,13 @@
     window.dispatchEvent(new CustomEvent("kana-sprint-streak-context", { detail: { current: state.streak, best: state.bestStreak } }));
   }
 
-  function directionLabel(direction = state.direction) {
-    return {
-      reading: "Digits → reading",
-      digits: "Reading → digits",
-      audio: "Listening → digits",
-      mixed: "Two-way mix",
-      all: "All directions"
-    }[direction] || "Adaptive";
-  }
-
   function publishActivityStatus() {
     if (document.body.dataset.activity !== "numbers") return;
     const available = availableConcepts();
     const introduced = available.filter(concept => state.concepts[concept.id].seen > 0);
     const mastered = available.filter(concept => state.concepts[concept.id].mastery >= 72);
-    const sessionTotal = Math.max(0, state.total - sessionStartTotal);
-    const sessionCorrect = Math.max(0, state.correct - sessionStartCorrect);
-    const range = RANGES.find(item => item.value === state.range)?.label || `0–${state.range.toLocaleString()}`;
+    const weak = introduced.filter(concept => state.concepts[concept.id].mastery < 55);
+    const improved = available.filter(concept => state.concepts[concept.id].mastery > (sessionStartMastery[concept.id] || 0));
     const note = pendingIntroduction
       ? `Learning ${pendingIntroduction.name}`
       : current
@@ -423,12 +393,12 @@
     window.dispatchEvent(new CustomEvent("kana-sprint-activity-status", { detail: {
       note,
       metrics: [
-        { label: "Range", value: range },
-        { label: "Direction", value: directionLabel() },
+        { label: "Total answers", value: state.total },
+        { label: "Overall accuracy", value: state.total ? `${Math.round(state.correct / state.total * 100)}%` : "—" },
         { label: "Current streak", value: state.streak },
-        { label: "Session accuracy", value: sessionTotal ? `${Math.round(sessionCorrect / sessionTotal * 100)}%` : "—" },
-        { label: "Introduced", value: `${introduced.length}/${available.length}` },
-        { label: "Mastered", value: `${mastered.length}/${available.length}` }
+        { label: "Patterns improved", value: improved.length },
+        { label: "Mastered patterns", value: `${mastered.length}/${available.length}` },
+        { label: "Weak patterns", value: weak.length }
       ]
     } }));
   }
@@ -623,8 +593,7 @@
         if (!imported || imported.version !== VERSION || !imported.concepts) throw new Error("Invalid file");
         const fallback = defaultState();
         state = { ...fallback, ...imported, concepts: { ...fallback.concepts, ...imported.concepts } };
-        sessionStartTotal = state.total;
-        sessionStartCorrect = state.correct;
+        sessionStartMastery = Object.fromEntries(CONCEPTS.map(concept => [concept.id, state.concepts[concept.id].mastery]));
         saveState();
         $("#numberRange").value = state.range;
         $("#numberDirection").value = state.direction;
@@ -675,8 +644,7 @@
       if (!confirm("Reset only number-learning progress? Kana and word progress will stay unchanged.")) return;
       localStorage.removeItem(STORAGE_KEY);
       state = defaultState();
-      sessionStartTotal = 0;
-      sessionStartCorrect = 0;
+      sessionStartMastery = Object.fromEntries(CONCEPTS.map(concept => [concept.id, 0]));
       $("#numberRange").value = state.range;
       $("#numberDirection").value = state.direction;
       updateDirectionAvailability();
