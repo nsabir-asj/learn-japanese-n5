@@ -63,6 +63,15 @@ test('all kana sprints expose separate Fonts and Settings management tabs', () =
   assert.doesNotMatch(trainer, /practiceFontSettingsBody/);
 });
 
+test('vocabulary feedback explains the meaning of a selected wrong choice', () => {
+  const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
+  const styles = readFileSync(resolve(root, 'features/kana/vocabulary.css'), 'utf8');
+  assert.match(vocabulary, /const selectedWord = !correct && selectedId \? WORDS\.find\(word => word\.id === selectedId\) : null/);
+  assert.match(vocabulary, /vocab-feedback-choice-label/);
+  assert.match(vocabulary, /Meaning: \$\{selectedWord\.meaning\}/);
+  assert.match(styles, /\.vocab-feedback-choice/);
+});
+
 test('stylesheet asset references remain valid after source moves', () => {
   for (const stylesheet of stylesheetsWithLocalAssets) {
     const cssPath = resolve(root, stylesheet);

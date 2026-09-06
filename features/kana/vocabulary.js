@@ -734,6 +734,7 @@
     if (phase !== "question" || !current) return;
     phase = "answered";
     const correct = !unknown && selectedId === current.id;
+    const selectedWord = !correct && selectedId ? WORDS.find(word => word.id === selectedId) : null;
     applyResult(correct, selectedId);
     [...$("#vocabOptions").children].forEach(button => {
       button.disabled = true;
@@ -742,7 +743,8 @@
     });
     const feedback = $("#vocabFeedback");
     feedback.className = `feedback show ${correct ? "good" : "bad"}`;
-    feedback.innerHTML = `<strong>${correct ? "Correct" : "Remember this one"}</strong><div class="meta"><span class="vocab-feedback-word">${current.jp} → ${current.romaji}</span><span>${current.meaning} • ${current.stageName}</span><button class="ghost speak-again" id="vocabReplayAnswer" type="button">🔊 Replay Japanese</button></div>`;
+    const selectedMarkup = selectedWord ? `<div class="vocab-feedback-choice"><span class="vocab-feedback-choice-label">Your choice</span><strong>${selectedWord.jp} → ${selectedWord.romaji}</strong><span>Meaning: ${selectedWord.meaning}</span></div>` : "";
+    feedback.innerHTML = `<strong>${correct ? "Correct" : "Remember this one"}</strong><div class="meta">${selectedMarkup}<span class="vocab-feedback-word">Correct answer: ${current.jp} → ${current.romaji}</span><span>Meaning: ${current.meaning} • ${current.stageName}</span><button class="ghost speak-again" id="vocabReplayAnswer" type="button">🔊 Replay Japanese</button></div>`;
     $("#vocabReplayAnswer").disabled = !japaneseSpeechReady();
     $("#vocabReplayAnswer").addEventListener("click", () => speak(current));
     $("#vocabNext").classList.remove("hidden");
