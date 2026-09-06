@@ -121,6 +121,17 @@ test('vocabulary uses global unlocks with one shared urgent schedule', () => {
   assert.match(vocabulary, /if \(wasUrgentRetry\) \{\s*progress\.urgentRetryPending = false;/);
 });
 
+test('vocabulary introduction and TTS controls have keyboard access', () => {
+  const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
+  assert.match(vocabulary, /Practice this word <kbd>Enter<\/kbd>/);
+  assert.match(vocabulary, /aria-keyshortcuts="Enter"/);
+  assert.match(vocabulary, /setTimeout\(\(\) => \$\("#vocabStartCheck"\)\?\.focus\(\), 0\)/);
+  assert.match(vocabulary, /Play again <kbd>R<\/kbd>/);
+  assert.match(vocabulary, /Replay Japanese <kbd>R<\/kbd>/);
+  assert.match(vocabulary, /if \(key === "r"/);
+  assert.match(vocabulary, /phase === "introduction" \? \$\("#vocabIntroSpeech"\)/);
+});
+
 test('stylesheet asset references remain valid after source moves', () => {
   for (const stylesheet of stylesheetsWithLocalAssets) {
     const cssPath = resolve(root, stylesheet);

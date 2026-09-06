@@ -592,7 +592,7 @@
           <div class="question">
             <div class="question-label" id="vocabQuestionLabel">Choose the English meaning</div>
             <div class="prompt word vocab-prompt" id="vocabPrompt">こんにちは</div>
-            <div class="word-audio-prompt hidden" id="vocabAudioPrompt"><span class="word-audio-icon" aria-hidden="true">🔊</span><strong>Listen to the Japanese expression</strong><button class="big-button" id="vocabQuestionSpeech" type="button">Play again</button><span class="tiny">Replay as often as you need.</span></div>
+          <div class="word-audio-prompt hidden" id="vocabAudioPrompt"><span class="word-audio-icon" aria-hidden="true">🔊</span><strong>Listen to the Japanese expression</strong><button class="big-button" id="vocabQuestionSpeech" type="button" aria-keyshortcuts="R">Play again <kbd>R</kbd></button><span class="tiny">Replay as often as you need, or press <kbd>R</kbd>.</span></div>
           </div>
           <div class="vocab-options" id="vocabOptions"></div>
           <div class="feedback" id="vocabFeedback"></div>
@@ -674,12 +674,14 @@
     $("#vocabIntroduction").classList.remove("hidden");
     $("#vocabDontKnow").classList.add("hidden");
     $("#vocabNext").classList.add("hidden");
-    $("#vocabIntroduction").innerHTML = `<span class="vocab-new-badge">New everyday expression</span><div class="vocab-intro-japanese">${word.jp}</div><strong>${word.romaji}</strong><div class="vocab-intro-meaning">${word.meaning}</div><span class="tiny">${word.stageName}</span><div class="actions"><button class="ghost" id="vocabIntroSpeech" type="button">🔊 Hear it</button><button class="big-button" id="vocabStartCheck" type="button">Practice this word</button></div>`;
+    $("#vocabIntroduction").innerHTML = `<span class="vocab-new-badge">New everyday expression</span><div class="vocab-intro-japanese">${word.jp}</div><strong>${word.romaji}</strong><div class="vocab-intro-meaning">${word.meaning}</div><span class="tiny">${word.stageName}</span><div class="actions"><button class="ghost" id="vocabIntroSpeech" type="button" aria-keyshortcuts="R">🔊 Hear it <kbd>R</kbd></button><button class="big-button" id="vocabStartCheck" type="button" aria-keyshortcuts="Enter">Practice this word <kbd>Enter</kbd></button></div>`;
     $("#vocabIntroSpeech").disabled = !japaneseSpeechReady();
     $("#vocabIntroSpeech").addEventListener("click", () => speak(word));
     $("#vocabStartCheck").addEventListener("click", () => showQuestion(word, preferredMode));
     if (japaneseSpeechReady()) setTimeout(() => speak(word), 100);
     $("#vocabPracticeMode").textContent = "Vocabulary • new expression";
+    $("#vocabKeyboardHint").innerHTML = `Press <kbd>Enter</kbd> to practice${japaneseSpeechReady() ? ` · <kbd>R</kbd> to hear it` : ""}.`;
+    setTimeout(() => $("#vocabStartCheck")?.focus(), 0);
     publishDashboard();
   }
 
@@ -774,7 +776,7 @@
     const choices = makeChoices(word, format);
     currentChoiceIds = choices.map(choice => choice.id);
     options.dataset.count = String(choices.length);
-    $("#vocabKeyboardHint").innerHTML = `Use <kbd>1</kbd>–<kbd>${choices.length}</kbd> to choose an answer.`;
+    $("#vocabKeyboardHint").innerHTML = `Use <kbd>1</kbd>–<kbd>${choices.length}</kbd> to choose an answer.${spoken ? " Press <kbd>R</kbd> to replay the audio." : ""}`;
     choices.forEach((choice, index) => {
       const button = document.createElement("button");
       button.className = "vocab-choice";
@@ -857,7 +859,7 @@
     const feedback = $("#vocabFeedback");
     feedback.className = `feedback show ${correct ? "good" : "bad"}`;
     const selectedMarkup = selectedWord ? `<div class="vocab-feedback-choice"><span class="vocab-feedback-choice-label">Your choice</span><strong>${selectedWord.jp} → ${selectedWord.romaji}</strong><span>Meaning: ${selectedWord.meaning}</span></div>` : "";
-    feedback.innerHTML = `<strong>${correct ? "Correct" : "Remember this one"}</strong><div class="meta">${selectedMarkup}<span class="vocab-feedback-word">Correct answer: ${current.jp} → ${current.romaji}</span><span>Meaning: ${current.meaning} • ${current.stageName}</span><button class="ghost speak-again" id="vocabReplayAnswer" type="button">🔊 Replay Japanese</button></div>`;
+    feedback.innerHTML = `<strong>${correct ? "Correct" : "Remember this one"}</strong><div class="meta">${selectedMarkup}<span class="vocab-feedback-word">Correct answer: ${current.jp} → ${current.romaji}</span><span>Meaning: ${current.meaning} • ${current.stageName}</span><button class="ghost speak-again" id="vocabReplayAnswer" type="button" aria-keyshortcuts="R">🔊 Replay Japanese <kbd>R</kbd></button></div>`;
     $("#vocabReplayAnswer").disabled = !japaneseSpeechReady();
     $("#vocabReplayAnswer").addEventListener("click", () => speak(current));
     $("#vocabNext").classList.remove("hidden");
@@ -1046,6 +1048,22 @@
   window.addEventListener("kana-sprint-speech-voices-changed", updateFormatAvailability);
   document.addEventListener("keydown", event => {
     if (!$("#panel-vocabulary").classList.contains("active")) return;
+    const target = event.target;
+    const isInteractive = target instanceof HTMLElement && target.matches("button,a,select,input,textarea,[contenteditable='true']");
+    const key = event.key.toLowerCase();
+    if (event.key === "Enter" && phase === "introduction" && !isInteractive) {
+      event.preventDefault();
+      $("#vocabStartCheck")?.click();
+      return;
+    }
+    if (key === "r" && !(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement || target?.isContentEditable)) {
+      const replayButton = phase === "introduction" ? $("#vocabIntroSpeech") : phase === "question" && currentMode === "spoken" ? $("#vocabQuestionSpeech") : phase === "answered" ? $("#vocabReplayAnswer") : null;
+      if (replayButton && !replayButton.disabled && !replayButton.classList.contains("hidden")) {
+        event.preventDefault();
+        replayButton.click();
+        return;
+      }
+    }
     if (event.key === "Enter" && phase === "answered") { event.preventDefault(); nextQuestion(); return; }
     if (/^[1-8]$/.test(event.key) && phase === "question") {
       const button = $("#vocabOptions").children[Number(event.key) - 1];
