@@ -376,6 +376,10 @@
     return "New-first";
   }
 
+  function paceMixLabel() {
+    return `${state.pace}% new / ${100 - state.pace}% review target`;
+  }
+
   function allowedModes() {
     if (state.questionFormat === "written") return ["written"];
     if (state.questionFormat === "spoken") return japaneseSpeechReady() ? ["spoken"] : ["written"];
@@ -432,6 +436,12 @@
     });
   }
 
+  function urgentReviewEntries(words) {
+    return words.flatMap(word => dueModes(word)
+      .filter(mode => modeState(word, mode).lastWasCorrect === false)
+      .map(mode => ({ word, mode })));
+  }
+
   function chooseMode(word, onlyDue = false) {
     const modes = onlyDue ? dueModes(word) : allowedModes();
     return [...modes].sort((left, right) => {
@@ -486,26 +496,37 @@
     if (!introduced.length && unseen.length) return { word: unseen[0], mode: allowedModes()[0], introduce: true, reason: "Introducing the first word" };
     const recent = new Set(state.recent.slice(-5));
     const due = introduced.filter(word => dueModes(word).length);
-    if (due.length) return { ...selectReviewWord(due, recent, true), introduce: false, reason: "Due review" };
+    const urgent = urgentReviewEntries(introduced);
+    if (urgent.length) return { ...selectReviewEntry(urgent), introduce: false, reason: "Urgent review" };
     if (unseen.length) {
       const decision = Scheduler.nextIntroductionDecision(state.pace, state.newWordCredit);
       state.newWordCredit = decision.credit;
       if (decision.introduce) return { word: unseen[0], mode: allowedModes()[0], introduce: true, reason: "Introducing a new word" };
+    }
+    if (due.length) return { ...selectReviewWord(due, recent, true), introduce: false, reason: "Due review" };
+    if (unseen.length) {
       const scheduled = introduced.filter(word => allowedModes().some(mode => modeState(word, mode).seen > 0));
-      if (scheduled.length) return { ...selectReviewWord(scheduled, recent, false), introduce: false, reason: "Adaptive review" };
+      const scheduledChoice = selectReviewWord(scheduled, recent, false, false);
+      if (scheduledChoice.word) return { ...scheduledChoice, introduce: false, reason: "Adaptive review" };
       return { word: unseen[0], mode: allowedModes()[0], introduce: true, reason: "Building the review pool" };
     }
     return { ...selectReviewWord(introduced, recent, false), introduce: false, reason: "Reviewing the current stage" };
   }
 
-  function selectReviewWord(words, recent, onlyDue) {
+  function selectReviewWord(words, recent, onlyDue, allowRecent = true) {
     let candidates = words.filter(word => !recent.has(word.id));
-    if (!candidates.length) candidates = words;
+    if (!candidates.length && allowRecent) candidates = words;
     const scored = candidates.map(word => {
       const mode = chooseMode(word, onlyDue);
       return { word, mode, score: Scheduler.reviewScore(modeState(word, mode)) };
     }).sort((a, b) => b.score - a.score);
     return scored[0] || { word: null, mode: "written" };
+  }
+
+  function selectReviewEntry(entries) {
+    const scored = entries.map(entry => ({ ...entry, score: Scheduler.reviewScore(modeState(entry.word, entry.mode)) }));
+    const best = scored.sort((left, right) => right.score - left.score)[0];
+    return best ? { word: best.word, mode: best.mode } : { word: null, mode: "written" };
   }
 
   function japaneseSpeechReady() {
@@ -825,13 +846,14 @@
 
   function paceStatus() {
     const due = dueReviewBreakdown();
+    const urgent = urgentReviewEntries(reviewPoolForScope()).length;
     if (state.practiceScope === "trouble") {
-      return due.total ? `Trouble review · ${dueReviewSummary(due)}` : "Focused review of recent trouble words";
+      return due.total ? `${urgent ? "Urgent retry due" : "Trouble review"} · ${dueReviewSummary(due)}` : "Focused review of recent trouble words";
     }
     const stage = unlockedStageIndex();
     const unseen = (state.practiceScope === "adaptive" ? stageWords(stage) : wordsForScope()).filter(word => !itemState(word).introduced).length;
-    if (due.total) return unseen ? `New words paused · ${dueReviewSummary(due)}` : `${dueReviewSummary(due)} · strengthening mastery`;
-    if (unseen) return `${paceLabel()} pace · ${unseen} new ${state.practiceScope === "adaptive" ? "in the current stage" : `in ${SCOPE_LABELS[state.practiceScope].toLowerCase()}`}`;
+    if (due.total) return urgent ? `Urgent retry due · ${dueReviewSummary(due)}` : `${paceLabel()} pace · ${paceMixLabel()} · ${dueReviewSummary(due)}`;
+    if (unseen) return `${paceLabel()} pace · ${paceMixLabel()} · ${unseen} new ${state.practiceScope === "adaptive" ? "in the current stage" : `in ${SCOPE_LABELS[state.practiceScope].toLowerCase()}`}`;
     if (state.practiceScope !== "adaptive") return `${SCOPE_LABELS[state.practiceScope]} introduced · strengthening mastery`;
     if (stage < STAGES.length - 1) return `Reviewing learned words while Stage ${stage + 1} finishes`;
     return "Curriculum introduced · strengthening recall";

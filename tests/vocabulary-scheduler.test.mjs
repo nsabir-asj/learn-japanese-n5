@@ -17,11 +17,9 @@ function introductionCount(pace, decisions = 100) {
 }
 
 test('vocabulary pace produces stable new-word proportions', () => {
-  assert.equal(introductionCount(10), 10);
-  assert.equal(introductionCount(20), 20);
-  assert.equal(introductionCount(50), 50);
-  assert.equal(introductionCount(80), 80);
-  assert.equal(introductionCount(90), 100);
+  for (const pace of [10, 20, 30, 40, 50, 60, 70, 80, 90]) {
+    assert.equal(introductionCount(pace), pace);
+  }
 });
 
 test('a stage requires every introduced word to have a completed attempt', () => {

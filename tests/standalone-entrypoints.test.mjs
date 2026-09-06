@@ -89,11 +89,22 @@ test('vocabulary review queues stay scoped and explain their direction breakdown
   assert.match(vocabulary, /return scope === "trouble" \? weakWords\(pool\) : pool/);
   assert.match(vocabulary, /function dueReviewBreakdown/);
   assert.match(vocabulary, /return dueReviewBreakdown\(\)\.total/);
-  assert.match(vocabulary, /New words paused · \$\{dueReviewSummary\(due\)\}/);
+  assert.match(vocabulary, /\$\{paceLabel\(\)\} pace · \$\{paceMixLabel\(\)\} · \$\{dueReviewSummary\(due\)\}/);
   assert.match(vocabulary, /id="vocabDueSummary"/);
   assert.match(vocabulary, /id="vocabDueBreakdown"/);
   assert.match(vocabulary, /Only weak words from the selected regular scope/);
   assert.match(vocabulary, /Recent misses in \$\{troubleSourceScope\}/);
+});
+
+test('vocabulary pacing interleaves new words with normal due reviews and prioritizes urgent retries', () => {
+  const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
+  assert.match(vocabulary, /function paceMixLabel/);
+  assert.match(vocabulary, /function urgentReviewEntries/);
+  assert.match(vocabulary, /if \(urgent\.length\) return \{\s*\.\.\.selectReviewEntry\(urgent\)/);
+  assert.match(vocabulary, /const decision = Scheduler\.nextIntroductionDecision\(state\.pace, state\.newWordCredit\)/);
+  assert.match(vocabulary, /if \(due\.length\) return \{\s*\.\.\.selectReviewWord\(due, recent, true\)/);
+  assert.match(vocabulary, /const scheduledChoice = selectReviewWord\(scheduled, recent, false, false\)/);
+  assert.match(vocabulary, /return `\$\{state\.pace\}% new \/ \$\{100 - state\.pace\}% review target`/);
 });
 
 test('stylesheet asset references remain valid after source moves', () => {

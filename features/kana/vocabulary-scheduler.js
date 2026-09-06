@@ -11,9 +11,8 @@
 
   function nextIntroductionDecision(pace, credit = 0) {
     const normalizedPace = clamp(Number(pace) || 50, 10, 90);
-    if (normalizedPace >= 90) return { introduce: true, credit: 0 };
     const updatedCredit = clamp(Number(credit) || 0, 0, 1) + normalizedPace / 100;
-    if (updatedCredit + Number.EPSILON >= 1) {
+    if (updatedCredit + 1e-9 >= 1) {
       return { introduce: true, credit: Math.max(0, updatedCredit - 1) };
     }
     return { introduce: false, credit: updatedCredit };
