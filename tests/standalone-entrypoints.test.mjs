@@ -72,6 +72,16 @@ test('vocabulary feedback explains the meaning of a selected wrong choice', () =
   assert.match(styles, /\.vocab-feedback-choice/);
 });
 
+test('vocabulary scopes separate guided sequencing from all-word practice', () => {
+  const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
+  assert.match(vocabulary, /adaptive: "Guided course", all: "All vocabulary"/);
+  assert.match(vocabulary, /<option value="all">All vocabulary<\/option>/);
+  assert.match(vocabulary, /if \(scope === "all"\) return WORDS/);
+  assert.match(vocabulary, /all: "All words"/);
+  assert.match(vocabulary, /const reviewPool = adaptive \? introducedWords\(\) : pool/);
+  assert.match(vocabulary, /practicedEarly \? "Practiced early"/);
+});
+
 test('stylesheet asset references remain valid after source moves', () => {
   for (const stylesheet of stylesheetsWithLocalAssets) {
     const cssPath = resolve(root, stylesheet);

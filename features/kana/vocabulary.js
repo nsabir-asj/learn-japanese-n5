@@ -265,7 +265,7 @@
   const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
   const Scheduler = window.KANA_SPRINT_VOCABULARY_SCHEDULER;
   const MODE_KEYS = ["written", "spoken", "recall"];
-  const SCOPE_LABELS = { adaptive: "Adaptive course", core: "Core lessons", lesson1: "Lesson 1", lesson2: "Lesson 2", extras: "Practical extras", trouble: "Trouble words" };
+  const SCOPE_LABELS = { adaptive: "Guided course", all: "All vocabulary", core: "Core lessons", lesson1: "Lesson 1", lesson2: "Lesson 2", extras: "Practical extras", trouble: "Trouble words" };
 
   function emptyModeProgress() {
     return { seen: 0, correct: 0, wrong: 0, mastery: 0, lastWasCorrect: null, lastSeen: 0, dueAt: 0, dueQuestion: 0, recentResults: [] };
@@ -388,6 +388,7 @@
   }
 
   function wordsForScope(scope = state.practiceScope) {
+    if (scope === "all") return WORDS;
     if (scope === "lesson1") return WORDS.filter(word => word.stageIndex <= 3);
     if (scope === "lesson2") return WORDS.filter(word => word.stageIndex >= 4 && word.stageIndex <= 6);
     if (scope === "core") return WORDS.filter(word => word.stageIndex <= 6);
@@ -398,7 +399,7 @@
   }
 
   function scopeShortLabel() {
-    return { adaptive: `Stage ${unlockedStageIndex() + 1} / ${STAGES.length}`, core: "Core", lesson1: "Lesson 1", lesson2: "Lesson 2", extras: "Extras", trouble: "Trouble" }[state.practiceScope];
+    return { adaptive: `Stage ${unlockedStageIndex() + 1} / ${STAGES.length}`, all: "All words", core: "Core", lesson1: "Lesson 1", lesson2: "Lesson 2", extras: "Extras", trouble: "Trouble" }[state.practiceScope];
   }
 
   function weakWords() {
@@ -427,12 +428,14 @@
   }
 
   function selectWord() {
+    const adaptive = state.practiceScope === "adaptive";
     const stageIndex = unlockedStageIndex();
     const pool = wordsForScope();
-    const unseenPool = state.practiceScope === "adaptive" ? stageWords(stageIndex) : pool;
+    const reviewPool = adaptive ? introducedWords() : pool;
+    const unseenPool = adaptive ? stageWords(stageIndex) : pool;
     const unseen = unseenPool.filter(word => !itemState(word).introduced)
       .sort((a, b) => a.stageIndex - b.stageIndex || a.order - b.order);
-    const introduced = pool.filter(word => itemState(word).introduced);
+    const introduced = reviewPool.filter(word => itemState(word).introduced);
     if (state.practiceScope === "trouble") {
       if (!introduced.length) {
         state.practiceScope = lastRegularScope;
@@ -512,8 +515,8 @@
       <details class="card vocab-setup-card">
         <summary><span><strong>Session controls</strong><small id="vocabPaceStatus">Balanced introduction and review</small></span></summary>
         <div class="vocab-setup">
-          <div><h2>Lesson 1–2 vocabulary</h2><p class="muted">Tune the current practice session. Voice selection and data tools remain in Settings &amp; Data.</p></div>
-          <label><span>Practice scope</span><select id="vocabPracticeScope"><option value="adaptive">Adaptive course</option><option value="core">Core lessons</option><option value="lesson1">Lesson 1</option><option value="lesson2">Lesson 2</option><option value="extras">Practical extras</option><option value="trouble">Trouble words</option></select><small id="vocabScopeHint">Core lessons includes Lessons 1 and 2.</small></label>
+          <div><h2>Vocabulary practice</h2><p class="muted">Guided course keeps new words in order; All vocabulary opens every lesson. Voice selection and data tools remain in Settings &amp; Data.</p></div>
+          <label><span>Practice scope</span><select id="vocabPracticeScope"><option value="adaptive">Guided course</option><option value="all">All vocabulary</option><option value="core">Core lessons</option><option value="lesson1">Lesson 1</option><option value="lesson2">Lesson 2</option><option value="extras">Practical extras</option><option value="trouble">Trouble words</option></select><small id="vocabScopeHint">New words follow the guided sequence; learned words remain reviewable.</small></label>
           <label><span>Question direction</span><select id="vocabQuestionFormat"><option value="mixed">Mixed practice</option><option value="written">Japanese text → English</option><option value="spoken">Spoken Japanese → English</option><option value="recall">English → Japanese</option></select><small id="vocabFormatHint" aria-live="polite"></small></label>
           <label class="vocab-pace"><span>New-word pace: <strong id="vocabPaceName">Balanced</strong></span><input id="vocabPace" type="range" min="10" max="90" step="10"><span class="vocab-pace-labels"><span>More review</span><span>More new</span></span></label>
           <div class="vocab-inline-playback"><label class="toggle-line"><input type="checkbox" id="vocabAutoPronounce"> Automatically pronounce revealed words</label><button class="ghost" id="vocabManageVoices" type="button">Manage voices</button></div>
@@ -523,7 +526,7 @@
         <div class="card"><h2>Mastery by direction</h2><p class="muted">Reading, listening, and recall now improve independently.</p><div class="vocab-direction-grid"><div><span>Japanese → English</span><strong id="vocabWrittenMastery">0%</strong><small id="vocabWrittenRecent">Not practised</small></div><div><span>Listening</span><strong id="vocabSpokenMastery">0%</strong><small id="vocabSpokenRecent">Not practised</small></div><div><span>English → Japanese</span><strong id="vocabRecallMastery">0%</strong><small id="vocabRecallRecent">Not practised</small></div></div></div>
         <div class="card vocab-trouble-card"><div class="vocab-section-heading"><div><h2>Trouble words</h2><p class="muted">Recent misses matter more than old mistakes.</p></div><button class="ghost" id="vocabReviewTrouble" type="button">Review trouble words</button></div><div class="vocab-trouble-list" id="vocabTroubleList"></div></div>
       </div>
-      <details class="card vocab-curriculum-card"><summary><span><strong>Lesson vocabulary curriculum</strong><small id="vocabCurriculumSummary">Stage 1 of ${STAGES.length}</small></span></summary><p class="muted">Adaptive course follows the staged order. Lesson filters let you focus directly without changing what has already been introduced.</p><div class="vocab-stages" id="vocabStages"></div></details>`;
+      <details class="card vocab-curriculum-card"><summary><span><strong>Lesson vocabulary curriculum</strong><small id="vocabCurriculumSummary">Stage 1 of ${STAGES.length}</small></span></summary><p class="muted">Guided course introduces new words in order and reviews words learned in any scope. All vocabulary opens the complete set without stage locks.</p><div class="vocab-stages" id="vocabStages"></div></details>`;
     const panelAnchor = $("#panel-wordprogress");
     if (panelAnchor) panelAnchor.before(panel); else $(".wrap").appendChild(panel);
 
@@ -778,7 +781,8 @@
   }
 
   function dueReviewCount() {
-    return wordsForScope().filter(word => itemState(word).introduced).reduce((count, word) => count + dueModes(word).length, 0);
+    const pool = state.practiceScope === "adaptive" ? introducedWords() : wordsForScope();
+    return pool.filter(word => itemState(word).introduced).reduce((count, word) => count + dueModes(word).length, 0);
   }
 
   function paceStatus() {
@@ -787,9 +791,9 @@
     const unseen = (state.practiceScope === "adaptive" ? stageWords(stage) : wordsForScope()).filter(word => !itemState(word).introduced).length;
     const due = dueReviewCount();
     if (due) return `${due} review${due === 1 ? "" : "s"} due now`;
-    if (unseen) return `${paceLabel()} pace · ${unseen} new in ${SCOPE_LABELS[state.practiceScope].toLowerCase()}`;
+    if (unseen) return `${paceLabel()} pace · ${unseen} new ${state.practiceScope === "adaptive" ? "in the current stage" : `in ${SCOPE_LABELS[state.practiceScope].toLowerCase()}`}`;
     if (state.practiceScope !== "adaptive") return `${SCOPE_LABELS[state.practiceScope]} introduced · strengthening mastery`;
-    if (stage < STAGES.length - 1) return "Reviewing until the next stage is ready";
+    if (stage < STAGES.length - 1) return `Reviewing learned words while Stage ${stage + 1} finishes`;
     return "Curriculum introduced · strengthening recall";
   }
 
@@ -819,7 +823,9 @@
     };
     if (!$("#vocabStages")) return;
     const introduced = introducedWords();
-    const introducedInScope = wordsForScope().filter(word => itemState(word).introduced).length;
+    const unlocked = unlockedStageIndex();
+    const scopeWords = wordsForScope();
+    const introducedInScope = scopeWords.filter(word => itemState(word).introduced).length;
     const mastered = introduced.filter(isMastered);
     const weak = weakWords();
     setOptionalText("#vocabTotal", state.total);
@@ -835,11 +841,16 @@
     setOptionalText("#vocabProgressWeak", weak.length);
     setOptionalText("#vocabProgressBestStreak", state.bestStreak);
     $("#vocabPaceName").textContent = paceLabel();
-    const unlocked = unlockedStageIndex();
     setOptionalText("#vocabPaceStatus", paceStatus());
-    setOptionalText("#vocabCurriculumSummary", `${SCOPE_LABELS[state.practiceScope]} · ${introducedInScope} introduced`);
+    const currentStageWords = stageWords(unlocked);
+    const currentStageIntroduced = currentStageWords.filter(word => itemState(word).introduced).length;
+    const curriculumSummary = state.practiceScope === "adaptive"
+      ? `${SCOPE_LABELS.adaptive} · ${currentStageIntroduced}/${currentStageWords.length} current · ${introduced.length} learned total`
+      : `${SCOPE_LABELS[state.practiceScope]} · ${introducedInScope}/${scopeWords.length} introduced`;
+    setOptionalText("#vocabCurriculumSummary", curriculumSummary);
     const scopeHints = {
-      adaptive: "Follows the staged curriculum and unlock thresholds.",
+      adaptive: "New words follow the guided sequence; learned words remain reviewable.",
+      all: "All core lessons and Practical extras in one shared practice pool.",
       core: "Everything in Lessons 1 and 2, without Practical extras.",
       lesson1: "Only Lesson 1 vocabulary and expressions.",
       lesson2: "Only Lesson 2 vocabulary and expressions.",
@@ -847,7 +858,7 @@
       trouble: "Only words flagged by recent mistakes."
     };
     setOptionalText("#vocabScopeHint", scopeHints[state.practiceScope]);
-    setOptionalText("#vocabProgressStage", STAGES[unlocked].name);
+    setOptionalText("#vocabProgressStage", state.practiceScope === "adaptive" ? STAGES[unlocked].name : SCOPE_LABELS[state.practiceScope]);
     MODE_KEYS.forEach(mode => {
       const capitalized = mode[0].toUpperCase() + mode.slice(1);
       const recent = recentModeAccuracy(mode, introduced);
@@ -867,9 +878,11 @@
       const words = stageWords(index);
       const introducedCount = words.filter(word => itemState(word).introduced).length;
       const average = Math.round(stageAverage(index));
-      const selected = state.practiceScope === "adaptive" ? index <= unlocked : wordsForScope().some(word => word.stageIndex === index);
-      const status = state.practiceScope === "adaptive" ? (index < unlocked ? "Complete" : index === unlocked ? "Current" : "Locked") : (stageReady(index) ? "Complete" : selected ? "In scope" : "Filtered");
-      return `<div class="vocab-stage ${selected ? "" : "locked"}"><span class="vocab-stage-number">${index + 1}</span><div><strong>${stage.name}</strong><p>${stage.description}</p><div class="vocab-stage-meter"><span style="width:${average}%"></span></div><small>${introducedCount} / ${words.length} introduced · ${average}% average mastery</small></div><span class="vocab-stage-status">${status}</span></div>`;
+      const selected = state.practiceScope === "adaptive" ? index <= unlocked : scopeWords.some(word => word.stageIndex === index);
+      const practicedEarly = state.practiceScope === "adaptive" && index > unlocked && introducedCount > 0;
+      const status = state.practiceScope === "adaptive" ? (index < unlocked ? "Complete" : index === unlocked ? "Current" : practicedEarly ? "Practiced early" : "Locked") : (selected ? (stageReady(index) ? "Complete" : "In scope") : "Filtered");
+      const stageClass = selected ? "" : practicedEarly ? "pre-practiced" : "locked";
+      return `<div class="vocab-stage ${stageClass}"><span class="vocab-stage-number">${index + 1}</span><div><strong>${stage.name}</strong><p>${stage.description}</p><div class="vocab-stage-meter"><span style="width:${average}%"></span></div><small>${introducedCount} / ${words.length} introduced · ${average}% average mastery</small></div><span class="vocab-stage-status">${status}</span></div>`;
     }).join("");
     publishDashboard();
   }
