@@ -592,7 +592,7 @@
           <div class="question">
             <div class="question-label" id="vocabQuestionLabel">Choose the English meaning</div>
             <div class="prompt word vocab-prompt" id="vocabPrompt">こんにちは</div>
-          <div class="word-audio-prompt hidden" id="vocabAudioPrompt"><span class="word-audio-icon" aria-hidden="true">🔊</span><strong>Listen to the Japanese expression</strong><button class="big-button" id="vocabQuestionSpeech" type="button" aria-keyshortcuts="R">Play again <kbd>R</kbd></button><span class="tiny">Replay as often as you need, or press <kbd>R</kbd>.</span></div>
+          <div class="word-audio-prompt hidden" id="vocabAudioPrompt"><span class="word-audio-icon" aria-hidden="true">🔊</span><strong>Listen to the Japanese expression</strong><button class="big-button" id="vocabQuestionSpeech" type="button" aria-keyshortcuts="R">Play again <kbd>R</kbd></button></div>
           </div>
           <div class="vocab-options" id="vocabOptions"></div>
           <div class="feedback" id="vocabFeedback"></div>
@@ -680,7 +680,7 @@
     $("#vocabStartCheck").addEventListener("click", () => showQuestion(word, preferredMode));
     if (japaneseSpeechReady()) setTimeout(() => speak(word), 100);
     $("#vocabPracticeMode").textContent = "Vocabulary • new expression";
-    $("#vocabKeyboardHint").innerHTML = `Press <kbd>Enter</kbd> to practice${japaneseSpeechReady() ? ` · <kbd>R</kbd> to hear it` : ""}.`;
+    $("#vocabKeyboardHint").innerHTML = "Press <kbd>Enter</kbd> to practice.";
     setTimeout(() => $("#vocabStartCheck")?.focus(), 0);
     publishDashboard();
   }
@@ -776,7 +776,7 @@
     const choices = makeChoices(word, format);
     currentChoiceIds = choices.map(choice => choice.id);
     options.dataset.count = String(choices.length);
-    $("#vocabKeyboardHint").innerHTML = `Use <kbd>1</kbd>–<kbd>${choices.length}</kbd> to choose an answer.${spoken ? " Press <kbd>R</kbd> to replay the audio." : ""}`;
+    $("#vocabKeyboardHint").innerHTML = `Use <kbd>1</kbd>–<kbd>${choices.length}</kbd> to choose an answer.`;
     choices.forEach((choice, index) => {
       const button = document.createElement("button");
       button.className = "vocab-choice";

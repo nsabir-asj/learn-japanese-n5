@@ -128,6 +128,9 @@ test('vocabulary introduction and TTS controls have keyboard access', () => {
   assert.match(vocabulary, /setTimeout\(\(\) => \$\("#vocabStartCheck"\)\?\.focus\(\), 0\)/);
   assert.match(vocabulary, /Play again <kbd>R<\/kbd>/);
   assert.match(vocabulary, /Replay Japanese <kbd>R<\/kbd>/);
+  assert.doesNotMatch(vocabulary, /Replay as often as you need, or press <kbd>R<\/kbd>/);
+  assert.doesNotMatch(vocabulary, /Press <kbd>R<\/kbd> to replay the audio/);
+  assert.doesNotMatch(vocabulary, /<kbd>R<\/kbd> to hear it/);
   assert.match(vocabulary, /if \(key === "r"/);
   assert.match(vocabulary, /phase === "introduction" \? \$\("#vocabIntroSpeech"\)/);
 });
