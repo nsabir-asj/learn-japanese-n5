@@ -82,6 +82,20 @@ test('vocabulary scopes separate guided sequencing from all-word practice', () =
   assert.match(vocabulary, /practicedEarly \? "Practiced early"/);
 });
 
+test('vocabulary review queues stay scoped and explain their direction breakdown', () => {
+  const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
+  assert.match(vocabulary, /function regularReviewPool/);
+  assert.match(vocabulary, /function reviewPoolForScope/);
+  assert.match(vocabulary, /return scope === "trouble" \? weakWords\(pool\) : pool/);
+  assert.match(vocabulary, /function dueReviewBreakdown/);
+  assert.match(vocabulary, /return dueReviewBreakdown\(\)\.total/);
+  assert.match(vocabulary, /New words paused · \$\{dueReviewSummary\(due\)\}/);
+  assert.match(vocabulary, /id="vocabDueSummary"/);
+  assert.match(vocabulary, /id="vocabDueBreakdown"/);
+  assert.match(vocabulary, /Only weak words from the selected regular scope/);
+  assert.match(vocabulary, /Recent misses in \$\{troubleSourceScope\}/);
+});
+
 test('stylesheet asset references remain valid after source moves', () => {
   for (const stylesheet of stylesheetsWithLocalAssets) {
     const cssPath = resolve(root, stylesheet);
