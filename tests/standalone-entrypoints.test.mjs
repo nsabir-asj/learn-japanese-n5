@@ -82,16 +82,19 @@ test('vocabulary scopes separate guided sequencing from all-word practice', () =
   assert.match(vocabulary, /practicedEarly \? "Practiced early"/);
 });
 
-test('vocabulary review queues stay scoped and explain their direction breakdown', () => {
+test('vocabulary review queue stays scoped and counts each word once', () => {
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
   assert.match(vocabulary, /function regularReviewPool/);
   assert.match(vocabulary, /function reviewPoolForScope/);
   assert.match(vocabulary, /return scope === "trouble" \? weakWords\(pool\) : pool/);
+  assert.match(vocabulary, /function wordIsDue/);
   assert.match(vocabulary, /function dueReviewBreakdown/);
+  assert.match(vocabulary, /const words = pool\.filter\(word => wordIsDue\(word\)\)/);
   assert.match(vocabulary, /return dueReviewBreakdown\(\)\.total/);
-  assert.match(vocabulary, /\$\{paceLabel\(\)\} pace · \$\{paceMixLabel\(\)\} · \$\{dueReviewSummary\(due\)\}/);
   assert.match(vocabulary, /id="vocabDueSummary"/);
   assert.match(vocabulary, /id="vocabDueBreakdown"/);
+  assert.match(vocabulary, /one shared review queue/);
+  assert.doesNotMatch(vocabulary, /function dueModes/);
   assert.match(vocabulary, /Only weak words from the selected regular scope/);
   assert.match(vocabulary, /Recent misses in \$\{troubleSourceScope\}/);
 });
@@ -105,6 +108,17 @@ test('vocabulary pacing interleaves new words with normal due reviews and priori
   assert.match(vocabulary, /if \(due\.length\) return \{\s*\.\.\.selectReviewWord\(due, recent, true\)/);
   assert.match(vocabulary, /const scheduledChoice = selectReviewWord\(scheduled, recent, false, false\)/);
   assert.match(vocabulary, /return `\$\{state\.pace\}% new \/ \$\{100 - state\.pace\}% review target`/);
+});
+
+test('vocabulary uses global unlocks with one shared urgent schedule', () => {
+  const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
+  assert.match(vocabulary, /const UNIFIED_REVIEW_MODEL = "unified-v1"/);
+  assert.match(vocabulary, /urgentMode: "", urgentRetryPending: false/);
+  assert.match(vocabulary, /progress\.urgentRetryPending = progress\.lastWasCorrect === false/);
+  assert.match(vocabulary, /const wasUrgentRetry = progress\.urgentRetryPending && progress\.urgentMode === currentMode/);
+  assert.match(vocabulary, /Scheduler\.nextReviewSchedule\(progress\.mastery, scheduleCorrect, state\.total, now\)/);
+  assert.match(vocabulary, /return progress\.introduced && progress\.seen > 0 && progress\.mastery >= 72/);
+  assert.match(vocabulary, /if \(wasUrgentRetry\) \{\s*progress\.urgentRetryPending = false;/);
 });
 
 test('stylesheet asset references remain valid after source moves', () => {

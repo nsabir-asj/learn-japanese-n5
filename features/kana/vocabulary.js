@@ -265,6 +265,7 @@
   const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
   const Scheduler = window.KANA_SPRINT_VOCABULARY_SCHEDULER;
   const MODE_KEYS = ["written", "spoken", "recall"];
+  const UNIFIED_REVIEW_MODEL = "unified-v1";
   const SCOPE_LABELS = { adaptive: "Guided course", all: "All vocabulary", core: "Core lessons", lesson1: "Lesson 1", lesson2: "Lesson 2", extras: "Practical extras", trouble: "Trouble words" };
 
   function emptyModeProgress() {
@@ -282,35 +283,72 @@
   function itemState(word) {
     if (!state.items[word.id]) state.items[word.id] = {
       introduced: false, seen: 0, correct: 0, wrong: 0, mastery: 0,
-      lastWasCorrect: null, lastSeen: 0, dueAt: 0, recentDistractors: [], confusions: {}, modes: {}
+      lastWasCorrect: null, lastSeen: 0, dueAt: 0, dueQuestion: 0, recentResults: [],
+      lastMode: "", urgentMode: "", urgentRetryPending: false, reviewModel: UNIFIED_REVIEW_MODEL,
+      recentDistractors: [], confusions: {}, modes: {}
     };
     const progress = state.items[word.id];
     if (!Array.isArray(progress.recentDistractors)) progress.recentDistractors = [];
+    if (!Array.isArray(progress.recentResults)) progress.recentResults = [];
     if (!progress.confusions || typeof progress.confusions !== "object") progress.confusions = {};
     if (!progress.modes || typeof progress.modes !== "object") {
       progress.modes = { written: { ...emptyModeProgress(), seen: Number(progress.seen) || 0, correct: Number(progress.correct) || 0, wrong: Number(progress.wrong) || 0, mastery: Number(progress.mastery) || 0, lastWasCorrect: progress.lastWasCorrect ?? null, lastSeen: Number(progress.lastSeen) || 0, dueAt: Number(progress.dueAt) || 0 } };
     }
     MODE_KEYS.forEach(mode => {
       progress.modes[mode] = { ...emptyModeProgress(), ...(progress.modes[mode] || {}) };
+      progress.modes[mode].seen = Math.max(0, Number(progress.modes[mode].seen) || 0);
+      progress.modes[mode].correct = Math.max(0, Number(progress.modes[mode].correct) || 0);
+      progress.modes[mode].wrong = Math.max(0, Number(progress.modes[mode].wrong) || 0);
+      progress.modes[mode].mastery = clamp(Number(progress.modes[mode].mastery) || 0, 0, 100);
+      progress.modes[mode].lastSeen = Math.max(0, Number(progress.modes[mode].lastSeen) || 0);
+      progress.modes[mode].dueAt = Math.max(0, Number(progress.modes[mode].dueAt) || 0);
+      progress.modes[mode].dueQuestion = Math.max(0, Number(progress.modes[mode].dueQuestion) || 0);
       if (!Array.isArray(progress.modes[mode].recentResults)) progress.modes[mode].recentResults = [];
     });
+    if (progress.reviewModel !== UNIFIED_REVIEW_MODEL) {
+      const attempted = MODE_KEYS
+        .map(mode => [mode, progress.modes[mode]])
+        .filter(([, mode]) => mode.seen > 0);
+      const totalSeen = attempted.reduce((sum, [, mode]) => sum + mode.seen, 0);
+      const totalCorrect = attempted.reduce((sum, [, mode]) => sum + mode.correct, 0);
+      const totalWrong = attempted.reduce((sum, [, mode]) => sum + mode.wrong, 0);
+      const weightedMastery = totalSeen
+        ? attempted.reduce((sum, [, mode]) => sum + mode.mastery * mode.seen, 0) / totalSeen
+        : Number(progress.mastery) || 0;
+      const latest = [...attempted].sort(([, left], [, right]) => right.lastSeen - left.lastSeen)[0];
+      const dueQuestions = attempted.map(([, mode]) => mode.dueQuestion).filter(Boolean);
+      const dueTimes = attempted.map(([, mode]) => mode.dueAt).filter(Boolean);
+      const latestMode = latest?.[0] || progress.lastMode || "";
+      const latestProgress = latest?.[1];
+      progress.seen = totalSeen || Math.max(0, Number(progress.seen) || 0);
+      progress.correct = totalSeen ? totalCorrect : Math.max(0, Number(progress.correct) || 0);
+      progress.wrong = totalSeen ? totalWrong : Math.max(0, Number(progress.wrong) || 0);
+      progress.mastery = clamp(weightedMastery, 0, 100);
+      progress.lastSeen = latestProgress?.lastSeen || Math.max(0, Number(progress.lastSeen) || 0);
+      progress.lastWasCorrect = latestProgress?.lastWasCorrect ?? progress.lastWasCorrect ?? null;
+      progress.lastMode = latestMode;
+      progress.dueQuestion = dueQuestions.length ? Math.min(...dueQuestions) : Math.max(0, Number(progress.dueQuestion) || 0);
+      progress.dueAt = dueTimes.length ? Math.min(...dueTimes) : Math.max(0, Number(progress.dueAt) || 0);
+      progress.recentResults = attempted.flatMap(([, mode]) => mode.recentResults).slice(-8);
+      progress.urgentRetryPending = progress.lastWasCorrect === false;
+      progress.urgentMode = progress.urgentRetryPending ? latestMode : "";
+      if (progress.urgentRetryPending && !progress.dueQuestion && !progress.dueAt) progress.dueQuestion = state.total + 1;
+      progress.reviewModel = UNIFIED_REVIEW_MODEL;
+    }
+    progress.seen = Math.max(0, Number(progress.seen) || 0);
+    progress.correct = Math.max(0, Number(progress.correct) || 0);
+    progress.wrong = Math.max(0, Number(progress.wrong) || 0);
+    progress.mastery = clamp(Number(progress.mastery) || 0, 0, 100);
+    progress.lastSeen = Math.max(0, Number(progress.lastSeen) || 0);
+    progress.dueAt = Math.max(0, Number(progress.dueAt) || 0);
+    progress.dueQuestion = Math.max(0, Number(progress.dueQuestion) || 0);
+    progress.lastMode = typeof progress.lastMode === "string" ? progress.lastMode : "";
+    progress.urgentMode = typeof progress.urgentMode === "string" ? progress.urgentMode : "";
+    progress.urgentRetryPending = Boolean(progress.urgentRetryPending);
     return progress;
   }
 
   function modeState(word, mode) { return itemState(word).modes[mode]; }
-
-  function refreshAggregate(progress) {
-    const attempted = MODE_KEYS.map(mode => progress.modes[mode]).filter(mode => mode.seen > 0);
-    progress.seen = attempted.reduce((sum, mode) => sum + mode.seen, 0);
-    progress.correct = attempted.reduce((sum, mode) => sum + mode.correct, 0);
-    progress.wrong = attempted.reduce((sum, mode) => sum + mode.wrong, 0);
-    progress.mastery = attempted.length ? attempted.reduce((sum, mode) => sum + mode.mastery, 0) / attempted.length : 0;
-    progress.lastSeen = Math.max(0, ...attempted.map(mode => mode.lastSeen));
-    const latest = attempted.sort((a, b) => b.lastSeen - a.lastSeen)[0];
-    progress.lastWasCorrect = latest?.lastWasCorrect ?? null;
-    const dueTimes = attempted.map(mode => mode.dueAt).filter(Boolean);
-    progress.dueAt = dueTimes.length ? Math.min(...dueTimes) : 0;
-  }
 
   function loadState() {
     const fallback = defaultState();
@@ -391,10 +429,6 @@
     return { written: "reading", spoken: "listening", recall: "recall" }[mode] || mode;
   }
 
-  function modeTitle(mode) {
-    return { written: "Reading", spoken: "Listening", recall: "Recall" }[mode] || mode;
-  }
-
   function wordsForScope(scope = state.practiceScope) {
     if (scope === "all") return WORDS;
     if (scope === "lesson1") return WORDS.filter(word => word.stageIndex <= 3);
@@ -422,28 +456,28 @@
   }
 
   function weakWords(words = reviewPoolForScope()) {
-    return words.filter(word => allowedModes().some(mode => {
-      const progress = modeState(word, mode);
+    return words.filter(word => {
+      const progress = itemState(word);
       const recentAccuracy = Scheduler.recentAccuracy(progress.recentResults);
       return progress.wrong > 0 && (progress.lastWasCorrect === false || progress.mastery < 40 || (recentAccuracy !== null && recentAccuracy < .6));
-    }));
-  }
-
-  function dueModes(word, now = Date.now()) {
-    return allowedModes().filter(mode => {
-      const progress = modeState(word, mode);
-      return progress.seen > 0 && Scheduler.reviewIsDue(progress, state.total, now);
     });
   }
 
-  function urgentReviewEntries(words) {
-    return words.flatMap(word => dueModes(word)
-      .filter(mode => modeState(word, mode).lastWasCorrect === false)
-      .map(mode => ({ word, mode })));
+  function wordIsDue(word, now = Date.now()) {
+    return Scheduler.reviewIsDue(itemState(word), state.total, now);
+  }
+
+  function urgentReviewEntries(words, now = Date.now()) {
+    const modes = allowedModes();
+    return words.flatMap(word => {
+      const progress = itemState(word);
+      if (!progress.urgentRetryPending || !progress.urgentMode || !modes.includes(progress.urgentMode) || !wordIsDue(word, now)) return [];
+      return [{ word, mode: progress.urgentMode }];
+    });
   }
 
   function chooseMode(word, onlyDue = false) {
-    const modes = onlyDue ? dueModes(word) : allowedModes();
+    const modes = allowedModes();
     return [...modes].sort((left, right) => {
       const a = modeState(word, left);
       const b = modeState(word, right);
@@ -454,25 +488,17 @@
 
   function dueReviewBreakdown() {
     const pool = reviewPoolForScope();
-    const counts = Object.fromEntries(MODE_KEYS.map(mode => [mode, 0]));
-    let words = 0;
-    pool.forEach(word => {
-      const due = dueModes(word);
-      if (due.length) words++;
-      due.forEach(mode => { counts[mode]++; });
-    });
+    const words = pool.filter(word => wordIsDue(word));
+    const urgent = urgentReviewEntries(words).length;
     return {
-      total: MODE_KEYS.reduce((sum, mode) => sum + counts[mode], 0),
-      words,
-      counts
+      total: words.length,
+      words: words.length,
+      urgent
     };
   }
 
   function dueReviewSummary(breakdown = dueReviewBreakdown()) {
-    const reviewLabel = `${breakdown.total} due review${breakdown.total === 1 ? "" : "s"}`;
-    const wordLabel = `${breakdown.words} word${breakdown.words === 1 ? "" : "s"}`;
-    const directions = allowedModes().map(mode => `${modeTitle(mode)} ${breakdown.counts[mode]}`);
-    return `${reviewLabel} across ${wordLabel}${directions.length ? ` · ${directions.join(" · ")}` : ""}`;
+    return `${breakdown.words} due word${breakdown.words === 1 ? "" : "s"}`;
   }
 
   function selectWord() {
@@ -495,7 +521,9 @@
     }
     if (!introduced.length && unseen.length) return { word: unseen[0], mode: allowedModes()[0], introduce: true, reason: "Introducing the first word" };
     const recent = new Set(state.recent.slice(-5));
-    const due = introduced.filter(word => dueModes(word).length);
+    const incomplete = introduced.filter(word => itemState(word).seen === 0);
+    if (incomplete.length) return { ...selectReviewWord(incomplete, recent, false), introduce: false, reason: "Completing the first practice check" };
+    const due = introduced.filter(word => wordIsDue(word));
     const urgent = urgentReviewEntries(introduced);
     if (urgent.length) return { ...selectReviewEntry(urgent), introduce: false, reason: "Urgent review" };
     if (unseen.length) {
@@ -518,13 +546,13 @@
     if (!candidates.length && allowRecent) candidates = words;
     const scored = candidates.map(word => {
       const mode = chooseMode(word, onlyDue);
-      return { word, mode, score: Scheduler.reviewScore(modeState(word, mode)) };
+      return { word, mode, score: Scheduler.reviewScore(itemState(word)) };
     }).sort((a, b) => b.score - a.score);
     return scored[0] || { word: null, mode: "written" };
   }
 
   function selectReviewEntry(entries) {
-    const scored = entries.map(entry => ({ ...entry, score: Scheduler.reviewScore(modeState(entry.word, entry.mode)) }));
+    const scored = entries.map(entry => ({ ...entry, score: Scheduler.reviewScore(itemState(entry.word)) }));
     const best = scored.sort((left, right) => right.score - left.score)[0];
     return best ? { word: best.word, mode: best.mode } : { word: null, mode: "written" };
   }
@@ -574,16 +602,16 @@
       <details class="card vocab-setup-card">
         <summary><span><strong>Session controls</strong><small id="vocabPaceStatus">Balanced introduction and review</small></span></summary>
         <div class="vocab-setup">
-          <div><h2>Vocabulary practice</h2><p class="muted">Guided course keeps new words in order; All vocabulary opens every lesson. Voice selection and data tools remain in Settings &amp; Data.</p></div>
+          <div><h2>Vocabulary practice</h2><p class="muted">Guided course keeps new words in order; All vocabulary opens every lesson. Changing the format changes the question, not the word’s unlock or review schedule.</p></div>
           <label><span>Practice scope</span><select id="vocabPracticeScope"><option value="adaptive">Guided course</option><option value="all">All vocabulary</option><option value="core">Core lessons</option><option value="lesson1">Lesson 1</option><option value="lesson2">Lesson 2</option><option value="extras">Practical extras</option><option value="trouble">Trouble words</option></select><small id="vocabScopeHint">New words follow the guided sequence; learned words remain reviewable.</small></label>
           <label><span>Question direction</span><select id="vocabQuestionFormat"><option value="mixed">Mixed practice</option><option value="written">Japanese text → English</option><option value="spoken">Spoken Japanese → English</option><option value="recall">English → Japanese</option></select><small id="vocabFormatHint" aria-live="polite"></small></label>
           <label class="vocab-pace"><span>New-word pace: <strong id="vocabPaceName">Balanced</strong></span><input id="vocabPace" type="range" min="10" max="90" step="10"><span class="vocab-pace-labels"><span>More review</span><span>More new</span></span></label>
-          <div class="vocab-due-summary" aria-live="polite"><span class="tiny">Review queue</span><strong id="vocabDueSummary">No reviews due</strong><small id="vocabDueBreakdown">Guided course · Reading 0 · Listening 0 · Recall 0</small></div>
+          <div class="vocab-due-summary" aria-live="polite"><span class="tiny">Review queue</span><strong id="vocabDueSummary">No words due</strong><small id="vocabDueBreakdown">Guided course · one shared review queue · prompts adapt across enabled formats</small></div>
           <div class="vocab-inline-playback"><label class="toggle-line"><input type="checkbox" id="vocabAutoPronounce"> Automatically pronounce revealed words</label><button class="ghost" id="vocabManageVoices" type="button">Manage voices</button></div>
         </div>
       </details>
       <div class="vocab-below">
-        <div class="card"><h2>Mastery by direction</h2><p class="muted">Reading, listening, and recall now improve independently.</p><div class="vocab-direction-grid"><div><span>Japanese → English</span><strong id="vocabWrittenMastery">0%</strong><small id="vocabWrittenRecent">Not practised</small></div><div><span>Listening</span><strong id="vocabSpokenMastery">0%</strong><small id="vocabSpokenRecent">Not practised</small></div><div><span>English → Japanese</span><strong id="vocabRecallMastery">0%</strong><small id="vocabRecallRecent">Not practised</small></div></div></div>
+        <div class="card"><h2>Practice coverage</h2><p class="muted">One shared review schedule; these direction stats help choose the next prompt.</p><div class="vocab-direction-grid"><div><span>Japanese → English</span><strong id="vocabWrittenMastery">0%</strong><small id="vocabWrittenRecent">Not practised</small></div><div><span>Listening</span><strong id="vocabSpokenMastery">0%</strong><small id="vocabSpokenRecent">Not practised</small></div><div><span>English → Japanese</span><strong id="vocabRecallMastery">0%</strong><small id="vocabRecallRecent">Not practised</small></div></div></div>
         <div class="card vocab-trouble-card"><div class="vocab-section-heading"><div><h2>Trouble words</h2><p class="muted" id="vocabTroubleHint">Recent misses in the selected scope matter more than old mistakes.</p></div><button class="ghost" id="vocabReviewTrouble" type="button">Review trouble words</button></div><div class="vocab-trouble-list" id="vocabTroubleList"></div></div>
       </div>
       <details class="card vocab-curriculum-card"><summary><span><strong>Lesson vocabulary curriculum</strong><small id="vocabCurriculumSummary">Stage 1 of ${STAGES.length}</small></span></summary><p class="muted">Guided course introduces new words in order and reviews words learned in any scope. All vocabulary opens the complete set without stage locks.</p><div class="vocab-stages" id="vocabStages"></div></details>`;
@@ -596,7 +624,7 @@
     if (wordProgressGrid) {
       const vocabularyProgress = document.createElement("div");
       vocabularyProgress.className = "card vocab-progress-detail-card";
-       vocabularyProgress.innerHTML = `<div class="vocab-progress-detail-heading"><div><h2>Vocabulary comprehension</h2><p class="muted">Meaning mastery is tracked separately from kana word reading.</p></div><span class="data-badge" id="vocabProgressStage">Lesson 1 · Greetings & courtesy</span></div><div class="vocab-progress-grid"><div class="mini"><strong id="vocabProgressTotal">0</strong><span class="tiny">answers</span></div><div class="mini"><strong id="vocabProgressAccuracy">—</strong><span class="tiny">accuracy</span></div><div class="mini"><strong id="vocabProgressIntroduced">0</strong><span class="tiny">introduced</span></div><div class="mini"><strong id="vocabProgressMastered">0</strong><span class="tiny">mastered</span></div><div class="mini"><strong id="vocabProgressWeak">0</strong><span class="tiny">weak in scope</span></div><div class="mini"><strong id="vocabProgressBestStreak">0</strong><span class="tiny">best streak</span></div></div>`;
+       vocabularyProgress.innerHTML = `<div class="vocab-progress-detail-heading"><div><h2>Vocabulary comprehension</h2><p class="muted">One shared mastery and review schedule across all enabled question formats.</p></div><span class="data-badge" id="vocabProgressStage">Lesson 1 · Greetings & courtesy</span></div><div class="vocab-progress-grid"><div class="mini"><strong id="vocabProgressTotal">0</strong><span class="tiny">answers</span></div><div class="mini"><strong id="vocabProgressAccuracy">—</strong><span class="tiny">accuracy</span></div><div class="mini"><strong id="vocabProgressIntroduced">0</strong><span class="tiny">introduced</span></div><div class="mini"><strong id="vocabProgressMastered">0</strong><span class="tiny">mastered</span></div><div class="mini"><strong id="vocabProgressWeak">0</strong><span class="tiny">weak in scope</span></div><div class="mini"><strong id="vocabProgressBestStreak">0</strong><span class="tiny">best streak</span></div></div>`;
       wordProgressGrid.insertAdjacentElement("afterend", vocabularyProgress);
     }
 
@@ -762,17 +790,37 @@
   function applyResult(correct, selectedId) {
     const progress = itemState(current);
     const direction = modeState(current, currentMode);
+    const now = Date.now();
+    const wasUrgentRetry = progress.urgentRetryPending && progress.urgentMode === currentMode;
     progress.introduced = true;
     const distractorIds = currentChoiceIds.filter(id => id !== current.id);
     progress.recentDistractors.push(...distractorIds);
     progress.recentDistractors = progress.recentDistractors.slice(-16);
     if (!correct && selectedId) progress.confusions[selectedId] = (Number(progress.confusions[selectedId]) || 0) + 1;
+    progress.seen++;
+    progress.lastSeen = now;
+    progress.lastWasCorrect = correct;
+    progress.lastMode = currentMode;
+    progress.recentResults.push(correct);
+    progress.recentResults = progress.recentResults.slice(-8);
+    if (correct) {
+      progress.correct++;
+      progress.mastery = Math.min(100, progress.mastery + Math.max(6, 20 * (1 - progress.mastery / 140)));
+      if (wasUrgentRetry) {
+        progress.urgentRetryPending = false;
+        progress.urgentMode = "";
+      }
+    } else {
+      progress.wrong++;
+      progress.mastery = Math.max(0, progress.mastery - 12);
+      progress.urgentRetryPending = true;
+      progress.urgentMode = currentMode;
+    }
     direction.seen++;
-    direction.lastSeen = Date.now();
+    direction.lastSeen = now;
     direction.lastWasCorrect = correct;
     direction.recentResults.push(correct);
     direction.recentResults = direction.recentResults.slice(-8);
-    state.total++;
     if (correct) {
       direction.correct++;
       direction.mastery = Math.min(100, direction.mastery + Math.max(6, 20 * (1 - direction.mastery / 140)));
@@ -784,9 +832,11 @@
       direction.mastery = Math.max(0, direction.mastery - 12);
       state.streak = 0;
     }
-    Object.assign(direction, Scheduler.nextReviewSchedule(direction.mastery, correct, state.total));
-    refreshAggregate(progress);
-    const questionsUntilReview = Math.max(0, direction.dueQuestion - state.total);
+    state.total++;
+    const scheduleCorrect = correct && (!progress.urgentRetryPending || wasUrgentRetry);
+    Object.assign(progress, Scheduler.nextReviewSchedule(progress.mastery, scheduleCorrect, state.total, now));
+    Object.assign(direction, { dueAt: progress.dueAt, dueQuestion: progress.dueQuestion });
+    const questionsUntilReview = Math.max(0, progress.dueQuestion - state.total);
     currentReason = correct ? `${modeLabel(currentMode)} strengthened · returns in ${questionsUntilReview} questions` : `${modeLabel(currentMode)} needs attention · returns soon`;
     state.recent.push(current.id);
     if (state.recent.length > 12) state.recent.shift();
@@ -834,10 +884,8 @@
   }
 
   function isMastered(word) {
-    const written = modeState(word, "written");
-    const spoken = modeState(word, "spoken");
-    const recall = modeState(word, "recall");
-    return written.mastery >= 72 && recall.mastery >= 72 && (!spoken.seen || spoken.mastery >= 72);
+    const progress = itemState(word);
+    return progress.introduced && progress.seen > 0 && progress.mastery >= 72;
   }
 
   function dueReviewCount() {
@@ -873,7 +921,7 @@
         { label: "Scope", value: scopeShortLabel() },
         { label: "Streak", value: state.streak },
         { label: "Session accuracy", value: sessionTotal ? `${Math.round(sessionCorrect / sessionTotal * 100)}%` : "—" },
-        { label: "Due reviews", value: due.total ? `${due.total} · ${due.words}w` : "0" },
+        { label: "Due words", value: due.total ? due.total : "0" },
         { label: "Mastered", value: `${mastered.length} / ${WORDS.length}` },
         { label: "Challenge", value: `${current ? choiceCountFor(current, currentMode) : 4} choices` }
       ]
@@ -908,9 +956,8 @@
     setOptionalText("#vocabPaceStatus", paceStatus());
     const due = dueReviewBreakdown();
     const dueScopeLabel = SCOPE_LABELS[state.practiceScope];
-    const dueDirectionSummary = allowedModes().map(mode => `${modeTitle(mode)} ${due.counts[mode]}`).join(" · ");
-    setOptionalText("#vocabDueSummary", due.total ? `${due.total} due review${due.total === 1 ? "" : "s"} across ${due.words} word${due.words === 1 ? "" : "s"}` : "No reviews due");
-    setOptionalText("#vocabDueBreakdown", `${dueScopeLabel} · ${dueDirectionSummary || "No directions enabled"}`);
+    setOptionalText("#vocabDueSummary", due.total ? `${due.total} word${due.total === 1 ? "" : "s"} due` : "No words due");
+    setOptionalText("#vocabDueBreakdown", `${dueScopeLabel} · one shared review queue · prompts adapt across enabled formats`);
     const currentStageWords = stageWords(unlocked);
     const currentStageIntroduced = currentStageWords.filter(word => itemState(word).introduced).length;
     const curriculumSummary = state.practiceScope === "adaptive"
