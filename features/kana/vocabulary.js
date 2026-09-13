@@ -331,10 +331,6 @@
     lesson1: COURSE_STAGES.slice(0, 4).map(stage => stage.id),
     lesson2: COURSE_STAGES.slice(4).map(stage => stage.id)
   };
-  const SCOPE_GROUPS = [
-    { id: "genki", label: "Genki II Course", stageIds: SCOPE_STAGE_IDS.genki },
-    { id: "n5", label: "JLPT N5", stageIds: SCOPE_STAGE_IDS.n5 }
-  ];
   const CHOICE_COUNT_VALUES = ["auto", "4", "6", "8"];
   const JAPANESE_COLLATOR = new Intl.Collator("ja", { usage: "sort", sensitivity: "base", numeric: true });
 
@@ -471,6 +467,9 @@
   let currentSpeechPrompt = null;
   let scopeDraft = "adaptive";
   let scopeStageDraft = new Set(state.customStageIds);
+  let scopeDialogView = "tracks";
+  let scopeTrackDraft = "genki";
+  let scopeTopicTrack = "n5";
   let curriculumStageId = COURSE_STAGES[0].id;
   let curriculumFilter = "all";
   let curriculumSort = "accuracy-low";
@@ -737,16 +736,22 @@
   function renderScopeDialog() {
     const dialog = $("#vocabScopeDialog");
     if (!dialog) return;
-    dialog.querySelector('[data-scope-preset="adaptive"]').setAttribute("aria-pressed", String(scopeDraft === "adaptive"));
-    dialog.querySelectorAll(".vocab-scope-presets [data-scope-preset]").forEach(button => {
+    dialog.querySelectorAll("[data-scope-view]").forEach(view => { view.hidden = view.dataset.scopeView !== scopeDialogView; });
+    dialog.querySelectorAll("[data-scope-track]").forEach(button => {
+      button.setAttribute("aria-selected", String(button.dataset.scopeTrack === scopeTrackDraft));
+    });
+    dialog.querySelectorAll("[data-scope-track-panel]").forEach(panel => {
+      panel.hidden = panel.dataset.scopeTrackPanel !== scopeTrackDraft;
+    });
+    dialog.querySelectorAll("[data-scope-preset]").forEach(button => {
       button.setAttribute("aria-pressed", String(scopeDraft === button.dataset.scopePreset));
     });
     dialog.querySelectorAll("[data-scope-topic]").forEach(input => { input.checked = scopeStageDraft.has(input.value); });
-    dialog.querySelectorAll("[data-scope-group]").forEach(input => {
-      const ids = SCOPE_GROUPS.find(group => group.id === input.dataset.scopeGroup)?.stageIds || [];
-      const selected = ids.filter(id => scopeStageDraft.has(id)).length;
-      input.checked = selected === ids.length;
-      input.indeterminate = selected > 0 && selected < ids.length;
+    const topicTrackIds = scopeTopicTrack === "all" ? SCOPE_STAGE_IDS.all : SCOPE_STAGE_IDS[scopeTopicTrack];
+    const query = $("#vocabScopeTopicSearch").value.trim().toLocaleLowerCase();
+    dialog.querySelectorAll("[data-topic-stage]").forEach(option => {
+      const inTrack = topicTrackIds.includes(option.dataset.topicStage);
+      option.hidden = !inTrack || (query && !option.textContent.toLocaleLowerCase().includes(query));
     });
     const selectedWords = WORDS.filter(word => word.stageIds.some(id => scopeStageDraft.has(id))).length;
     const count = $("#vocabScopeDraftCount");
@@ -757,13 +762,30 @@
         : `${scopeStageDraft.size} topic${scopeStageDraft.size === 1 ? "" : "s"} · ${selectedWords} words`;
     const valid = scopeDraft === "adaptive" || scopeStageDraft.size > 0;
     $("#vocabScopeApply").disabled = !valid;
+    $("#vocabScopeApply").textContent = scopeDraft === "adaptive"
+      ? "Use guided course"
+      : scopeDraft === "n5"
+        ? "Practice all N5"
+        : scopeDraft === "genki"
+          ? "Practice entire course"
+          : `Practice ${selectedWords} word${selectedWords === 1 ? "" : "s"}`;
     $("#vocabScopeValidation").textContent = valid ? "" : "Select at least one topic.";
+    $("#vocabScopeTopicTitle").textContent = scopeTopicTrack === "all" ? "Combine topics" : `Choose ${scopeTopicTrack === "n5" ? "JLPT N5" : "Genki II"} topics`;
+    $("#vocabScopeTopicDescription").textContent = scopeTopicTrack === "all"
+      ? "Choose any combination across both tracks. Shared words still count once."
+      : `Choose one or more topics from the ${scopeTopicTrack === "n5" ? "JLPT N5" : "Genki II Course"} track.`;
   }
 
   function openScopeDialog() {
     const baseScope = regularScope();
     scopeDraft = baseScope;
     scopeStageDraft = new Set(baseScope === "adaptive" ? [] : baseScope === "custom" ? state.customStageIds : SCOPE_STAGE_IDS[baseScope]);
+    scopeDialogView = "tracks";
+    const selectedN5 = [...scopeStageDraft].filter(id => SCOPE_STAGE_IDS.n5.includes(id)).length;
+    const selectedGenki = [...scopeStageDraft].filter(id => SCOPE_STAGE_IDS.genki.includes(id)).length;
+    scopeTrackDraft = baseScope === "n5" || selectedN5 > selectedGenki ? "n5" : "genki";
+    scopeTopicTrack = scopeTrackDraft;
+    $("#vocabScopeTopicSearch").value = "";
     renderScopeDialog();
     const dialog = $("#vocabScopeDialog");
     if (typeof dialog.showModal === "function") dialog.showModal(); else dialog.setAttribute("open", "");
@@ -1063,18 +1085,40 @@
         <div class="vocab-scope-dialog-shell">
           <header><div><h2 id="vocabScopeDialogTitle">Choose practice scope</h2><p>Study the Genki II Course, the JLPT N5 list, or any combination of topics.</p></div><button class="vocab-scope-close" id="vocabScopeClose" type="button" aria-label="Close practice scope">×</button></header>
           <div class="vocab-scope-dialog-body">
-            <button class="vocab-scope-guided" type="button" data-scope-preset="adaptive" aria-pressed="false"><span><strong>Guided Genki II Course</strong><small>Introduce new vocabulary in lesson order while reviewing learned words.</small></span><i aria-hidden="true"></i></button>
-            <section class="vocab-scope-custom" aria-labelledby="vocabScopeCustomTitle">
-              <div class="vocab-scope-section-heading"><div><h3 id="vocabScopeCustomTitle">Choose tracks or topics</h3><p>Select any combination across Genki II and JLPT N5.</p></div><span id="vocabScopeDraftCount">0 topics</span></div>
-              <div class="vocab-scope-presets" aria-label="Quick selections">
-                <button type="button" data-scope-preset="genki">Genki II Course</button><button type="button" data-scope-preset="n5">All JLPT N5</button><button type="button" data-scope-preset="lesson1">Genki II · Lesson 1</button><button type="button" data-scope-preset="lesson2">Genki II · Lesson 2</button><button type="button" data-scope-preset="all">All vocabulary</button>
+            <section class="vocab-scope-track-view" data-scope-view="tracks">
+              <div class="vocab-scope-track-tabs" role="tablist" aria-label="Vocabulary track">
+                <button type="button" role="tab" data-scope-track="genki" aria-selected="true"><strong>Genki II Course</strong><small>Lesson-based study</small></button>
+                <button type="button" role="tab" data-scope-track="n5" aria-selected="false"><strong>JLPT N5</strong><small>802 official entries</small></button>
               </div>
-              <div class="vocab-scope-groups">
-                ${SCOPE_GROUPS.map(group => `<fieldset class="vocab-scope-group"><legend><label><input type="checkbox" data-scope-group="${group.id}"><span>${group.label}</span></label></legend><div>${ALL_STAGES.filter(stage => group.stageIds.includes(stage.id)).map(stage => `<label class="vocab-topic-option"><input type="checkbox" value="${stage.id}" data-scope-topic><span><strong>${stage.name.replace(/^Lesson \d · |^JLPT N5 · /, "")}</strong><small>${wordsInStage(stage.id).length} words · ${stage.description}</small></span></label>`).join("")}</div></fieldset>`).join("")}
+              <div class="vocab-scope-track-panel" data-scope-track-panel="genki" role="tabpanel">
+                <button class="vocab-scope-choice vocab-scope-choice-primary" type="button" data-scope-preset="adaptive" aria-pressed="false"><span><em>Recommended</em><strong>Guided Genki II Course</strong><small>Continue from your current stage with automatic review.</small></span><i aria-hidden="true"></i></button>
+                <button class="vocab-scope-choice" type="button" data-scope-preset="genki" aria-pressed="false"><span><strong>Entire Genki II Course</strong><small>Practise all 131 course words without stage locks.</small></span><i aria-hidden="true"></i></button>
+                <div class="vocab-scope-lesson-choices" aria-label="Genki II lessons">
+                  <button type="button" data-scope-preset="lesson1" aria-pressed="false"><strong>Lesson 1</strong><small>4 topics · 83 words</small></button>
+                  <button type="button" data-scope-preset="lesson2" aria-pressed="false"><strong>Lesson 2</strong><small>3 topics · 48 words</small></button>
+                </div>
+                <button class="vocab-scope-topics-link" type="button" data-open-scope-topics="genki"><span>Choose Genki II topics</span><span aria-hidden="true">›</span></button>
+              </div>
+              <div class="vocab-scope-track-panel" data-scope-track-panel="n5" role="tabpanel" hidden>
+                <button class="vocab-scope-choice vocab-scope-choice-primary" type="button" data-scope-preset="n5" aria-pressed="false"><span><strong>All JLPT N5 vocabulary</strong><small>802 official entries · 803 practice forms across 23 topics.</small></span><i aria-hidden="true"></i></button>
+                <button class="vocab-scope-topics-link" type="button" data-open-scope-topics="n5"><span>Choose JLPT N5 topics</span><span aria-hidden="true">›</span></button>
+              </div>
+              <button class="vocab-scope-advanced" type="button" data-open-scope-topics="all"><span><strong>Combine tracks</strong><small>Advanced · mix individual Genki II and JLPT N5 topics</small></span><span aria-hidden="true">›</span></button>
+            </section>
+            <section class="vocab-scope-topic-view" data-scope-view="topics" hidden>
+              <button class="vocab-scope-back" id="vocabScopeBack" type="button">← Back to tracks</button>
+              <div class="vocab-scope-section-heading"><div><h3 id="vocabScopeTopicTitle">Choose topics</h3><p id="vocabScopeTopicDescription"></p></div></div>
+              <div class="vocab-scope-topic-tools"><label><span class="sr-only">Search topics</span><input id="vocabScopeTopicSearch" type="search" placeholder="Search topics…" autocomplete="off"></label><div><button type="button" id="vocabScopeSelectAll">Select all</button><button type="button" id="vocabScopeClearTopics">Clear</button></div></div>
+              <div class="vocab-scope-topic-list">
+                ${ALL_STAGES.map(stage => {
+                  const track = N5_STAGES.some(topic => topic.id === stage.id) ? "n5" : "genki";
+                  const label = stage.name.replace(/^Lesson \d · |^JLPT N5 · /, "");
+                  return `<label class="vocab-topic-option" data-topic-stage="${stage.id}" data-topic-track="${track}"><input type="checkbox" value="${stage.id}" data-scope-topic><span><span class="vocab-topic-track-label">${track === "n5" ? "JLPT N5" : "Genki II"}</span><strong>${label}</strong><small>${wordsInStage(stage.id).length} words · ${stage.description}</small></span></label>`;
+                }).join("")}
               </div>
             </section>
           </div>
-          <footer><p id="vocabScopeValidation" aria-live="polite"></p><div><button class="ghost" id="vocabScopeCancel" type="button">Cancel</button><button class="big-button" id="vocabScopeApply" type="button">Apply selection</button></div></footer>
+          <footer><div class="vocab-scope-selection-summary"><strong id="vocabScopeDraftCount">Guided course selected</strong><p id="vocabScopeValidation" aria-live="polite"></p></div><div><button class="ghost" id="vocabScopeCancel" type="button">Cancel</button><button class="big-button" id="vocabScopeApply" type="button">Use guided course</button></div></footer>
         </div>
       </dialog>
       <dialog class="vocab-curriculum-dialog" id="vocabCurriculumDialog" aria-labelledby="vocabCurriculumDialogTitle" aria-describedby="vocabCurriculumDialogDescription">
@@ -1644,15 +1688,42 @@
     scopeStageDraft = new Set(scopeDraft === "adaptive" ? [] : SCOPE_STAGE_IDS[scopeDraft]);
     renderScopeDialog();
   }));
+  $("#vocabScopeDialog").querySelectorAll("[data-scope-track]").forEach(button => button.addEventListener("click", () => {
+    scopeTrackDraft = button.dataset.scopeTrack;
+    renderScopeDialog();
+  }));
+  $("#vocabScopeDialog").querySelectorAll("[data-open-scope-topics]").forEach(button => button.addEventListener("click", () => {
+    scopeTopicTrack = button.dataset.openScopeTopics;
+    if (scopeTopicTrack !== "all") {
+      const allowed = SCOPE_STAGE_IDS[scopeTopicTrack];
+      scopeStageDraft = new Set([...scopeStageDraft].filter(id => allowed.includes(id)));
+    }
+    scopeDraft = "custom";
+    scopeDialogView = "topics";
+    $("#vocabScopeTopicSearch").value = "";
+    renderScopeDialog();
+    $("#vocabScopeTopicSearch").focus();
+  }));
+  $("#vocabScopeBack").addEventListener("click", () => {
+    scopeDialogView = "tracks";
+    renderScopeDialog();
+  });
+  $("#vocabScopeTopicSearch").addEventListener("input", renderScopeDialog);
+  $("#vocabScopeSelectAll").addEventListener("click", () => {
+    const ids = scopeTopicTrack === "all" ? SCOPE_STAGE_IDS.all : SCOPE_STAGE_IDS[scopeTopicTrack];
+    ids.forEach(id => scopeStageDraft.add(id));
+    scopeDraft = "custom";
+    renderScopeDialog();
+  });
+  $("#vocabScopeClearTopics").addEventListener("click", () => {
+    const ids = scopeTopicTrack === "all" ? SCOPE_STAGE_IDS.all : SCOPE_STAGE_IDS[scopeTopicTrack];
+    ids.forEach(id => scopeStageDraft.delete(id));
+    scopeDraft = "custom";
+    renderScopeDialog();
+  });
   $("#vocabScopeDialog").querySelectorAll("[data-scope-topic]").forEach(input => input.addEventListener("change", () => {
     scopeDraft = "custom";
     if (input.checked) scopeStageDraft.add(input.value); else scopeStageDraft.delete(input.value);
-    renderScopeDialog();
-  }));
-  $("#vocabScopeDialog").querySelectorAll("[data-scope-group]").forEach(input => input.addEventListener("change", () => {
-    scopeDraft = "custom";
-    const ids = SCOPE_GROUPS.find(group => group.id === input.dataset.scopeGroup)?.stageIds || [];
-    ids.forEach(id => input.checked ? scopeStageDraft.add(id) : scopeStageDraft.delete(id));
     renderScopeDialog();
   }));
   $("#vocabStages").addEventListener("click", event => {

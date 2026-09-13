@@ -171,6 +171,21 @@
           "text": "Words shared between tracks now keep one learning history, and the former Practical extras vocabulary has moved into JLPT N5."
         }
       ]
+    },
+    {
+      "id": "2026-09-14.2",
+      "publishedAt": "2026-09-14",
+      "title": "A simpler vocabulary scope picker",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Choose the Genki II Course or JLPT N5 first, then quickly practise a whole track or open a focused, searchable topic selector."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "Advanced topic mixing remains available without crowding the most common study choices."
+        }
+      ]
     }
   ]
 }

@@ -108,9 +108,14 @@ test('vocabulary scope picker supports guided, preset, and custom topic practice
   assert.match(vocabulary, /id="vocabCurriculumSort"/);
   assert.match(vocabulary, /Accuracy: low first/);
   assert.match(vocabulary, /JAPANESE_COLLATOR/);
-  assert.match(vocabulary, /data-scope-preset="genki">Genki II Course<\/button>/);
-  assert.match(vocabulary, /data-scope-preset="n5">All JLPT N5<\/button>/);
-  assert.match(vocabulary, /data-scope-preset="all">All vocabulary<\/button>/);
+  assert.match(vocabulary, /data-scope-track="genki"/);
+  assert.match(vocabulary, /data-scope-track="n5"/);
+  assert.match(vocabulary, /data-scope-preset="genki"/);
+  assert.match(vocabulary, /data-scope-preset="n5"/);
+  assert.match(vocabulary, /data-open-scope-topics="all"/);
+  assert.match(vocabulary, /id="vocabScopeTopicSearch"/);
+  assert.match(vocabulary, /id="vocabScopeSelectAll"/);
+  assert.match(vocabulary, /id="vocabScopeBack"/);
   assert.match(vocabulary, /data-scope-topic/);
   assert.match(vocabulary, /customStageIds/);
   assert.match(vocabulary, /if \(scope === "all"\) return WORDS/);
