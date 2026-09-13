@@ -1,6 +1,8 @@
 # JLPT N5 vocabulary topic dataset
 
-`content/vocabulary/n5-topics.json` is the checked-in source dataset for the future JLPT N5 practice track. It is not loaded by the vocabulary page yet.
+`content/vocabulary/n5-topics.json` is the checked-in source dataset for the JLPT N5 practice track. The vocabulary page loads a generated browser asset from this dataset and its examples.
+
+`content/vocabulary/n5-examples.json` contains one kana-only helper sentence and English translation for every one of the 802 records. It uses the same two- or three-element array shape as the current vocabulary example registry; the optional third value identifies the exact focus text when the full stored term does not appear literally.
 
 ## Sources
 
@@ -11,9 +13,21 @@
 The source PDF is intentionally not committed. Regenerate the data with the bundled Python runtime and `pdfplumber`:
 
 ```powershell
+python -m pip install pdfplumber fugashi unidic-lite jaconv
+```
+
+```powershell
 python scripts/build-n5-vocabulary-topics.py `
   --pdf "C:\path\to\Vocabulary_of_JLPT_N5.pdf" `
   --output "content\vocabulary\n5-topics.json"
+
+python scripts/build-n5-vocabulary-examples.py `
+  --pdf "C:\path\to\Vocabulary_of_JLPT_N5.pdf" `
+  --dataset "content\vocabulary\n5-topics.json" `
+  --current "features\kana\vocabulary-examples.js" `
+  --output "content\vocabulary\n5-examples.json"
+
+npm run prepare:vocabulary
 ```
 
 ## Record and matching rules
@@ -25,16 +39,26 @@ python scripts/build-n5-vocabulary-topics.py `
 - Unmatched entries are marked `manual`. Their notes make the editorial decision visible. Function words use the supplemental topic only when the existing semantic topics do not fit.
 - Every record has exactly one primary topic so custom topic pools can be combined and deduplicated predictably.
 
-## Existing vocabulary and future scopes
+## Existing vocabulary and practice scopes
 
-Exact matches and deliberate lemma/inflection matches to the current vocabulary are stored in `existingWordIds` and `existingStageIds`. These fields are migration metadata; current stable IDs must not be renamed when the dataset is integrated.
+Exact matches and deliberate lemma/inflection matches to the original vocabulary are stored in `existingWordIds` and `existingStageIds`. The runtime reuses these stable IDs so existing learning progress remains intact.
 
-The future practice-scope design has two tracks:
+The practice-scope design has two tracks:
 
-- Course: the existing guided lessons and lesson-aligned topics.
+- Genki II Course: the existing guided lessons and lesson-aligned topics.
 - JLPT N5: all 802 records or a custom selection of N5 semantic topics.
 
-Existing words have one progress identity even when referenced by different curricula. The JSON's `scopePolicy.courseTrackWordIdsToMove` records the current Practical extras words that should move to the JLPT N5 track during integration, rather than appearing in both Practical extras and N5. No live scope membership changes are made by this data-only batch.
+Existing words have one progress identity even when referenced by different curricula. The JSON's `scopePolicy.courseTrackWordIdsToMove` records the 35 former Practical extras words now assigned only to the JLPT N5 track. Legacy saved Practical extras scopes migrate to JLPT N5, and legacy custom selections migrate to the corresponding N5 topics.
+
+The 802 official source entries produce 803 practice forms because the `わかります` record deliberately preserves both existing stable forms: `wakarimasu` and `wakarimasen`. The UI states both totals where this distinction matters.
+
+## Helper sentence policy
+
+- Existing app examples are reused when they match the stored N5 term and already provide a clear teaching context.
+- Suitable PDF examples are adapted by converting kanji to contextual kana readings while preserving katakana, numbers, and punctuation.
+- Lists, fragments, ambiguous conversions, placeholders, and weak contexts are replaced with short curated examples.
+- `provenance` records whether each example came from `current`, `pdf-adapted`, or `curated` content.
+- Tests require exactly one example per vocabulary ID, kana/katakana-only Japanese, a matching focus term, an English translation, and no generic fallback sentence.
 
 ## Current audit totals
 
@@ -45,3 +69,4 @@ Existing words have one progress identity even when referenced by different curr
 - 203 records classified manually because there was no reliable site match.
 - 121 current app vocabulary IDs linked to 120 PDF records.
 - 35 current Practical extras IDs marked to move into the N5 track during later integration.
+- 802 kana-only helper sentences: 114 reused current examples, 548 adapted PDF examples, and 140 curated replacements.

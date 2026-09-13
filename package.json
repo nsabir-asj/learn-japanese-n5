@@ -7,7 +7,8 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "prepare:site": "node scripts/prepare-site-assets.mjs",
+    "prepare:vocabulary": "node scripts/build-vocabulary-runtime.mjs",
+    "prepare:site": "npm run prepare:vocabulary && node scripts/prepare-site-assets.mjs",
     "dev": "npm run prepare:site && npm run db:local && vinext dev",
     "build": "npm run prepare:site && vinext build",
     "start": "wrangler dev --config dist/server/wrangler.json",

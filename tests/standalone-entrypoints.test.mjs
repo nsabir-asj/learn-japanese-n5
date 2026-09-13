@@ -99,7 +99,7 @@ test('vocabulary choices reveal pronunciation or Japanese text only after answer
 test('vocabulary scope picker supports guided, preset, and custom topic practice', () => {
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
   assert.doesNotThrow(() => new Script(vocabulary));
-  assert.match(vocabulary, /adaptive: "Guided course", all: "All vocabulary"/);
+  assert.match(vocabulary, /adaptive: "Guided Genki II Course", all: "All vocabulary", genki: "Genki II Course", n5: "JLPT N5"/);
   assert.match(vocabulary, /id="vocabScopeDialog"/);
   assert.match(vocabulary, /id="vocabCurriculumDialog"/);
   assert.match(vocabulary, /data-curriculum-stage/);
@@ -108,12 +108,16 @@ test('vocabulary scope picker supports guided, preset, and custom topic practice
   assert.match(vocabulary, /id="vocabCurriculumSort"/);
   assert.match(vocabulary, /Accuracy: low first/);
   assert.match(vocabulary, /JAPANESE_COLLATOR/);
+  assert.match(vocabulary, /data-scope-preset="genki">Genki II Course<\/button>/);
+  assert.match(vocabulary, /data-scope-preset="n5">All JLPT N5<\/button>/);
   assert.match(vocabulary, /data-scope-preset="all">All vocabulary<\/button>/);
   assert.match(vocabulary, /data-scope-topic/);
   assert.match(vocabulary, /customStageIds/);
   assert.match(vocabulary, /if \(scope === "all"\) return WORDS/);
-  assert.match(vocabulary, /if \(scope === "custom"\) return WORDS\.filter\(word => state\.customStageIds\.includes\(word\.stageId\)\)/);
+  assert.match(vocabulary, /if \(scope === "custom"\) return WORDS\.filter\(word => word\.stageIds\.some\(id => state\.customStageIds\.includes\(id\)\)\)/);
   assert.match(vocabulary, /all: "All words"/);
+  assert.match(vocabulary, /const ALL_STAGES = \[\.\.\.COURSE_STAGES, \.\.\.N5_STAGES\]/);
+  assert.match(vocabulary, /existingWordIds\.length \? sourceWord\.existingWordIds : \[sourceWord\.sourceId\]/);
   assert.match(vocabulary, /const reviewPool = adaptive \? introducedWords\(\) : pool/);
   assert.match(vocabulary, /practicedEarly \? "Practiced early"/);
   assert.match(vocabulary, /function applyScopeSelection/);

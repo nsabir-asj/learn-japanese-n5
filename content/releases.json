@@ -156,6 +156,21 @@
           "text": "Every submitted vocabulary answer now includes a natural example sentence, an English translation, and separate sentence pronunciation playback."
         }
       ]
+    },
+    {
+      "id": "2026-09-14.1",
+      "publishedAt": "2026-09-14",
+      "title": "Complete JLPT N5 vocabulary practice",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Practice all 802 official JLPT N5 vocabulary entries by topic, each with a kana-only example sentence, alongside the separate Genki II Course track."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "Words shared between tracks now keep one learning history, and the former Practical extras vocabulary has moved into JLPT N5."
+        }
+      ]
     }
   ]
 }

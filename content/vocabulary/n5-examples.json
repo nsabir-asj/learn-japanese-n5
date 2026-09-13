@@ -1,0 +1,4039 @@
+{
+  "schemaVersion": 1,
+  "level": "N5",
+  "recordCount": 802,
+  "sentencePolicy": "Kana and katakana only; kanji is intentionally excluded.",
+  "provenanceSummary": {
+    "curated": 140,
+    "current": 114,
+    "pdf-adapted": 548
+  },
+  "examples": {
+    "n5-0001": [
+      "えきでともだちにあいます。",
+      "I meet my friend at the station."
+    ],
+    "n5-0002": [
+      "このほんはせんえんです。",
+      "This book costs one thousand yen."
+    ],
+    "n5-0003": [
+      "わたしのへやは2かいです。",
+      "My room is on the second floor."
+    ],
+    "n5-0004": [
+      "このえいがを2かいみました。",
+      "I watched this movie twice."
+    ],
+    "n5-0005": [
+      "みっかかん、とうきょうにいました。",
+      "I stayed in Tokyo for three days."
+    ],
+    "n5-0006": [
+      "にかげつ、にほんごをべんきょうしました。",
+      "I studied Japanese for two months."
+    ],
+    "n5-0007": [
+      "つかいかたをおしえてください。",
+      "Please teach me how to use it."
+    ],
+    "n5-0008": [
+      "4がつににほんへいきます。",
+      "I will go to Japan in April."
+    ],
+    "n5-0009": [
+      "こどもはこうえんであそびたがります。",
+      "The child wants to play in the park."
+    ],
+    "n5-0010": [
+      "ひだりがわをあるきます。",
+      "Walk on the left side."
+    ],
+    "n5-0011": [
+      "このにもつは5キロです。",
+      "This luggage weighs five kilograms."
+    ],
+    "n5-0012": [
+      "10キロぐらいはしりました。",
+      "I ran about 10 km."
+    ],
+    "n5-0013": [
+      "2じかんぐらいべんきょうしました。",
+      "I studied for about 2 hours.",
+      "ぐらい"
+    ],
+    "n5-0014": [
+      "しおを10グラムいれます。",
+      "I add ten grams of salt."
+    ],
+    "n5-0015": [
+      "りんごを3こかいました。",
+      "I bought three apples."
+    ],
+    "n5-0016": [
+      "まいにち、にほんごをべんきょうします。",
+      "I study Japanese every day."
+    ],
+    "n5-0017": [
+      "2じごろにそちらにいきます。",
+      "I will go there around 2 o'clock."
+    ],
+    "n5-0018": [
+      "いもうとはじゅうはっさいです。",
+      "My younger sister is eighteen years old."
+    ],
+    "n5-0019": [
+      "としょかんでほんを2さつかりました。",
+      "I borrowed two books from the library."
+    ],
+    "n5-0020": [
+      "こちらはたなかさんです。",
+      "This is Mr. Tanaka."
+    ],
+    "n5-0021": [
+      "まいあさ、しちじにおきます。",
+      "I get up at seven every morning."
+    ],
+    "n5-0022": [
+      "まいにち2じかんべんきょうします。",
+      "I study for two hours every day."
+    ],
+    "n5-0023": [
+      "にほんに3しゅうかんいました。",
+      "I was in Japan for three weeks."
+    ],
+    "n5-0024": [
+      "リーさんはちゅうごくじんです。",
+      "Li is Chinese."
+    ],
+    "n5-0025": [
+      "2じすぎにとうきょうにつきます。",
+      "I will arrive in Tokyo after 2 o'clock."
+    ],
+    "n5-0026": [
+      "これとこれを２つずつください。",
+      "Please give me two of this and two of this."
+    ],
+    "n5-0027": [
+      "たなかせんせいはにほんごをおしえます。",
+      "Teacher Tanaka teaches Japanese."
+    ],
+    "n5-0028": [
+      "へやにパソコンが2だいあります。",
+      "There are two computers in the room."
+    ],
+    "n5-0029": [
+      "わたしたちはがくせいです。",
+      "We are students."
+    ],
+    "n5-0030": [
+      "いま、かいぎちゅうです。",
+      "I am in a meeting now."
+    ],
+    "n5-0031": [
+      "コーヒーを3つください。",
+      "Please give me three coffees."
+    ],
+    "n5-0032": [
+      "もういちどいってください。",
+      "Please say that again."
+    ],
+    "n5-0033": [
+      "きょうはじゅうににちです。",
+      "Today is the twelfth."
+    ],
+    "n5-0034": [
+      "わたしのかぞくは4にんです。",
+      "There are four people in my family."
+    ],
+    "n5-0035": [
+      "にほんに3ねんすんでいました。",
+      "I lived in Japan for three years."
+    ],
+    "n5-0036": [
+      "コーヒーをにはいのみました。",
+      "I drank two cups of coffee.",
+      "はい"
+    ],
+    "n5-0037": [
+      "いま、くじはんです。",
+      "It is half past nine now."
+    ],
+    "n5-0038": [
+      "わたしはいちばんがすきです。",
+      "I like number one best."
+    ],
+    "n5-0039": [
+      "にわにねこがさんびきいます。",
+      "There are three cats in the garden.",
+      "びき"
+    ],
+    "n5-0040": [
+      "えきまでごふんかかります。",
+      "It takes five minutes to reach the station.",
+      "ふん"
+    ],
+    "n5-0041": [
+      "13ページをみてください。",
+      "Please look at page 13."
+    ],
+    "n5-0042": [
+      "かさが3ぽんあります。",
+      "I have three umbrellas.",
+      "ぽん"
+    ],
+    "n5-0043": [
+      "かみを3まいください。",
+      "Please give me three sheets of paper."
+    ],
+    "n5-0044": [
+      "レッスンのまえにトイレにいきます。",
+      "I go to the restroom before the lesson."
+    ],
+    "n5-0045": [
+      "えきまで500メートルです。",
+      "It is five hundred meters to the station."
+    ],
+    "n5-0046": [
+      "ほんやでじしょをかいました。",
+      "I bought a dictionary at a bookshop."
+    ],
+    "n5-0047": [
+      "えきでともだちにあいます。",
+      "I meet my friend at the station."
+    ],
+    "n5-0048": [
+      "あおいボールペンでかきます。",
+      "I write with a blue ballpoint pen."
+    ],
+    "n5-0049": [
+      "あかでかきます。",
+      "Write in red."
+    ],
+    "n5-0050": [
+      "あかいかさはわたしのです。",
+      "The red umbrella is mine."
+    ],
+    "n5-0051": [
+      "エレベーターで15かいにあがります。",
+      "Take the elevator to the 15th floor."
+    ],
+    "n5-0052": [
+      "このへやはあかるいです。",
+      "The room is bright."
+    ],
+    "n5-0053": [
+      "あきがすきです。",
+      "I like autumn."
+    ],
+    "n5-0054": [
+      "ドアがあきます。",
+      "The door opens."
+    ],
+    "n5-0055": [
+      "わたしはドアをあけます。",
+      "I open the door."
+    ],
+    "n5-0056": [
+      "ともだちにプレゼントをあげます。",
+      "I give a present to my friend."
+    ],
+    "n5-0057": [
+      "あさ、コーヒーをのみます。",
+      "I drink coffee in the morning."
+    ],
+    "n5-0058": [
+      "しちじにあさごはんをたべます。",
+      "I eat breakfast at seven."
+    ],
+    "n5-0059": [
+      "あさってはにほんごのテストです。",
+      "The day after tomorrow will be a Japanese test."
+    ],
+    "n5-0060": [
+      "かのじょはあしがながいです。",
+      "She has long legs."
+    ],
+    "n5-0061": [
+      "あした、としょかんへいきます。",
+      "I will go to the library tomorrow."
+    ],
+    "n5-0062": [
+      "トイレはあそこです。",
+      "The restroom is over there."
+    ],
+    "n5-0063": [
+      "こどもはよくこうえんであそびます。",
+      "Children often play in the park."
+    ],
+    "n5-0064": [
+      "きょうはきのうよりあたたかいです。",
+      "Today is warmer than yesterday."
+    ],
+    "n5-0065": [
+      "かれはとてもあたまがいいです。",
+      "He is very smart."
+    ],
+    "n5-0066": [
+      "あたらしいコンピュータをかいました。",
+      "I bought a new computer."
+    ],
+    "n5-0067": [
+      "いりぐちはあちらです。",
+      "The entrance is over there."
+    ],
+    "n5-0068": [
+      "きょうはあついですね。",
+      "It's hot today."
+    ],
+    "n5-0069": [
+      "このほんはあついです。",
+      "This book is thick."
+    ],
+    "n5-0070": [
+      "あさごはんのあとでさんぽをします。",
+      "I will take a walk after breakfast.",
+      "あと"
+    ],
+    "n5-0071": [
+      "あにはイギリスにいます。",
+      "My brother is in England."
+    ],
+    "n5-0072": [
+      "あねはフランスにいます。",
+      "My sister is in France."
+    ],
+    "n5-0073": [
+      "あのひとはせんせいです。",
+      "That person over there is a teacher."
+    ],
+    "n5-0074": [
+      "わたしはふるいアパートにすんでいます。",
+      "I live in an old apartment."
+    ],
+    "n5-0075": [
+      "あさシャワーをあびます。",
+      "Take a shower in the morning."
+    ],
+    "n5-0076": [
+      "ここはあぶないですよ。",
+      "It's dangerous here."
+    ],
+    "n5-0077": [
+      "このケーキはとてもあまいです。",
+      "This cake is very sweet."
+    ],
+    "n5-0078": [
+      "あまりほんをよみません。",
+      "I don't read many books."
+    ],
+    "n5-0079": [
+      "ごごはたぶんあめがふります。",
+      "It will probably rain in the afternoon."
+    ],
+    "n5-0080": [
+      "ともだちはアメリカからきました。",
+      "My friend came from America."
+    ],
+    "n5-0081": [
+      "ここでてをあらいます。",
+      "Wash your hands here."
+    ],
+    "n5-0082": [
+      "はこのなかにりんごがななつあります。",
+      "There are seven apples in the box."
+    ],
+    "n5-0083": [
+      "わたしはきょうじかんがあります。",
+      "I have time today."
+    ],
+    "n5-0084": [
+      "まいあさ、えきまであるきます。",
+      "I walk to the station every morning."
+    ],
+    "n5-0085": [
+      "あれはえきです。",
+      "That over there is the station."
+    ],
+    "n5-0086": [
+      "このアプリはとてもいいです。",
+      "This app is very nice."
+    ],
+    "n5-0087": [
+      "もういちどいいます。",
+      "I will say it again."
+    ],
+    "n5-0088": [
+      "いえのなかはあたたかいです。",
+      "The inside of the house is warm."
+    ],
+    "n5-0089": [
+      "じてんしゃでがっこうにいきます。",
+      "I go to school by bicycle."
+    ],
+    "n5-0090": [
+      "れいぞうこのなかにたまごがいくつありますか。",
+      "How many eggs are there in the fridge?"
+    ],
+    "n5-0091": [
+      "このかばんはいくらですか。",
+      "How much is this bag?"
+    ],
+    "n5-0092": [
+      "いけのなかにきれいなさかながいます。",
+      "There are beautiful fish in the pond."
+    ],
+    "n5-0093": [
+      "わたしのちちはいしゃです。",
+      "My father is a doctor."
+    ],
+    "n5-0094": [
+      "このいすはたかかったです。",
+      "This chair was expensive."
+    ],
+    "n5-0095": [
+      "このごろまいにちいそがしいです。",
+      "I'm busy these days."
+    ],
+    "n5-0096": [
+      "きょうはすこしあたまがいたいです。",
+      "I have a slight headache today."
+    ],
+    "n5-0097": [
+      "いちからじゅうまでかぞえます。",
+      "I count from one to ten."
+    ],
+    "n5-0098": [
+      "もういちどいってください。",
+      "Say that once more please."
+    ],
+    "n5-0099": [
+      "いちにちうちでやすみました。",
+      "I rested at home for one day."
+    ],
+    "n5-0100": [
+      "いちばんいいものをえらびます。",
+      "Choose the best one."
+    ],
+    "n5-0101": [
+      "いつとうきょうにいきますか。",
+      "When are you going to Tokyo?"
+    ],
+    "n5-0102": [
+      "きょうはいつかです。",
+      "Today is the 5th."
+    ],
+    "n5-0103": [
+      "ともだちといっしょにがっこうにいきます。",
+      "I will go to school with my friends.",
+      "いっしょ"
+    ],
+    "n5-0104": [
+      "りんごはいつつ400えんです。",
+      "Five apples cost 400 yen."
+    ],
+    "n5-0105": [
+      "いつもけいたいでんわをもっています。",
+      "I always have a mobile phone."
+    ],
+    "n5-0106": [
+      "いま、なんじですか。",
+      "What time is it now?"
+    ],
+    "n5-0107": [
+      "わたしはきょうだいがいます。",
+      "I have a sibling."
+    ],
+    "n5-0108": [
+      "おなじいみのぶんはどれですか。",
+      "Which sentences have the same meaning?"
+    ],
+    "n5-0109": [
+      "いもうとはじゅうごさいです。",
+      "My younger sister is fifteen."
+    ],
+    "n5-0110": [
+      "いもうとさんはどこにいますか。",
+      "Where is your sister?"
+    ],
+    "n5-0111": [
+      "いやなしごともあります。",
+      "There are also unpleasant jobs."
+    ],
+    "n5-0112": [
+      "いりぐちはあそこです。",
+      "The entrance is over there."
+    ],
+    "n5-0113": [
+      "あめですから、かさがいります。",
+      "It is raining, so I need an umbrella."
+    ],
+    "n5-0114": [
+      "コーヒーにクリームをいれますか。",
+      "Would you like to add cream to your coffee?"
+    ],
+    "n5-0115": [
+      "どんないろがすきですか。",
+      "What kind of color do you like?"
+    ],
+    "n5-0116": [
+      "このビルのなかにはいろいろなみせがあります。",
+      "There are various shops in this building."
+    ],
+    "n5-0117": [
+      "めがねはつくえのうえにあります。",
+      "The glasses are on the desk."
+    ],
+    "n5-0118": [
+      "モニターのうしろにスイッチがあります。",
+      "There is a switch on the back of the monitor."
+    ],
+    "n5-0119": [
+      "このほんはうすいです。",
+      "This book is thin."
+    ],
+    "n5-0120": [
+      "これはいいうたですね。",
+      "This is a good song."
+    ],
+    "n5-0121": [
+      "カラオケでにほんのうたをうたいます。",
+      "I sing a Japanese song at karaoke."
+    ],
+    "n5-0122": [
+      "うちはどこですか。",
+      "Where is your home?"
+    ],
+    "n5-0123": [
+      "あかちゃんはらいげつうまれます。",
+      "The baby will be born next month."
+    ],
+    "n5-0124": [
+      "やまよりうみがすきです。",
+      "I like the sea better than the mountains."
+    ],
+    "n5-0125": [
+      "このみせはくだものをうります。",
+      "This shop sells fruit."
+    ],
+    "n5-0126": [
+      "ちかてつのなかはうるさいです。",
+      "It's noisy in the subway."
+    ],
+    "n5-0127": [
+      "とてもうれしいです。",
+      "I am very happy."
+    ],
+    "n5-0128": [
+      "みせにうわぎをわすれました。",
+      "I forgot my jacket at the store."
+    ],
+    "n5-0129": [
+      "かのじょはえがじょうずです。",
+      "She is good at painting."
+    ],
+    "n5-0130": [
+      "わたしのうちにはエアコンが５だいあります。",
+      "There are 5 air conditioners in my house."
+    ],
+    "n5-0131": [
+      "きのうともだちとえいがをみました。",
+      "I watched a movie with my friends yesterday."
+    ],
+    "n5-0132": [
+      "あたらしいえいがかんにいきました。",
+      "I went to a new movie theater."
+    ],
+    "n5-0133": [
+      "かのじょはえいごをはなします。",
+      "She speaks English."
+    ],
+    "n5-0134": [
+      "うちからえきまで5ふんぐらいです。",
+      "It takes about 5 minutes from our house to the station."
+    ],
+    "n5-0135": [
+      "いちばんいいものをえらびます。",
+      "Choose the best one."
+    ],
+    "n5-0136": [
+      "エレベーターはどこにありますか。",
+      "Where is the elevator?"
+    ],
+    "n5-0137": [
+      "えんぴつでかいてもいいですか。",
+      "Can I write it in pencil?"
+    ],
+    "n5-0138": [
+      "おくに。おかね。おしごと。おでんわ。",
+      "Country. Money. Job. Phone."
+    ],
+    "n5-0139": [
+      "このケーキはおいしいです。",
+      "This cake is delicious."
+    ],
+    "n5-0140": [
+      "あしたはなんじにおいでになりますか。",
+      "What time will you come tomorrow?"
+    ],
+    "n5-0141": [
+      "このホテルはへやがおおいです。",
+      "This hotel has many rooms."
+    ],
+    "n5-0142": [
+      "おおきいくるまをかいたいです。",
+      "I want to buy a big car."
+    ],
+    "n5-0143": [
+      "おおきなショッピングモールにいきました。",
+      "I went to a big shopping mall."
+    ],
+    "n5-0144": [
+      "えきのまえにひとがおおぜいいます。",
+      "There are a lot of people in front of the station."
+    ],
+    "n5-0145": [
+      "おかあさんはりょうりがじょうずです。",
+      "My mother is good at cooking."
+    ],
+    "n5-0146": [
+      "にほんのおかしがすきです。",
+      "I like Japanese sweets."
+    ],
+    "n5-0147": [
+      "さいふにおかねがありません。",
+      "There is no money in my wallet."
+    ],
+    "n5-0148": [
+      "バッグをテーブルのしたにおきます。",
+      "Place the bag under the table."
+    ],
+    "n5-0149": [
+      "まいにち7じにおきます。",
+      "It wakes up at 7 o'clock every day."
+    ],
+    "n5-0150": [
+      "かれのおくさんはとてもきれいです。",
+      "His wife is very pretty."
+    ],
+    "n5-0151": [
+      "おくにはどちらですか。",
+      "Where is your country?"
+    ],
+    "n5-0152": [
+      "メールでデータをおくります。",
+      "We will send you the data by email."
+    ],
+    "n5-0153": [
+      "ときどきおさけをのみます。",
+      "I drink alcohol sometimes."
+    ],
+    "n5-0154": [
+      "おおきいおさらを5まいかいました。",
+      "I bought 5 large plates."
+    ],
+    "n5-0155": [
+      "おじさんはいつにほんにきますか。",
+      "When will your uncle come to Japan?"
+    ],
+    "n5-0156": [
+      "かれのおじいさんはいまカナダにいます。",
+      "His grandfather is now in Canada."
+    ],
+    "n5-0157": [
+      "ともだちにえいごをおしえます。",
+      "I will teach English to my friends."
+    ],
+    "n5-0158": [
+      "きょうはおそいですね。",
+      "You are late today, aren't you?"
+    ],
+    "n5-0159": [
+      "きのうはおそくまでしごとをしました。",
+      "I worked late yesterday."
+    ],
+    "n5-0160": [
+      "いっしょにおちゃをのみませんか。",
+      "Would you like to drink tea together?"
+    ],
+    "n5-0161": [
+      "おてあらいはどこですか。",
+      "Where is the restroom?"
+    ],
+    "n5-0162": [
+      "おとうさんはまいにちしんぶんをよみます。",
+      "My father reads the newspaper every day."
+    ],
+    "n5-0163": [
+      "おとうとはサッカーがすきです。",
+      "My younger brother likes soccer."
+    ],
+    "n5-0164": [
+      "おとうとさんはなんさいですか。",
+      "How old is your younger brother?"
+    ],
+    "n5-0165": [
+      "おとこのひとが5にんいます。",
+      "There are 5 men."
+    ],
+    "n5-0166": [
+      "おとこのこが3にんいます。",
+      "There are 3 boys."
+    ],
+    "n5-0167": [
+      "おとといともだちにあいました。",
+      "I met my friend the day before yesterday."
+    ],
+    "n5-0168": [
+      "おととしにほんにきました。",
+      "I came here two years ago."
+    ],
+    "n5-0169": [
+      "おとなは1,000えん、こどもは500えんです。",
+      "Adults are 1,000 yen and children are 500 yen."
+    ],
+    "n5-0170": [
+      "おなかがすきました。",
+      "I'm hungry."
+    ],
+    "n5-0171": [
+      "おなじいみのぶんはどれですか。",
+      "Which sentences have the same meaning?"
+    ],
+    "n5-0172": [
+      "おにいさんはなんさいですか。",
+      "How old is your older brother?"
+    ],
+    "n5-0173": [
+      "コンビニでおにぎりをふたつかいました。",
+      "I bought two rice balls at a convenience store."
+    ],
+    "n5-0174": [
+      "おねえさんはだいがくせいです。",
+      "My older sister is a university student."
+    ],
+    "n5-0175": [
+      "おばさんはいつにほんにきますか。",
+      "When will your aunt come to Japan?"
+    ],
+    "n5-0176": [
+      "おばあさんはなんさいですか。",
+      "How old is your grandmother?"
+    ],
+    "n5-0177": [
+      "おべんとうをつくります。",
+      "I will make a lunch box."
+    ],
+    "n5-0178": [
+      "アプリであたらしいことばをおぼえます。",
+      "Learn new words in the app."
+    ],
+    "n5-0179": [
+      "えきのなかのおみせでかいました。",
+      "I bought it at a shop inside the station."
+    ],
+    "n5-0180": [
+      "このノートパソコンはおもいです。",
+      "This laptop is heavy."
+    ],
+    "n5-0181": [
+      "おもしろいえいがをみました。",
+      "I watched an interesting movie."
+    ],
+    "n5-0182": [
+      "まいしゅうまつ500メートルおよぎます。",
+      "I swim 500 meters every weekend."
+    ],
+    "n5-0183": [
+      "つぎのえきででんしゃをおります。",
+      "Get off the train at the next station."
+    ],
+    "n5-0184": [
+      "かいぎは3じにおわります。",
+      "The meeting ends at 3 o'clock."
+    ],
+    "n5-0185": [
+      "おんがくがだいすきです。",
+      "I love music."
+    ],
+    "n5-0186": [
+      "わたしのオフィスにはおんなのひとが6にんいます。",
+      "There are 6 women in my office."
+    ],
+    "n5-0187": [
+      "おんなのこが3にんいます。",
+      "There are 3 girls."
+    ],
+    "n5-0188": [
+      "カレンダーの「か」はかようびです。",
+      "On a calendar, 'ka' stands for Tuesday."
+    ],
+    "n5-0189": [
+      "がいこくにいきたいです。",
+      "I want to go abroad."
+    ],
+    "n5-0190": [
+      "このまちにはがいこくじんがおおぜいいます。",
+      "Many foreigners live in this town."
+    ],
+    "n5-0191": [
+      "うちからかいしゃまで40ぷんぐらいです。",
+      "It's about 40 from our house to the company."
+    ],
+    "n5-0192": [
+      "かいだんでいきましょう。",
+      "Let's go up the stairs."
+    ],
+    "n5-0193": [
+      "これはテストのかいとうようしです。",
+      "This is the test answer sheet."
+    ],
+    "n5-0194": [
+      "スーパーでやさいをかいます。",
+      "I buy vegetables at the supermarket."
+    ],
+    "n5-0195": [
+      "くるまでかいものにいきます。",
+      "I'm going shopping by car."
+    ],
+    "n5-0196": [
+      "としょかんにほんをかえします。",
+      "Return the book to the library."
+    ],
+    "n5-0197": [
+      "タクシーでうちにかえります。",
+      "I'll take a taxi home."
+    ],
+    "n5-0198": [
+      "あのひとのかおをおぼえていますか。",
+      "Do you remember that person's face?"
+    ],
+    "n5-0199": [
+      "えきまであるいて10ぷんかかります。",
+      "It takes 10 minutes on foot to the station."
+    ],
+    "n5-0200": [
+      "うちにくるまのかぎをわすれました。",
+      "I forgot my car key at home."
+    ],
+    "n5-0201": [
+      "ノートになまえをかきます。",
+      "I write my name in the notebook."
+    ],
+    "n5-0202": [
+      "わたしはにほんごのがくせいです。",
+      "I am a student of Japanese."
+    ],
+    "n5-0203": [
+      "めがねをかけます。",
+      "I wear glasses."
+    ],
+    "n5-0204": [
+      "あとでかいしゃにでんわをかけます。",
+      "I'll call the company later."
+    ],
+    "n5-0205": [
+      "あめですから、かさをもちます。",
+      "It is raining, so I will take an umbrella."
+    ],
+    "n5-0206": [
+      "ともだちにほんをかします。",
+      "I lend a book to my friend."
+    ],
+    "n5-0207": [
+      "きょうはとてもかぜがつよいです。",
+      "It's very windy today."
+    ],
+    "n5-0208": [
+      "かぜをひきました。",
+      "I caught a cold."
+    ],
+    "n5-0209": [
+      "わたしのかぞくはよにんです。",
+      "There are four people in my family."
+    ],
+    "n5-0210": [
+      "かいしゃのかたとはなしました。",
+      "I talked to a person from the company."
+    ],
+    "n5-0211": [
+      "カタカナはむずかしくないです。",
+      "Katakana is not difficult."
+    ],
+    "n5-0212": [
+      "あるいてがっこうにいきます。",
+      "I will walk to school."
+    ],
+    "n5-0213": [
+      "つぎのかどをみぎにまがります。",
+      "Turn right at the next corner."
+    ],
+    "n5-0214": [
+      "かないはいまうちにいます。",
+      "My wife is at home now."
+    ],
+    "n5-0215": [
+      "ほんはかばんのなかです。",
+      "The book is inside the bag."
+    ],
+    "n5-0216": [
+      "テーブルのうえにかびんがあります。",
+      "There is a vase on the table."
+    ],
+    "n5-0217": [
+      "ぼうしをかぶります。",
+      "Put on a hat."
+    ],
+    "n5-0218": [
+      "かみを1まいください。",
+      "Please give me a piece of paper."
+    ],
+    "n5-0219": [
+      "あたらしいカメラをかいたいです。",
+      "I want to buy a new camera."
+    ],
+    "n5-0220": [
+      "かようびにテストがあります。",
+      "There is a test on Tuesday."
+    ],
+    "n5-0221": [
+      "からいたべものはだいじょうぶですか。",
+      "Is spicy food okay?"
+    ],
+    "n5-0222": [
+      "スポーツはからだにいいです。",
+      "Sports are good for you."
+    ],
+    "n5-0223": [
+      "としょかんでじしょをかります。",
+      "I borrow a dictionary from the library."
+    ],
+    "n5-0224": [
+      "このバッグはかるいです。",
+      "This bag is light."
+    ],
+    "n5-0225": [
+      "これはきょねんのカレンダーです。",
+      "This is last year's calendar."
+    ],
+    "n5-0226": [
+      "おおきいかわがあります。",
+      "There is a big river."
+    ],
+    "n5-0227": [
+      "こどもはかわいいです。",
+      "Children are cute."
+    ],
+    "n5-0228": [
+      "しゅうまつのよていをかんがえます。",
+      "I think about my weekend plans."
+    ],
+    "n5-0229": [
+      "かんじのべんきょうをしています。",
+      "I'm studying kanji."
+    ],
+    "n5-0230": [
+      "このもんだいはかんたんです。",
+      "This question is easy."
+    ],
+    "n5-0231": [
+      "にわにおおきいきがあります。",
+      "There is a big tree in the garden."
+    ],
+    "n5-0232": [
+      "きいろいマーカーでチェックします。",
+      "Check with the yellow marker."
+    ],
+    "n5-0233": [
+      "よるになると、へやのでんきがきえます。",
+      "The room light goes out at night."
+    ],
+    "n5-0234": [
+      "イヤホンでおんがくをききます。",
+      "Listen to music with earphones."
+    ],
+    "n5-0235": [
+      "きたはどちらですか。",
+      "Which direction is north?"
+    ],
+    "n5-0236": [
+      "ギターのれんしゅうをしています。",
+      "I'm practicing the guitar."
+    ],
+    "n5-0237": [
+      "このビルのトイレはきたないです。",
+      "The toilet in this building is dirty."
+    ],
+    "n5-0238": [
+      "えきのまえにふるいきっさてんがあります。",
+      "There is an old coffee shop in front of the station."
+    ],
+    "n5-0239": [
+      "ゆうびんきょくできってをかいました。",
+      "I bought a stamp at the post office."
+    ],
+    "n5-0240": [
+      "これはしんかんせんのきっぷです。",
+      "This is a Shinkansen ticket."
+    ],
+    "n5-0241": [
+      "きのう、えいがをみました。",
+      "I watched a movie yesterday."
+    ],
+    "n5-0242": [
+      "らいしゅうりょうしんがとうきょうにきます。",
+      "Next week, my parents will come to Tokyo."
+    ],
+    "n5-0243": [
+      "さむいですから、セーターをきます。",
+      "It's cold, so I'll wear a sweater."
+    ],
+    "n5-0244": [
+      "ほんをきゅうさつかりました。",
+      "I borrowed nine books."
+    ],
+    "n5-0245": [
+      "にほんでぎゅうにくはたかいです。",
+      "Beef is expensive in Japan."
+    ],
+    "n5-0246": [
+      "まいあさぎゅうにゅうをのみます。",
+      "I drink milk every morning."
+    ],
+    "n5-0247": [
+      "きょうはにほんごをべんきょうします。",
+      "I will study Japanese today."
+    ],
+    "n5-0248": [
+      "せんせいはきょうしつにいます。",
+      "The teacher is in the classroom."
+    ],
+    "n5-0249": [
+      "きょうだいがいますか。",
+      "Do you have any siblings?"
+    ],
+    "n5-0250": [
+      "おととしきょうとにいきました。",
+      "I went to Kyoto two years ago."
+    ],
+    "n5-0251": [
+      "きょねんにほんごのべんきょうをはじめました。",
+      "Last year, I started studying Japanese."
+    ],
+    "n5-0252": [
+      "なっとうがきらいです。",
+      "I hate natto."
+    ],
+    "n5-0253": [
+      "やさいをきります。",
+      "Cut the vegetables."
+    ],
+    "n5-0254": [
+      "このへやはきれいです。",
+      "This room is clean."
+    ],
+    "n5-0255": [
+      "カレンダーの「きん」はきんようびです。",
+      "On a calendar, 'kin' stands for Friday."
+    ],
+    "n5-0256": [
+      "ぎんこうはごごさんじまでです。",
+      "The bank is open until three p.m."
+    ],
+    "n5-0257": [
+      "きんようびにともだちとあいます。",
+      "I meet my friend on Friday."
+    ],
+    "n5-0258": [
+      "でんしゃはくじにきます。",
+      "The train comes at nine o'clock."
+    ],
+    "n5-0259": [
+      "しょくじのあとでくすりをのみます。",
+      "Take medicine after meals."
+    ],
+    "n5-0260": [
+      "よくくだものをたべます。",
+      "I often eat fruits."
+    ],
+    "n5-0261": [
+      "かれはくちがおおきいです。",
+      "He has a big mouth."
+    ],
+    "n5-0262": [
+      "あたらしいくつをかいました。",
+      "I bought new shoes."
+    ],
+    "n5-0263": [
+      "しろいくつしたをかいました。",
+      "I bought white socks."
+    ],
+    "n5-0264": [
+      "あしたこくにかえります。",
+      "Tomorrow, I will return to my country."
+    ],
+    "n5-0265": [
+      "きょうはくもりです。",
+      "It's cloudy today."
+    ],
+    "n5-0266": [
+      "このへやはくらいです。",
+      "This room is dark."
+    ],
+    "n5-0267": [
+      "しゅうまつはヨガのクラスにいきます。",
+      "I go to yoga classes on weekends."
+    ],
+    "n5-0268": [
+      "ちちはくるまでしごとへいきます。",
+      "My father goes to work by car."
+    ],
+    "n5-0269": [
+      "くろでかきます。",
+      "Write in black."
+    ],
+    "n5-0270": [
+      "くろいバッグが3つあります。",
+      "There are three black bags."
+    ],
+    "n5-0271": [
+      "くろくなりました。",
+      "It turned black."
+    ],
+    "n5-0272": [
+      "このケーキを4つください。",
+      "Please give me four of these cakes."
+    ],
+    "n5-0273": [
+      "けさは６じにおきました。",
+      "I got up at 6 o'clock this morning."
+    ],
+    "n5-0274": [
+      "けしゴムをかしてください。",
+      "Please lend me an eraser."
+    ],
+    "n5-0275": [
+      "でんきをけします。",
+      "Turn off the light."
+    ],
+    "n5-0276": [
+      "カレンダーの「げつ」はげつようびです。",
+      "On a calendar, 'getsu' stands for Monday."
+    ],
+    "n5-0277": [
+      "あねはらいねんけっこんします。",
+      "My older sister will get married next year."
+    ],
+    "n5-0278": [
+      "げつようびからしごとがはじまります。",
+      "Work starts on Monday."
+    ],
+    "n5-0279": [
+      "げんかんでくつをぬぎます。",
+      "Take off your shoes at the entrance."
+    ],
+    "n5-0280": [
+      "おげんきですか。",
+      "How are you?"
+    ],
+    "n5-0281": [
+      "ふじさんにごかいのぼりました。",
+      "I climbed Mt. Fuji five times."
+    ],
+    "n5-0282": [
+      "うちのちかくにこうえんがあります。",
+      "There is a park near my house."
+    ],
+    "n5-0283": [
+      "えきのまえにこうばんがあります。",
+      "There is a police box in front of the station."
+    ],
+    "n5-0284": [
+      "いいこえですね。",
+      "You have a good voice."
+    ],
+    "n5-0285": [
+      "さむいから、コートをきます。",
+      "It's cold, so I'll wear a coat."
+    ],
+    "n5-0286": [
+      "コーヒーを2はいのみました。",
+      "I drank two cups of coffee."
+    ],
+    "n5-0287": [
+      "ここはとしょかんです。",
+      "This place is the library."
+    ],
+    "n5-0288": [
+      "ごごさんじにあいましょう。",
+      "Let's meet at three p.m."
+    ],
+    "n5-0289": [
+      "きょうはここのかです。",
+      "Today is the 9th."
+    ],
+    "n5-0290": [
+      "ふくろのなかにりんごがここのつあります。",
+      "There are nine apples in the bag."
+    ],
+    "n5-0291": [
+      "ごしゅじんはいまどこにいますか。",
+      "Where is your husband now?"
+    ],
+    "n5-0292": [
+      "ごぜんはちじにおきます。",
+      "I get up at eight a.m."
+    ],
+    "n5-0293": [
+      "ここにこたえをかいてください。",
+      "Please write your answer here."
+    ],
+    "n5-0294": [
+      "こたえかたがわかりません。",
+      "I don't know how to answer."
+    ],
+    "n5-0295": [
+      "せんせいのしつもんにこたえます。",
+      "I answer the teacher's question."
+    ],
+    "n5-0296": [
+      "こちらはどなたですか。",
+      "Who is this?"
+    ],
+    "n5-0297": [
+      "テーブルのうえにコップがたくさんあります。",
+      "There are many cups on the table."
+    ],
+    "n5-0298": [
+      "ことし、にほんへいきたいです。",
+      "I want to go to Japan this year."
+    ],
+    "n5-0299": [
+      "たくさんことばをおぼえました。",
+      "I learned a lot of words."
+    ],
+    "n5-0300": [
+      "わたしはこどもが3にんいます。",
+      "I have 3 children."
+    ],
+    "n5-0301": [
+      "このほんはおもしろいです。",
+      "This book is interesting."
+    ],
+    "n5-0302": [
+      "かぞくとごはんをたべます。",
+      "I eat a meal with my family."
+    ],
+    "n5-0303": [
+      "コピーをもらってもいいですか。",
+      "May I get a copy?"
+    ],
+    "n5-0304": [
+      "このしりょうをコピーします。",
+      "I make a copy of this document."
+    ],
+    "n5-0305": [
+      "みちがわからなくて、こまります。",
+      "I am in trouble because I do not know the way."
+    ],
+    "n5-0306": [
+      "これはわたしのかさです。",
+      "This is my umbrella."
+    ],
+    "n5-0307": [
+      "こんげつはとてもいそがしいです。",
+      "This month is very busy."
+    ],
+    "n5-0308": [
+      "こんしゅうはあまりいそがしくないです。",
+      "I'm not very busy this week."
+    ],
+    "n5-0309": [
+      "こんなりょうりがすきです。",
+      "I like this kind of food."
+    ],
+    "n5-0310": [
+      "こんばん9じにうちにかえります。",
+      "I'll be back home tonight at 9 o'clock."
+    ],
+    "n5-0311": [
+      "レッスンのさいごにしゅくだいをあげます。",
+      "I will give you homework at the end of the lesson."
+    ],
+    "n5-0312": [
+      "ばんごはんにさかなをたべます。",
+      "I eat fish for dinner."
+    ],
+    "n5-0313": [
+      "おさきにどうぞ。",
+      "After you."
+    ],
+    "n5-0314": [
+      "はるにはいろいろなはながさきます。",
+      "Various flowers bloom in spring."
+    ],
+    "n5-0315": [
+      "さくぶんはいいれんしゅうです。",
+      "Writing is a good practice."
+    ],
+    "n5-0316": [
+      "あめですから、かさをさします。",
+      "It is raining, so I put up my umbrella."
+    ],
+    "n5-0317": [
+      "あしたはサッカーのしあいがあります。",
+      "Tomorrow there is a soccer game."
+    ],
+    "n5-0318": [
+      "このざっしのしゃしんはきれいです。",
+      "The photos in this magazine are beautiful."
+    ],
+    "n5-0319": [
+      "コーヒーにさとうをいれますか。",
+      "Would you like to add sugar to your coffee?"
+    ],
+    "n5-0320": [
+      "きょうはきのうよりさむいです。",
+      "It's colder today than yesterday."
+    ],
+    "n5-0321": [
+      "さらいねんににほんへいきます。",
+      "I will go to Japan the year after next."
+    ],
+    "n5-0322": [
+      "でんちをさんこいれます。",
+      "Insert three batteries."
+    ],
+    "n5-0323": [
+      "ちちとはははさんぽがすきです。",
+      "My father and mother like walking."
+    ],
+    "n5-0324": [
+      "ばんごはんのあとでさんぽします。",
+      "I take a walk after dinner.",
+      "さんぽします"
+    ],
+    "n5-0325": [
+      "しがつにがっこうがはじまります。",
+      "School starts in April, the fourth month."
+    ],
+    "n5-0326": [
+      "しおをすこしいれてください。",
+      "Please add a little salt."
+    ],
+    "n5-0327": [
+      "べんきょうしました。しかし、わすれました。",
+      "I studied. But I forgot."
+    ],
+    "n5-0328": [
+      "いま、じかんがありますか。",
+      "Do you have time now?"
+    ],
+    "n5-0329": [
+      "ちちはまいにちしごとへいきます。",
+      "My father goes to work every day."
+    ],
+    "n5-0330": [
+      "じしょでしらべました。",
+      "I looked it up in the dictionary."
+    ],
+    "n5-0331": [
+      "このカフェはしずかです。",
+      "This cafe is quiet."
+    ],
+    "n5-0332": [
+      "テーブルのしたにコンセントがあります。",
+      "There is an outlet under the table."
+    ],
+    "n5-0333": [
+      "しつもんがあります。",
+      "I have a question."
+    ],
+    "n5-0334": [
+      "じてんしゃでがっこうへいきます。",
+      "I go to school by bicycle."
+    ],
+    "n5-0335": [
+      "じどうしゃが5だいあります。",
+      "There are 5 cars."
+    ],
+    "n5-0336": [
+      "みずがないと、さかなはしにます。",
+      "Fish die without water."
+    ],
+    "n5-0337": [
+      "じしょとじびきはおなじです。",
+      "\"Jisho\" and \"Jibiki\" are the same."
+    ],
+    "n5-0338": [
+      "じぶんでつくりました。",
+      "I made it myself."
+    ],
+    "n5-0339": [
+      "あしたはなにをしますか。",
+      "What are you going to do tomorrow?"
+    ],
+    "n5-0340": [
+      "ドアがしまります。",
+      "The door closes."
+    ],
+    "n5-0341": [
+      "わたしはドアをしめます。",
+      "I close the door."
+    ],
+    "n5-0342": [
+      "いっしょにしゃしんをとりましょう。",
+      "Let's take a picture together."
+    ],
+    "n5-0343": [
+      "しろいシャツをかいました。",
+      "I bought a white shirt."
+    ],
+    "n5-0344": [
+      "まいあさシャワーをあびます。",
+      "I take a shower every morning."
+    ],
+    "n5-0345": [
+      "こんしゅうはとうきょうにいます。",
+      "I am in Tokyo this week."
+    ],
+    "n5-0346": [
+      "おとこのひとがじゅうにんいます。",
+      "There are ten men."
+    ],
+    "n5-0347": [
+      "オレンジジュースをください。",
+      "Please give me orange juice."
+    ],
+    "n5-0348": [
+      "きょうはにほんごのじゅぎょうがあります。",
+      "I have a Japanese class today."
+    ],
+    "n5-0349": [
+      "しゅくだいがたくさんあります。",
+      "I have a lot of homework."
+    ],
+    "n5-0350": [
+      "かのじょはにほんごがじょうずです。",
+      "She is good at Japanese."
+    ],
+    "n5-0351": [
+      "とてもじょうずにできましたね。",
+      "You did it very well."
+    ],
+    "n5-0352": [
+      "このスーツケースはじょうぶです。",
+      "This suitcase is durable."
+    ],
+    "n5-0353": [
+      "しょうゆをすこしいれます。",
+      "Add a little soy sauce."
+    ],
+    "n5-0354": [
+      "10かいにしょくどうがあります。",
+      "There is a dining room on the 10th floor."
+    ],
+    "n5-0355": [
+      "あした、テストのけっかをしります。",
+      "I will learn the test result tomorrow."
+    ],
+    "n5-0356": [
+      "しろいはなをかいました。",
+      "I bought a white flower."
+    ],
+    "n5-0357": [
+      "あさ、しんぶんをよみます。",
+      "I read the newspaper in the morning."
+    ],
+    "n5-0358": [
+      "カレンダーの「すい」はすいようびです。",
+      "On a calendar, 'sui' stands for Wednesday."
+    ],
+    "n5-0359": [
+      "たばこをすいますか。",
+      "Do you smoke?"
+    ],
+    "n5-0360": [
+      "すいようびにとしょかんへいきます。",
+      "I go to the library on Wednesday."
+    ],
+    "n5-0361": [
+      "ときどきスカートをはきます。",
+      "I wear a skirt sometimes."
+    ],
+    "n5-0362": [
+      "わたしはべんきょうがすきです。",
+      "I like studying."
+    ],
+    "n5-0363": [
+      "きょうはしゅくだいがすくないです。",
+      "I have less homework today."
+    ],
+    "n5-0364": [
+      "すぐにおわります。",
+      "It will end soon."
+    ],
+    "n5-0365": [
+      "すこしじかんをください。",
+      "Please give me some time."
+    ],
+    "n5-0366": [
+      "きのうすしをたべました。",
+      "I ate sushi yesterday."
+    ],
+    "n5-0367": [
+      "きのうはすしやにいきました。",
+      "Yesterday I went to a sushi restaurant."
+    ],
+    "n5-0368": [
+      "きょうはきのうよりすずしいです。",
+      "Today is cooler than yesterday."
+    ],
+    "n5-0369": [
+      "これはふるいストーブです。",
+      "This is an old stove."
+    ],
+    "n5-0370": [
+      "スプーンでカレーをたべます。",
+      "Eat curry with a spoon."
+    ],
+    "n5-0371": [
+      "なにかスポーツをしていますか。",
+      "Do you play any sports?"
+    ],
+    "n5-0372": [
+      "ズボンをはきます。",
+      "I wear pants."
+    ],
+    "n5-0373": [
+      "らいねんからとうきょうにすみます。",
+      "I will live in Tokyo starting next year."
+    ],
+    "n5-0374": [
+      "ここでスリッパをはきます。",
+      "I will put on my slippers here."
+    ],
+    "n5-0375": [
+      "ここにすわります。",
+      "I sit here."
+    ],
+    "n5-0376": [
+      "あのひとはとてもせがたかいです。",
+      "That person is very tall."
+    ],
+    "n5-0377": [
+      "わたしはMLCのせいとです。",
+      "I am a MLC student."
+    ],
+    "n5-0378": [
+      "このセーターはとてもあたたかいです。",
+      "This sweater is very warm."
+    ],
+    "n5-0379": [
+      "せっけんでよくてをあらいましょう。",
+      "Wash your hands thoroughly with soap."
+    ],
+    "n5-0380": [
+      "あのひとはいつもせびろをきています。",
+      "That person is always in a suit."
+    ],
+    "n5-0381": [
+      "わたしのへやはせまいです。",
+      "My room is small."
+    ],
+    "n5-0382": [
+      "これはカロリーゼロです。",
+      "This is zero calories."
+    ],
+    "n5-0383": [
+      "これはせんえんです。",
+      "This is a thousand yen."
+    ],
+    "n5-0384": [
+      "せんげつハワイにいきました。",
+      "I went to Hawaii last month."
+    ],
+    "n5-0385": [
+      "せんしゅうのきんようびにびょういんにいきました。",
+      "I went to the hospital last Friday."
+    ],
+    "n5-0386": [
+      "こちらはわたしのせんせいです。",
+      "This is my teacher."
+    ],
+    "n5-0387": [
+      "まいにちせんたくをします。",
+      "I will do the laundry every day."
+    ],
+    "n5-0388": [
+      "しゅくだいはぜんぶおわりました。",
+      "I've done all my homework."
+    ],
+    "n5-0389": [
+      "わたしはそうじがすきです。",
+      "I like cleaning."
+    ],
+    "n5-0390": [
+      "これからこのへやをそうじします。",
+      "I'm going to clean this room."
+    ],
+    "n5-0391": [
+      "そこにかばんがあります。",
+      "There is a bag there."
+    ],
+    "n5-0392": [
+      "ともだちにあいました。そして、すしやにいきました。",
+      "I met my friend. Then I went to a sushi restaurant."
+    ],
+    "n5-0393": [
+      "あしたそちらにいきます。",
+      "I will go there tomorrow."
+    ],
+    "n5-0394": [
+      "そとはすごいあめです。",
+      "It's raining a lot outside."
+    ],
+    "n5-0395": [
+      "そのかさはだれのですか。",
+      "Whose umbrella is that?"
+    ],
+    "n5-0396": [
+      "オフィスのそばのみせでかいました。",
+      "I bought it at a store near my office."
+    ],
+    "n5-0397": [
+      "きょうはそらがとてもきれいですね。",
+      "The sky is very beautiful today."
+    ],
+    "n5-0398": [
+      "それはなんですか。",
+      "What is that?"
+    ],
+    "n5-0399": [
+      "これをください。それから、これもください。",
+      "This one, please. Also, this one, please."
+    ],
+    "n5-0400": [
+      "それではつぎのページにいきましょう。",
+      "Now let's go to the next page."
+    ],
+    "n5-0401": [
+      "あねはだいがくへいきます。",
+      "My older sister goes to university."
+    ],
+    "n5-0402": [
+      "これからたいしかんにいきます。",
+      "I will go to the embassy from now on."
+    ],
+    "n5-0403": [
+      "しんぱいしないで。だいじょうぶです。",
+      "Don't worry. It's all right."
+    ],
+    "n5-0404": [
+      "チーズケーキがだいすきです。",
+      "I love cheesecake."
+    ],
+    "n5-0405": [
+      "これはとてもたいせつです。",
+      "This is very important."
+    ],
+    "n5-0406": [
+      "だいたいおなじいみです。",
+      "It has almost the same meaning."
+    ],
+    "n5-0407": [
+      "あさごはんはたいていパンとコーヒーです。",
+      "Breakfast is usually bread and coffee."
+    ],
+    "n5-0408": [
+      "かないとむすめはだいどころにいます。",
+      "My wife and daughter are in the kitchen."
+    ],
+    "n5-0409": [
+      "きのうはたいへんいそがしかったです。",
+      "It was very busy yesterday."
+    ],
+    "n5-0410": [
+      "かんじのべんきょうはたいへんです。",
+      "Studying kanji is hard."
+    ],
+    "n5-0411": [
+      "このとけいはたかいです。",
+      "This watch is expensive."
+    ],
+    "n5-0412": [
+      "あのビルはとてもたかいです。",
+      "That building is very tall."
+    ],
+    "n5-0413": [
+      "あしたはあめです。だから、うちにいます。",
+      "It will rain tomorrow. So I will stay home."
+    ],
+    "n5-0414": [
+      "きょうはたくさんしゅくだいがあります。",
+      "I have a lot of homework today."
+    ],
+    "n5-0415": [
+      "タクシーでいきましょう。",
+      "Let's go by taxi."
+    ],
+    "n5-0416": [
+      "バッグのなかからスマホをだします。",
+      "Take your smartphone out of the bag."
+    ],
+    "n5-0417": [
+      "ただしいぶんはどれですか。",
+      "Which is the correct sentence?"
+    ],
+    "n5-0418": [
+      "せんせいがきたので、たちます。",
+      "I stand up because the teacher arrived."
+    ],
+    "n5-0419": [
+      "たかいたてものがたくさんあります。",
+      "There are many tall buildings."
+    ],
+    "n5-0420": [
+      "ともだちとりょこうするのはたのしいです。",
+      "Traveling with friends is fun."
+    ],
+    "n5-0421": [
+      "たなかさんにこのしごとをたのみます。",
+      "I will ask Mr. Tanaka for this job."
+    ],
+    "n5-0422": [
+      "わたしはたばこをすいません。",
+      "I don't smoke."
+    ],
+    "n5-0423": [
+      "たぶんあしたはじかんがあります。",
+      "Maybe I have time tomorrow."
+    ],
+    "n5-0424": [
+      "コンビニでたべものとのみものをかいました。",
+      "I bought food and drinks at a convenience store."
+    ],
+    "n5-0425": [
+      "よくおすしをたべます。",
+      "I often eat sushi."
+    ],
+    "n5-0426": [
+      "たまごを10こかいました。",
+      "I bought 10 eggs."
+    ],
+    "n5-0427": [
+      "あのひとはだれですか。",
+      "Who is that person?"
+    ],
+    "n5-0428": [
+      "たんじょうびはいつですか。",
+      "When is your birthday."
+    ],
+    "n5-0429": [
+      "だんだんあたたかくなりました。",
+      "It's getting warmer and warmer."
+    ],
+    "n5-0430": [
+      "このかばんはちいさいです。",
+      "This bag is small."
+    ],
+    "n5-0431": [
+      "ちいさなさかながいます。",
+      "There is a small fish.",
+      "ちいさな"
+    ],
+    "n5-0432": [
+      "わたしのうちはえきからちかいです。",
+      "My house is close to the station."
+    ],
+    "n5-0433": [
+      "N5とN4はレベルがちがいます。",
+      "N5 and N4 have different levels."
+    ],
+    "n5-0434": [
+      "えきのちかくにコンビニがあります。",
+      "There is a convenience store near the station."
+    ],
+    "n5-0435": [
+      "ちかてつはとてもべんりです。",
+      "The subway is very convenient."
+    ],
+    "n5-0436": [
+      "ちずをみてチェックしましょう。",
+      "Let's check by looking at the map."
+    ],
+    "n5-0437": [
+      "ちちはエンジニアです。",
+      "My father is an engineer."
+    ],
+    "n5-0438": [
+      "わたしのさいふはちゃいろです。",
+      "My wallet is brown."
+    ],
+    "n5-0439": [
+      "きれいなちゃわんとおはしをかいました。",
+      "I bought a beautiful bowl and chopsticks."
+    ],
+    "n5-0440": [
+      "いま3じちょうどです。",
+      "It's just 3 o'clock now."
+    ],
+    "n5-0441": [
+      "すみません。ここでちょっとまってください。",
+      "Excuse me. Please wait a moment here."
+    ],
+    "n5-0442": [
+      "たんじょうびは３がつついたちです。",
+      "Birthday is March 1st."
+    ],
+    "n5-0443": [
+      "しごとでまいにちにほんごをつかいます。",
+      "I use Japanese every day at work."
+    ],
+    "n5-0444": [
+      "たくさんあるくと、つかれます。",
+      "I get tired when I walk a lot."
+    ],
+    "n5-0445": [
+      "つぎのかどをみぎにまがってください。",
+      "Turn right at the next corner."
+    ],
+    "n5-0446": [
+      "3じはんになりたくうこうにつきます。",
+      "I will arrive at Narita Airport at 3:30."
+    ],
+    "n5-0447": [
+      "つくえのうえにほんがたくさんあります。",
+      "There are many books on the desk."
+    ],
+    "n5-0448": [
+      "このりょうりのつくりかたをしりたいです。",
+      "I want to know how to make this dish."
+    ],
+    "n5-0449": [
+      "ばんごはんをつくります。",
+      "I make dinner."
+    ],
+    "n5-0450": [
+      "このリモコンでエアコンをつけます。",
+      "Turn on the air conditioner with this remote control."
+    ],
+    "n5-0451": [
+      "ちちはぎんこうにつとめます。",
+      "My father works for a bank."
+    ],
+    "n5-0452": [
+      "このえいがはつまらないです。",
+      "This movie is boring."
+    ],
+    "n5-0453": [
+      "つめたいのみのもはいかがですか。",
+      "How about a cold drink?"
+    ],
+    "n5-0454": [
+      "きょうはとてもかぜがつよいです。",
+      "It's very windy today."
+    ],
+    "n5-0455": [
+      "てをみせてください。",
+      "Please show me your hand."
+    ],
+    "n5-0456": [
+      "ティッシュペーパーをいちまいください。",
+      "Please give me a piece of tissue paper."
+    ],
+    "n5-0457": [
+      "ここにテープをはってください。",
+      "Please stick the tape here."
+    ],
+    "n5-0458": [
+      "テープレコーダーはいまはありません。",
+      "There is no tape recorder now."
+    ],
+    "n5-0459": [
+      "このテーブルをつかってもいいですか。",
+      "Can I use this table?"
+    ],
+    "n5-0460": [
+      "にちようびにかぞくとでかけます。",
+      "I go out with my family on Sunday."
+    ],
+    "n5-0461": [
+      "よくメールはしますが、てがみはかきません。",
+      "I often email, but I don't write letters."
+    ],
+    "n5-0462": [
+      "わたしはちゅうごくごとかんこくごもできます。",
+      "I can also speak Chinese and Korean."
+    ],
+    "n5-0463": [
+      "でぐちはみぎです。",
+      "The exit is on the right."
+    ],
+    "n5-0464": [
+      "あしたはかんじのテストがあります。",
+      "Tomorrow I have a kanji test."
+    ],
+    "n5-0465": [
+      "では、きょうのレッスンをおわりましょう。",
+      "So let's finish today's lesson."
+    ],
+    "n5-0466": [
+      "デパートにかいものにいきました。",
+      "I went shopping at a department store."
+    ],
+    "n5-0467": [
+      "あしたはあさ7じにうちをでます。",
+      "I will leave home at 7 am tomorrow."
+    ],
+    "n5-0468": [
+      "にちようびです。でも、うちでしごとをします。",
+      "It's Sunday. But I do work at home."
+    ],
+    "n5-0469": [
+      "テレビでそのニュースをみました。",
+      "I saw the news on TV."
+    ],
+    "n5-0470": [
+      "きょうはとてもいいてんきですね。",
+      "It's a very nice weather today."
+    ],
+    "n5-0471": [
+      "でんきをつけてもいいですか。",
+      "Can I turn on the light?"
+    ],
+    "n5-0472": [
+      "でんしゃでだいがくへいきます。",
+      "I go to university by train."
+    ],
+    "n5-0473": [
+      "あとででんわをかけます。",
+      "I will call you later."
+    ],
+    "n5-0474": [
+      "たまにかぞくにでんわします。",
+      "I call my family once in a while."
+    ],
+    "n5-0475": [
+      "ここにでんわばんごうをかいてください。",
+      "Please write your phone number here."
+    ],
+    "n5-0476": [
+      "とがあいています。",
+      "The door is open."
+    ],
+    "n5-0477": [
+      "5がつ16にち（ど）ににほんにいきます。",
+      "I will go to Japan on Saturday, May 16th."
+    ],
+    "n5-0478": [
+      "みぎがわのドアがあきます。",
+      "The door on the right opens."
+    ],
+    "n5-0479": [
+      "すみません、トイレはどこですか。",
+      "Excuse me, where is the restroom?"
+    ],
+    "n5-0480": [
+      "トイレットペーパーがありません！",
+      "There is no toilet paper!"
+    ],
+    "n5-0481": [
+      "きのうのテストはどうでしたか。",
+      "How was your test yesterday?"
+    ],
+    "n5-0482": [
+      "とうきょうはおもしろいところですね。",
+      "Tokyo is an interesting place, isn't it?"
+    ],
+    "n5-0483": [
+      "どうしてきのうやすみましたか。",
+      "Why did you take a day off yesterday?"
+    ],
+    "n5-0484": [
+      "とうふをたべたことがありますか。",
+      "Have you ever eaten tofu?"
+    ],
+    "n5-0485": [
+      "どうぶつえんにいろいろなどうぶつがいます。",
+      "There are many kinds of animals at the zoo."
+    ],
+    "n5-0486": [
+      "みかんをとおください。",
+      "Please give me ten mandarins."
+    ],
+    "n5-0487": [
+      "えきはここからすこしとおいです。",
+      "The station is a little far from here."
+    ],
+    "n5-0488": [
+      "りょうしんはとおくにすんでいます。",
+      "My parents live far away."
+    ],
+    "n5-0489": [
+      "とおかにテストがあります。",
+      "There is a test on the tenth."
+    ],
+    "n5-0490": [
+      "ときどきじぶんでりょうりをつくります。",
+      "Sometimes I cook myself."
+    ],
+    "n5-0491": [
+      "このとけいはたかいです。",
+      "This watch is expensive."
+    ],
+    "n5-0492": [
+      "えきはどこですか。",
+      "Where is the station?"
+    ],
+    "n5-0493": [
+      "どこかでランチをたべませんか。",
+      "Would you like to have lunch somewhere?"
+    ],
+    "n5-0494": [
+      "どんなところにすみたいですか。",
+      "What kind of place do you want to live in?"
+    ],
+    "n5-0495": [
+      "としょかんでほんをよみます。",
+      "I read books at the library."
+    ],
+    "n5-0496": [
+      "えきはどちらですか。",
+      "Which way is the station?"
+    ],
+    "n5-0497": [
+      "きょうはとてもたのしかったです。",
+      "I had a lot of fun today."
+    ],
+    "n5-0498": [
+      "このしゃしんのひとはどなたですか。",
+      "Who is the person in this photo?"
+    ],
+    "n5-0499": [
+      "となりにすわってもいいですか。",
+      "Can I sit next to you?"
+    ],
+    "n5-0500": [
+      "どのくるまがあなたのですか。",
+      "Which car is yours?"
+    ],
+    "n5-0501": [
+      "そらをとりがとびます。",
+      "A bird flies through the sky."
+    ],
+    "n5-0502": [
+      "このでんしゃはしぶやえきにとまりますか。",
+      "Does this train stop at Shibuya Station?"
+    ],
+    "n5-0503": [
+      "ユキさんはわたしのともだちです。",
+      "Yuki is my friend."
+    ],
+    "n5-0504": [
+      "どようびはしごとをやすみます。",
+      "I take Saturday off work."
+    ],
+    "n5-0505": [
+      "きのうえにちいさいとりがたくさんいます。",
+      "There are many small birds on the tree."
+    ],
+    "n5-0506": [
+      "とりにくをよくたべます。",
+      "I often eat chicken."
+    ],
+    "n5-0507": [
+      "つくえのうえのペンをとります。",
+      "I take the pen from the desk."
+    ],
+    "n5-0508": [
+      "こうえんでしゃしんをとります。",
+      "I take photographs in the park."
+    ],
+    "n5-0509": [
+      "あなたのかばんはどれですか。",
+      "Which one is your bag?"
+    ],
+    "n5-0510": [
+      "どんなものをたべたいですか。",
+      "What kind of food do you want to eat?"
+    ],
+    "n5-0511": [
+      "フォークとナイフでステーキをたべます。",
+      "I eat steak with a fork and knife."
+    ],
+    "n5-0512": [
+      "ポケットのなかにティッシュがあります。",
+      "There is tissue in my pocket."
+    ],
+    "n5-0513": [
+      "このえいがはとてもながいです。",
+      "This movie is very long."
+    ],
+    "n5-0514": [
+      "ねこが「にゃあ」となきます。",
+      "The cat meows."
+    ],
+    "n5-0515": [
+      "いちねんのなかでなつがいちばんすきです。",
+      "I like summer the best of the year."
+    ],
+    "n5-0516": [
+      "バッグのなかにスマホやサイフなどがあります。",
+      "There are smartphones, wallets and other things in the bag."
+    ],
+    "n5-0517": [
+      "このドーナツをななつください。",
+      "7 of these donuts, please."
+    ],
+    "n5-0518": [
+      "これはなにですか。",
+      "What is this?"
+    ],
+    "n5-0519": [
+      "なにかのみますか。",
+      "Would you like something to drink?"
+    ],
+    "n5-0520": [
+      "きょうはなのかです。",
+      "Today is the seventh."
+    ],
+    "n5-0521": [
+      "あなたのなまえはなんですか。",
+      "What is your name?"
+    ],
+    "n5-0522": [
+      "せんせいににほんごをならいます。",
+      "I learn Japanese from a teacher."
+    ],
+    "n5-0523": [
+      "いりぐちのまえにならびます。",
+      "We line up in front of the entrance."
+    ],
+    "n5-0524": [
+      "テーブルのうえにおさらを５まいならべます。",
+      "I line up five dishes on the table."
+    ],
+    "n5-0525": [
+      "こどもはらいげつ5さいになります。",
+      "My child will be 5 years old next month."
+    ],
+    "n5-0526": [
+      "このスイッチはなんですか。",
+      "What is this switch?"
+    ],
+    "n5-0527": [
+      "あしたはなんじにどこであいましょうか。",
+      "What time and where will we meet tomorrow?"
+    ],
+    "n5-0528": [
+      "きょうはなんにちですか。",
+      "What day is it today?"
+    ],
+    "n5-0529": [
+      "さん、に、いちスタート！",
+      "Three, two, one start!"
+    ],
+    "n5-0530": [
+      "このまちはにぎやかです。",
+      "This town is lively."
+    ],
+    "n5-0531": [
+      "きょうはにくをたべません。",
+      "I will not eat meat today."
+    ],
+    "n5-0532": [
+      "にしはこっちです。",
+      "West is this direction."
+    ],
+    "n5-0533": [
+      "たんじょうびは5がつ17にちです。",
+      "My birthday is May 17th."
+    ],
+    "n5-0534": [
+      "にちようびはうちでやすみます。",
+      "I rest at home on Sunday."
+    ],
+    "n5-0535": [
+      "わたしはにほんにきてもうにねんです。",
+      "I have been in Japan for two years now."
+    ],
+    "n5-0536": [
+      "らいねん、にほんへいきます。",
+      "I will go to Japan next year."
+    ],
+    "n5-0537": [
+      "わたしはにほんごをべんきょうしています。",
+      "I am studying Japanese."
+    ],
+    "n5-0538": [
+      "ここににもつをおいてもいいですか。",
+      "Can I put my luggage here?"
+    ],
+    "n5-0539": [
+      "よくインターネットでニュースをみます。",
+      "I often watch the news on the internet."
+    ],
+    "n5-0540": [
+      "にわにいぬが2ひきいます。",
+      "There are two dogs in the yard."
+    ],
+    "n5-0541": [
+      "いつもここでくつをぬぎます。",
+      "I always take off my shoes here."
+    ],
+    "n5-0542": [
+      "テーブルをしろくぬります。",
+      "I paint the table white."
+    ],
+    "n5-0543": [
+      "わたしはネクタイが30ぽんぐらいあります。",
+      "I have about 30 ties."
+    ],
+    "n5-0544": [
+      "いつも12じごろにねます。",
+      "I always go to bed around 12 o'clock."
+    ],
+    "n5-0545": [
+      "ノートになまえをかきます。",
+      "I write my name in the notebook."
+    ],
+    "n5-0546": [
+      "なつにともだちとふじさんにのぼります。",
+      "I will climb Mt. Fuji with my friends this summer."
+    ],
+    "n5-0547": [
+      "まいにちコーヒーを３ばいぐらいのみます。",
+      "I drink about 3 cups of coffee every day."
+    ],
+    "n5-0548": [
+      "のみものはなにがいいですか。",
+      "What do you like for a drink?"
+    ],
+    "n5-0549": [
+      "うちのちかくからえきまでバスにのります。",
+      "I take a bus from near my house to the station."
+    ],
+    "n5-0550": [
+      "きょうはすこしはがいたいです。",
+      "I have a slight toothache today."
+    ],
+    "n5-0551": [
+      "こんばんともだちのうちでパーティーがあります。",
+      "I have a party at my friend's house tonight."
+    ],
+    "n5-0552": [
+      "すみません。はいざらがありますか。",
+      "Excuse me. Do you have an ashtray?"
+    ],
+    "n5-0553": [
+      "へやにはいります。",
+      "I enter the room."
+    ],
+    "n5-0554": [
+      "ゆうびんきょくではがきを10まいかいました。",
+      "I bought ten postcards at the post office."
+    ],
+    "n5-0555": [
+      "いつもここでくつをはきます。",
+      "I always put on shoes here."
+    ],
+    "n5-0556": [
+      "はこのなかにくるまのかぎがあります。",
+      "There is a car key in the box."
+    ],
+    "n5-0557": [
+      "おはしでおすしをたべます。",
+      "I eat sushi with chopsticks.",
+      "おはし"
+    ],
+    "n5-0558": [
+      "あのおおきいはしをあるいてわたります。",
+      "I walk across a large bridge."
+    ],
+    "n5-0559": [
+      "らいしゅうからにほんごのレッスンがはじまります。",
+      "Japanese lessons will start next week."
+    ],
+    "n5-0560": [
+      "はじめにひらがなとカタカナをべんきょうしました。",
+      "First, I studied hiragana and katakana."
+    ],
+    "n5-0561": [
+      "きょねんはじめてふじさんをみました。",
+      "I saw Mt. Fuji for the first time last year."
+    ],
+    "n5-0562": [
+      "まいあさ、バスにのります。",
+      "I take the bus every morning."
+    ],
+    "n5-0563": [
+      "バスがいしゃにでんわします。",
+      "I call the bus company."
+    ],
+    "n5-0564": [
+      "このちかくにバスていがありますか。",
+      "Is there a bus stop near here?"
+    ],
+    "n5-0565": [
+      "わたしのちちとはははバスりょこうがすきです。",
+      "My dad and mom love bus trips."
+    ],
+    "n5-0566": [
+      "パンにバターをぬります。",
+      "I spread butter on bread."
+    ],
+    "n5-0567": [
+      "おとうとはらいげつはたちになります。",
+      "My brother will be 20 next month."
+    ],
+    "n5-0568": [
+      "こんしゅうはしゅうまつもはたらきます。",
+      "This week I also work on weekends."
+    ],
+    "n5-0569": [
+      "はちにんでりょこうにいきました。",
+      "I went on a trip with 8 people."
+    ],
+    "n5-0570": [
+      "きょうははつかです。",
+      "Today is the 20th."
+    ],
+    "n5-0571": [
+      "わたしははながひくいです。",
+      "I have a low nose."
+    ],
+    "n5-0572": [
+      "きれいなはなをたくさんかいました。",
+      "I bought a lot of beautiful flowers."
+    ],
+    "n5-0573": [
+      "せんせいからおもしろいはなしをききました。",
+      "I heard an interesting story from the teacher."
+    ],
+    "n5-0574": [
+      "よくともだちとにほんごをはなします。",
+      "I often speak Japanese with my friends."
+    ],
+    "n5-0575": [
+      "ときどきははにメールします。",
+      "I email my mother sometimes."
+    ],
+    "n5-0576": [
+      "あさ4じはんははやいです。",
+      "4:30 in the morning is early."
+    ],
+    "n5-0577": [
+      "このコンピュータははやいです。",
+      "This computer is fast."
+    ],
+    "n5-0578": [
+      "はながすきですから、はるがすきです。",
+      "I like spring because I like flowers."
+    ],
+    "n5-0579": [
+      "ふうとうにきってをはります。",
+      "I put a stamp on the envelope."
+    ],
+    "n5-0580": [
+      "あしたはたぶんはれです。",
+      "It will probably be sunny tomorrow."
+    ],
+    "n5-0581": [
+      "ごごはたぶんはれます。",
+      "It will probably be sunny in the afternoon."
+    ],
+    "n5-0582": [
+      "あしたのばんともだちにあいます。",
+      "I'll see my friends tomorrow night."
+    ],
+    "n5-0583": [
+      "あさはふつうパンをたべます。",
+      "I usually eat bread in the morning."
+    ],
+    "n5-0584": [
+      "ポケットのなかにハンカチがあります。",
+      "There is a handkerchief in my pocket."
+    ],
+    "n5-0585": [
+      "でんわばんごうはなんばんですか。",
+      "What is your telephone number?"
+    ],
+    "n5-0586": [
+      "こんばんはうちでばんごはんをたべます。",
+      "I'll have dinner at home tonight."
+    ],
+    "n5-0587": [
+      "きのうのよるはんぶんだけしゅくだいをしました。",
+      "I did my homework only half last night."
+    ],
+    "n5-0588": [
+      "えきのなかにおいしいパンやがあります。",
+      "There is a delicious bakery inside the station."
+    ],
+    "n5-0589": [
+      "ふゆはひがみじかいです。",
+      "The days are short in winter."
+    ],
+    "n5-0590": [
+      "ひがしはあっちです。",
+      "East is that direction."
+    ],
+    "n5-0591": [
+      "おかねをいれて、レバーをひきます。",
+      "Put some money and pull the lever."
+    ],
+    "n5-0592": [
+      "ときどきギターをひきます。",
+      "I play the guitar sometimes."
+    ],
+    "n5-0593": [
+      "いもうとはせがひくいです。",
+      "My sister is short."
+    ],
+    "n5-0594": [
+      "ひこうきのよやくをしました。",
+      "I made a reservation for an airplane."
+    ],
+    "n5-0595": [
+      "ぎんこうはえきのひだりです。",
+      "The bank is to the left of the station."
+    ],
+    "n5-0596": [
+      "あのひとはだれですか。",
+      "Who is that person?"
+    ],
+    "n5-0597": [
+      "すみません。これをひとつください。",
+      "Excuse me. Please give me this one."
+    ],
+    "n5-0598": [
+      "ひとつきにほんにいました。",
+      "I was in Japan for one month."
+    ],
+    "n5-0599": [
+      "ことしのなつはひとりでりょこうにいきます。",
+      "I'm going on a trip alone this summer."
+    ],
+    "n5-0600": [
+      "こんしゅうまつはひまです。",
+      "I'm free this weekend."
+    ],
+    "n5-0601": [
+      "これはどれでもひとつひゃくえんです。",
+      "Each one costs 100 yen."
+    ],
+    "n5-0602": [
+      "つきに１かいびょういんにいきます。",
+      "I go to the hospital once a month."
+    ],
+    "n5-0603": [
+      "はははいまびょうきです。",
+      "My mother is sick now."
+    ],
+    "n5-0604": [
+      "ひらがなでかきます。",
+      "I write in hiragana."
+    ],
+    "n5-0605": [
+      "ひるにともだちとごはんをたべます。",
+      "I eat lunch with a friend at noon."
+    ],
+    "n5-0606": [
+      "たかいビルがたくさんあります。",
+      "There are many tall buildings."
+    ],
+    "n5-0607": [
+      "ともだちとひるごはんをたべました。",
+      "I ate lunch with my friends."
+    ],
+    "n5-0608": [
+      "このへやはとてもひろいです。",
+      "This room is very large."
+    ],
+    "n5-0609": [
+      "カメラにフィルムをいれます。",
+      "I put the film in the camera."
+    ],
+    "n5-0610": [
+      "ふうとうのなかにチケットをいれます。",
+      "I put the ticket in the envelope."
+    ],
+    "n5-0611": [
+      "きのうプールで1,000メートルおよぎました。",
+      "I swam 1,000 meters in the pool yesterday."
+    ],
+    "n5-0612": [
+      "フォークとナイフでステーキをたべます。",
+      "I eat steak with a fork and knife."
+    ],
+    "n5-0613": [
+      "きょうはつよいかぜがふきます。",
+      "A strong wind blows today."
+    ],
+    "n5-0614": [
+      "あたらしいふくをたくさんかいました。",
+      "I bought a lot of new clothes."
+    ],
+    "n5-0615": [
+      "このパンをふたつください。",
+      "Please give me two of these breads."
+    ],
+    "n5-0616": [
+      "わたしはぶたにくをたべません。",
+      "I don't eat pork."
+    ],
+    "n5-0617": [
+      "わたしはこどもがふたりいます。",
+      "I have two children."
+    ],
+    "n5-0618": [
+      "ふつかにテストがあります。",
+      "There is a test on the second."
+    ],
+    "n5-0619": [
+      "ふといペンでじゅうしょをかきます。",
+      "I write my address with a thick pen."
+    ],
+    "n5-0620": [
+      "まいとしふゆにスキーにいきます。",
+      "I go skiing every winter."
+    ],
+    "n5-0621": [
+      "たぶんこんばんはあめがふります。",
+      "Maybe it will rain tonight."
+    ],
+    "n5-0622": [
+      "これはふるいカメラです。",
+      "This is an old camera."
+    ],
+    "n5-0623": [
+      "まいにちおふろにはいります。",
+      "I take a bath every day."
+    ],
+    "n5-0624": [
+      "みじかいぶんをかいてください。",
+      "Please write a short sentence."
+    ],
+    "n5-0625": [
+      "このぶんしょうをよんでください。",
+      "Please read this passage."
+    ],
+    "n5-0626": [
+      "53ページをよんでください。",
+      "Please read page 53."
+    ],
+    "n5-0627": [
+      "わたしはうたがへたです。",
+      "I'm not good at singing."
+    ],
+    "n5-0628": [
+      "ベッドのしたにねこがいます。",
+      "There is a cat under the bed."
+    ],
+    "n5-0629": [
+      "このへやはひろいですね。",
+      "This room is large."
+    ],
+    "n5-0630": [
+      "このへんにATMがありますか。",
+      "Is there an ATM near here?"
+    ],
+    "n5-0631": [
+      "このペンをつかってください。",
+      "Please use this pen."
+    ],
+    "n5-0632": [
+      "まいにちうちでにほんごをべんきょうします。",
+      "I will study Japanese at home every day."
+    ],
+    "n5-0633": [
+      "このアプリはとてもべんりです。",
+      "This app is very useful."
+    ],
+    "n5-0634": [
+      "ふゆよりなつのほうがすきです。",
+      "I like summer better than winter."
+    ],
+    "n5-0635": [
+      "あかいぼうしをかぶります。",
+      "I wear a red hat."
+    ],
+    "n5-0636": [
+      "ボールペンをもっていますか。",
+      "Do you have a ballpoint pen?"
+    ],
+    "n5-0637": [
+      "ほかのひはどうですか。",
+      "How about the other day?"
+    ],
+    "n5-0638": [
+      "ぼくは13さいです。",
+      "I am 13 years old."
+    ],
+    "n5-0639": [
+      "ポケットのなかにけいたいでんわがあります。",
+      "I have a mobile phone in my pocket."
+    ],
+    "n5-0640": [
+      "あたらしいカメラがほしいです。",
+      "I want a new camera."
+    ],
+    "n5-0641": [
+      "ほそいペンでイラストをかきます。",
+      "Draw an illustration with a thin pen."
+    ],
+    "n5-0642": [
+      "このシャツはボタンがひとつありません。",
+      "This shirt doesn't have one button."
+    ],
+    "n5-0643": [
+      "ホテルでおいしいひるごはんをたべました。",
+      "I had a delicious lunch at the hotel."
+    ],
+    "n5-0644": [
+      "まいばん、ほんをよみます。",
+      "I read a book every night."
+    ],
+    "n5-0645": [
+      "ほんだなにほんが200さつぐらいあります。",
+      "There are about 200 books on the bookshelf."
+    ],
+    "n5-0646": [
+      "ほんとうですか。しりませんでした。",
+      "Is it true? I did not know that."
+    ],
+    "n5-0647": [
+      "５かいにおおきいほんやがあります。",
+      "There is a large bookstore on the 5th floor."
+    ],
+    "n5-0648": [
+      "まいあさコーヒーを２はいのみます。",
+      "I drink two cups of coffee every morning."
+    ],
+    "n5-0649": [
+      "まいつきホンコンにしゅっちょうします。",
+      "I go on a business trip to Hong Kong every month.",
+      "まいつき"
+    ],
+    "n5-0650": [
+      "まいしゅうげつようびにジムにいきます。",
+      "I I go to the gym in my neighborhood every week."
+    ],
+    "n5-0651": [
+      "へいじつはまいにち7じはんにおきます。",
+      "I wake up at 7:30am every weekday."
+    ],
+    "n5-0652": [
+      "まいとし８がつと12がつにりょこうをします。",
+      "I travel every August and December.",
+      "まいとし"
+    ],
+    "n5-0653": [
+      "まいばん、ほんをよんでからねます。",
+      "Every night, I read a book before sleeping."
+    ],
+    "n5-0654": [
+      "しごとのまえにコーヒーをのみます。",
+      "I drink coffee before work."
+    ],
+    "n5-0655": [
+      "２つめのかどをみぎにまがります。",
+      "Turn right at the second corner."
+    ],
+    "n5-0656": [
+      "このりょうりはほんとうにまずいです。",
+      "This dish is really bad."
+    ],
+    "n5-0657": [
+      "じゃ、またらいしゅう！",
+      "Then, see you next week!"
+    ],
+    "n5-0658": [
+      "しゅくだいはまだおわっていません。",
+      "I have not finished my homework yet."
+    ],
+    "n5-0659": [
+      "わたしたちはこのまちがすきです。",
+      "We like this town."
+    ],
+    "n5-0660": [
+      "ここでタクシーをまちます。",
+      "I'll wait for a taxi here."
+    ],
+    "n5-0661": [
+      "このみちをまっすぐいってください。",
+      "Please go straight along this road."
+    ],
+    "n5-0662": [
+      "たぶんうちにマッチはありません。",
+      "There is probably no match at home."
+    ],
+    "n5-0663": [
+      "このまどをあけてもいいですか。",
+      "Is it okay to open this window?"
+    ],
+    "n5-0664": [
+      "まるいテーブルをかいたいです。",
+      "I want to buy a round table."
+    ],
+    "n5-0665": [
+      "このタブレットは5まんえんでかいました。",
+      "I bought this tablet for 50,000 yen."
+    ],
+    "n5-0666": [
+      "たかいまんねんひつを３ぼんもっています。",
+      "I have three expensive fountain pens."
+    ],
+    "n5-0667": [
+      "しょくじのあとではをみがきます。",
+      "I will brush after the meal."
+    ],
+    "n5-0668": [
+      "つぎのかどをみぎにまがってください。",
+      "Please turn right at the next corner."
+    ],
+    "n5-0669": [
+      "みじかいえいがを３ぼんみました。",
+      "I watched 3 short movies."
+    ],
+    "n5-0670": [
+      "まいあさ、みずをのみます。",
+      "I drink water every morning."
+    ],
+    "n5-0671": [
+      "このみせはやすいです。",
+      "This shop is inexpensive."
+    ],
+    "n5-0672": [
+      "いりぐちでチケットをみせます。",
+      "I will show them the ticket at the entrance."
+    ],
+    "n5-0673": [
+      "このみちをまっすぐいってください。",
+      "Please go straight on this road."
+    ],
+    "n5-0674": [
+      "きょうはみっかです。",
+      "Today is the 3rd."
+    ],
+    "n5-0675": [
+      "このふくはポケットがみっつあります。",
+      "This cloth has three pockets."
+    ],
+    "n5-0676": [
+      "みなさん、こんにちは。",
+      "Hello everyone."
+    ],
+    "n5-0677": [
+      "みなみはこっちです。",
+      "South is this direction."
+    ],
+    "n5-0678": [
+      "よくネットでえいがをみます。",
+      "I often watch movies online."
+    ],
+    "n5-0679": [
+      "わたしはみみがちいさいです。",
+      "I have small ears."
+    ],
+    "n5-0680": [
+      "これはみんな100えんです。",
+      "This is all 100 yen."
+    ],
+    "n5-0681": [
+      "きょうはむいかです。",
+      "Today is the 6th."
+    ],
+    "n5-0682": [
+      "だんせいのおてあらいはむこうです。",
+      "Men's restrooms are over there."
+    ],
+    "n5-0683": [
+      "このもんだいはとてもむずかしいです。",
+      "This question is very difficult."
+    ],
+    "n5-0684": [
+      "たまごをむっつかいました。",
+      "I bought six eggs."
+    ],
+    "n5-0685": [
+      "わたしはめがあまりよくないです。",
+      "My eyes are not very good."
+    ],
+    "n5-0686": [
+      "ここからえきまで100メートルぐらいです。",
+      "It is about 100 meters from here to Eki."
+    ],
+    "n5-0687": [
+      "ポケットのなかにめがねがあります。",
+      "I have glasses in my pocket."
+    ],
+    "n5-0688": [
+      "バッグのなかにメモがあります。",
+      "There is a note in my bag."
+    ],
+    "n5-0689": [
+      "たいせつなことをメモします。",
+      "I make a note of the important point."
+    ],
+    "n5-0690": [
+      "もうおわりました。",
+      "It's already over."
+    ],
+    "n5-0691": [
+      "もういちどゆっくりいってください。",
+      "Please say slowly again."
+    ],
+    "n5-0692": [
+      "カレンダーの「もく」はもくようびです。",
+      "On a calendar, 'moku' stands for Thursday."
+    ],
+    "n5-0693": [
+      "もくようびにびょういんへいきます。",
+      "I go to the hospital on Thursday."
+    ],
+    "n5-0694": [
+      "でんわにでて「もしもし」といいます。",
+      "I answer the phone and say 'hello.'"
+    ],
+    "n5-0695": [
+      "はい、もちろん。",
+      "Yes of course."
+    ],
+    "n5-0696": [
+      "りょこうにかさをもちます。",
+      "I take an umbrella on the trip."
+    ],
+    "n5-0697": [
+      "パーティーになにをもっていきますか。",
+      "What are you going to take to the party?"
+    ],
+    "n5-0698": [
+      "もっとおおきいこえではなしてください。",
+      "Please speak louder."
+    ],
+    "n5-0699": [
+      "いちばんいいものをえらんでください。",
+      "Please choose the best one."
+    ],
+    "n5-0700": [
+      "ともだちからてがみをもらいます。",
+      "I receive a letter from my friend."
+    ],
+    "n5-0701": [
+      "あそこのもんからはいってください。",
+      "Please enter from the gate over there."
+    ],
+    "n5-0702": [
+      "これはむずかしいもんだいです。",
+      "This is a difficult question."
+    ],
+    "n5-0703": [
+      "まだもんだいようしをみないでください。",
+      "Don't look at the question paper yet."
+    ],
+    "n5-0704": [
+      "これはN5のもんだいれいです。",
+      "This is an example of an N5 question."
+    ],
+    "n5-0705": [
+      "ちかくのやおやでくだものをかいました。",
+      "I bought some fruits at a nearby greengrocer."
+    ],
+    "n5-0706": [
+      "まいにちやさいをたべます。",
+      "I eat vegetables every day."
+    ],
+    "n5-0707": [
+      "かれはとてもやさしいです。",
+      "He is very kind."
+    ],
+    "n5-0708": [
+      "あそこにあかいやじるしがあります。",
+      "There is a red arrow over there."
+    ],
+    "n5-0709": [
+      "このみせのランチはやすいですが、おいしいです。",
+      "Lunch at this shop is cheap but delicious."
+    ],
+    "n5-0710": [
+      "あしたはやすみです。",
+      "Tomorrow is a holiday."
+    ],
+    "n5-0711": [
+      "つかれましたから、すこしやすみます。",
+      "I'm tired, so I'll take a break."
+    ],
+    "n5-0712": [
+      "りんごをやっつかいました。",
+      "I bought eight apples."
+    ],
+    "n5-0713": [
+      "しゅうまつにたかいやまにのぼりました。",
+      "I climbed a high mountain on the weekend."
+    ],
+    "n5-0714": [
+      "そのしごとはあとでわたしがやります。",
+      "I will do the work later."
+    ],
+    "n5-0715": [
+      "なつでもゆうがたはすずしいです。",
+      "Even in the summer, it is cool in the evening."
+    ],
+    "n5-0716": [
+      "ゆうびんきょくはえきのとなりです。",
+      "The post office is next to the station."
+    ],
+    "n5-0717": [
+      "これはすごくゆうめいなアニメです。",
+      "This is a very famous anime."
+    ],
+    "n5-0718": [
+      "ふゆはたくさんゆきがふります。",
+      "In winter, there are many snowfalls."
+    ],
+    "n5-0719": [
+      "もうすこしゆっくりはなしてください。",
+      "Please speak a little more slowly.",
+      "ゆっくり"
+    ],
+    "n5-0720": [
+      "きょうはようか、きんようびです。",
+      "Today is the 8th, Friday."
+    ],
+    "n5-0721": [
+      "ともだちのたんじょうびにようふくをあげました。",
+      "I gave clothes to my friend's birthday."
+    ],
+    "n5-0722": [
+      "よくカフェでしごとをします。",
+      "I often work at a nearby cafe."
+    ],
+    "n5-0723": [
+      "テレビのよこにスイッチがあります。",
+      "There is a switch next to the TV."
+    ],
+    "n5-0724": [
+      "ケーキをよっつください。",
+      "Please give me four cakes."
+    ],
+    "n5-0725": [
+      "パーティーにともだちをよびます。",
+      "I invite my friend to the party."
+    ],
+    "n5-0726": [
+      "むすめはよくほんをよみます。",
+      "My daughter often reads books."
+    ],
+    "n5-0727": [
+      "よる、ほんをよみます。",
+      "I read a book at night."
+    ],
+    "n5-0728": [
+      "ときどきラーメンをたべます。",
+      "I eat ramen sometimes."
+    ],
+    "n5-0729": [
+      "たぶんらいげつシンガポールにいきます。",
+      "Maybe I'm going to Singapore next month."
+    ],
+    "n5-0730": [
+      "らいしゅうはとてもいそがしいです。",
+      "I will be very busy next week."
+    ],
+    "n5-0731": [
+      "らいねんけっこんします。",
+      "I'm getting married next year."
+    ],
+    "n5-0732": [
+      "いまはほとんどラジオをききません。",
+      "I rarely listen to the radio now."
+    ],
+    "n5-0733": [
+      "あのひとはとてもりっぱなひとです。",
+      "That person is a very good person."
+    ],
+    "n5-0734": [
+      "マリアさんはりゅうがくせいです。",
+      "Maria is an international student."
+    ],
+    "n5-0735": [
+      "りょうしんはハワイにすんでいます。",
+      "My parents live in Hawaii."
+    ],
+    "n5-0736": [
+      "よくりょうりをします。",
+      "I cook often."
+    ],
+    "n5-0737": [
+      "かれはりょこうがいしゃにつとめています。",
+      "He works for a travel agency."
+    ],
+    "n5-0738": [
+      "なつやすみにともだちとりょこうします。",
+      "I travel with friends for summer vacation."
+    ],
+    "n5-0739": [
+      "ネットでりんごをたくさんかいました。",
+      "I bought a lot of apples online."
+    ],
+    "n5-0740": [
+      "もうすこしれいをおしえてください。",
+      "Please give me a few more examples."
+    ],
+    "n5-0741": [
+      "れいぞうこのなかにビールがたくさんあります。",
+      "There is a lot of beer in the fridge."
+    ],
+    "n5-0742": [
+      "わたしのうちにレコードはありません。",
+      "There are no records in my house."
+    ],
+    "n5-0743": [
+      "このレストランはとてもおいしいです。",
+      "This restaurant has really good food."
+    ],
+    "n5-0744": [
+      "れんしゅうはとてもたいせつです。",
+      "Practice is very important."
+    ],
+    "n5-0745": [
+      "まいにちにほんごをれんしゅうします。",
+      "I practise Japanese every day."
+    ],
+    "n5-0746": [
+      "このタブレットはろくまんえんぐらいでした。",
+      "This tablet cost about 60,000 yen."
+    ],
+    "n5-0747": [
+      "コーラをろっぽんください。",
+      "Please give me six bottles of cola."
+    ],
+    "n5-0748": [
+      "ワイシャツはあまりきません。",
+      "I don't wear shirts very often."
+    ],
+    "n5-0749": [
+      "はははちちより５さいわかいです。",
+      "My mother is 5 years younger than my father."
+    ],
+    "n5-0750": [
+      "はい、にほんごがわかります。",
+      "Yes, I understand Japanese."
+    ],
+    "n5-0751": [
+      "かさをでんしゃにわすれます。",
+      "I forget my umbrella on the train."
+    ],
+    "n5-0752": [
+      "わたくしはたなかともうします。",
+      "I am Tanaka."
+    ],
+    "n5-0753": [
+      "わたしはバングラデシュじんです。",
+      "I am Bangladeshi."
+    ],
+    "n5-0754": [
+      "これからしゅくだいをわたします。",
+      "I will give you homework from now on."
+    ],
+    "n5-0755": [
+      "しんごうがあおになったら、みちをわたります。",
+      "I cross the road when the light turns green."
+    ],
+    "n5-0756": [
+      "わたしはめがわるいです。",
+      "I have bad eyesight."
+    ],
+    "n5-0757": [
+      "あ、でんしゃがきました。",
+      "Oh, the train has arrived."
+    ],
+    "n5-0758": [
+      "ああ、そうですか。",
+      "Ah, I see."
+    ],
+    "n5-0759": [
+      "あの、ちょっといいですか。",
+      "Well, may I have a moment?"
+    ],
+    "n5-0760": [
+      "あのう、えきはどこですか。",
+      "Um, where is the station?"
+    ],
+    "n5-0761": [
+      "せんせい、ありがとうございます。",
+      "Thank you, teacher."
+    ],
+    "n5-0762": [
+      "いいえ、わたしのではありません。",
+      "No, it is not mine."
+    ],
+    "n5-0763": [
+      "いえ、わたしのではありません。",
+      "No, it is not mine."
+    ],
+    "n5-0764": [
+      "いただきます。おいしそうですね。",
+      "Let's eat. It looks delicious."
+    ],
+    "n5-0765": [
+      "がっこうへいってきます。",
+      "I'm leaving for school and will be back."
+    ],
+    "n5-0766": [
+      "いらっしゃいませ。なんめいさまですか。",
+      "Welcome. How many people are in your party?"
+    ],
+    "n5-0767": [
+      "うーん、まだわかりません。",
+      "Hmm, I still do not understand."
+    ],
+    "n5-0768": [
+      "え、ほんとうですか。",
+      "Oh, is that true?"
+    ],
+    "n5-0769": [
+      "ええ、だいじょうぶです。",
+      "Yes, it is all right."
+    ],
+    "n5-0770": [
+      "えー、どれにしましょうか。",
+      "Well, which one should I choose?"
+    ],
+    "n5-0771": [
+      "えっ、もうごじですか。",
+      "What, is it already five o'clock?"
+    ],
+    "n5-0772": [
+      "では、また。おげんきで。",
+      "See you again. Take care."
+    ],
+    "n5-0773": [
+      "コーヒーをひとつ、おねがいします。",
+      "One coffee, please."
+    ],
+    "n5-0774": [
+      "せんせい、おはようございます。",
+      "Good morning, teacher."
+    ],
+    "n5-0775": [
+      "もうねます。おやすみなさい。",
+      "I'm going to sleep now. Good night."
+    ],
+    "n5-0776": [
+      "みずをください。",
+      "Please give me some water."
+    ],
+    "n5-0777": [
+      "おいしかったです。ごちそうさまでした。",
+      "It was delicious. Thank you for the meal."
+    ],
+    "n5-0778": [
+      "こちらこそ、ありがとうございます。",
+      "No, thank you."
+    ],
+    "n5-0779": [
+      "ごめんください。どなたかいますか。",
+      "Hello, is anyone home?"
+    ],
+    "n5-0780": [
+      "おそくなって、ごめんなさい。",
+      "I'm sorry for being late."
+    ],
+    "n5-0781": [
+      "こんにちは、おげんきですか。",
+      "Hello, how are you?"
+    ],
+    "n5-0782": [
+      "こんばんは。きょうはさむいですね。",
+      "Good evening. It is cold today, isn't it?"
+    ],
+    "n5-0783": [
+      "さあ、いきましょう。",
+      "Well then, let's go.",
+      "さあ"
+    ],
+    "n5-0784": [
+      "せんせい、さようなら。",
+      "Goodbye, teacher."
+    ],
+    "n5-0785": [
+      "さきほどはしつれいしました。",
+      "I am sorry for being rude earlier."
+    ],
+    "n5-0786": [
+      "おさきにしつれいします。",
+      "Excuse me for leaving before you."
+    ],
+    "n5-0787": [
+      "じゃ、またあした。",
+      "Well then, see you tomorrow."
+    ],
+    "n5-0788": [
+      "じゃあ、またあした。",
+      "Well then, see you tomorrow."
+    ],
+    "n5-0789": [
+      "すみません、トイレはどこですか。",
+      "Excuse me, where is the restroom?"
+    ],
+    "n5-0790": [
+      "えきであいましょう。そうしましょう。",
+      "Let's meet at the station. Let's do that."
+    ],
+    "n5-0791": [
+      "はい、そうです。",
+      "Yes, that's right."
+    ],
+    "n5-0792": [
+      "そうですか。わかりました。",
+      "I see. I understand."
+    ],
+    "n5-0793": [
+      "そうですね。きょうはさむいですね。",
+      "That's true. It is cold today."
+    ],
+    "n5-0794": [
+      "ただいま。いま、かえりました。",
+      "I'm home. I just got back."
+    ],
+    "n5-0795": [
+      "では、また。きをつけて。",
+      "Well then, see you again. Take care."
+    ],
+    "n5-0796": [
+      "「ありがとう」「どういたしまして」",
+      "'Thank you.' 'You're welcome.'"
+    ],
+    "n5-0797": [
+      "どうぞ、ここにすわってください。",
+      "Please, sit here."
+    ],
+    "n5-0798": [
+      "どうも、ありがとう。",
+      "Thank you very much."
+    ],
+    "n5-0799": [
+      "てつだってくれて、どうもありがとう。",
+      "Thank you very much for helping me."
+    ],
+    "n5-0800": [
+      "はい、わたしはがくせいです。",
+      "Yes, I am a student."
+    ],
+    "n5-0801": [
+      "はじめまして。わたしはエマです。",
+      "Nice to meet you. I'm Emma."
+    ],
+    "n5-0802": [
+      "はじめまして。よろしく。",
+      "Nice to meet you."
+    ]
+  },
+  "provenance": {
+    "n5-0001": "current",
+    "n5-0002": "current",
+    "n5-0003": "pdf-adapted",
+    "n5-0004": "pdf-adapted",
+    "n5-0005": "curated",
+    "n5-0006": "curated",
+    "n5-0007": "pdf-adapted",
+    "n5-0008": "curated",
+    "n5-0009": "curated",
+    "n5-0010": "pdf-adapted",
+    "n5-0011": "curated",
+    "n5-0012": "pdf-adapted",
+    "n5-0013": "pdf-adapted",
+    "n5-0014": "curated",
+    "n5-0015": "curated",
+    "n5-0016": "current",
+    "n5-0017": "pdf-adapted",
+    "n5-0018": "current",
+    "n5-0019": "curated",
+    "n5-0020": "current",
+    "n5-0021": "current",
+    "n5-0022": "curated",
+    "n5-0023": "curated",
+    "n5-0024": "current",
+    "n5-0025": "pdf-adapted",
+    "n5-0026": "pdf-adapted",
+    "n5-0027": "current",
+    "n5-0028": "curated",
+    "n5-0029": "curated",
+    "n5-0030": "curated",
+    "n5-0031": "pdf-adapted",
+    "n5-0032": "pdf-adapted",
+    "n5-0033": "curated",
+    "n5-0034": "curated",
+    "n5-0035": "curated",
+    "n5-0036": "curated",
+    "n5-0037": "current",
+    "n5-0038": "current",
+    "n5-0039": "curated",
+    "n5-0040": "curated",
+    "n5-0041": "pdf-adapted",
+    "n5-0042": "pdf-adapted",
+    "n5-0043": "curated",
+    "n5-0044": "curated",
+    "n5-0045": "curated",
+    "n5-0046": "curated",
+    "n5-0047": "curated",
+    "n5-0048": "curated",
+    "n5-0049": "pdf-adapted",
+    "n5-0050": "curated",
+    "n5-0051": "pdf-adapted",
+    "n5-0052": "pdf-adapted",
+    "n5-0053": "pdf-adapted",
+    "n5-0054": "pdf-adapted",
+    "n5-0055": "pdf-adapted",
+    "n5-0056": "curated",
+    "n5-0057": "current",
+    "n5-0058": "current",
+    "n5-0059": "pdf-adapted",
+    "n5-0060": "pdf-adapted",
+    "n5-0061": "current",
+    "n5-0062": "current",
+    "n5-0063": "pdf-adapted",
+    "n5-0064": "pdf-adapted",
+    "n5-0065": "pdf-adapted",
+    "n5-0066": "pdf-adapted",
+    "n5-0067": "pdf-adapted",
+    "n5-0068": "pdf-adapted",
+    "n5-0069": "pdf-adapted",
+    "n5-0070": "pdf-adapted",
+    "n5-0071": "pdf-adapted",
+    "n5-0072": "pdf-adapted",
+    "n5-0073": "current",
+    "n5-0074": "pdf-adapted",
+    "n5-0075": "pdf-adapted",
+    "n5-0076": "pdf-adapted",
+    "n5-0077": "pdf-adapted",
+    "n5-0078": "pdf-adapted",
+    "n5-0079": "pdf-adapted",
+    "n5-0080": "current",
+    "n5-0081": "pdf-adapted",
+    "n5-0082": "pdf-adapted",
+    "n5-0083": "pdf-adapted",
+    "n5-0084": "curated",
+    "n5-0085": "current",
+    "n5-0086": "pdf-adapted",
+    "n5-0087": "pdf-adapted",
+    "n5-0088": "pdf-adapted",
+    "n5-0089": "pdf-adapted",
+    "n5-0090": "pdf-adapted",
+    "n5-0091": "current",
+    "n5-0092": "pdf-adapted",
+    "n5-0093": "current",
+    "n5-0094": "pdf-adapted",
+    "n5-0095": "pdf-adapted",
+    "n5-0096": "pdf-adapted",
+    "n5-0097": "curated",
+    "n5-0098": "pdf-adapted",
+    "n5-0099": "curated",
+    "n5-0100": "pdf-adapted",
+    "n5-0101": "pdf-adapted",
+    "n5-0102": "pdf-adapted",
+    "n5-0103": "pdf-adapted",
+    "n5-0104": "pdf-adapted",
+    "n5-0105": "pdf-adapted",
+    "n5-0106": "current",
+    "n5-0107": "curated",
+    "n5-0108": "pdf-adapted",
+    "n5-0109": "current",
+    "n5-0110": "pdf-adapted",
+    "n5-0111": "pdf-adapted",
+    "n5-0112": "current",
+    "n5-0113": "curated",
+    "n5-0114": "pdf-adapted",
+    "n5-0115": "pdf-adapted",
+    "n5-0116": "pdf-adapted",
+    "n5-0117": "pdf-adapted",
+    "n5-0118": "pdf-adapted",
+    "n5-0119": "pdf-adapted",
+    "n5-0120": "pdf-adapted",
+    "n5-0121": "curated",
+    "n5-0122": "pdf-adapted",
+    "n5-0123": "curated",
+    "n5-0124": "pdf-adapted",
+    "n5-0125": "curated",
+    "n5-0126": "pdf-adapted",
+    "n5-0127": "pdf-adapted",
+    "n5-0128": "pdf-adapted",
+    "n5-0129": "pdf-adapted",
+    "n5-0130": "pdf-adapted",
+    "n5-0131": "pdf-adapted",
+    "n5-0132": "pdf-adapted",
+    "n5-0133": "current",
+    "n5-0134": "pdf-adapted",
+    "n5-0135": "pdf-adapted",
+    "n5-0136": "pdf-adapted",
+    "n5-0137": "pdf-adapted",
+    "n5-0138": "pdf-adapted",
+    "n5-0139": "current",
+    "n5-0140": "pdf-adapted",
+    "n5-0141": "pdf-adapted",
+    "n5-0142": "pdf-adapted",
+    "n5-0143": "pdf-adapted",
+    "n5-0144": "pdf-adapted",
+    "n5-0145": "current",
+    "n5-0146": "pdf-adapted",
+    "n5-0147": "curated",
+    "n5-0148": "pdf-adapted",
+    "n5-0149": "pdf-adapted",
+    "n5-0150": "pdf-adapted",
+    "n5-0151": "pdf-adapted",
+    "n5-0152": "pdf-adapted",
+    "n5-0153": "pdf-adapted",
+    "n5-0154": "pdf-adapted",
+    "n5-0155": "pdf-adapted",
+    "n5-0156": "pdf-adapted",
+    "n5-0157": "pdf-adapted",
+    "n5-0158": "pdf-adapted",
+    "n5-0159": "pdf-adapted",
+    "n5-0160": "current",
+    "n5-0161": "pdf-adapted",
+    "n5-0162": "current",
+    "n5-0163": "current",
+    "n5-0164": "pdf-adapted",
+    "n5-0165": "pdf-adapted",
+    "n5-0166": "pdf-adapted",
+    "n5-0167": "pdf-adapted",
+    "n5-0168": "pdf-adapted",
+    "n5-0169": "pdf-adapted",
+    "n5-0170": "pdf-adapted",
+    "n5-0171": "pdf-adapted",
+    "n5-0172": "current",
+    "n5-0173": "pdf-adapted",
+    "n5-0174": "current",
+    "n5-0175": "pdf-adapted",
+    "n5-0176": "pdf-adapted",
+    "n5-0177": "pdf-adapted",
+    "n5-0178": "pdf-adapted",
+    "n5-0179": "pdf-adapted",
+    "n5-0180": "pdf-adapted",
+    "n5-0181": "pdf-adapted",
+    "n5-0182": "pdf-adapted",
+    "n5-0183": "pdf-adapted",
+    "n5-0184": "pdf-adapted",
+    "n5-0185": "pdf-adapted",
+    "n5-0186": "pdf-adapted",
+    "n5-0187": "pdf-adapted",
+    "n5-0188": "curated",
+    "n5-0189": "pdf-adapted",
+    "n5-0190": "curated",
+    "n5-0191": "pdf-adapted",
+    "n5-0192": "pdf-adapted",
+    "n5-0193": "pdf-adapted",
+    "n5-0194": "curated",
+    "n5-0195": "pdf-adapted",
+    "n5-0196": "pdf-adapted",
+    "n5-0197": "pdf-adapted",
+    "n5-0198": "pdf-adapted",
+    "n5-0199": "pdf-adapted",
+    "n5-0200": "pdf-adapted",
+    "n5-0201": "curated",
+    "n5-0202": "current",
+    "n5-0203": "pdf-adapted",
+    "n5-0204": "pdf-adapted",
+    "n5-0205": "current",
+    "n5-0206": "curated",
+    "n5-0207": "pdf-adapted",
+    "n5-0208": "pdf-adapted",
+    "n5-0209": "current",
+    "n5-0210": "pdf-adapted",
+    "n5-0211": "pdf-adapted",
+    "n5-0212": "pdf-adapted",
+    "n5-0213": "pdf-adapted",
+    "n5-0214": "pdf-adapted",
+    "n5-0215": "current",
+    "n5-0216": "pdf-adapted",
+    "n5-0217": "pdf-adapted",
+    "n5-0218": "pdf-adapted",
+    "n5-0219": "pdf-adapted",
+    "n5-0220": "curated",
+    "n5-0221": "pdf-adapted",
+    "n5-0222": "pdf-adapted",
+    "n5-0223": "curated",
+    "n5-0224": "pdf-adapted",
+    "n5-0225": "pdf-adapted",
+    "n5-0226": "pdf-adapted",
+    "n5-0227": "pdf-adapted",
+    "n5-0228": "curated",
+    "n5-0229": "pdf-adapted",
+    "n5-0230": "pdf-adapted",
+    "n5-0231": "pdf-adapted",
+    "n5-0232": "pdf-adapted",
+    "n5-0233": "curated",
+    "n5-0234": "pdf-adapted",
+    "n5-0235": "pdf-adapted",
+    "n5-0236": "pdf-adapted",
+    "n5-0237": "pdf-adapted",
+    "n5-0238": "pdf-adapted",
+    "n5-0239": "pdf-adapted",
+    "n5-0240": "pdf-adapted",
+    "n5-0241": "current",
+    "n5-0242": "pdf-adapted",
+    "n5-0243": "pdf-adapted",
+    "n5-0244": "pdf-adapted",
+    "n5-0245": "pdf-adapted",
+    "n5-0246": "pdf-adapted",
+    "n5-0247": "current",
+    "n5-0248": "pdf-adapted",
+    "n5-0249": "pdf-adapted",
+    "n5-0250": "pdf-adapted",
+    "n5-0251": "pdf-adapted",
+    "n5-0252": "pdf-adapted",
+    "n5-0253": "pdf-adapted",
+    "n5-0254": "pdf-adapted",
+    "n5-0255": "curated",
+    "n5-0256": "current",
+    "n5-0257": "curated",
+    "n5-0258": "curated",
+    "n5-0259": "pdf-adapted",
+    "n5-0260": "pdf-adapted",
+    "n5-0261": "pdf-adapted",
+    "n5-0262": "current",
+    "n5-0263": "pdf-adapted",
+    "n5-0264": "pdf-adapted",
+    "n5-0265": "pdf-adapted",
+    "n5-0266": "pdf-adapted",
+    "n5-0267": "pdf-adapted",
+    "n5-0268": "current",
+    "n5-0269": "pdf-adapted",
+    "n5-0270": "pdf-adapted",
+    "n5-0271": "pdf-adapted",
+    "n5-0272": "pdf-adapted",
+    "n5-0273": "pdf-adapted",
+    "n5-0274": "pdf-adapted",
+    "n5-0275": "pdf-adapted",
+    "n5-0276": "curated",
+    "n5-0277": "curated",
+    "n5-0278": "curated",
+    "n5-0279": "pdf-adapted",
+    "n5-0280": "pdf-adapted",
+    "n5-0281": "pdf-adapted",
+    "n5-0282": "pdf-adapted",
+    "n5-0283": "pdf-adapted",
+    "n5-0284": "pdf-adapted",
+    "n5-0285": "pdf-adapted",
+    "n5-0286": "pdf-adapted",
+    "n5-0287": "current",
+    "n5-0288": "current",
+    "n5-0289": "pdf-adapted",
+    "n5-0290": "pdf-adapted",
+    "n5-0291": "pdf-adapted",
+    "n5-0292": "current",
+    "n5-0293": "pdf-adapted",
+    "n5-0294": "pdf-adapted",
+    "n5-0295": "curated",
+    "n5-0296": "pdf-adapted",
+    "n5-0297": "pdf-adapted",
+    "n5-0298": "curated",
+    "n5-0299": "pdf-adapted",
+    "n5-0300": "pdf-adapted",
+    "n5-0301": "current",
+    "n5-0302": "current",
+    "n5-0303": "pdf-adapted",
+    "n5-0304": "curated",
+    "n5-0305": "curated",
+    "n5-0306": "current",
+    "n5-0307": "pdf-adapted",
+    "n5-0308": "pdf-adapted",
+    "n5-0309": "pdf-adapted",
+    "n5-0310": "pdf-adapted",
+    "n5-0311": "pdf-adapted",
+    "n5-0312": "current",
+    "n5-0313": "pdf-adapted",
+    "n5-0314": "pdf-adapted",
+    "n5-0315": "pdf-adapted",
+    "n5-0316": "curated",
+    "n5-0317": "pdf-adapted",
+    "n5-0318": "pdf-adapted",
+    "n5-0319": "pdf-adapted",
+    "n5-0320": "pdf-adapted",
+    "n5-0321": "curated",
+    "n5-0322": "pdf-adapted",
+    "n5-0323": "pdf-adapted",
+    "n5-0324": "curated",
+    "n5-0325": "curated",
+    "n5-0326": "pdf-adapted",
+    "n5-0327": "pdf-adapted",
+    "n5-0328": "current",
+    "n5-0329": "current",
+    "n5-0330": "pdf-adapted",
+    "n5-0331": "pdf-adapted",
+    "n5-0332": "pdf-adapted",
+    "n5-0333": "pdf-adapted",
+    "n5-0334": "current",
+    "n5-0335": "pdf-adapted",
+    "n5-0336": "curated",
+    "n5-0337": "pdf-adapted",
+    "n5-0338": "pdf-adapted",
+    "n5-0339": "pdf-adapted",
+    "n5-0340": "pdf-adapted",
+    "n5-0341": "pdf-adapted",
+    "n5-0342": "pdf-adapted",
+    "n5-0343": "pdf-adapted",
+    "n5-0344": "pdf-adapted",
+    "n5-0345": "curated",
+    "n5-0346": "pdf-adapted",
+    "n5-0347": "pdf-adapted",
+    "n5-0348": "pdf-adapted",
+    "n5-0349": "pdf-adapted",
+    "n5-0350": "pdf-adapted",
+    "n5-0351": "pdf-adapted",
+    "n5-0352": "pdf-adapted",
+    "n5-0353": "pdf-adapted",
+    "n5-0354": "pdf-adapted",
+    "n5-0355": "curated",
+    "n5-0356": "pdf-adapted",
+    "n5-0357": "current",
+    "n5-0358": "curated",
+    "n5-0359": "pdf-adapted",
+    "n5-0360": "curated",
+    "n5-0361": "pdf-adapted",
+    "n5-0362": "pdf-adapted",
+    "n5-0363": "pdf-adapted",
+    "n5-0364": "pdf-adapted",
+    "n5-0365": "pdf-adapted",
+    "n5-0366": "pdf-adapted",
+    "n5-0367": "pdf-adapted",
+    "n5-0368": "pdf-adapted",
+    "n5-0369": "pdf-adapted",
+    "n5-0370": "pdf-adapted",
+    "n5-0371": "pdf-adapted",
+    "n5-0372": "pdf-adapted",
+    "n5-0373": "curated",
+    "n5-0374": "pdf-adapted",
+    "n5-0375": "curated",
+    "n5-0376": "pdf-adapted",
+    "n5-0377": "pdf-adapted",
+    "n5-0378": "pdf-adapted",
+    "n5-0379": "pdf-adapted",
+    "n5-0380": "pdf-adapted",
+    "n5-0381": "pdf-adapted",
+    "n5-0382": "pdf-adapted",
+    "n5-0383": "pdf-adapted",
+    "n5-0384": "pdf-adapted",
+    "n5-0385": "pdf-adapted",
+    "n5-0386": "pdf-adapted",
+    "n5-0387": "pdf-adapted",
+    "n5-0388": "pdf-adapted",
+    "n5-0389": "pdf-adapted",
+    "n5-0390": "pdf-adapted",
+    "n5-0391": "current",
+    "n5-0392": "pdf-adapted",
+    "n5-0393": "pdf-adapted",
+    "n5-0394": "pdf-adapted",
+    "n5-0395": "current",
+    "n5-0396": "pdf-adapted",
+    "n5-0397": "pdf-adapted",
+    "n5-0398": "current",
+    "n5-0399": "pdf-adapted",
+    "n5-0400": "pdf-adapted",
+    "n5-0401": "current",
+    "n5-0402": "pdf-adapted",
+    "n5-0403": "current",
+    "n5-0404": "pdf-adapted",
+    "n5-0405": "pdf-adapted",
+    "n5-0406": "pdf-adapted",
+    "n5-0407": "pdf-adapted",
+    "n5-0408": "pdf-adapted",
+    "n5-0409": "pdf-adapted",
+    "n5-0410": "pdf-adapted",
+    "n5-0411": "current",
+    "n5-0412": "pdf-adapted",
+    "n5-0413": "pdf-adapted",
+    "n5-0414": "pdf-adapted",
+    "n5-0415": "pdf-adapted",
+    "n5-0416": "pdf-adapted",
+    "n5-0417": "pdf-adapted",
+    "n5-0418": "curated",
+    "n5-0419": "pdf-adapted",
+    "n5-0420": "curated",
+    "n5-0421": "pdf-adapted",
+    "n5-0422": "pdf-adapted",
+    "n5-0423": "pdf-adapted",
+    "n5-0424": "pdf-adapted",
+    "n5-0425": "pdf-adapted",
+    "n5-0426": "pdf-adapted",
+    "n5-0427": "current",
+    "n5-0428": "pdf-adapted",
+    "n5-0429": "pdf-adapted",
+    "n5-0430": "curated",
+    "n5-0431": "pdf-adapted",
+    "n5-0432": "pdf-adapted",
+    "n5-0433": "pdf-adapted",
+    "n5-0434": "curated",
+    "n5-0435": "pdf-adapted",
+    "n5-0436": "pdf-adapted",
+    "n5-0437": "pdf-adapted",
+    "n5-0438": "pdf-adapted",
+    "n5-0439": "pdf-adapted",
+    "n5-0440": "pdf-adapted",
+    "n5-0441": "pdf-adapted",
+    "n5-0442": "pdf-adapted",
+    "n5-0443": "pdf-adapted",
+    "n5-0444": "curated",
+    "n5-0445": "pdf-adapted",
+    "n5-0446": "pdf-adapted",
+    "n5-0447": "pdf-adapted",
+    "n5-0448": "pdf-adapted",
+    "n5-0449": "curated",
+    "n5-0450": "pdf-adapted",
+    "n5-0451": "curated",
+    "n5-0452": "pdf-adapted",
+    "n5-0453": "pdf-adapted",
+    "n5-0454": "pdf-adapted",
+    "n5-0455": "pdf-adapted",
+    "n5-0456": "pdf-adapted",
+    "n5-0457": "pdf-adapted",
+    "n5-0458": "pdf-adapted",
+    "n5-0459": "pdf-adapted",
+    "n5-0460": "curated",
+    "n5-0461": "pdf-adapted",
+    "n5-0462": "pdf-adapted",
+    "n5-0463": "current",
+    "n5-0464": "pdf-adapted",
+    "n5-0465": "pdf-adapted",
+    "n5-0466": "pdf-adapted",
+    "n5-0467": "pdf-adapted",
+    "n5-0468": "pdf-adapted",
+    "n5-0469": "pdf-adapted",
+    "n5-0470": "pdf-adapted",
+    "n5-0471": "pdf-adapted",
+    "n5-0472": "current",
+    "n5-0473": "current",
+    "n5-0474": "pdf-adapted",
+    "n5-0475": "pdf-adapted",
+    "n5-0476": "pdf-adapted",
+    "n5-0477": "pdf-adapted",
+    "n5-0478": "pdf-adapted",
+    "n5-0479": "current",
+    "n5-0480": "pdf-adapted",
+    "n5-0481": "pdf-adapted",
+    "n5-0482": "pdf-adapted",
+    "n5-0483": "pdf-adapted",
+    "n5-0484": "pdf-adapted",
+    "n5-0485": "curated",
+    "n5-0486": "curated",
+    "n5-0487": "pdf-adapted",
+    "n5-0488": "pdf-adapted",
+    "n5-0489": "curated",
+    "n5-0490": "pdf-adapted",
+    "n5-0491": "current",
+    "n5-0492": "current",
+    "n5-0493": "pdf-adapted",
+    "n5-0494": "pdf-adapted",
+    "n5-0495": "current",
+    "n5-0496": "curated",
+    "n5-0497": "pdf-adapted",
+    "n5-0498": "pdf-adapted",
+    "n5-0499": "pdf-adapted",
+    "n5-0500": "current",
+    "n5-0501": "curated",
+    "n5-0502": "pdf-adapted",
+    "n5-0503": "current",
+    "n5-0504": "curated",
+    "n5-0505": "pdf-adapted",
+    "n5-0506": "pdf-adapted",
+    "n5-0507": "curated",
+    "n5-0508": "curated",
+    "n5-0509": "current",
+    "n5-0510": "pdf-adapted",
+    "n5-0511": "pdf-adapted",
+    "n5-0512": "pdf-adapted",
+    "n5-0513": "pdf-adapted",
+    "n5-0514": "curated",
+    "n5-0515": "pdf-adapted",
+    "n5-0516": "pdf-adapted",
+    "n5-0517": "pdf-adapted",
+    "n5-0518": "curated",
+    "n5-0519": "curated",
+    "n5-0520": "curated",
+    "n5-0521": "current",
+    "n5-0522": "curated",
+    "n5-0523": "curated",
+    "n5-0524": "pdf-adapted",
+    "n5-0525": "pdf-adapted",
+    "n5-0526": "pdf-adapted",
+    "n5-0527": "pdf-adapted",
+    "n5-0528": "pdf-adapted",
+    "n5-0529": "pdf-adapted",
+    "n5-0530": "curated",
+    "n5-0531": "current",
+    "n5-0532": "pdf-adapted",
+    "n5-0533": "pdf-adapted",
+    "n5-0534": "curated",
+    "n5-0535": "pdf-adapted",
+    "n5-0536": "current",
+    "n5-0537": "current",
+    "n5-0538": "pdf-adapted",
+    "n5-0539": "pdf-adapted",
+    "n5-0540": "pdf-adapted",
+    "n5-0541": "pdf-adapted",
+    "n5-0542": "pdf-adapted",
+    "n5-0543": "pdf-adapted",
+    "n5-0544": "pdf-adapted",
+    "n5-0545": "current",
+    "n5-0546": "pdf-adapted",
+    "n5-0547": "pdf-adapted",
+    "n5-0548": "pdf-adapted",
+    "n5-0549": "pdf-adapted",
+    "n5-0550": "pdf-adapted",
+    "n5-0551": "pdf-adapted",
+    "n5-0552": "pdf-adapted",
+    "n5-0553": "curated",
+    "n5-0554": "curated",
+    "n5-0555": "pdf-adapted",
+    "n5-0556": "pdf-adapted",
+    "n5-0557": "pdf-adapted",
+    "n5-0558": "pdf-adapted",
+    "n5-0559": "pdf-adapted",
+    "n5-0560": "pdf-adapted",
+    "n5-0561": "pdf-adapted",
+    "n5-0562": "current",
+    "n5-0563": "curated",
+    "n5-0564": "pdf-adapted",
+    "n5-0565": "pdf-adapted",
+    "n5-0566": "pdf-adapted",
+    "n5-0567": "pdf-adapted",
+    "n5-0568": "pdf-adapted",
+    "n5-0569": "pdf-adapted",
+    "n5-0570": "pdf-adapted",
+    "n5-0571": "pdf-adapted",
+    "n5-0572": "pdf-adapted",
+    "n5-0573": "pdf-adapted",
+    "n5-0574": "pdf-adapted",
+    "n5-0575": "pdf-adapted",
+    "n5-0576": "pdf-adapted",
+    "n5-0577": "pdf-adapted",
+    "n5-0578": "pdf-adapted",
+    "n5-0579": "pdf-adapted",
+    "n5-0580": "pdf-adapted",
+    "n5-0581": "pdf-adapted",
+    "n5-0582": "pdf-adapted",
+    "n5-0583": "pdf-adapted",
+    "n5-0584": "pdf-adapted",
+    "n5-0585": "current",
+    "n5-0586": "pdf-adapted",
+    "n5-0587": "pdf-adapted",
+    "n5-0588": "pdf-adapted",
+    "n5-0589": "curated",
+    "n5-0590": "pdf-adapted",
+    "n5-0591": "pdf-adapted",
+    "n5-0592": "pdf-adapted",
+    "n5-0593": "pdf-adapted",
+    "n5-0594": "pdf-adapted",
+    "n5-0595": "current",
+    "n5-0596": "current",
+    "n5-0597": "pdf-adapted",
+    "n5-0598": "curated",
+    "n5-0599": "pdf-adapted",
+    "n5-0600": "pdf-adapted",
+    "n5-0601": "pdf-adapted",
+    "n5-0602": "pdf-adapted",
+    "n5-0603": "pdf-adapted",
+    "n5-0604": "pdf-adapted",
+    "n5-0605": "current",
+    "n5-0606": "pdf-adapted",
+    "n5-0607": "pdf-adapted",
+    "n5-0608": "pdf-adapted",
+    "n5-0609": "pdf-adapted",
+    "n5-0610": "pdf-adapted",
+    "n5-0611": "pdf-adapted",
+    "n5-0612": "pdf-adapted",
+    "n5-0613": "curated",
+    "n5-0614": "pdf-adapted",
+    "n5-0615": "pdf-adapted",
+    "n5-0616": "pdf-adapted",
+    "n5-0617": "pdf-adapted",
+    "n5-0618": "curated",
+    "n5-0619": "pdf-adapted",
+    "n5-0620": "pdf-adapted",
+    "n5-0621": "pdf-adapted",
+    "n5-0622": "pdf-adapted",
+    "n5-0623": "pdf-adapted",
+    "n5-0624": "curated",
+    "n5-0625": "curated",
+    "n5-0626": "pdf-adapted",
+    "n5-0627": "pdf-adapted",
+    "n5-0628": "pdf-adapted",
+    "n5-0629": "pdf-adapted",
+    "n5-0630": "pdf-adapted",
+    "n5-0631": "current",
+    "n5-0632": "pdf-adapted",
+    "n5-0633": "pdf-adapted",
+    "n5-0634": "pdf-adapted",
+    "n5-0635": "current",
+    "n5-0636": "pdf-adapted",
+    "n5-0637": "pdf-adapted",
+    "n5-0638": "pdf-adapted",
+    "n5-0639": "pdf-adapted",
+    "n5-0640": "pdf-adapted",
+    "n5-0641": "pdf-adapted",
+    "n5-0642": "pdf-adapted",
+    "n5-0643": "pdf-adapted",
+    "n5-0644": "current",
+    "n5-0645": "pdf-adapted",
+    "n5-0646": "pdf-adapted",
+    "n5-0647": "pdf-adapted",
+    "n5-0648": "pdf-adapted",
+    "n5-0649": "pdf-adapted",
+    "n5-0650": "pdf-adapted",
+    "n5-0651": "pdf-adapted",
+    "n5-0652": "pdf-adapted",
+    "n5-0653": "curated",
+    "n5-0654": "curated",
+    "n5-0655": "pdf-adapted",
+    "n5-0656": "pdf-adapted",
+    "n5-0657": "pdf-adapted",
+    "n5-0658": "curated",
+    "n5-0659": "pdf-adapted",
+    "n5-0660": "pdf-adapted",
+    "n5-0661": "current",
+    "n5-0662": "pdf-adapted",
+    "n5-0663": "pdf-adapted",
+    "n5-0664": "pdf-adapted",
+    "n5-0665": "pdf-adapted",
+    "n5-0666": "pdf-adapted",
+    "n5-0667": "pdf-adapted",
+    "n5-0668": "current",
+    "n5-0669": "pdf-adapted",
+    "n5-0670": "current",
+    "n5-0671": "current",
+    "n5-0672": "pdf-adapted",
+    "n5-0673": "pdf-adapted",
+    "n5-0674": "pdf-adapted",
+    "n5-0675": "pdf-adapted",
+    "n5-0676": "pdf-adapted",
+    "n5-0677": "pdf-adapted",
+    "n5-0678": "pdf-adapted",
+    "n5-0679": "pdf-adapted",
+    "n5-0680": "pdf-adapted",
+    "n5-0681": "pdf-adapted",
+    "n5-0682": "pdf-adapted",
+    "n5-0683": "pdf-adapted",
+    "n5-0684": "curated",
+    "n5-0685": "pdf-adapted",
+    "n5-0686": "pdf-adapted",
+    "n5-0687": "pdf-adapted",
+    "n5-0688": "pdf-adapted",
+    "n5-0689": "curated",
+    "n5-0690": "pdf-adapted",
+    "n5-0691": "pdf-adapted",
+    "n5-0692": "curated",
+    "n5-0693": "curated",
+    "n5-0694": "curated",
+    "n5-0695": "pdf-adapted",
+    "n5-0696": "curated",
+    "n5-0697": "pdf-adapted",
+    "n5-0698": "pdf-adapted",
+    "n5-0699": "pdf-adapted",
+    "n5-0700": "curated",
+    "n5-0701": "pdf-adapted",
+    "n5-0702": "pdf-adapted",
+    "n5-0703": "pdf-adapted",
+    "n5-0704": "pdf-adapted",
+    "n5-0705": "pdf-adapted",
+    "n5-0706": "current",
+    "n5-0707": "pdf-adapted",
+    "n5-0708": "pdf-adapted",
+    "n5-0709": "pdf-adapted",
+    "n5-0710": "curated",
+    "n5-0711": "pdf-adapted",
+    "n5-0712": "curated",
+    "n5-0713": "pdf-adapted",
+    "n5-0714": "pdf-adapted",
+    "n5-0715": "pdf-adapted",
+    "n5-0716": "current",
+    "n5-0717": "pdf-adapted",
+    "n5-0718": "pdf-adapted",
+    "n5-0719": "pdf-adapted",
+    "n5-0720": "pdf-adapted",
+    "n5-0721": "pdf-adapted",
+    "n5-0722": "pdf-adapted",
+    "n5-0723": "pdf-adapted",
+    "n5-0724": "curated",
+    "n5-0725": "curated",
+    "n5-0726": "pdf-adapted",
+    "n5-0727": "current",
+    "n5-0728": "pdf-adapted",
+    "n5-0729": "pdf-adapted",
+    "n5-0730": "pdf-adapted",
+    "n5-0731": "pdf-adapted",
+    "n5-0732": "pdf-adapted",
+    "n5-0733": "pdf-adapted",
+    "n5-0734": "current",
+    "n5-0735": "pdf-adapted",
+    "n5-0736": "pdf-adapted",
+    "n5-0737": "pdf-adapted",
+    "n5-0738": "pdf-adapted",
+    "n5-0739": "pdf-adapted",
+    "n5-0740": "pdf-adapted",
+    "n5-0741": "pdf-adapted",
+    "n5-0742": "pdf-adapted",
+    "n5-0743": "pdf-adapted",
+    "n5-0744": "pdf-adapted",
+    "n5-0745": "curated",
+    "n5-0746": "pdf-adapted",
+    "n5-0747": "curated",
+    "n5-0748": "pdf-adapted",
+    "n5-0749": "pdf-adapted",
+    "n5-0750": "current",
+    "n5-0751": "curated",
+    "n5-0752": "curated",
+    "n5-0753": "current",
+    "n5-0754": "pdf-adapted",
+    "n5-0755": "curated",
+    "n5-0756": "pdf-adapted",
+    "n5-0757": "curated",
+    "n5-0758": "curated",
+    "n5-0759": "curated",
+    "n5-0760": "current",
+    "n5-0761": "current",
+    "n5-0762": "current",
+    "n5-0763": "curated",
+    "n5-0764": "current",
+    "n5-0765": "current",
+    "n5-0766": "current",
+    "n5-0767": "curated",
+    "n5-0768": "curated",
+    "n5-0769": "curated",
+    "n5-0770": "curated",
+    "n5-0771": "curated",
+    "n5-0772": "curated",
+    "n5-0773": "current",
+    "n5-0774": "current",
+    "n5-0775": "current",
+    "n5-0776": "current",
+    "n5-0777": "current",
+    "n5-0778": "curated",
+    "n5-0779": "curated",
+    "n5-0780": "current",
+    "n5-0781": "current",
+    "n5-0782": "current",
+    "n5-0783": "curated",
+    "n5-0784": "current",
+    "n5-0785": "curated",
+    "n5-0786": "curated",
+    "n5-0787": "curated",
+    "n5-0788": "current",
+    "n5-0789": "current",
+    "n5-0790": "curated",
+    "n5-0791": "current",
+    "n5-0792": "current",
+    "n5-0793": "curated",
+    "n5-0794": "current",
+    "n5-0795": "curated",
+    "n5-0796": "curated",
+    "n5-0797": "current",
+    "n5-0798": "current",
+    "n5-0799": "curated",
+    "n5-0800": "current",
+    "n5-0801": "current",
+    "n5-0802": "curated"
+  }
+}
