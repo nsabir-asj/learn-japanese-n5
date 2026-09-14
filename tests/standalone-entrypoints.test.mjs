@@ -99,7 +99,7 @@ test('vocabulary choices reveal pronunciation or Japanese text only after answer
 test('vocabulary scope picker supports guided, preset, and custom topic practice', () => {
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
   assert.doesNotThrow(() => new Script(vocabulary));
-  assert.match(vocabulary, /adaptive: "Guided Genki II Course", all: "All vocabulary", genki: "Genki II Course", n5: "JLPT N5"/);
+  assert.match(vocabulary, /adaptive: "Guided Genki II Course", "n5-guided": "Guided JLPT N5", all: "All vocabulary", genki: "Genki II Course", n5: "JLPT N5"/);
   assert.match(vocabulary, /id="vocabScopeDialog"/);
   assert.match(vocabulary, /id="vocabCurriculumDialog"/);
   assert.match(vocabulary, /data-curriculum-stage/);
@@ -112,6 +112,8 @@ test('vocabulary scope picker supports guided, preset, and custom topic practice
   assert.match(vocabulary, /data-scope-track="n5"/);
   assert.match(vocabulary, /data-scope-preset="genki"/);
   assert.match(vocabulary, /data-scope-preset="n5"/);
+  assert.match(vocabulary, /data-scope-preset="n5-guided"/);
+  assert.match(vocabulary, /function unlockedN5StageIndex/);
   assert.match(vocabulary, /data-open-scope-topics="all"/);
   assert.match(vocabulary, /id="vocabScopeTopicSearch"/);
   assert.match(vocabulary, /id="vocabScopeSelectAll"/);
@@ -123,8 +125,8 @@ test('vocabulary scope picker supports guided, preset, and custom topic practice
   assert.match(vocabulary, /all: "All words"/);
   assert.match(vocabulary, /const ALL_STAGES = \[\.\.\.COURSE_STAGES, \.\.\.N5_STAGES\]/);
   assert.match(vocabulary, /existingWordIds\.length \? sourceWord\.existingWordIds : \[sourceWord\.sourceId\]/);
-  assert.match(vocabulary, /const reviewPool = adaptive \? introducedWords\(\) : pool/);
-  assert.match(vocabulary, /practicedEarly \? "Practiced early"/);
+  assert.match(vocabulary, /guidedN5 \? wordsForScope\("n5"\)\.filter\(word => itemState\(word\)\.introduced\) : pool/);
+  assert.match(vocabulary, /practicedEarly \? "Practised early"/);
   assert.match(vocabulary, /function applyScopeSelection/);
 });
 

@@ -323,7 +323,7 @@
   const Examples = { ...N5_EXAMPLES_BY_WORD_ID, ...(window.KANA_SPRINT_VOCABULARY_EXAMPLES || {}) };
   const SpeechDiagnostics = window.KANA_SPRINT_SPEECH_DIAGNOSTICS;
   const UNIFIED_REVIEW_MODEL = "unified-v1";
-  const SCOPE_LABELS = { adaptive: "Guided Genki II Course", all: "All vocabulary", genki: "Genki II Course", n5: "JLPT N5", lesson1: "Genki II · Lesson 1", lesson2: "Genki II · Lesson 2", custom: "Custom topics", trouble: "Trouble words" };
+  const SCOPE_LABELS = { adaptive: "Guided Genki II Course", "n5-guided": "Guided JLPT N5", all: "All vocabulary", genki: "Genki II Course", n5: "JLPT N5", lesson1: "Genki II · Lesson 1", lesson2: "Genki II · Lesson 2", custom: "Custom topics", trouble: "Trouble words" };
   const SCOPE_STAGE_IDS = {
     all: ALL_STAGES.map(stage => stage.id),
     genki: COURSE_STAGES.map(stage => stage.id),
@@ -341,7 +341,7 @@
   function defaultState() {
     return {
       version: VERSION, total: 0, correct: 0, streak: 0, bestStreak: 0,
-      questionFormat: "mixed", practiceScope: "adaptive", customStageIds: [COURSE_STAGES[0].id], pace: 50, newWordCredit: 0, unlockedStage: 0,
+      questionFormat: "mixed", practiceScope: "adaptive", customStageIds: [COURSE_STAGES[0].id], pace: 50, newWordCredit: 0, unlockedStage: 0, n5UnlockedStage: 0,
       autoPronounce: true, choiceCount: "auto", items: {}, recent: [], savedAt: 0
     };
   }
@@ -447,6 +447,7 @@
   state.pace = clamp(Number(state.pace) || 50, 10, 90);
   state.newWordCredit = clamp(Number(state.newWordCredit) || 0, 0, 1);
   state.unlockedStage = clamp(Number(state.unlockedStage) || 0, 0, COURSE_STAGES.length - 1);
+  state.n5UnlockedStage = clamp(Number(state.n5UnlockedStage) || 0, 0, Math.max(0, N5_STAGES.length - 1));
   let current = null;
   let phase = "idle";
   let questionNumber = 0;
@@ -635,6 +636,7 @@
 
   function wordsInStage(stageId) { return WORDS.filter(word => word.stageIds.includes(stageId)); }
   function stageWords(index) { return wordsInStage(COURSE_STAGES[index]?.id); }
+  function n5StageWords(index) { return wordsInStage(N5_STAGES[index]?.id); }
   function stageAverage(index) {
     const words = stageWords(index);
     return words.reduce((sum, word) => sum + itemState(word).mastery, 0) / words.length;
@@ -647,6 +649,13 @@
     let index = clamp(Number(state.unlockedStage) || 0, 0, COURSE_STAGES.length - 1);
     while (index < COURSE_STAGES.length - 1 && stageReady(index)) index++;
     state.unlockedStage = Math.max(Number(state.unlockedStage) || 0, index);
+    return index;
+  }
+  function unlockedN5StageIndex() {
+    if (!N5_STAGES.length) return 0;
+    let index = clamp(Number(state.n5UnlockedStage) || 0, 0, N5_STAGES.length - 1);
+    while (index < N5_STAGES.length - 1 && Scheduler.stageIsReady(n5StageWords(index).map(word => itemState(word)))) index++;
+    state.n5UnlockedStage = Math.max(Number(state.n5UnlockedStage) || 0, index);
     return index;
   }
   function introducedWords() { return WORDS.filter(word => itemState(word).introduced); }
@@ -683,6 +692,10 @@
     }
     if (scope === "custom") return WORDS.filter(word => word.stageIds.some(id => state.customStageIds.includes(id)));
     if (scope === "trouble") return weakWords();
+    if (scope === "n5-guided") {
+      const unlockedIds = N5_STAGES.slice(0, unlockedN5StageIndex() + 1).map(stage => stage.id);
+      return WORDS.filter(word => word.stageIds.some(id => unlockedIds.includes(id)));
+    }
     const unlocked = unlockedStageIndex();
     const unlockedIds = COURSE_STAGES.slice(0, unlocked + 1).map(stage => stage.id);
     return WORDS.filter(word => word.stageIds.some(id => unlockedIds.includes(id)));
@@ -691,6 +704,7 @@
   function regularReviewPool(scope = state.practiceScope) {
     const sourceScope = scope === "trouble" ? (lastRegularScope === "trouble" ? "adaptive" : lastRegularScope) : scope;
     if (sourceScope === "adaptive") return introducedWords();
+    if (sourceScope === "n5-guided") return wordsForScope("n5").filter(word => itemState(word).introduced);
     return wordsForScope(sourceScope).filter(word => itemState(word).introduced);
   }
 
@@ -702,7 +716,7 @@
   function scopeShortLabel() {
     return state.practiceScope === "custom"
       ? `${state.customStageIds.length} topic${state.customStageIds.length === 1 ? "" : "s"}`
-      : { adaptive: `Genki stage ${unlockedStageIndex() + 1} / ${COURSE_STAGES.length}`, all: "All words", genki: "Genki II", n5: "JLPT N5", lesson1: "Lesson 1", lesson2: "Lesson 2", trouble: "Trouble" }[state.practiceScope];
+      : { adaptive: `Genki stage ${unlockedStageIndex() + 1} / ${COURSE_STAGES.length}`, "n5-guided": `N5 topic ${unlockedN5StageIndex() + 1} / ${N5_STAGES.length}`, all: "All words", genki: "Genki II", n5: "JLPT N5", lesson1: "Lesson 1", lesson2: "Lesson 2", trouble: "Trouble" }[state.practiceScope];
   }
 
   function regularScope(scope = state.practiceScope) {
@@ -711,12 +725,17 @@
 
   function scopeStageIds(scope = regularScope()) {
     if (scope === "adaptive") return COURSE_STAGES.slice(0, unlockedStageIndex() + 1).map(stage => stage.id);
+    if (scope === "n5-guided") return N5_STAGES.slice(0, unlockedN5StageIndex() + 1).map(stage => stage.id);
     if (scope === "custom") return state.customStageIds;
     return SCOPE_STAGE_IDS[scope] || [];
   }
 
   function scopeSelectionSummary(scope = regularScope()) {
     if (scope === "adaptive") return "New words follow the guided sequence";
+    if (scope === "n5-guided") {
+      const stage = N5_STAGES[unlockedN5StageIndex()];
+      return stage ? `Current topic: ${stage.name.replace(/^JLPT N5 · /, "")}` : "New words follow the guided N5 sequence";
+    }
     const ids = scopeStageIds(scope);
     const count = WORDS.filter(word => word.stageIds.some(id => ids.includes(id))).length;
     if (scope === "n5") return `${N5_DATA.officialEntryCount} official entries · ${count} practice forms`;
@@ -757,13 +776,17 @@
     const count = $("#vocabScopeDraftCount");
     count.textContent = scopeDraft === "adaptive"
       ? "Guided Genki II Course selected"
+      : scopeDraft === "n5-guided"
+        ? `Guided JLPT N5 · ${scopeSelectionSummary("n5-guided")}`
       : scopeDraft === "n5"
         ? `${N5_DATA.officialEntryCount} official entries · ${selectedWords} practice forms`
         : `${scopeStageDraft.size} topic${scopeStageDraft.size === 1 ? "" : "s"} · ${selectedWords} words`;
-    const valid = scopeDraft === "adaptive" || scopeStageDraft.size > 0;
+    const valid = ["adaptive", "n5-guided"].includes(scopeDraft) || scopeStageDraft.size > 0;
     $("#vocabScopeApply").disabled = !valid;
     $("#vocabScopeApply").textContent = scopeDraft === "adaptive"
       ? "Use guided course"
+      : scopeDraft === "n5-guided"
+        ? "Use guided N5"
       : scopeDraft === "n5"
         ? "Practice all N5"
         : scopeDraft === "genki"
@@ -779,11 +802,11 @@
   function openScopeDialog() {
     const baseScope = regularScope();
     scopeDraft = baseScope;
-    scopeStageDraft = new Set(baseScope === "adaptive" ? [] : baseScope === "custom" ? state.customStageIds : SCOPE_STAGE_IDS[baseScope]);
+    scopeStageDraft = new Set(["adaptive", "n5-guided"].includes(baseScope) ? [] : baseScope === "custom" ? state.customStageIds : SCOPE_STAGE_IDS[baseScope]);
     scopeDialogView = "tracks";
     const selectedN5 = [...scopeStageDraft].filter(id => SCOPE_STAGE_IDS.n5.includes(id)).length;
     const selectedGenki = [...scopeStageDraft].filter(id => SCOPE_STAGE_IDS.genki.includes(id)).length;
-    scopeTrackDraft = baseScope === "n5" || selectedN5 > selectedGenki ? "n5" : "genki";
+    scopeTrackDraft = ["n5", "n5-guided"].includes(baseScope) || selectedN5 > selectedGenki ? "n5" : "genki";
     scopeTopicTrack = scopeTrackDraft;
     $("#vocabScopeTopicSearch").value = "";
     renderScopeDialog();
@@ -797,7 +820,7 @@
   }
 
   function applyScopeSelection() {
-    if (scopeDraft !== "adaptive" && !scopeStageDraft.size) return;
+    if (!["adaptive", "n5-guided"].includes(scopeDraft) && !scopeStageDraft.size) return;
     if (scopeDraft === "custom") state.customStageIds = ALL_STAGES.map(stage => stage.id).filter(id => scopeStageDraft.has(id));
     state.practiceScope = scopeDraft;
     lastRegularScope = state.practiceScope;
@@ -955,10 +978,12 @@
 
   function selectWord() {
     const adaptive = state.practiceScope === "adaptive";
-    const stageIndex = unlockedStageIndex();
+    const guidedN5 = state.practiceScope === "n5-guided";
+    const guided = adaptive || guidedN5;
+    const stageIndex = guidedN5 ? unlockedN5StageIndex() : unlockedStageIndex();
     const pool = wordsForScope();
-    const reviewPool = adaptive ? introducedWords() : pool;
-    const unseenPool = adaptive ? stageWords(stageIndex) : pool;
+    const reviewPool = adaptive ? introducedWords() : guidedN5 ? wordsForScope("n5").filter(word => itemState(word).introduced) : pool;
+    const unseenPool = adaptive ? stageWords(stageIndex) : guidedN5 ? n5StageWords(stageIndex) : pool;
     const unseen = unseenPool.filter(word => !itemState(word).introduced)
       .sort((a, b) => a.stageIndex - b.stageIndex || a.order - b.order);
     const introduced = reviewPool.filter(word => itemState(word).introduced);
@@ -988,7 +1013,7 @@
       if (scheduledChoice.word) return { ...scheduledChoice, introduce: false, reason: "Adaptive review" };
       return { word: unseen[0], mode: allowedModes()[0], introduce: true, reason: "Building the review pool" };
     }
-    return { ...selectReviewWord(introduced, recent, false), introduce: false, reason: "Reviewing the current stage" };
+    return { ...selectReviewWord(introduced, recent, false), introduce: false, reason: guided ? "Reviewing the current stage" : "Adaptive review" };
   }
 
   function selectReviewWord(words, recent, onlyDue, allowRecent = true) {
@@ -1067,7 +1092,7 @@
       <details class="card vocab-setup-card">
         <summary><span><strong>Session controls</strong><small id="vocabPaceStatus">Balanced introduction and review</small></span></summary>
         <div class="vocab-setup">
-          <div><h2>Vocabulary practice</h2><p class="muted">The guided Genki II Course keeps new words in lesson order. You can also practise all JLPT N5 vocabulary or combine topics from either track. Changing the format changes the question, not the word’s review schedule.</p></div>
+          <div><h2>Vocabulary practice</h2><p class="muted">Guided practice moves through Genki II lessons or JLPT N5 topics in order. You can also practise a whole track or combine topics. Changing the format changes the question, not the word’s review schedule.</p></div>
           <div class="vocab-scope-field"><span>Practice scope</span><button class="vocab-scope-trigger" id="vocabPracticeScope" type="button" aria-haspopup="dialog" aria-controls="vocabScopeDialog"><strong id="vocabScopeLabel">Guided Genki II Course</strong><span aria-hidden="true">›</span></button><small id="vocabScopeHint">New words follow the Genki II sequence.</small></div>
           <label><span>Question direction</span><select id="vocabQuestionFormat"><option value="mixed">Mixed practice</option><option value="written-both">Japanese ↔ English (written)</option><option value="written">Japanese text → English</option><option value="spoken">Spoken Japanese → English</option><option value="recall">English → Japanese</option><option value="speaking">English → Japanese (Speaking)</option></select><small id="vocabFormatHint" aria-live="polite"></small></label>
           <label><span>Answer choices</span><select id="vocabChoiceCount"><option value="auto">Auto (adaptive)</option><option value="4">4 choices</option><option value="6">6 choices</option><option value="8">8 choices</option><option value="not-used" disabled>Not used for speaking</option></select><small id="vocabChoiceCountHint">Auto uses 4, 6, or 8 choices based on mastery.</small></label>
@@ -1080,7 +1105,7 @@
         <div class="card"><h2>Practice coverage</h2><p class="muted">One shared review schedule; these direction stats help choose the next prompt.</p><div class="vocab-direction-grid"><div><span>Japanese → English</span><strong id="vocabWrittenMastery">0%</strong><small id="vocabWrittenRecent">Not practised</small></div><div><span>Listening</span><strong id="vocabSpokenMastery">0%</strong><small id="vocabSpokenRecent">Not practised</small></div><div><span>English → Japanese</span><strong id="vocabRecallMastery">0%</strong><small id="vocabRecallRecent">Not practised</small></div><div><span>Speaking</span><strong id="vocabSpeakingMastery">0%</strong><small id="vocabSpeakingRecent">Not practised</small></div></div></div>
         <div class="card vocab-trouble-card"><div class="vocab-section-heading"><div><h2>Trouble words</h2><p class="muted" id="vocabTroubleHint">Recent misses in the selected scope matter more than old mistakes.</p></div><button class="ghost" id="vocabReviewTrouble" type="button">Review trouble words</button></div><div class="vocab-trouble-list" id="vocabTroubleList"></div></div>
       </div>
-      <details class="card vocab-curriculum-card"><summary><span><strong>Vocabulary tracks and topics</strong><small id="vocabCurriculumSummary">Genki stage 1 of ${COURSE_STAGES.length}</small></span></summary><p class="muted">Browse progress across the Genki II Course and JLPT N5 topics. Guided practice introduces Genki words in order; every topic can also be practised directly.</p><div class="vocab-stages" id="vocabStages"></div></details>
+      <details class="card vocab-curriculum-card"><summary><span><strong>Vocabulary tracks and topics</strong><small id="vocabCurriculumSummary">Genki stage 1 of ${COURSE_STAGES.length}</small></span></summary><p class="muted">Browse progress across the Genki II Course and JLPT N5 topics. Guided practice introduces words in track order; every topic can also be practised directly.</p><div class="vocab-stages" id="vocabStages"></div></details>
       <dialog class="vocab-scope-dialog" id="vocabScopeDialog" aria-labelledby="vocabScopeDialogTitle">
         <div class="vocab-scope-dialog-shell">
           <header><div><h2 id="vocabScopeDialogTitle">Choose practice scope</h2><p>Study the Genki II Course, the JLPT N5 list, or any combination of topics.</p></div><button class="vocab-scope-close" id="vocabScopeClose" type="button" aria-label="Close practice scope">×</button></header>
@@ -1091,7 +1116,7 @@
                 <button type="button" role="tab" data-scope-track="n5" aria-selected="false"><strong>JLPT N5</strong><small>802 official entries</small></button>
               </div>
               <div class="vocab-scope-track-panel" data-scope-track-panel="genki" role="tabpanel">
-                <button class="vocab-scope-choice vocab-scope-choice-primary" type="button" data-scope-preset="adaptive" aria-pressed="false"><span><em>Recommended</em><strong>Guided Genki II Course</strong><small>Continue from your current stage with automatic review.</small></span><i aria-hidden="true"></i></button>
+                <button class="vocab-scope-choice vocab-scope-choice-primary" type="button" data-scope-preset="adaptive" aria-pressed="false"><span><span class="vocab-scope-choice-title"><strong>Guided Genki II Course</strong><em>Recommended</em></span><small>Continue from your current stage with automatic review.</small></span><i aria-hidden="true"></i></button>
                 <button class="vocab-scope-choice" type="button" data-scope-preset="genki" aria-pressed="false"><span><strong>Entire Genki II Course</strong><small>Practise all 131 course words without stage locks.</small></span><i aria-hidden="true"></i></button>
                 <div class="vocab-scope-lesson-choices" aria-label="Genki II lessons">
                   <button type="button" data-scope-preset="lesson1" aria-pressed="false"><strong>Lesson 1</strong><small>4 topics · 83 words</small></button>
@@ -1100,7 +1125,8 @@
                 <button class="vocab-scope-topics-link" type="button" data-open-scope-topics="genki"><span>Choose Genki II topics</span><span aria-hidden="true">›</span></button>
               </div>
               <div class="vocab-scope-track-panel" data-scope-track-panel="n5" role="tabpanel" hidden>
-                <button class="vocab-scope-choice vocab-scope-choice-primary" type="button" data-scope-preset="n5" aria-pressed="false"><span><strong>All JLPT N5 vocabulary</strong><small>802 official entries · 803 practice forms across 23 topics.</small></span><i aria-hidden="true"></i></button>
+                <button class="vocab-scope-choice vocab-scope-choice-primary" type="button" data-scope-preset="n5-guided" aria-pressed="false"><span><span class="vocab-scope-choice-title"><strong>Guided JLPT N5</strong><em>Recommended</em></span><small>Learn one topic at a time while earlier N5 words stay in review.</small></span><i aria-hidden="true"></i></button>
+                <button class="vocab-scope-choice" type="button" data-scope-preset="n5" aria-pressed="false"><span><strong>All JLPT N5 vocabulary</strong><small>802 official entries · 803 practice forms across 23 topics.</small></span><i aria-hidden="true"></i></button>
                 <button class="vocab-scope-topics-link" type="button" data-open-scope-topics="n5"><span>Choose JLPT N5 topics</span><span aria-hidden="true">›</span></button>
               </div>
               <button class="vocab-scope-advanced" type="button" data-open-scope-topics="all"><span><strong>Combine tracks</strong><small>Advanced · mix individual Genki II and JLPT N5 topics</small></span><span aria-hidden="true">›</span></button>
@@ -1475,12 +1501,16 @@
     if (state.practiceScope === "trouble") {
       return due.total ? `${urgent ? "Urgent retry due" : "Trouble review"} · ${dueReviewSummary(due)}` : "Focused review of recent trouble words";
     }
-    const stage = unlockedStageIndex();
-    const unseen = (state.practiceScope === "adaptive" ? stageWords(stage) : wordsForScope()).filter(word => !itemState(word).introduced).length;
+    const guidedN5 = state.practiceScope === "n5-guided";
+    const guided = state.practiceScope === "adaptive" || guidedN5;
+    const stage = guidedN5 ? unlockedN5StageIndex() : unlockedStageIndex();
+    const guidedStageWords = guidedN5 ? n5StageWords(stage) : stageWords(stage);
+    const guidedStages = guidedN5 ? N5_STAGES : COURSE_STAGES;
+    const unseen = (guided ? guidedStageWords : wordsForScope()).filter(word => !itemState(word).introduced).length;
     if (due.total) return urgent ? `Urgent retry due · ${dueReviewSummary(due)}` : `${paceLabel()} pace · ${paceMixLabel()} · ${dueReviewSummary(due)}`;
-    if (unseen) return `${paceLabel()} pace · ${paceMixLabel()} · ${unseen} new ${state.practiceScope === "adaptive" ? "in the current stage" : `in ${SCOPE_LABELS[state.practiceScope].toLowerCase()}`}`;
-    if (state.practiceScope !== "adaptive") return `${SCOPE_LABELS[state.practiceScope]} introduced · strengthening mastery`;
-    if (stage < COURSE_STAGES.length - 1) return `Reviewing learned words while Genki stage ${stage + 1} finishes`;
+    if (unseen) return `${paceLabel()} pace · ${paceMixLabel()} · ${unseen} new ${guided ? `in the current ${guidedN5 ? "topic" : "stage"}` : `in ${SCOPE_LABELS[state.practiceScope].toLowerCase()}`}`;
+    if (!guided) return `${SCOPE_LABELS[state.practiceScope]} introduced · strengthening mastery`;
+    if (stage < guidedStages.length - 1) return `Reviewing learned words while ${guidedN5 ? `N5 topic ${stage + 1}` : `Genki stage ${stage + 1}`} finishes`;
     return "Curriculum introduced · strengthening recall";
   }
 
@@ -1540,14 +1570,21 @@
       : scopeSelectionSummary(state.practiceScope));
     setOptionalText("#vocabDueSummary", due.total ? `${due.total} word${due.total === 1 ? "" : "s"} due` : "No words due");
     setOptionalText("#vocabDueBreakdown", `${dueScopeLabel} · one shared review queue · prompts adapt across enabled formats`);
-    const currentStageWords = stageWords(unlocked);
+    const guidedN5 = state.practiceScope === "n5-guided";
+    const guided = state.practiceScope === "adaptive" || guidedN5;
+    const guidedIndex = guidedN5 ? unlockedN5StageIndex() : unlocked;
+    const currentStageWords = guidedN5 ? n5StageWords(guidedIndex) : stageWords(guidedIndex);
     const currentStageIntroduced = currentStageWords.filter(word => itemState(word).introduced).length;
-    const curriculumSummary = state.practiceScope === "adaptive"
+    const curriculumSummary = guided
       ? `${SCOPE_LABELS.adaptive} · ${currentStageIntroduced}/${currentStageWords.length} current · ${introduced.length} learned total`
       : `${SCOPE_LABELS[state.practiceScope]} · ${introducedInScope}/${scopeWords.length} introduced`;
-    setOptionalText("#vocabCurriculumSummary", curriculumSummary);
+    const guidedSummary = guidedN5
+      ? `${SCOPE_LABELS["n5-guided"]} · ${currentStageIntroduced}/${currentStageWords.length} current · ${wordsForScope("n5").filter(word => itemState(word).introduced).length} N5 learned`
+      : curriculumSummary;
+    setOptionalText("#vocabCurriculumSummary", guidedSummary);
     const scopeHints = {
       adaptive: "New words follow the Genki II sequence; learned words remain reviewable.",
+      "n5-guided": `Current topic: ${N5_STAGES[guidedIndex]?.name.replace(/^JLPT N5 · /, "") || "JLPT N5"}. Earlier N5 words remain reviewable.`,
       all: "The Genki II Course and JLPT N5 list in one deduplicated practice pool.",
       genki: "All vocabulary in the Genki II Course track.",
       n5: `${N5_DATA.officialEntryCount} official JLPT N5 entries · ${wordsForScope("n5").length} practice forms.`,
@@ -1558,7 +1595,7 @@
     if (state.practiceScope !== "custom" && state.practiceScope !== "trouble") setOptionalText("#vocabScopeHint", scopeHints[state.practiceScope]);
     const troubleSourceScope = state.practiceScope === "trouble" ? (lastRegularScope === "adaptive" ? "Guided Genki II Course" : SCOPE_LABELS[lastRegularScope]) : SCOPE_LABELS[state.practiceScope];
     setOptionalText("#vocabTroubleHint", `Recent misses in ${troubleSourceScope} matter more than old mistakes.`);
-    setOptionalText("#vocabProgressStage", state.practiceScope === "adaptive" ? COURSE_STAGES[unlocked].name : SCOPE_LABELS[state.practiceScope]);
+    setOptionalText("#vocabProgressStage", guided ? (guidedN5 ? N5_STAGES[guidedIndex]?.name : COURSE_STAGES[guidedIndex].name) : SCOPE_LABELS[state.practiceScope]);
     MODE_KEYS.forEach(mode => {
       const capitalized = mode[0].toUpperCase() + mode.slice(1);
       const recent = recentModeAccuracy(mode, introduced);
@@ -1577,11 +1614,13 @@
       const introducedCount = words.filter(word => itemState(word).introduced).length;
       const average = words.length ? Math.round(words.reduce((sum, word) => sum + itemState(word).mastery, 0) / words.length) : 0;
       const courseIndex = COURSE_STAGES.findIndex(candidate => candidate.id === stage.id);
-      const selected = state.practiceScope === "adaptive" ? courseIndex >= 0 && courseIndex <= unlocked : scopeWords.some(word => word.stageIds.includes(stage.id));
-      const practicedEarly = state.practiceScope === "adaptive" && !selected && introducedCount > 0;
+      const n5Index = N5_STAGES.findIndex(candidate => candidate.id === stage.id);
+      const guidedStageIndex = guidedN5 ? n5Index : courseIndex;
+      const selected = guided ? guidedStageIndex >= 0 && guidedStageIndex <= guidedIndex : scopeWords.some(word => word.stageIds.includes(stage.id));
+      const practicedEarly = guided && !selected && introducedCount > 0;
       const ready = words.length > 0 && Scheduler.stageIsReady(words.map(word => itemState(word)));
-      const status = state.practiceScope === "adaptive"
-        ? (courseIndex < 0 ? (practicedEarly ? "Practiced" : "Choose scope") : courseIndex < unlocked ? "Complete" : courseIndex === unlocked ? "Current" : practicedEarly ? "Practiced early" : "Locked")
+      const status = guided
+        ? (guidedStageIndex < 0 ? (practicedEarly ? "Practised" : "Choose scope") : guidedStageIndex < guidedIndex ? "Complete" : guidedStageIndex === guidedIndex ? "Current" : practicedEarly ? "Practised early" : "Locked")
         : (selected ? (ready ? "Complete" : "In scope") : "Filtered");
       const stageClass = selected ? "" : practicedEarly ? "pre-practiced" : "locked";
       const numberLabel = courseIndex >= 0 ? `${courseIndex + 1}` : "N5";
@@ -1685,7 +1724,7 @@
   });
   $("#vocabScopeDialog").querySelectorAll("[data-scope-preset]").forEach(button => button.addEventListener("click", () => {
     scopeDraft = button.dataset.scopePreset;
-    scopeStageDraft = new Set(scopeDraft === "adaptive" ? [] : SCOPE_STAGE_IDS[scopeDraft]);
+    scopeStageDraft = new Set(["adaptive", "n5-guided"].includes(scopeDraft) ? [] : SCOPE_STAGE_IDS[scopeDraft]);
     renderScopeDialog();
   }));
   $("#vocabScopeDialog").querySelectorAll("[data-scope-track]").forEach(button => button.addEventListener("click", () => {

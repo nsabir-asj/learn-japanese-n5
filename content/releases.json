@@ -186,6 +186,21 @@
           "text": "Advanced topic mixing remains available without crowding the most common study choices."
         }
       ]
+    },
+    {
+      "id": "2026-09-14.3",
+      "publishedAt": "2026-09-14",
+      "title": "Guided JLPT N5 study",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Guided JLPT N5 practice now introduces vocabulary one topic at a time while keeping earlier N5 words available for review."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "Recommendation labels now sit quietly beside each guided track instead of competing with the practice choice."
+        }
+      ]
     }
   ]
 }
