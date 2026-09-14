@@ -135,6 +135,14 @@ test('vocabulary scope picker supports guided, preset, and custom topic practice
   assert.match(vocabulary, /activeCurriculumTrack === "all"/);
   assert.match(vocabulary, /class="vocab-track-group"/);
   assert.match(styles, /\.vocab-track-group/);
+  assert.match(vocabulary, /scopeChangeCount: 0/);
+  assert.match(vocabulary, /function scopeSelectionKey/);
+  assert.match(vocabulary, /scopeSelectionKey\(regularScope\(\), state\.customStageIds\)/);
+  assert.match(vocabulary, /state\.scopeChangeCount = Math\.min\(3, state\.scopeChangeCount \+ 1\)/);
+  assert.match(vocabulary, /id="vocabSessionControls"/);
+  assert.match(vocabulary, /if \(event\.currentTarget\.open\) nudgePracticeScope\(\)/);
+  assert.match(styles, /@keyframes vocab-scope-nudge/);
+  assert.match(styles, /@media\(prefers-reduced-motion:reduce\)/);
 });
 
 test('vocabulary answers reveal a highlighted example with separate sentence audio', () => {

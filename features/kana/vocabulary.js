@@ -341,7 +341,7 @@
   function defaultState() {
     return {
       version: VERSION, total: 0, correct: 0, streak: 0, bestStreak: 0,
-      questionFormat: "mixed", practiceScope: "adaptive", customStageIds: [COURSE_STAGES[0].id], pace: 50, newWordCredit: 0, unlockedStage: 0, n5UnlockedStage: 0,
+      questionFormat: "mixed", practiceScope: "adaptive", customStageIds: [COURSE_STAGES[0].id], scopeChangeCount: 0, pace: 50, newWordCredit: 0, unlockedStage: 0, n5UnlockedStage: 0,
       autoPronounce: true, choiceCount: "auto", items: {}, recent: [], savedAt: 0
     };
   }
@@ -444,6 +444,7 @@
     .filter(id => ALL_STAGES.some(stage => stage.id === id));
   if (!state.customStageIds.length) state.customStageIds = [COURSE_STAGES[0].id];
   state.choiceCount = CHOICE_COUNT_VALUES.includes(String(state.choiceCount)) ? String(state.choiceCount) : "auto";
+  state.scopeChangeCount = clamp(Number(state.scopeChangeCount) || 0, 0, 3);
   state.pace = clamp(Number(state.pace) || 50, 10, 90);
   state.newWordCredit = clamp(Number(state.newWordCredit) || 0, 0, 1);
   state.unlockedStage = clamp(Number(state.unlockedStage) || 0, 0, COURSE_STAGES.length - 1);
@@ -471,6 +472,7 @@
   let scopeDialogView = "tracks";
   let scopeTrackDraft = "genki";
   let scopeTopicTrack = "n5";
+  let scopeNudgeTimer = 0;
   let curriculumStageId = COURSE_STAGES[0].id;
   let curriculumFilter = "all";
   let curriculumSort = "accuracy-low";
@@ -757,6 +759,20 @@
     return `${nameSummary} · ${topicLabel} · ${count} words`;
   }
 
+  function scopeSelectionKey(scope = state.practiceScope, customStageIds = state.customStageIds) {
+    return scope === "custom" ? `custom:${[...customStageIds].sort().join(",")}` : scope;
+  }
+
+  function nudgePracticeScope() {
+    const trigger = $("#vocabPracticeScope");
+    if (!trigger || state.scopeChangeCount >= 3) return;
+    clearTimeout(scopeNudgeTimer);
+    trigger.classList.remove("is-onboarding-nudge");
+    void trigger.offsetWidth;
+    trigger.classList.add("is-onboarding-nudge");
+    scopeNudgeTimer = setTimeout(() => trigger.classList.remove("is-onboarding-nudge"), 1700);
+  }
+
   function wordContextName(word) {
     const selectedStageIds = scopeStageIds();
     const stageId = word.stageIds.find(id => selectedStageIds.includes(id)) || word.stageId;
@@ -832,8 +848,10 @@
 
   function applyScopeSelection() {
     if (!["adaptive", "n5-guided"].includes(scopeDraft) && !scopeStageDraft.size) return;
+    const previousSelection = scopeSelectionKey(regularScope(), state.customStageIds);
     if (scopeDraft === "custom") state.customStageIds = ALL_STAGES.map(stage => stage.id).filter(id => scopeStageDraft.has(id));
     state.practiceScope = scopeDraft;
+    if (scopeSelectionKey() !== previousSelection) state.scopeChangeCount = Math.min(3, state.scopeChangeCount + 1);
     lastRegularScope = state.practiceScope;
     current = null;
     closeScopeDialog();
@@ -1100,7 +1118,7 @@
         </div>
         <div class="footer-actions"><div class="actions"><button class="ghost" id="vocabDontKnow">I don’t know</button><button class="ghost hidden" id="vocabNext">Next <kbd>Enter</kbd></button></div><span class="tiny" id="vocabKeyboardHint">Use <kbd>1</kbd>–<kbd>4</kbd> to choose an answer.</span></div>
       </div>
-      <details class="card vocab-setup-card">
+      <details class="card vocab-setup-card" id="vocabSessionControls">
         <summary><span><strong>Session controls</strong><small id="vocabPaceStatus">Balanced introduction and review</small></span></summary>
         <div class="vocab-setup">
           <div><h2>Vocabulary practice</h2><p class="muted">Guided practice moves through Genki II lessons or JLPT N5 topics in order. You can also practise a whole track or combine topics. Changing the format changes the question, not the word’s review schedule.</p></div>
@@ -1745,6 +1763,9 @@
     current = null;
     nextQuestion();
     saveState();
+  });
+  $("#vocabSessionControls").addEventListener("toggle", event => {
+    if (event.currentTarget.open) nudgePracticeScope();
   });
   $("#vocabPracticeScope").addEventListener("click", openScopeDialog);
   $("#vocabCurriculumChangeScope").addEventListener("click", openScopeDialog);
