@@ -114,6 +114,8 @@ test('vocabulary scope picker supports guided, preset, and custom topic practice
   assert.match(vocabulary, /data-scope-preset="genki"/);
   assert.match(vocabulary, /data-scope-preset="n5"/);
   assert.match(vocabulary, /data-scope-preset="n5-guided"/);
+  assert.match(vocabulary, /data-scope-preset="\$\{scope\}"/);
+  assert.match(vocabulary, /\[1, 2, 3, 4\]\.map/);
   assert.match(vocabulary, /function unlockedN5StageIndex/);
   assert.match(vocabulary, /data-open-scope-topics="all"/);
   assert.match(vocabulary, /id="vocabScopeTopicSearch"/);

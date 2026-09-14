@@ -220,6 +220,21 @@
           "text": "The practice-scope hint now waits briefly after Session controls opens, making the guidance feel calmer and easier to notice."
         }
       ]
+    },
+    {
+      "id": "2026-09-14.5",
+      "publishedAt": "2026-09-14",
+      "title": "Genki vocabulary for Lessons 3 and 4",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "The Genki II Course now includes all 118 vocabulary entries from Lessons 3 and 4, organised into focused topics with kana-only example sentences."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "Lesson 3 and Lesson 4 can now be selected directly as practice scopes, while words shared with JLPT N5 keep one learning history."
+        }
+      ]
     }
   ]
 }

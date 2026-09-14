@@ -5,7 +5,7 @@ import { test } from 'node:test';
 const dataset = JSON.parse(readFileSync('content/vocabulary/n5-topics.json', 'utf8'));
 const vocabularySource = readFileSync('features/kana/vocabulary.js', 'utf8');
 const stageSource = vocabularySource.split('const WORDS =', 1)[0];
-const stagePattern = /\{\s*id:\s*"([^"]+)".*?words:\s*\[(.*?)\]\s*\}/gs;
+const stagePattern = /\{\s*id:\s*"([^"]+)".*?words:\s*\[(.*?)\]\s*(?:,\s*reusedWordIds:\s*\[[^\]]*\])?\s*\}/gs;
 const wordPattern = /\["([^"]+)",\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)"\]/g;
 const existingWords = [...stageSource.matchAll(stagePattern)].flatMap(([, stageId, body]) =>
   [...body.matchAll(wordPattern)].map(([, id]) => ({ id, stageId })),
