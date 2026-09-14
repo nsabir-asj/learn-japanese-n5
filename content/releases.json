@@ -199,6 +199,10 @@
         {
           "pages": ["vocabulary"],
           "text": "Recommendation labels now sit quietly beside each guided track instead of competing with the practice choice."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "The curriculum now follows the selected vocabulary track, while combined scopes keep Genki II and JLPT N5 clearly grouped."
         }
       ]
     }

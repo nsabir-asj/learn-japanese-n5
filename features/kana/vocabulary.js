@@ -723,6 +723,17 @@
     return scope === "trouble" ? lastRegularScope : scope;
   }
 
+  function curriculumTrack(scope = regularScope()) {
+    if (["adaptive", "genki", "lesson1", "lesson2"].includes(scope)) return "genki";
+    if (["n5-guided", "n5"].includes(scope)) return "n5";
+    if (scope === "custom") {
+      const hasGenki = state.customStageIds.some(id => SCOPE_STAGE_IDS.genki.includes(id));
+      const hasN5 = state.customStageIds.some(id => SCOPE_STAGE_IDS.n5.includes(id));
+      if (hasGenki !== hasN5) return hasGenki ? "genki" : "n5";
+    }
+    return "all";
+  }
+
   function scopeStageIds(scope = regularScope()) {
     if (scope === "adaptive") return COURSE_STAGES.slice(0, unlockedStageIndex() + 1).map(stage => stage.id);
     if (scope === "n5-guided") return N5_STAGES.slice(0, unlockedN5StageIndex() + 1).map(stage => stage.id);
@@ -1105,7 +1116,7 @@
         <div class="card"><h2>Practice coverage</h2><p class="muted">One shared review schedule; these direction stats help choose the next prompt.</p><div class="vocab-direction-grid"><div><span>Japanese → English</span><strong id="vocabWrittenMastery">0%</strong><small id="vocabWrittenRecent">Not practised</small></div><div><span>Listening</span><strong id="vocabSpokenMastery">0%</strong><small id="vocabSpokenRecent">Not practised</small></div><div><span>English → Japanese</span><strong id="vocabRecallMastery">0%</strong><small id="vocabRecallRecent">Not practised</small></div><div><span>Speaking</span><strong id="vocabSpeakingMastery">0%</strong><small id="vocabSpeakingRecent">Not practised</small></div></div></div>
         <div class="card vocab-trouble-card"><div class="vocab-section-heading"><div><h2>Trouble words</h2><p class="muted" id="vocabTroubleHint">Recent misses in the selected scope matter more than old mistakes.</p></div><button class="ghost" id="vocabReviewTrouble" type="button">Review trouble words</button></div><div class="vocab-trouble-list" id="vocabTroubleList"></div></div>
       </div>
-      <details class="card vocab-curriculum-card"><summary><span><strong>Vocabulary tracks and topics</strong><small id="vocabCurriculumSummary">Genki stage 1 of ${COURSE_STAGES.length}</small></span></summary><p class="muted">Browse progress across the Genki II Course and JLPT N5 topics. Guided practice introduces words in track order; every topic can also be practised directly.</p><div class="vocab-stages" id="vocabStages"></div></details>
+      <details class="card vocab-curriculum-card"><summary><span><strong id="vocabCurriculumTitle">Genki II Course curriculum</strong><small id="vocabCurriculumSummary">Genki stage 1 of ${COURSE_STAGES.length}</small></span></summary><div class="vocab-curriculum-intro"><p class="muted" id="vocabCurriculumDescription">Browse progress through the topics in your current practice track.</p><button class="ghost" id="vocabCurriculumChangeScope" type="button">Change practice scope</button></div><div class="vocab-stages" id="vocabStages"></div></details>
       <dialog class="vocab-scope-dialog" id="vocabScopeDialog" aria-labelledby="vocabScopeDialogTitle">
         <div class="vocab-scope-dialog-shell">
           <header><div><h2 id="vocabScopeDialogTitle">Choose practice scope</h2><p>Study the Genki II Course, the JLPT N5 list, or any combination of topics.</p></div><button class="vocab-scope-close" id="vocabScopeClose" type="button" aria-label="Close practice scope">×</button></header>
@@ -1609,7 +1620,24 @@
       troubleButton.disabled = !weak.length;
       troubleButton.textContent = state.practiceScope === "trouble" ? `Return to ${SCOPE_LABELS[lastRegularScope]}` : "Review trouble words";
     }
-    $("#vocabStages").innerHTML = ALL_STAGES.map((stage, index) => {
+    const activeCurriculumTrack = curriculumTrack();
+    const curriculumCopy = {
+      genki: {
+        title: "Genki II Course curriculum",
+        description: "Browse progress through the Genki II topics in your current practice track."
+      },
+      n5: {
+        title: "JLPT N5 topic curriculum",
+        description: "Browse progress through the JLPT N5 topics in your current practice track."
+      },
+      all: {
+        title: "Combined vocabulary curriculum",
+        description: "Your practice scope includes both tracks, so their topics are grouped below."
+      }
+    }[activeCurriculumTrack];
+    setOptionalText("#vocabCurriculumTitle", curriculumCopy.title);
+    setOptionalText("#vocabCurriculumDescription", curriculumCopy.description);
+    const stageMarkup = stage => {
       const words = wordsInStage(stage.id);
       const introducedCount = words.filter(word => itemState(word).introduced).length;
       const average = words.length ? Math.round(words.reduce((sum, word) => sum + itemState(word).mastery, 0) / words.length) : 0;
@@ -1625,7 +1653,10 @@
       const stageClass = selected ? "" : practicedEarly ? "pre-practiced" : "locked";
       const numberLabel = courseIndex >= 0 ? `${courseIndex + 1}` : "N5";
       return `<button class="vocab-stage ${stageClass}" type="button" data-curriculum-stage="${stage.id}" aria-label="View words in ${stage.name}"><span class="vocab-stage-number">${numberLabel}</span><span class="vocab-stage-content"><strong>${stage.name}</strong><span class="vocab-stage-description">${stage.description}</span><span class="vocab-stage-meter"><span style="width:${average}%"></span></span><small>${introducedCount} / ${words.length} introduced · ${average}% average mastery</small></span><span class="vocab-stage-status">${status}<i aria-hidden="true">›</i></span></button>`;
-    }).join("");
+    };
+    $("#vocabStages").innerHTML = activeCurriculumTrack === "all"
+      ? `<section class="vocab-track-group" aria-labelledby="vocabGenkiTrackHeading"><h3 class="vocab-track-heading" id="vocabGenkiTrackHeading">Genki II Course</h3>${COURSE_STAGES.map(stageMarkup).join("")}</section><section class="vocab-track-group" aria-labelledby="vocabN5TrackHeading"><h3 class="vocab-track-heading" id="vocabN5TrackHeading">JLPT N5</h3>${N5_STAGES.map(stageMarkup).join("")}</section>`
+      : (activeCurriculumTrack === "genki" ? COURSE_STAGES : N5_STAGES).map(stageMarkup).join("");
     publishDashboard();
   }
 
@@ -1716,6 +1747,7 @@
     saveState();
   });
   $("#vocabPracticeScope").addEventListener("click", openScopeDialog);
+  $("#vocabCurriculumChangeScope").addEventListener("click", openScopeDialog);
   $("#vocabScopeClose").addEventListener("click", closeScopeDialog);
   $("#vocabScopeCancel").addEventListener("click", closeScopeDialog);
   $("#vocabScopeApply").addEventListener("click", applyScopeSelection);

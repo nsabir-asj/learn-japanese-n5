@@ -98,6 +98,7 @@ test('vocabulary choices reveal pronunciation or Japanese text only after answer
 
 test('vocabulary scope picker supports guided, preset, and custom topic practice', () => {
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
+  const styles = readFileSync(resolve(root, 'features/kana/vocabulary.css'), 'utf8');
   assert.doesNotThrow(() => new Script(vocabulary));
   assert.match(vocabulary, /adaptive: "Guided Genki II Course", "n5-guided": "Guided JLPT N5", all: "All vocabulary", genki: "Genki II Course", n5: "JLPT N5"/);
   assert.match(vocabulary, /id="vocabScopeDialog"/);
@@ -128,6 +129,12 @@ test('vocabulary scope picker supports guided, preset, and custom topic practice
   assert.match(vocabulary, /guidedN5 \? wordsForScope\("n5"\)\.filter\(word => itemState\(word\)\.introduced\) : pool/);
   assert.match(vocabulary, /practicedEarly \? "Practised early"/);
   assert.match(vocabulary, /function applyScopeSelection/);
+  assert.match(vocabulary, /function curriculumTrack/);
+  assert.match(vocabulary, /id="vocabCurriculumTitle"/);
+  assert.match(vocabulary, /id="vocabCurriculumChangeScope"/);
+  assert.match(vocabulary, /activeCurriculumTrack === "all"/);
+  assert.match(vocabulary, /class="vocab-track-group"/);
+  assert.match(styles, /\.vocab-track-group/);
 });
 
 test('vocabulary answers reveal a highlighted example with separate sentence audio', () => {
