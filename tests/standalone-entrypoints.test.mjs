@@ -141,6 +141,9 @@ test('vocabulary scope picker supports guided, preset, and custom topic practice
   assert.match(vocabulary, /state\.scopeChangeCount = Math\.min\(3, state\.scopeChangeCount \+ 1\)/);
   assert.match(vocabulary, /id="vocabSessionControls"/);
   assert.match(vocabulary, /if \(event\.currentTarget\.open\) nudgePracticeScope\(\)/);
+  assert.match(vocabulary, /function clearPracticeScopeNudge/);
+  assert.match(vocabulary, /\}, 650\)/);
+  assert.match(vocabulary, /else clearPracticeScopeNudge\(\)/);
   assert.match(styles, /@keyframes vocab-scope-nudge/);
   assert.match(styles, /@media\(prefers-reduced-motion:reduce\)/);
 });

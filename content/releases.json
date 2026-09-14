@@ -209,6 +209,17 @@
           "text": "Session controls now gently point new learners toward practice scope until they have changed it three times."
         }
       ]
+    },
+    {
+      "id": "2026-09-14.4",
+      "publishedAt": "2026-09-14",
+      "title": "Smoother scope guidance",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "The practice-scope hint now waits briefly after Session controls opens, making the guidance feel calmer and easier to notice."
+        }
+      ]
     }
   ]
 }

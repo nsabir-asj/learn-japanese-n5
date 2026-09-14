@@ -472,7 +472,8 @@
   let scopeDialogView = "tracks";
   let scopeTrackDraft = "genki";
   let scopeTopicTrack = "n5";
-  let scopeNudgeTimer = 0;
+  let scopeNudgeDelayTimer = 0;
+  let scopeNudgeEndTimer = 0;
   let curriculumStageId = COURSE_STAGES[0].id;
   let curriculumFilter = "all";
   let curriculumSort = "accuracy-low";
@@ -763,14 +764,22 @@
     return scope === "custom" ? `custom:${[...customStageIds].sort().join(",")}` : scope;
   }
 
+  function clearPracticeScopeNudge() {
+    const trigger = $("#vocabPracticeScope");
+    clearTimeout(scopeNudgeDelayTimer);
+    clearTimeout(scopeNudgeEndTimer);
+    trigger?.classList.remove("is-onboarding-nudge");
+  }
+
   function nudgePracticeScope() {
     const trigger = $("#vocabPracticeScope");
+    clearPracticeScopeNudge();
     if (!trigger || state.scopeChangeCount >= 3) return;
-    clearTimeout(scopeNudgeTimer);
-    trigger.classList.remove("is-onboarding-nudge");
-    void trigger.offsetWidth;
-    trigger.classList.add("is-onboarding-nudge");
-    scopeNudgeTimer = setTimeout(() => trigger.classList.remove("is-onboarding-nudge"), 1700);
+    scopeNudgeDelayTimer = setTimeout(() => {
+      if (!$("#vocabSessionControls")?.open || state.scopeChangeCount >= 3) return;
+      trigger.classList.add("is-onboarding-nudge");
+      scopeNudgeEndTimer = setTimeout(() => trigger.classList.remove("is-onboarding-nudge"), 1700);
+    }, 650);
   }
 
   function wordContextName(word) {
@@ -851,7 +860,10 @@
     const previousSelection = scopeSelectionKey(regularScope(), state.customStageIds);
     if (scopeDraft === "custom") state.customStageIds = ALL_STAGES.map(stage => stage.id).filter(id => scopeStageDraft.has(id));
     state.practiceScope = scopeDraft;
-    if (scopeSelectionKey() !== previousSelection) state.scopeChangeCount = Math.min(3, state.scopeChangeCount + 1);
+    if (scopeSelectionKey() !== previousSelection) {
+      state.scopeChangeCount = Math.min(3, state.scopeChangeCount + 1);
+      if (state.scopeChangeCount >= 3) clearPracticeScopeNudge();
+    }
     lastRegularScope = state.practiceScope;
     current = null;
     closeScopeDialog();
@@ -1765,7 +1777,7 @@
     saveState();
   });
   $("#vocabSessionControls").addEventListener("toggle", event => {
-    if (event.currentTarget.open) nudgePracticeScope();
+    if (event.currentTarget.open) nudgePracticeScope(); else clearPracticeScopeNudge();
   });
   $("#vocabPracticeScope").addEventListener("click", openScopeDialog);
   $("#vocabCurriculumChangeScope").addEventListener("click", openScopeDialog);
