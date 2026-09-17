@@ -35,7 +35,7 @@ section + section { margin-top: 44px; }
 .section-heading > p { max-width: 590px; margin: 0; color: var(--muted); line-height: 1.55; }
 .activity-grid { display: grid; gap: 14px; }
 .activity-grid-sprints { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.activity-grid-foundations { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.activity-grid-foundations { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .activity-card { position: relative; display: grid; min-width: 0; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(145deg, rgba(28,36,48,.96), rgba(22,27,34,.96)); color: var(--text); padding: 22px; text-decoration: none; box-shadow: 0 18px 55px rgba(0,0,0,.18); transition: transform .16s ease, border-color .16s ease, background .16s ease; }
 .activity-card:hover { transform: translateY(-3px); border-color: #637083; background: linear-gradient(145deg, #202a37, #181e27); }
 .activity-card:focus-visible { outline: 3px solid rgba(88,166,255,.5); outline-offset: 3px; }
@@ -44,7 +44,7 @@ section + section { margin-top: 44px; }
 .kana-pair span:last-child { color: #d2baff; transform: translateY(10px); }
 .foundation-mark { display: flex; align-items: center; min-height: 94px; margin-bottom: 18px; color: #8fd7b0; font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif; font-size: 3.7rem; font-weight: 700; line-height: 1; }
 .numbers-card .foundation-mark { color: #f1c76d; font-family: ui-monospace,"Cascadia Mono","Segoe UI Mono",monospace; }
-.vocabulary-card { background: linear-gradient(145deg,rgba(63,185,80,.09),rgba(22,27,34,.96)); }.numbers-card { background: linear-gradient(145deg,rgba(210,153,34,.1),rgba(22,27,34,.96)); }
+.vocabulary-card { background: linear-gradient(145deg,rgba(63,185,80,.09),rgba(22,27,34,.96)); }.numbers-card { background: linear-gradient(145deg,rgba(210,153,34,.1),rgba(22,27,34,.96)); }.kanji-card { background: linear-gradient(145deg,rgba(163,113,247,.11),rgba(22,27,34,.96)); }.kanji-card .foundation-mark { color: #d2baff; }
 .hiragana-card .kana-mark { color: #9ccbff; }
 .katakana-card .kana-mark { color: #d2baff; }
 .activity-copy { display: grid; gap: 8px; }

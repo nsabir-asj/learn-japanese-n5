@@ -235,6 +235,17 @@
           "text": "Lesson 3 and Lesson 4 can now be selected directly as practice scopes, while words shared with JLPT N5 keep one learning history."
         }
       ]
+    },
+    {
+      "id": "2026-09-17.1",
+      "publishedAt": "2026-09-17",
+      "title": "Guided kanji learning",
+      "changes": [
+        {
+          "pages": ["home"],
+          "text": "Learn 104 core N5 preparation kanji in small stages with answer-safe practice choices, highlighted example sentences, adaptive review, checkpoints, and a searchable progress map."
+        }
+      ]
     }
   ]
 }

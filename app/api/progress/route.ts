@@ -16,6 +16,7 @@ const ALLOWED_STORE_KEYS = new Set([
   'kana-sprint-mix-v1',
   'kanaSprintNumbersV1',
   'kanaSprintVocabularyV1',
+  'kanaSprintKanjiV1',
   'kanaSprintGuidedLessonsV1',
   'kanaSprintSpeechV1',
 ]);

@@ -88,6 +88,7 @@
       kana: 'Kana Mix',
       vocabulary: 'Vocabulary',
       numbers: 'Numbers',
+      kanji: 'Kanji',
       guided: 'Guided lessons',
       settings: 'Settings',
     };
