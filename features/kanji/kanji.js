@@ -42,7 +42,7 @@
 
   function defaultState() {
     return {
-      version: 1, track: "core", questionFormat: "mixed", pace: 50,
+      version: 1, questionFormat: "mixed", pace: 50, autoPronounce: true,
       total: 0, correct: 0, streak: 0, bestStreak: 0, newCredit: 0,
       recent: [], items: {}, savedAt: 0
     };
@@ -69,15 +69,15 @@
   }
 
   function trackEntries() {
-    return DATA.kanji.filter(entry => state.track === "all" || entry.tier === "core");
+    return DATA.kanji;
   }
 
   function trackStages() {
-    return DATA.stages.filter(stage => state.track === "all" || stage.tier === "core");
+    return DATA.stages;
   }
 
   function stageEntries(stage) {
-    return stage.kanjiIds.map(id => entryById.get(id)).filter(entry => entry && (state.track === "all" || entry.tier === "core"));
+    return stage.kanjiIds.map(id => entryById.get(id)).filter(Boolean);
   }
 
   function modeState(entry, mode) {
@@ -208,7 +208,7 @@
       </nav>
       <section class="kanji-workspace" id="kanjiWorkspace">
         <aside class="card kanji-roadmap-card">
-          <div class="kanji-roadmap-heading"><div><span class="tiny">Guided journey</span><h2 id="kanjiJourneyTitle">Core 104</h2></div><span class="data-badge" id="kanjiStageBadge">Stage 1</span></div>
+          <div class="kanji-roadmap-heading"><div><span class="tiny">Guided journey</span><h2 id="kanjiJourneyTitle">JLPT N5</h2></div><span class="data-badge" id="kanjiStageBadge">Stage 1</span></div>
           <div class="kanji-stage-list" id="kanjiStageList"></div>
         </aside>
         <div class="kanji-main">
@@ -220,11 +220,12 @@
             <div class="footer-actions kanji-footer"><div class="actions"><button class="ghost kanji-hidden" id="kanjiDontKnow" type="button">I don’t know</button><button class="big-button kanji-hidden" id="kanjiNext" type="button">Continue <kbd>Enter</kbd></button></div><span class="tiny" id="kanjiKeyboardHint">New kanji are introduced before testing.</span></div>
           </section>
           <details class="card kanji-session-card" id="kanjiSessionControls">
-            <summary><span><strong>Session controls</strong><small id="kanjiSessionSummary">Core 104 · mixed practice · balanced pace</small></span></summary>
+            <summary><span><strong>Session controls</strong><small id="kanjiSessionSummary">JLPT N5 · mixed practice · balanced pace</small></span></summary>
             <div class="kanji-controls">
-              <label><span>Learning track</span><select id="kanjiTrack"><option value="core">Core 104</option><option value="all">Full 120 preparation set</option></select><small class="tiny">The final 16 broaden preparation beyond the legacy core.</small></label>
+              <div class="kanji-track-field"><span>Learning course</span><strong>JLPT N5</strong><small class="tiny">The guided journey covers 104 core kanji, followed by 16 extension kanji.</small></div>
               <label><span>Question direction</span><select id="kanjiQuestionFormat"><option value="mixed">Mixed automatically</option><option value="meaning">Kanji → meaning</option><option value="reading">Word → reading</option><option value="spelling">Reading → kanji word</option></select><small class="tiny">Mixed practice targets the weakest direction.</small></label>
-              <label><span>New-kanji pace: <strong id="kanjiPaceLabel">Balanced</strong></span><input id="kanjiPace" type="range" min="10" max="90" step="10"><span class="kanji-pace-labels"><span>More review</span><span>More new</span></span></label>
+              <label class="kanji-pace"><span>New-kanji pace: <strong id="kanjiPaceLabel">Balanced</strong></span><input id="kanjiPace" type="range" min="10" max="90" step="10"><span class="kanji-pace-labels"><span>More review</span><span>More new</span></span></label>
+              <div class="kanji-playback-settings"><label class="kanji-toggle"><input type="checkbox" id="kanjiAutoPronounce"><span>Automatically pronounce revealed words</span></label><button class="ghost" id="kanjiManageVoices" type="button">Manage voices</button></div>
             </div>
             <p class="kanji-attribution tiny">Meanings, readings, stroke counts, and radical data adapted from <a href="https://github.com/kanjialive/kanji-data-media" target="_blank" rel="noreferrer">Kanji alive</a> under CC BY 4.0.</p>
           </details>
@@ -240,9 +241,9 @@
       </section>`;
     host.appendChild(shell);
 
-    $("#kanjiTrack").value = state.track;
     $("#kanjiQuestionFormat").value = state.questionFormat;
     $("#kanjiPace").value = String(state.pace);
+    $("#kanjiAutoPronounce").checked = state.autoPronounce;
     globalThis.KANA_SPRINT_SYNC_RANGE?.($("#kanjiPace"));
     bindEvents();
   }
@@ -251,13 +252,6 @@
     document.querySelectorAll("[data-kanji-view]").forEach(button => button.addEventListener("click", () => switchView(button.dataset.kanjiView)));
     $("#kanjiDontKnow").addEventListener("click", () => answer(null));
     $("#kanjiNext").addEventListener("click", advance);
-    $("#kanjiTrack").addEventListener("change", event => {
-      state.track = event.target.value === "all" ? "all" : "core";
-      checkpoint = null;
-      saveState();
-      renderAll();
-      if (view !== "progress") nextActivity();
-    });
     $("#kanjiQuestionFormat").addEventListener("change", event => {
       state.questionFormat = MODE_KEYS.includes(event.target.value) ? event.target.value : "mixed";
       saveState();
@@ -266,6 +260,8 @@
     });
     $("#kanjiPace").addEventListener("input", event => { state.pace = Number(event.target.value); renderControls(); });
     $("#kanjiPace").addEventListener("change", saveState);
+    $("#kanjiAutoPronounce").addEventListener("change", event => { state.autoPronounce = event.target.checked; saveState(); });
+    $("#kanjiManageVoices").addEventListener("click", () => globalThis.KANA_SPRINT_SPEECH?.openSettings());
     $("#kanjiSearch").addEventListener("input", renderMap);
     $("#kanjiMapFilter").addEventListener("change", event => { mapFilter = event.target.value; renderMap(); });
     $("#kanjiMap").addEventListener("click", event => {
@@ -312,13 +308,13 @@
 
   function renderControls() {
     $("#kanjiPaceLabel").textContent = paceLabel();
-    $("#kanjiSessionSummary").textContent = `${state.track === "core" ? "Core 104" : "Full 120"} · ${state.questionFormat === "mixed" ? "mixed practice" : state.questionFormat} · ${paceLabel().toLowerCase()} pace`;
+    $("#kanjiSessionSummary").textContent = `JLPT N5 · ${state.questionFormat === "mixed" ? "mixed practice" : formatLabel(state.questionFormat)} · ${paceLabel().toLowerCase()} pace`;
   }
 
   function renderRoadmap() {
     const stages = trackStages();
     const activeIndex = currentStageIndex();
-    $("#kanjiJourneyTitle").textContent = state.track === "core" ? "Core 104" : "Full 120";
+    $("#kanjiJourneyTitle").textContent = "JLPT N5";
     $("#kanjiStageBadge").textContent = `Stage ${activeIndex + 1} / ${stages.length}`;
     $("#kanjiStageList").innerHTML = stages.map((stage, index) => {
       const entries = stageEntries(stage);
@@ -345,7 +341,7 @@
     const accuracy = state.total ? `${Math.round(state.correct / state.total * 100)}%` : "—";
     globalThis.dispatchEvent(new CustomEvent("kana-sprint-streak-context", { detail: { current: state.streak, best: state.bestStreak, label: "kanji streak" } }));
     globalThis.dispatchEvent(new CustomEvent("kana-sprint-activity-status", { detail: {
-      note: state.track === "core" ? "Core 104 journey" : "Full 120 preparation set",
+      note: "JLPT N5 journey",
       metrics: [
         { label: "Introduced", value: `${introduced.length}/${pool.length}` },
         { label: "Mastered", value: mastered.length },
@@ -386,6 +382,7 @@
     $("#kanjiIntroAudio").addEventListener("click", () => speak(entry.anchor.reading));
     $("#kanjiStartPractice").addEventListener("click", startIntroducedQuestion);
     setTimeout(() => $("#kanjiStartPractice")?.focus(), 0);
+    if (state.autoPronounce) speak(entry.anchor.reading);
     renderAll();
   }
 
@@ -437,8 +434,13 @@
     const label = format === "meaning" ? "Choose the core meaning" : format === "reading" ? "Choose this word’s reading" : "Choose the matching kanji word";
     const choiceMarkup = choice => {
       const main = format === "meaning" ? choice.meanings[0] : format === "reading" ? choice.anchor.reading : choice.anchor.word;
+      const detail = format === "meaning"
+        ? `${choice.anchor.word}（${choice.anchor.reading}） · ${choice.anchor.meaning}`
+        : format === "reading"
+          ? `${choice.anchor.word} · ${choice.anchor.meaning}`
+          : `${choice.anchor.reading} · ${choice.anchor.meaning}`;
       const language = format === "meaning" ? "" : ' lang="ja"';
-      return `<button class="kanji-choice ${format === "meaning" ? "meaning-choice" : "japanese-choice"}" type="button" data-choice-id="${choice.id}"><span>${choices.indexOf(choice) + 1}</span><span><strong${language}>${escapeHtml(main)}</strong></span></button>`;
+      return `<button class="kanji-choice ${format === "meaning" ? "meaning-choice" : "japanese-choice"}" type="button" data-choice-id="${choice.id}"><span>${choices.indexOf(choice) + 1}</span><span><strong${language}>${escapeHtml(main)}</strong><small class="kanji-choice-secondary" aria-hidden="true">${escapeHtml(detail)}</small></span></button>`;
     };
     $("#kanjiModeLabel").textContent = `${view === "checkpoint" ? "Checkpoint" : view === "practice" ? "Practice" : "Learn"} · ${formatLabel(format)}`;
     $("#kanjiQuestionCount").textContent = view === "checkpoint" ? `Question ${checkpoint.index + 1} / ${checkpoint.queue.length}` : currentReason;
@@ -496,6 +498,8 @@
     phase = "answered";
     const correct = selectedId === current.id;
     applyResult(correct);
+    $(".kanji-options").classList.add("is-answered");
+    $(".kanji-options").querySelectorAll(".kanji-choice-secondary").forEach(detail => detail.removeAttribute("aria-hidden"));
     $("#kanjiCardBody").querySelectorAll("[data-choice-id]").forEach(button => {
       button.disabled = true;
       if (button.dataset.choiceId === current.id) button.classList.add("correct");
@@ -510,6 +514,7 @@
     $("#kanjiDontKnow").classList.add("kanji-hidden");
     $("#kanjiNext").classList.remove("kanji-hidden");
     $("#kanjiKeyboardHint").innerHTML = "Press <kbd>Enter</kbd> for the next question.";
+    if (state.autoPronounce) speak(current.anchor.reading);
     renderAll();
   }
 

@@ -51,10 +51,14 @@ test('kanji page offers staged learning, practice, checkpoints, and a progress m
 
 test('kanji questions do not reveal answers through duplicated helper text', () => {
   const script = readFileSync(resolve(root, 'features/kanji/kanji.js'), 'utf8');
+  const styles = readFileSync(resolve(root, 'features/kanji/kanji.css'), 'utf8');
 
   assert.match(script, /const language = format === "meaning" \? "" : ' lang="ja"'/);
   assert.match(script, /kanji-choice \$\{format === "meaning" \? "meaning-choice" : "japanese-choice"\}/);
   assert.doesNotMatch(script, /<small>\$\{escapeHtml\(detail\)\}<\/small>/);
+  assert.match(script, /class="kanji-choice-secondary" aria-hidden="true"/);
+  assert.match(script, /querySelectorAll\("\.kanji-choice-secondary"\)\.forEach\(detail => detail\.removeAttribute\("aria-hidden"\)\)/);
+  assert.match(styles, /\.kanji-options:not\(\.is-answered\) \.kanji-choice-secondary\{display:none\}/);
   assert.match(script, /spelling: "reading → kanji"/);
 });
 
@@ -66,4 +70,20 @@ test('kanji examples display and highlight the character being learned', () => {
   assert.match(script, /learningLabel\(current\)/);
   assert.doesNotMatch(script, /\$\{Math\.round\(progress\.mastery\)\}% mastery/);
   assert.doesNotMatch(script, /introduced · \$\{mastery\}% mastery/);
+});
+
+test('kanji uses one JLPT N5 course with styled controls and optional autoplay', () => {
+  const script = readFileSync(resolve(root, 'features/kanji/kanji.js'), 'utf8');
+  const styles = readFileSync(resolve(root, 'features/kanji/kanji.css'), 'utf8');
+
+  assert.match(script, /<strong>JLPT N5<\/strong>/);
+  assert.doesNotMatch(script, /id="kanjiTrack"/);
+  assert.match(script, /return DATA\.kanji;/);
+  assert.match(script, /autoPronounce: true/);
+  assert.match(script, /id="kanjiAutoPronounce"/);
+  assert.match(script, /if \(state\.autoPronounce\) speak\(current\.anchor\.reading\)/);
+  assert.match(script, /KANA_SPRINT_SPEECH\?\.openSettings/);
+  assert.match(styles, /\.kanji-controls select\{/);
+  assert.match(styles, /\.kanji-pace input\[type="range"\]/);
+  assert.match(styles, /\.kanji-toggle input\{/);
 });

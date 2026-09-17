@@ -246,6 +246,17 @@
           "text": "Learn 104 core N5 preparation kanji in small stages with answer-safe practice choices, highlighted example sentences, adaptive review, checkpoints, and a searchable progress map."
         }
       ]
+    },
+    {
+      "id": "2026-09-17.2",
+      "publishedAt": "2026-09-17",
+      "title": "Clearer kanji practice",
+      "changes": [
+        {
+          "pages": ["home"],
+          "text": "Kanji practice now follows one JLPT N5 journey, reveals every choice’s learning details after answering, offers automatic pronunciation, and uses polished session controls."
+        }
+      ]
     }
   ]
 }
