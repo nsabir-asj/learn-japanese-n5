@@ -207,10 +207,6 @@
         <button class="kanji-mode-tab" type="button" data-kanji-view="progress"><strong>Kanji map</strong><small>Browse progress and details</small></button>
       </nav>
       <section class="kanji-workspace" id="kanjiWorkspace">
-        <aside class="card kanji-roadmap-card">
-          <div class="kanji-roadmap-heading"><div><span class="tiny">Guided journey</span><h2 id="kanjiJourneyTitle">JLPT N5</h2></div><span class="data-badge" id="kanjiStageBadge">Stage 1</span></div>
-          <div class="kanji-stage-list" id="kanjiStageList"></div>
-        </aside>
         <div class="kanji-main">
           <section class="trainer kanji-trainer" aria-live="polite">
             <div class="trainer-top"><div class="mode-tag"><span class="dot"></span><span id="kanjiModeLabel">Learn · guided kanji</span></div><div class="kanji-context"><div class="tiny" id="kanjiQuestionCount">Ready</div><span class="tiny" id="kanjiStageProgressText">Stage progress</span></div></div>
@@ -228,6 +224,10 @@
               <div class="kanji-playback-settings"><label class="kanji-toggle"><input type="checkbox" id="kanjiAutoPronounce"><span>Automatically pronounce revealed words</span></label><button class="ghost" id="kanjiManageVoices" type="button">Manage voices</button></div>
             </div>
             <p class="kanji-attribution tiny">Meanings, readings, stroke counts, and radical data adapted from <a href="https://github.com/kanjialive/kanji-data-media" target="_blank" rel="noreferrer">Kanji alive</a> under CC BY 4.0.</p>
+          </details>
+          <details class="card kanji-roadmap-card" id="kanjiJourney">
+            <summary><span><strong id="kanjiJourneyTitle">JLPT N5 journey</strong><small id="kanjiJourneySummary">Stage 1 of 12 · 0/120 introduced</small></span></summary>
+            <div class="kanji-roadmap-content"><div class="kanji-stage-list" id="kanjiStageList"></div></div>
           </details>
         </div>
       </section>
@@ -314,8 +314,9 @@
   function renderRoadmap() {
     const stages = trackStages();
     const activeIndex = currentStageIndex();
-    $("#kanjiJourneyTitle").textContent = "JLPT N5";
-    $("#kanjiStageBadge").textContent = `Stage ${activeIndex + 1} / ${stages.length}`;
+    const totalIntroduced = trackEntries().filter(entry => itemState(entry).introduced).length;
+    $("#kanjiJourneyTitle").textContent = "JLPT N5 journey";
+    $("#kanjiJourneySummary").textContent = `Stage ${activeIndex + 1} of ${stages.length} · ${totalIntroduced}/${trackEntries().length} introduced`;
     $("#kanjiStageList").innerHTML = stages.map((stage, index) => {
       const entries = stageEntries(stage);
       const introduced = entries.filter(entry => itemState(entry).introduced).length;
@@ -330,7 +331,7 @@
     const stagePercent = entries.length ? Math.round(introduced / entries.length * 100) : 0;
     $("#kanjiStageProgress").style.width = `${stagePercent}%`;
     $(".kanji-stage-progress").setAttribute("aria-valuenow", String(stagePercent));
-    $("#kanjiStageProgressText").textContent = `Stage ${currentStageIndex() + 1} · ${introduced}/${entries.length} introduced`;
+    $("#kanjiStageProgressText").textContent = `Stage ${currentStageIndex() + 1} of ${stages.length} · ${stage.label} · ${introduced}/${entries.length} introduced`;
   }
 
   function renderDashboard() {

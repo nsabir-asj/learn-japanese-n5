@@ -87,3 +87,15 @@ test('kanji uses one JLPT N5 course with styled controls and optional autoplay',
   assert.match(styles, /\.kanji-pace input\[type="range"\]/);
   assert.match(styles, /\.kanji-toggle input\{/);
 });
+
+test('kanji keeps practice full width and places the journey in a collapsed section', () => {
+  const script = readFileSync(resolve(root, 'features/kanji/kanji.js'), 'utf8');
+  const styles = readFileSync(resolve(root, 'features/kanji/kanji.css'), 'utf8');
+
+  assert.match(script, /<details class="card kanji-roadmap-card" id="kanjiJourney">/);
+  assert.match(script, /id="kanjiJourneySummary">Stage 1 of 12 · 0\/120 introduced/);
+  assert.match(script, /Stage \$\{currentStageIndex\(\) \+ 1\} of \$\{stages\.length\} · \$\{stage\.label\}/);
+  assert.doesNotMatch(script, /<aside class="card kanji-roadmap-card">/);
+  assert.match(styles, /\.kanji-workspace\{display:block\}/);
+  assert.doesNotMatch(styles, /\.kanji-roadmap-card\{position:sticky/);
+});

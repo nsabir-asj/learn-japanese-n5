@@ -257,6 +257,17 @@
           "text": "Kanji practice now follows one JLPT N5 journey, reveals every choice’s learning details after answering, offers automatic pronunciation, and uses polished session controls."
         }
       ]
+    },
+    {
+      "id": "2026-09-18.1",
+      "publishedAt": "2026-09-18",
+      "title": "More focused kanji practice",
+      "changes": [
+        {
+          "pages": ["home"],
+          "text": "Kanji questions now use the full practice area, while the complete JLPT N5 journey remains available in a compact section below."
+        }
+      ]
     }
   ]
 }
