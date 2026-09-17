@@ -13,6 +13,7 @@ const entrypoints = [
   'kana_sprint.html',
   'vocabulary.html',
   'numbers.html',
+  'kanji.html',
   'settings.html',
   'guided/player.html',
 ];
@@ -43,6 +44,7 @@ test('the root launcher links to every learning experience', () => {
     './kana_sprint.html',
     './vocabulary.html',
     './numbers.html',
+    './kanji.html',
     './settings.html',
     './guided/player.html?lesson=1',
     './guided/player.html?lesson=2',
@@ -402,8 +404,10 @@ test('stylesheet asset references remain valid after source moves', () => {
 
 test('frontend implementation is separated into features and content', () => {
   assert.ok(existsSync(resolve(root, 'features/kana/trainer.js')));
+  assert.ok(existsSync(resolve(root, 'features/kanji/kanji.js')));
   assert.ok(existsSync(resolve(root, 'features/guided/player.js')));
   assert.ok(existsSync(resolve(root, 'content/kana/hiragana.js')));
+  assert.ok(existsSync(resolve(root, 'content/kanji/n5-kanji.json')));
   assert.ok(existsSync(resolve(root, 'content/guided/lesson-01.js')));
   assert.ok(existsSync(resolve(root, 'content/guided/lesson-02.js')));
   assert.ok(!existsSync(resolve(root, 'lessons')));

@@ -30,6 +30,7 @@ const pageScopes = new Map([
   ['kana_sprint.html', 'kana'],
   ['vocabulary.html', 'vocabulary'],
   ['numbers.html', 'numbers'],
+  ['kanji.html', 'kanji'],
   ['settings.html', 'settings'],
   [path.join('guided', 'player.html'), 'guided'],
 ]);
