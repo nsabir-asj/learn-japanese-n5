@@ -276,6 +276,17 @@
           "text": "Kanji map search and status filters now match the polished controls used throughout the lessons."
         }
       ]
+    },
+    {
+      "id": "2026-09-18.2",
+      "publishedAt": "2026-09-18",
+      "title": "More predictable kanji pacing",
+      "changes": [
+        {
+          "pages": ["guided"],
+          "text": "The new-kanji pace slider now counts successful recall reviews, while a three-kanji learning buffer and direction-specific mistake checks prevent new material from outrunning recall. Established kanji return on a longer time-based schedule."
+        }
+      ]
     }
   ]
 }

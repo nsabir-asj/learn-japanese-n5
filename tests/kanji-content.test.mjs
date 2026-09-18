@@ -88,6 +88,40 @@ test('kanji uses one JLPT N5 course with styled controls and optional autoplay',
   assert.match(styles, /\.kanji-toggle input\{/);
 });
 
+test('kanji pace counts successful delayed reviews instead of treating pace as a new-item percentage', () => {
+  const script = readFileSync(resolve(root, 'features/kanji/kanji.js'), 'utf8');
+
+  assert.match(script, /reviewsSinceNew: 0/);
+  assert.match(script, /unsettledEntries\(\)\.length/);
+  assert.match(script, /trackEntries\(\)\.filter\(entry => itemState\(entry\)\.introduced\)\.length/);
+  assert.match(script, /showQuestion\(current, "meaning", false\)/);
+  assert.match(script, /currentQuestionCountsAsReview && correct\) state\.reviewsSinceNew \+= 1/);
+  assert.doesNotMatch(script, /nextIntroductionDecision\(state\.pace, state\.newCredit\)/);
+});
+
+test('kanji keeps at most three unsettled items and uses delayed retention reviews', () => {
+  const script = readFileSync(resolve(root, 'features/kanji/kanji.js'), 'utf8');
+
+  assert.match(script, /progress\.awaitingRecall = true/);
+  assert.match(script, /progress\.urgentMode = currentFormat/);
+  assert.match(script, /progress\.urgentMode === currentFormat/);
+  assert.match(script, /nextKanjiReviewSchedule/);
+  assert.match(script, /Checking \$\{unsettled\} recently learned kanji/);
+});
+
+test('kanji stages unlock through the same slider-controlled review countdown', () => {
+  const script = readFileSync(resolve(root, 'features/kanji/kanji.js'), 'utf8');
+
+  assert.match(script, /unlockedStageIndex: 0/);
+  assert.match(script, /function stageUnlockDecision\(\)/);
+  assert.match(script, /entries\.every\(entry => itemState\(entry\)\.introduced && itemState\(entry\)\.seen > 0\)/);
+  assert.match(script, /function maybeUnlockNextStage\(\)/);
+  assert.match(script, /if \(view === "learn"\) maybeUnlockNextStage\(\)/);
+  assert.match(script, /Next stage after \$\{count\} successful review/);
+  assert.match(script, /recently learned kanji before opening stage/);
+  assert.doesNotMatch(script, /requiredAverage = 35/);
+});
+
 test('kanji keeps practice full width and places the journey in a collapsed section', () => {
   const script = readFileSync(resolve(root, 'features/kanji/kanji.js'), 'utf8');
   const styles = readFileSync(resolve(root, 'features/kanji/kanji.css'), 'utf8');

@@ -22,6 +22,40 @@ test('vocabulary pace produces stable new-word proportions', () => {
   }
 });
 
+test('kanji pace maps every slider step to an explicit review requirement', () => {
+  const expected = new Map([
+    [10, 9], [20, 8], [30, 7], [40, 6], [50, 5],
+    [60, 4], [70, 3], [80, 2], [90, 1],
+  ]);
+  for (const [pace, reviews] of expected) {
+    assert.equal(scheduler.kanjiReviewRequirement(pace), reviews);
+    assert.equal(scheduler.nextKanjiIntroductionDecision(pace, reviews - 1, 0, 3).introduce, false);
+    assert.equal(scheduler.nextKanjiIntroductionDecision(pace, reviews, 0, 3).introduce, true);
+  }
+});
+
+test('kanji builds a starter set and pauses at three unsettled items', () => {
+  const starter = scheduler.nextKanjiIntroductionDecision(10, 0, 2, 2);
+  const paused = scheduler.nextKanjiIntroductionDecision(90, 20, 3, 20);
+
+  assert.equal(starter.introduce, true);
+  assert.equal(starter.buildingStarterSet, true);
+  assert.equal(paused.introduce, false);
+  assert.equal(paused.paused, true);
+});
+
+test('kanji uses question spacing for first recall and elapsed time for retention', () => {
+  const initial = scheduler.nextKanjiReviewSchedule({ correct: true, initial: true, questionNumber: 4, now: 1000 });
+  const missed = scheduler.nextKanjiReviewSchedule({ correct: false, questionNumber: 8, now: 1000 });
+  const remembered = scheduler.nextKanjiReviewSchedule({ correct: true, retentionStep: 1, questionNumber: 12, now: 1000 });
+
+  assert.deepEqual(initial, { dueQuestion: 7, dueAt: 301000, retentionStep: 0 });
+  assert.deepEqual(missed, { dueQuestion: 10, dueAt: 61000, retentionStep: 0 });
+  assert.equal(remembered.dueQuestion, 0);
+  assert.equal(remembered.dueAt, 1000 + 72 * 60 * 60000);
+  assert.equal(remembered.retentionStep, 2);
+});
+
 test('a stage requires every introduced word to have a completed attempt', () => {
   assert.equal(scheduler.stageIsReady([
     { introduced: true, seen: 2, mastery: 40 },

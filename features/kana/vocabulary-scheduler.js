@@ -18,6 +18,39 @@
     return { introduce: false, credit: updatedCredit };
   }
 
+  function kanjiReviewRequirement(pace) {
+    const normalizedPace = clamp(Number(pace) || 50, 10, 90);
+    return 10 - Math.round(normalizedPace / 10);
+  }
+
+  function nextKanjiIntroductionDecision(pace, successfulReviews = 0, unsettledCount = 0, introducedCount = 0) {
+    const completedReviews = Math.max(0, Math.floor(Number(successfulReviews) || 0));
+    const unsettled = Math.max(0, Math.floor(Number(unsettledCount) || 0));
+    const introduced = Math.max(0, Math.floor(Number(introducedCount) || 0));
+    const requiredReviews = kanjiReviewRequirement(pace);
+    const buildingStarterSet = introduced < 3;
+    const paused = unsettled >= 3;
+
+    return {
+      introduce: !paused && (buildingStarterSet || completedReviews >= requiredReviews),
+      paused,
+      buildingStarterSet,
+      requiredReviews,
+      remainingReviews: buildingStarterSet ? 0 : Math.max(0, requiredReviews - completedReviews)
+    };
+  }
+
+  function nextKanjiReviewSchedule({ correct, initial = false, retentionStep = 0, questionNumber = 0, now = Date.now() } = {}) {
+    const question = Math.max(0, Math.floor(Number(questionNumber) || 0));
+    const timestamp = Math.max(0, Number(now) || Date.now());
+    const step = Math.max(0, Math.floor(Number(retentionStep) || 0));
+    if (!correct) return { dueQuestion: question + 2, dueAt: timestamp + 60000, retentionStep: 0 };
+    if (initial) return { dueQuestion: question + 3, dueAt: timestamp + 5 * 60000, retentionStep: 0 };
+    const intervals = [24, 72, 168, 336, 720].map(hours => hours * 60 * 60000);
+    const nextStep = Math.min(intervals.length, step + 1);
+    return { dueQuestion: 0, dueAt: timestamp + intervals[nextStep - 1], retentionStep: nextStep };
+  }
+
   function stageIsReady(items, requiredAverage = 35) {
     if (!items.length || !items.every(item => item.introduced && item.seen > 0)) return false;
     const average = items.reduce((sum, item) => sum + (Number(item.mastery) || 0), 0) / items.length;
@@ -61,7 +94,10 @@
 
   globalThis.KANA_SPRINT_VOCABULARY_SCHEDULER = {
     choiceCountForMastery,
+    kanjiReviewRequirement,
     nextIntroductionDecision,
+    nextKanjiIntroductionDecision,
+    nextKanjiReviewSchedule,
     nextReviewSchedule,
     recentAccuracy,
     reviewIsDue,

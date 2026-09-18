@@ -25,6 +25,8 @@
   let currentChoiceIds = [];
   let currentReason = "";
   let checkpoint = null;
+  let currentQuestionCountsAsReview = false;
+  let currentQuestionQualifiesRecall = false;
   let mapFilter = "all";
   let selectedDetailId = DATA.kanji[0].id;
 
@@ -36,14 +38,15 @@
     return {
       introduced: false, seen: 0, correct: 0, wrong: 0, mastery: 0,
       lastWasCorrect: null, lastSeen: 0, dueAt: 0, dueQuestion: 0,
-      recentResults: [], modes: Object.fromEntries(MODE_KEYS.map(mode => [mode, emptyModeProgress()]))
+      recentResults: [], awaitingRecall: false, urgentMode: "", retentionStep: 0,
+      reviewModel: "kanji-retention-v2", modes: Object.fromEntries(MODE_KEYS.map(mode => [mode, emptyModeProgress()]))
     };
   }
 
   function defaultState() {
     return {
       version: 1, questionFormat: "mixed", pace: 50, autoPronounce: true,
-      total: 0, correct: 0, streak: 0, bestStreak: 0, newCredit: 0,
+      total: 0, correct: 0, streak: 0, bestStreak: 0, reviewsSinceNew: 0, unlockedStageIndex: 0,
       recent: [], items: {}, savedAt: 0
     };
   }
@@ -60,6 +63,17 @@
     const progress = state.items[entry.id] ||= emptyItemProgress();
     progress.modes ||= {};
     MODE_KEYS.forEach(mode => { progress.modes[mode] = { ...emptyModeProgress(), ...(progress.modes[mode] || {}) }; });
+    if (progress.reviewModel !== "kanji-retention-v2") {
+      const missedMode = MODE_KEYS.find(mode => progress.modes[mode].lastWasCorrect === false);
+      progress.awaitingRecall = Boolean(progress.introduced && progress.seen === 0);
+      progress.urgentMode = missedMode || "";
+      progress.retentionStep = progress.mastery >= 72 ? 2 : progress.mastery >= 40 ? 1 : 0;
+      if (!progress.awaitingRecall && !progress.urgentMode) progress.dueQuestion = 0;
+      progress.reviewModel = "kanji-retention-v2";
+    }
+    progress.awaitingRecall = Boolean(progress.awaitingRecall);
+    progress.urgentMode = MODE_KEYS.includes(progress.urgentMode) ? progress.urgentMode : "";
+    progress.retentionStep = Math.max(0, Math.floor(Number(progress.retentionStep) || 0));
     return progress;
   }
 
@@ -92,12 +106,15 @@
 
   function isMastered(entry) {
     const progress = itemState(entry);
-    return progress.introduced && modeState(entry, "meaning").seen > 0 && modeState(entry, "reading").seen > 0 && overallMastery(entry) >= 72;
+    return progress.introduced && !progress.awaitingRecall && !progress.urgentMode && progress.retentionStep >= 2
+      && modeState(entry, "meaning").seen > 0 && modeState(entry, "reading").seen > 0 && overallMastery(entry) >= 72;
   }
 
   function learningLabel(entry) {
     const progress = itemState(entry);
     if (!progress.introduced) return "Not introduced";
+    if (progress.urgentMode) return `${formatLabel(progress.urgentMode)} check due`;
+    if (progress.awaitingRecall) return "Building first recall";
     if (isMastered(entry)) return "Strong";
     if (progress.seen <= 1) return "Just started";
     if (overallMastery(entry) < 40) return "Building recall";
@@ -119,19 +136,79 @@
       .join(`<mark>${escapeHtml(entry.character)}</mark>`);
   }
 
-  function stageReady(stage) {
-    const entries = stageEntries(stage);
-    return entries.length > 0 && Scheduler.stageIsReady(entries.map(entry => ({ ...itemState(entry), mastery: overallMastery(entry) })));
-  }
-
   function currentStageIndex() {
     const stages = trackStages();
-    const pending = stages.findIndex(stage => !stageReady(stage));
-    return pending < 0 ? stages.length - 1 : pending;
+    const saved = clamp(Math.floor(Number(state.unlockedStageIndex) || 0), 0, stages.length - 1);
+    const introduced = stages.reduce((highest, stage, index) =>
+      stageEntries(stage).some(entry => itemState(entry).introduced) ? index : highest, 0);
+    state.unlockedStageIndex = Math.max(saved, introduced);
+    return state.unlockedStageIndex;
   }
 
   function currentStage() {
     return trackStages()[Math.max(0, currentStageIndex())];
+  }
+
+  function unsettledEntries(entries = trackEntries()) {
+    return entries.filter(entry => {
+      const progress = itemState(entry);
+      return progress.introduced && (progress.awaitingRecall || progress.urgentMode);
+    });
+  }
+
+  function introductionDecision() {
+    const introducedCount = trackEntries().filter(entry => itemState(entry).introduced).length;
+    return Scheduler.nextKanjiIntroductionDecision(
+      state.pace,
+      state.reviewsSinceNew,
+      unsettledEntries().length,
+      introducedCount
+    );
+  }
+
+  function introductionStatus(noun = "kanji") {
+    const decision = introductionDecision();
+    const unsettled = unsettledEntries().length;
+    if (decision.paused) return `Checking ${unsettled} recently learned kanji before adding another`;
+    if (decision.buildingStarterSet) return "Building a three-kanji starter set";
+    if (decision.introduce) return `The next ${noun} is ready`;
+    const count = decision.remainingReviews;
+    return `Next ${noun} after ${count} successful review${count === 1 ? "" : "s"}`;
+  }
+
+  function stageUnlockDecision() {
+    const stages = trackStages();
+    const index = currentStageIndex();
+    const entries = stageEntries(stages[index]);
+    if (index >= stages.length - 1) return { eligible: false, finalStage: true };
+    if (!entries.every(entry => itemState(entry).introduced && itemState(entry).seen > 0)) {
+      return { eligible: false, finalStage: false };
+    }
+    return {
+      eligible: true,
+      finalStage: false,
+      ...introductionDecision()
+    };
+  }
+
+  function maybeUnlockNextStage() {
+    const decision = stageUnlockDecision();
+    if (!decision.eligible || !decision.introduce) return false;
+    state.unlockedStageIndex = Math.min(trackStages().length - 1, currentStageIndex() + 1);
+    return true;
+  }
+
+  function stageTransitionStatus() {
+    const stages = trackStages();
+    const index = currentStageIndex();
+    const entries = stageEntries(stages[index]);
+    if (index >= stages.length - 1 || entries.some(entry => !itemState(entry).introduced)) return "";
+    if (entries.some(entry => itemState(entry).seen === 0)) return "Complete each new-kanji question to prepare the next stage";
+    const decision = stageUnlockDecision();
+    if (decision.paused) return `Checking ${unsettledEntries().length} recently learned kanji before opening stage ${index + 2}`;
+    if (decision.introduce) return `Stage ${index + 2} is ready after this question`;
+    const count = decision.remainingReviews;
+    return `Next stage after ${count} successful review${count === 1 ? "" : "s"}`;
   }
 
   function dueEntries(entries = trackEntries()) {
@@ -151,6 +228,9 @@
   }
 
   function chooseFormat(entry) {
+    const progress = itemState(entry);
+    if (progress.urgentMode && Scheduler.reviewIsDue(progress, state.total)) return progress.urgentMode;
+    if (progress.awaitingRecall && Scheduler.reviewIsDue(progress, state.total)) return "meaning";
     return state.questionFormat === "mixed" ? weakestMode(entry) : state.questionFormat;
   }
 
@@ -159,13 +239,19 @@
     let score = Scheduler.reviewScore(progress);
     if (state.recent.slice(-5).includes(entry.id)) score -= 55;
     if (Scheduler.reviewIsDue(progress, state.total)) score += 28;
+    if (progress.awaitingRecall && Scheduler.reviewIsDue(progress, state.total)) score += 90;
+    if (progress.urgentMode && Scheduler.reviewIsDue(progress, state.total)) score += 140;
     return score;
   }
 
   function selectReview(entries) {
     const available = entries.filter(entry => itemState(entry).introduced);
     if (!available.length) return null;
-    return [...available].sort((left, right) => reviewScore(right) - reviewScore(left))[0];
+    const due = available.filter(entry => Scheduler.reviewIsDue(itemState(entry), state.total));
+    const urgent = due.filter(entry => itemState(entry).urgentMode);
+    const firstRecall = due.filter(entry => itemState(entry).awaitingRecall);
+    const candidates = urgent.length ? urgent : firstRecall.length ? firstRecall : due.length ? due : available;
+    return [...candidates].sort((left, right) => reviewScore(right) - reviewScore(left))[0];
   }
 
   function selectForLearn() {
@@ -173,16 +259,22 @@
     const entries = stageEntries(stage);
     const unseen = entries.filter(entry => !itemState(entry).introduced);
     const introduced = trackEntries().filter(entry => itemState(entry).introduced);
-    if (unseen.length && (!introduced.length || !entries.some(entry => itemState(entry).introduced))) {
+    if (unseen.length && !introduced.length) {
       return { entry: unseen[0], introduce: true, reason: `New in ${stage.label}` };
     }
     if (unseen.length) {
-      const decision = Scheduler.nextIntroductionDecision(state.pace, state.newCredit);
-      state.newCredit = decision.credit;
+      const decision = introductionDecision();
       if (decision.introduce) return { entry: unseen[0], introduce: true, reason: `New in ${stage.label}` };
     }
     const review = selectReview(introduced);
-    return review ? { entry: review, introduce: false, reason: dueEntries(introduced).includes(review) ? "Scheduled review" : "Strengthening recall" } : { entry: unseen[0], introduce: true, reason: `New in ${stage.label}` };
+    if (!review) return { entry: unseen[0], introduce: true, reason: `New in ${stage.label}` };
+    const progress = itemState(review);
+    const due = Scheduler.reviewIsDue(progress, state.total);
+    const reason = due && progress.urgentMode
+      ? `${formatLabel(progress.urgentMode)} recovery check`
+      : due && progress.awaitingRecall ? `First recall check for ${review.character}`
+        : due ? "Scheduled retention review" : "Strengthening recall";
+    return { entry: review, introduce: false, reason };
   }
 
   function selectForPractice() {
@@ -220,7 +312,7 @@
             <div class="kanji-controls">
               <div class="kanji-track-field"><span>Learning course</span><strong>JLPT N5</strong><small class="tiny">The guided journey covers 104 core kanji, followed by 16 extension kanji.</small></div>
               <label><span>Question direction</span><select id="kanjiQuestionFormat"><option value="mixed">Mixed automatically</option><option value="meaning">Kanji → meaning</option><option value="reading">Word → reading</option><option value="spelling">Reading → kanji word</option></select><small class="tiny">Mixed practice targets the weakest direction.</small></label>
-              <label class="kanji-pace"><span>New-kanji pace: <strong id="kanjiPaceLabel">Balanced</strong></span><input id="kanjiPace" type="range" min="10" max="90" step="10"><span class="kanji-pace-labels"><span>More review</span><span>More new</span></span></label>
+              <label class="kanji-pace"><span>New-kanji pace: <strong id="kanjiPaceLabel">Balanced</strong></span><input id="kanjiPace" type="range" min="10" max="90" step="10"><span class="kanji-pace-labels"><span>More review</span><span>More new</span></span><small class="tiny" id="kanjiPaceDescription"></small></label>
               <div class="kanji-playback-settings"><label class="kanji-toggle"><input type="checkbox" id="kanjiAutoPronounce"><span>Automatically pronounce revealed words</span></label><button class="ghost" id="kanjiManageVoices" type="button">Manage voices</button></div>
             </div>
             <p class="kanji-attribution tiny">Meanings, readings, stroke counts, and radical data adapted from <a href="https://github.com/kanjialive/kanji-data-media" target="_blank" rel="noreferrer">Kanji alive</a> under CC BY 4.0.</p>
@@ -263,9 +355,13 @@
       state.questionFormat = MODE_KEYS.includes(event.target.value) ? event.target.value : "mixed";
       saveState();
       renderAll();
-      if (phase === "question") showQuestion(current, chooseFormat(current));
+      if (phase === "question") showQuestion(current, chooseFormat(current), currentQuestionCountsAsReview);
     });
-    $("#kanjiPace").addEventListener("input", event => { state.pace = Number(event.target.value); renderControls(); });
+    $("#kanjiPace").addEventListener("input", event => {
+      state.pace = Number(event.target.value);
+      renderControls();
+      renderRoadmap();
+    });
     $("#kanjiPace").addEventListener("change", saveState);
     $("#kanjiAutoPronounce").addEventListener("change", event => { state.autoPronounce = event.target.checked; saveState(); });
     $("#kanjiManageVoices").addEventListener("click", () => globalThis.KANA_SPRINT_SPEECH?.openSettings());
@@ -326,6 +422,7 @@
 
   function renderControls() {
     $("#kanjiPaceLabel").textContent = paceLabel();
+    $("#kanjiPaceDescription").textContent = introductionStatus();
     $("#kanjiSessionSummary").textContent = `JLPT N5 · ${state.questionFormat === "mixed" ? "mixed practice" : formatLabel(state.questionFormat)} · ${paceLabel().toLowerCase()} pace`;
   }
 
@@ -334,13 +431,16 @@
     const activeIndex = currentStageIndex();
     const totalIntroduced = trackEntries().filter(entry => itemState(entry).introduced).length;
     $("#kanjiJourneyTitle").textContent = "JLPT N5 journey";
-    $("#kanjiJourneySummary").textContent = `Stage ${activeIndex + 1} of ${stages.length} · ${totalIntroduced}/${trackEntries().length} introduced`;
+    const transitionStatus = stageTransitionStatus();
+    const hasUnintroduced = totalIntroduced < trackEntries().length;
+    const pacingStatus = hasUnintroduced ? introductionStatus() : "";
+    $("#kanjiJourneySummary").textContent = transitionStatus || pacingStatus || `Stage ${activeIndex + 1} of ${stages.length} · ${totalIntroduced}/${trackEntries().length} introduced`;
     $("#kanjiStageList").innerHTML = stages.map((stage, index) => {
       const entries = stageEntries(stage);
       const introduced = entries.filter(entry => itemState(entry).introduced).length;
       const strong = entries.filter(isMastered).length;
       const coverage = entries.length ? Math.round(introduced / entries.length * 100) : 0;
-      const status = index < activeIndex ? "Complete" : index === activeIndex ? "Current" : "Locked";
+      const status = index < activeIndex ? "Covered" : index === activeIndex ? "Current" : "Locked";
       return `<button class="kanji-stage ${index === activeIndex ? "current" : index > activeIndex ? "locked" : ""}" type="button" data-kanji-stage-id="${stage.id}" aria-label="View stage ${index + 1}, ${escapeHtml(stage.label)}"><span class="kanji-stage-number">${index + 1}</span><span class="kanji-stage-copy"><strong>${escapeHtml(stage.label)}</strong><span class="kanji-stage-meter"><span style="width:${coverage}%"></span></span><small>${introduced}/${entries.length} introduced · ${strong}/${entries.length} strong</small></span><span class="kanji-stage-status">${status}<i aria-hidden="true">›</i></span></button>`;
     }).join("");
     const stage = currentStage();
@@ -349,7 +449,7 @@
     const stagePercent = entries.length ? Math.round(introduced / entries.length * 100) : 0;
     $("#kanjiStageProgress").style.width = `${stagePercent}%`;
     $(".kanji-stage-progress").setAttribute("aria-valuenow", String(stagePercent));
-    $("#kanjiStageProgressText").textContent = `Stage ${currentStageIndex() + 1} of ${stages.length} · ${stage.label} · ${introduced}/${entries.length} introduced`;
+    $("#kanjiStageProgressText").textContent = transitionStatus || pacingStatus || `Stage ${currentStageIndex() + 1} of ${stages.length} · ${stage.label} · ${introduced}/${entries.length} introduced`;
   }
 
   function renderDashboard() {
@@ -382,7 +482,16 @@
     current = entry;
     currentReason = reason;
     phase = "introduction";
-    itemState(entry).introduced = true;
+    currentQuestionCountsAsReview = false;
+    currentQuestionQualifiesRecall = false;
+    state.reviewsSinceNew = 0;
+    const progress = itemState(entry);
+    progress.introduced = true;
+    progress.awaitingRecall = true;
+    progress.urgentMode = "";
+    progress.retentionStep = 0;
+    progress.dueAt = 0;
+    progress.dueQuestion = 0;
     saveState();
     $("#kanjiModeLabel").textContent = "Learn · new kanji";
     $("#kanjiQuestionCount").textContent = reason;
@@ -407,7 +516,7 @@
 
   function startIntroducedQuestion() {
     if (!current) return;
-    showQuestion(current, "meaning");
+    showQuestion(current, "meaning", false);
   }
 
   function distractorsFor(entry, format) {
@@ -439,9 +548,11 @@
     return [entry, ...picked].sort(() => Math.random() - .5);
   }
 
-  function showQuestion(entry, format) {
+  function showQuestion(entry, format, countsAsReview = true) {
     current = entry;
     currentFormat = format;
+    currentQuestionCountsAsReview = countsAsReview;
+    currentQuestionQualifiesRecall = countsAsReview && Scheduler.reviewIsDue(itemState(entry), state.total);
     phase = "question";
     const choices = distractorsFor(entry, format);
     currentChoiceIds = choices.map(choice => choice.id);
@@ -494,17 +605,33 @@
       state.correct += 1;
       state.streak += 1;
       state.bestStreak = Math.max(state.bestStreak, state.streak);
+      if (currentQuestionQualifiesRecall) {
+        progress.awaitingRecall = false;
+        if (progress.urgentMode === currentFormat) progress.urgentMode = "";
+      }
     } else {
       progress.wrong += 1;
       direction.wrong += 1;
       direction.mastery = Math.max(0, direction.mastery - 12);
+      progress.urgentMode = currentFormat;
+      progress.retentionStep = 0;
       state.streak = 0;
     }
     progress.mastery = overallMastery(current);
     state.total += 1;
-    Object.assign(progress, Scheduler.nextReviewSchedule(progress.mastery, correct, state.total, now));
+    const resolvedReview = correct && currentQuestionQualifiesRecall && !progress.awaitingRecall && !progress.urgentMode;
+    if (!correct || !currentQuestionCountsAsReview || resolvedReview) {
+      Object.assign(progress, Scheduler.nextKanjiReviewSchedule({
+        correct,
+        initial: !currentQuestionCountsAsReview,
+        retentionStep: progress.retentionStep,
+        questionNumber: state.total,
+        now
+      }));
+    }
     state.recent.push(current.id);
     state.recent = state.recent.slice(-12);
+    if (view === "learn" && currentQuestionCountsAsReview && correct) state.reviewsSinceNew += 1;
     if (view === "checkpoint") {
       checkpoint.correct += correct ? 1 : 0;
       checkpoint.results.push({ id: current.id, correct });
@@ -542,6 +669,7 @@
       showCheckpointNext();
       return;
     }
+    if (view === "learn") maybeUnlockNextStage();
     const selected = view === "practice" ? selectForPractice() : selectForLearn();
     if (!selected?.entry) {
       view = "learn";
@@ -625,7 +753,7 @@
     const strong = entries.filter(isMastered);
     const due = dueEntries(entries);
     const learning = introduced.filter(entry => !isMastered(entry));
-    const stageStatus = index < activeIndex ? "Completed stage" : index === activeIndex ? "Current stage" : "Preview · unlocks later";
+    const stageStatus = index < activeIndex ? "Earlier stage" : index === activeIndex ? "Current stage" : "Preview · unlocks later";
     $("#kanjiStageDialogEyebrow").textContent = `Stage ${index + 1} of ${stages.length} · ${stageStatus}`;
     $("#kanjiStageDialogTitle").textContent = stage.label;
     $("#kanjiStageDialogDescription").textContent = stage.description;
