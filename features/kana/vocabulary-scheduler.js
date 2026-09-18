@@ -51,6 +51,22 @@
     return { dueQuestion: 0, dueAt: timestamp + intervals[nextStep - 1], retentionStep: nextStep };
   }
 
+  function kanjiPracticeEvidenceStatus(evidence = {}, urgentMode = "") {
+    const recent = Array.isArray(evidence.recentResults) ? evidence.recentResults.slice(-8) : [];
+    const accuracy = recent.length ? recent.filter(Boolean).length / recent.length : 0;
+    const modes = evidence.modes && typeof evidence.modes === "object" ? Object.values(evidence.modes) : [];
+    const successfulDirections = modes.filter(mode => Number(mode?.correct) > 0).length;
+    const seen = Math.max(0, Number(evidence.seen) || 0);
+    const correct = Math.max(0, Number(evidence.correct) || 0);
+    const clear = !urgentMode;
+    return {
+      accuracy,
+      familiar: clear && seen >= 2 && correct >= 2 && accuracy >= .75,
+      validated: clear && seen >= 4 && accuracy >= .8 && successfulDirections >= 2
+        && Number(evidence.delayedCorrect) >= 1
+    };
+  }
+
   function stageIsReady(items, requiredAverage = 35) {
     if (!items.length || !items.every(item => item.introduced && item.seen > 0)) return false;
     const average = items.reduce((sum, item) => sum + (Number(item.mastery) || 0), 0) / items.length;
@@ -98,6 +114,7 @@
     nextIntroductionDecision,
     nextKanjiIntroductionDecision,
     nextKanjiReviewSchedule,
+    kanjiPracticeEvidenceStatus,
     nextReviewSchedule,
     recentAccuracy,
     reviewIsDue,

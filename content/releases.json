@@ -289,6 +289,10 @@
         {
           "pages": ["guided"],
           "text": "Review now focuses on learned kanji, while Practice lets you work through all 120 kanji, your learned set, or any combination of curriculum groups with persistent coverage progress."
+        },
+        {
+          "pages": ["guided"],
+          "text": "Kanji knowledge now carries between Practice and Learn. Familiar characters receive a quick check, while only accurate, varied, and delayed Practice evidence can count toward the guided journey."
         }
       ]
     }

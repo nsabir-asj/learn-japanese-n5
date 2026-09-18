@@ -100,9 +100,22 @@ test('kanji practice supports reusable all, learned, and multi-group scopes', ()
   assert.match(script, /practiceStageIds/);
   assert.match(script, /practiceCoverage: \{ key: "", seenIds: \[\] \}/);
   assert.match(script, /id="kanjiChangePractice"/);
-  assert.match(script, /if \(view !== "practice"\) progress\.introduced = true/);
+  assert.match(script, /if \(view !== "practice" && !verification\) progress\.introduced = true/);
   assert.match(styles, /\.kanji-practice-scope-options/);
   assert.match(styles, /\.kanji-practice-group-grid/);
+});
+
+test('strong Practice evidence can satisfy Learn without weak attempts skipping lessons', () => {
+  const script = readFileSync(resolve(root, 'features/kanji/kanji.js'), 'utf8');
+
+  assert.match(script, /function emptyPracticeEvidence\(\)/);
+  assert.match(script, /Scheduler\.kanjiPracticeEvidenceStatus\(progress\.practice, progress\.urgentMode\)/);
+  assert.match(script, /function isCurriculumCovered\(entry\)/);
+  assert.match(script, /Quick check · familiar from Practice/);
+  assert.match(script, /if \(verification && correct\) progress\.introduced = true/);
+  assert.match(script, /Practice check missed · guided explanation/);
+  assert.match(script, /evidence\.delayedCorrect \+= 1/);
+  assert.match(script, /Learn step credited/);
 });
 
 test('kanji pace counts successful delayed reviews instead of treating pace as a new-item percentage', () => {
@@ -110,7 +123,7 @@ test('kanji pace counts successful delayed reviews instead of treating pace as a
 
   assert.match(script, /reviewsSinceNew: 0/);
   assert.match(script, /unsettledEntries\(\)\.length/);
-  assert.match(script, /trackEntries\(\)\.filter\(entry => itemState\(entry\)\.introduced\)\.length/);
+  assert.match(script, /stageById\.get\(entry\.stageId\)\.order <= activeStageOrder && isPracticeValidated\(entry\)/);
   assert.match(script, /showQuestion\(current, "meaning", false\)/);
   assert.match(script, /currentQuestionCountsAsReview && correct\) state\.reviewsSinceNew \+= 1/);
   assert.doesNotMatch(script, /nextIntroductionDecision\(state\.pace, state\.newCredit\)/);
@@ -131,7 +144,8 @@ test('kanji stages unlock through the same slider-controlled review countdown', 
 
   assert.match(script, /unlockedStageIndex: 0/);
   assert.match(script, /function stageUnlockDecision\(\)/);
-  assert.match(script, /entries\.every\(entry => itemState\(entry\)\.introduced && itemState\(entry\)\.seen > 0\)/);
+  assert.match(script, /entries\.every\(isCurriculumCovered\)/);
+  assert.match(script, /state\.reviewsSinceNew \+ validationCredits/);
   assert.match(script, /function maybeUnlockNextStage\(\)/);
   assert.match(script, /if \(view === "learn"\) maybeUnlockNextStage\(\)/);
   assert.match(script, /Next stage after \$\{count\} successful review/);
@@ -144,7 +158,7 @@ test('kanji keeps practice full width and places the journey in a collapsed sect
   const styles = readFileSync(resolve(root, 'features/kanji/kanji.css'), 'utf8');
 
   assert.match(script, /<details class="card kanji-roadmap-card" id="kanjiJourney">/);
-  assert.match(script, /id="kanjiJourneySummary">Stage 1 of 12 · 0\/120 introduced/);
+  assert.match(script, /id="kanjiJourneySummary">Stage 1 of 12 · 0\/120 covered/);
   assert.match(script, /Stage \$\{currentStageIndex\(\) \+ 1\} of \$\{stages\.length\} · \$\{stage\.label\}/);
   assert.doesNotMatch(script, /<aside class="card kanji-roadmap-card">/);
   assert.match(styles, /\.kanji-workspace\{display:block\}/);
@@ -158,7 +172,7 @@ test('kanji stages open an overview and link individual kanji to the map', () =>
   assert.match(script, /data-kanji-stage-id="\$\{stage\.id\}"/);
   assert.match(script, /id="kanjiStageDialog"/);
   assert.match(script, /function openStageDialog\(stageId\)/);
-  assert.match(script, /\[learning\.length, "learning"\]/);
+  assert.match(script, /\[validated\.length, "Practice validated"\]/);
   assert.match(script, /data-stage-kanji-id="\$\{entry\.id\}"/);
   assert.match(script, /function openMapDetail\(entryId\)/);
   assert.match(script, /switchView\("progress"\)/);

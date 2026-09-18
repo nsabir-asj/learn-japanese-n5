@@ -56,6 +56,27 @@ test('kanji uses question spacing for first recall and elapsed time for retentio
   assert.equal(remembered.retentionStep, 2);
 });
 
+test('kanji Practice evidence needs breadth, accuracy, and delayed recall to validate', () => {
+  const evidence = {
+    seen: 4,
+    correct: 4,
+    recentResults: [true, true, true, true],
+    delayedCorrect: 1,
+    modes: {
+      meaning: { correct: 2 },
+      reading: { correct: 2 },
+      spelling: { correct: 0 },
+    },
+  };
+
+  assert.equal(scheduler.kanjiPracticeEvidenceStatus(evidence).validated, true);
+  assert.equal(scheduler.kanjiPracticeEvidenceStatus({ ...evidence, seen: 3 }).validated, false);
+  assert.equal(scheduler.kanjiPracticeEvidenceStatus({ ...evidence, delayedCorrect: 0 }).validated, false);
+  assert.equal(scheduler.kanjiPracticeEvidenceStatus({ ...evidence, modes: { meaning: { correct: 4 } } }).validated, false);
+  assert.equal(scheduler.kanjiPracticeEvidenceStatus({ ...evidence, recentResults: [true, true, true, false, false] }).validated, false);
+  assert.equal(scheduler.kanjiPracticeEvidenceStatus(evidence, 'reading').validated, false);
+});
+
 test('a stage requires every introduced word to have a completed attempt', () => {
   assert.equal(scheduler.stageIsReady([
     { introduced: true, seen: 2, mastery: 40 },
