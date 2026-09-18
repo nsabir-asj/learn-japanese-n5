@@ -285,6 +285,10 @@
         {
           "pages": ["guided"],
           "text": "The new-kanji pace slider now counts successful recall reviews, while a three-kanji learning buffer and direction-specific mistake checks prevent new material from outrunning recall. Established kanji return on a longer time-based schedule."
+        },
+        {
+          "pages": ["guided"],
+          "text": "Review now focuses on learned kanji, while Practice lets you work through all 120 kanji, your learned set, or any combination of curriculum groups with persistent coverage progress."
         }
       ]
     }

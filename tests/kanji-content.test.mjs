@@ -33,7 +33,7 @@ test('every kanji is assigned once and has usable learning content', () => {
   }
 });
 
-test('kanji page offers staged learning, practice, checkpoints, and a progress map', () => {
+test('kanji page separates guided learning, adaptive review, selected practice, and the progress map', () => {
   const html = readFileSync(resolve(root, 'kanji.html'), 'utf8');
   const script = readFileSync(resolve(root, 'features/kanji/kanji.js'), 'utf8');
   const styles = readFileSync(resolve(root, 'features/kanji/kanji.css'), 'utf8');
@@ -41,9 +41,10 @@ test('kanji page offers staged learning, practice, checkpoints, and a progress m
   assert.doesNotThrow(() => new Script(script));
   assert.match(html, /kanji-data\.js/);
   assert.match(script, /data-kanji-view="learn"/);
+  assert.match(script, /data-kanji-view="review"/);
   assert.match(script, /data-kanji-view="practice"/);
-  assert.match(script, /data-kanji-view="checkpoint"/);
   assert.match(script, /data-kanji-view="progress"/);
+  assert.doesNotMatch(script, /data-kanji-view="checkpoint"/);
   assert.match(script, /kanaSprintKanjiV1/);
   assert.match(script, /meaning.*reading.*spelling/s);
   assert.match(styles, /\.kanji-map\{/);
@@ -86,6 +87,22 @@ test('kanji uses one JLPT N5 course with styled controls and optional autoplay',
   assert.match(styles, /\.kanji-controls select\{/);
   assert.match(styles, /\.kanji-pace input\[type="range"\]/);
   assert.match(styles, /\.kanji-toggle input\{/);
+});
+
+test('kanji practice supports reusable all, learned, and multi-group scopes', () => {
+  const script = readFileSync(resolve(root, 'features/kanji/kanji.js'), 'utf8');
+  const styles = readFileSync(resolve(root, 'features/kanji/kanji.css'), 'utf8');
+
+  assert.match(script, /practiceScope: ""/);
+  assert.match(script, /value="all"/);
+  assert.match(script, /value="learned"/);
+  assert.match(script, /value="groups"/);
+  assert.match(script, /practiceStageIds/);
+  assert.match(script, /practiceCoverage: \{ key: "", seenIds: \[\] \}/);
+  assert.match(script, /id="kanjiChangePractice"/);
+  assert.match(script, /if \(view !== "practice"\) progress\.introduced = true/);
+  assert.match(styles, /\.kanji-practice-scope-options/);
+  assert.match(styles, /\.kanji-practice-group-grid/);
 });
 
 test('kanji pace counts successful delayed reviews instead of treating pace as a new-item percentage', () => {

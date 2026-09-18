@@ -24,9 +24,11 @@
   let currentFormat = "meaning";
   let currentChoiceIds = [];
   let currentReason = "";
-  let checkpoint = null;
   let currentQuestionCountsAsReview = false;
   let currentQuestionQualifiesRecall = false;
+  let practiceDraftScope = "all";
+  let practiceDraftStageIds = new Set();
+  let practiceDraftFormat = "mixed";
   let mapFilter = "all";
   let selectedDetailId = DATA.kanji[0].id;
 
@@ -47,6 +49,7 @@
     return {
       version: 1, questionFormat: "mixed", pace: 50, autoPronounce: true,
       total: 0, correct: 0, streak: 0, bestStreak: 0, reviewsSinceNew: 0, unlockedStageIndex: 0,
+      practiceScope: "", practiceStageIds: [], practiceCoverage: { key: "", seenIds: [] },
       recent: [], items: {}, savedAt: 0
     };
   }
@@ -54,7 +57,17 @@
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (saved?.version === 1) return { ...defaultState(), ...saved, items: saved.items || {} };
+      if (saved?.version === 1) {
+        const loaded = { ...defaultState(), ...saved, items: saved.items || {} };
+        loaded.practiceScope = ["all", "learned", "groups"].includes(loaded.practiceScope) ? loaded.practiceScope : "";
+        loaded.practiceStageIds = Array.isArray(loaded.practiceStageIds)
+          ? loaded.practiceStageIds.filter(id => stageById.has(id))
+          : [];
+        loaded.practiceCoverage = loaded.practiceCoverage && typeof loaded.practiceCoverage === "object"
+          ? { key: String(loaded.practiceCoverage.key || ""), seenIds: Array.isArray(loaded.practiceCoverage.seenIds) ? loaded.practiceCoverage.seenIds : [] }
+          : { key: "", seenIds: [] };
+        return loaded;
+      }
     } catch {}
     return defaultState();
   }
@@ -106,13 +119,13 @@
 
   function isMastered(entry) {
     const progress = itemState(entry);
-    return progress.introduced && !progress.awaitingRecall && !progress.urgentMode && progress.retentionStep >= 2
+    return progress.seen > 0 && !progress.awaitingRecall && !progress.urgentMode && progress.retentionStep >= 2
       && modeState(entry, "meaning").seen > 0 && modeState(entry, "reading").seen > 0 && overallMastery(entry) >= 72;
   }
 
   function learningLabel(entry) {
     const progress = itemState(entry);
-    if (!progress.introduced) return "Not introduced";
+    if (!progress.introduced && progress.seen === 0) return "Not practised";
     if (progress.urgentMode) return `${formatLabel(progress.urgentMode)} check due`;
     if (progress.awaitingRecall) return "Building first recall";
     if (isMastered(entry)) return "Strong";
@@ -215,7 +228,7 @@
     const now = Date.now();
     return entries.filter(entry => {
       const progress = itemState(entry);
-      return progress.introduced && Scheduler.reviewIsDue(progress, state.total, now);
+      return (progress.introduced || progress.seen > 0) && Scheduler.reviewIsDue(progress, state.total, now);
     });
   }
 
@@ -277,10 +290,85 @@
     return { entry: review, introduce: false, reason };
   }
 
-  function selectForPractice() {
+  function selectForReview() {
     const introduced = trackEntries().filter(entry => itemState(entry).introduced);
     const review = selectReview(introduced);
     return review ? { entry: review, introduce: false, reason: dueEntries(introduced).includes(review) ? "Due review" : "Adaptive weak-area review" } : null;
+  }
+
+  function practiceSelectionKey(scope = state.practiceScope, stageIds = state.practiceStageIds) {
+    return scope === "groups" ? `groups:${[...stageIds].sort().join(",")}` : scope;
+  }
+
+  function practicePool(scope = state.practiceScope, stageIds = state.practiceStageIds) {
+    if (scope === "all") return trackEntries();
+    if (scope === "learned") return trackEntries().filter(entry => {
+      const progress = itemState(entry);
+      return progress.introduced || progress.seen > 0;
+    });
+    const selected = new Set(stageIds);
+    return trackEntries().filter(entry => selected.has(entry.stageId));
+  }
+
+  function normalizePracticeCoverage() {
+    const key = practiceSelectionKey();
+    if (state.practiceCoverage.key !== key) state.practiceCoverage = { key, seenIds: [] };
+    const available = new Set(practicePool().map(entry => entry.id));
+    state.practiceCoverage.seenIds = [...new Set(state.practiceCoverage.seenIds)].filter(id => available.has(id));
+    return state.practiceCoverage;
+  }
+
+  function practiceScopeLabel(scope = state.practiceScope, stageIds = state.practiceStageIds) {
+    if (scope === "all") return "All 120 kanji";
+    if (scope === "learned") return "My learned kanji";
+    const selected = trackStages().filter(stage => stageIds.includes(stage.id));
+    if (selected.length <= 3) return selected.map(stage => `Group ${stage.order}`).join(", ") || "Choose groups";
+    return `${selected.length} groups`;
+  }
+
+  function practiceCoverageSummary() {
+    const pool = practicePool();
+    const seen = new Set(normalizePracticeCoverage().seenIds);
+    const checked = pool.filter(entry => seen.has(entry.id)).length;
+    return { checked, total: pool.length, text: `${checked}/${pool.length} kanji checked` };
+  }
+
+  function selectPracticeAdaptive(entries) {
+    const available = entries.filter(entry => itemState(entry).seen > 0);
+    if (!available.length) return null;
+    const due = available.filter(entry => Scheduler.reviewIsDue(itemState(entry), state.total));
+    const urgent = due.filter(entry => itemState(entry).urgentMode);
+    const candidates = urgent.length ? urgent : due.length ? due : available;
+    return [...candidates].sort((left, right) => reviewScore(right) - reviewScore(left))[0];
+  }
+
+  function selectForPractice() {
+    const pool = practicePool();
+    if (!pool.length) return null;
+    const coverage = normalizePracticeCoverage();
+    const checked = new Set(coverage.seenIds);
+    const urgent = pool.filter(entry => itemState(entry).urgentMode && Scheduler.reviewIsDue(itemState(entry), state.total));
+    if (urgent.length) {
+      const entry = [...urgent].sort((left, right) => reviewScore(right) - reviewScore(left))[0];
+      return { entry, introduce: false, reason: `${formatLabel(itemState(entry).urgentMode)} recovery check` };
+    }
+    const uncovered = pool.filter(entry => !checked.has(entry.id));
+    if (uncovered.length) {
+      const stages = trackStages().filter(stage => uncovered.some(entry => entry.stageId === stage.id));
+      const stage = stages.sort((left, right) => {
+        const leftEntries = pool.filter(entry => entry.stageId === left.id);
+        const rightEntries = pool.filter(entry => entry.stageId === right.id);
+        const leftRatio = leftEntries.filter(entry => checked.has(entry.id)).length / leftEntries.length;
+        const rightRatio = rightEntries.filter(entry => checked.has(entry.id)).length / rightEntries.length;
+        return leftRatio - rightRatio || left.order - right.order;
+      })[0];
+      const recent = new Set(state.recent.slice(-5));
+      const stageUncovered = uncovered.filter(entry => entry.stageId === stage.id);
+      const entry = stageUncovered.find(candidate => !recent.has(candidate.id)) || stageUncovered[0];
+      return { entry, introduce: false, reason: `Coverage · Group ${stage.order} · ${checked.size}/${pool.length} checked` };
+    }
+    const review = selectPracticeAdaptive(pool);
+    return review ? { entry: review, introduce: false, reason: "Coverage complete · adaptive practice" } : null;
   }
 
   function speak(text) {
@@ -294,14 +382,14 @@
     shell.innerHTML = `
       <nav class="kanji-mode-tabs" aria-label="Kanji learning modes">
         <button class="kanji-mode-tab active" type="button" data-kanji-view="learn"><strong>Learn</strong><small>Follow the guided journey</small></button>
-        <button class="kanji-mode-tab" type="button" data-kanji-view="practice"><strong>Practice</strong><small>Review learned kanji</small></button>
-        <button class="kanji-mode-tab" type="button" data-kanji-view="checkpoint"><strong>Checkpoint</strong><small>Eight mixed questions</small></button>
+        <button class="kanji-mode-tab" type="button" data-kanji-view="review"><strong>Review</strong><small>Strengthen learned kanji</small></button>
+        <button class="kanji-mode-tab" type="button" data-kanji-view="practice"><strong>Practice</strong><small>Choose groups to practise</small></button>
         <button class="kanji-mode-tab" type="button" data-kanji-view="progress"><strong>Kanji map</strong><small>Browse progress and details</small></button>
       </nav>
       <section class="kanji-workspace" id="kanjiWorkspace">
         <div class="kanji-main">
           <section class="trainer kanji-trainer" aria-live="polite">
-            <div class="trainer-top"><div class="mode-tag"><span class="dot"></span><span id="kanjiModeLabel">Learn · guided kanji</span></div><div class="kanji-context"><div class="tiny" id="kanjiQuestionCount">Ready</div><span class="tiny" id="kanjiStageProgressText">Stage progress</span></div></div>
+            <div class="trainer-top"><div class="mode-tag"><span class="dot"></span><span id="kanjiModeLabel">Learn · guided kanji</span></div><div class="kanji-context"><div><div class="tiny" id="kanjiQuestionCount">Ready</div><span class="tiny" id="kanjiStageProgressText">Stage progress</span></div><button class="ghost kanji-hidden" id="kanjiChangePractice" type="button">Change groups</button></div></div>
             <div class="kanji-stage-progress" role="progressbar" aria-label="Current stage introductions" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="kanjiStageProgress"></span></div>
             <div class="kanji-card-body" id="kanjiCardBody"></div>
             <div class="feedback kanji-feedback" id="kanjiFeedback"></div>
@@ -312,8 +400,8 @@
             <div class="kanji-controls">
               <div class="kanji-track-field"><span>Learning course</span><strong>JLPT N5</strong><small class="tiny">The guided journey covers 104 core kanji, followed by 16 extension kanji.</small></div>
               <label><span>Question direction</span><select id="kanjiQuestionFormat"><option value="mixed">Mixed automatically</option><option value="meaning">Kanji → meaning</option><option value="reading">Word → reading</option><option value="spelling">Reading → kanji word</option></select><small class="tiny">Mixed practice targets the weakest direction.</small></label>
-              <label class="kanji-pace"><span>New-kanji pace: <strong id="kanjiPaceLabel">Balanced</strong></span><input id="kanjiPace" type="range" min="10" max="90" step="10"><span class="kanji-pace-labels"><span>More review</span><span>More new</span></span><small class="tiny" id="kanjiPaceDescription"></small></label>
-              <div class="kanji-playback-settings"><label class="kanji-toggle"><input type="checkbox" id="kanjiAutoPronounce"><span>Automatically pronounce revealed words</span></label><button class="ghost" id="kanjiManageVoices" type="button">Manage voices</button></div>
+              <label class="kanji-pace" id="kanjiPaceControl"><span>New-kanji pace: <strong id="kanjiPaceLabel">Balanced</strong></span><input id="kanjiPace" type="range" min="10" max="90" step="10"><span class="kanji-pace-labels"><span>More review</span><span>More new</span></span><small class="tiny" id="kanjiPaceDescription"></small></label>
+              <div class="kanji-playback-settings"><label class="kanji-toggle"><input type="checkbox" id="kanjiAutoPronounce"><span>Automatically pronounce revealed words</span></label><div class="actions"><button class="ghost" id="kanjiPracticeSetup" type="button">Practice setup</button><button class="ghost" id="kanjiManageVoices" type="button">Manage voices</button></div></div>
             </div>
             <p class="kanji-attribution tiny">Meanings, readings, stroke counts, and radical data adapted from <a href="https://github.com/kanjialive/kanji-data-media" target="_blank" rel="noreferrer">Kanji alive</a> under CC BY 4.0.</p>
           </details>
@@ -336,6 +424,21 @@
           <header><div><span class="tiny" id="kanjiStageDialogEyebrow">Stage overview</span><h2 id="kanjiStageDialogTitle">People & first numbers</h2><p id="kanjiStageDialogDescription"></p></div><button class="kanji-stage-dialog-close" id="kanjiStageDialogClose" type="button" aria-label="Close stage overview">×</button></header>
           <div class="kanji-stage-dialog-body"><div class="kanji-stage-dialog-stats" id="kanjiStageDialogStats"></div><div><h3>Kanji in this stage</h3><p class="muted">Choose a kanji to open its complete readings, example, and progress in the Kanji map.</p></div><div class="kanji-stage-dialog-list" id="kanjiStageDialogList"></div></div>
           <footer><span class="tiny" id="kanjiStageDialogHint">Future stages can be previewed before they unlock.</span><button class="ghost" id="kanjiStageDialogDone" type="button">Close</button></footer>
+        </div>
+      </dialog>
+      <dialog class="kanji-stage-dialog kanji-practice-dialog" id="kanjiPracticeDialog" aria-labelledby="kanjiPracticeDialogTitle">
+        <div class="kanji-stage-dialog-shell">
+          <header><div><span class="tiny">Practice setup</span><h2 id="kanjiPracticeDialogTitle">Choose what to practise</h2><p>Use all N5 kanji, your learned set, or any combination of curriculum groups.</p></div><button class="kanji-stage-dialog-close" id="kanjiPracticeDialogClose" type="button" aria-label="Close practice setup">×</button></header>
+          <div class="kanji-stage-dialog-body kanji-practice-dialog-body">
+            <div class="kanji-practice-scope-options" id="kanjiPracticeScopeOptions">
+              <label><input type="radio" name="kanjiPracticeScope" value="all"><span><strong>All JLPT N5 kanji</strong><small>Practise all 120 characters</small></span></label>
+              <label><input type="radio" name="kanjiPracticeScope" value="learned"><span><strong>My learned kanji</strong><small id="kanjiLearnedScopeCount">Introduced or previously practised</small></span></label>
+              <label><input type="radio" name="kanjiPracticeScope" value="groups"><span><strong>Choose groups</strong><small>Select one or more curriculum groups</small></span></label>
+            </div>
+            <div class="kanji-practice-groups" id="kanjiPracticeGroups"><div class="kanji-practice-groups-heading"><div><h3>Curriculum groups</h3><p class="muted">Choose any combination. Selecting a group does not mark its kanji as learned.</p></div><div class="actions"><button class="ghost" id="kanjiPracticeSelectAll" type="button">Select all</button><button class="ghost" id="kanjiPracticeClear" type="button">Clear</button></div></div><div class="kanji-practice-group-grid" id="kanjiPracticeGroupGrid"></div></div>
+            <label class="kanji-practice-direction"><span>Question direction</span><select id="kanjiPracticeFormat"><option value="mixed">Mixed automatically</option><option value="meaning">Kanji → meaning</option><option value="reading">Word → reading</option><option value="spelling">Reading → kanji word</option></select><small>Mixed practice rotates toward each kanji’s weakest direction.</small></label>
+          </div>
+          <footer><span class="tiny" id="kanjiPracticeSelectionSummary">120 kanji selected</span><button class="big-button" id="kanjiPracticeApply" type="button">Start practice</button></footer>
         </div>
       </dialog>`;
     host.appendChild(shell);
@@ -364,6 +467,8 @@
     });
     $("#kanjiPace").addEventListener("change", saveState);
     $("#kanjiAutoPronounce").addEventListener("change", event => { state.autoPronounce = event.target.checked; saveState(); });
+    $("#kanjiChangePractice").addEventListener("click", openPracticeDialog);
+    $("#kanjiPracticeSetup").addEventListener("click", openPracticeDialog);
     $("#kanjiManageVoices").addEventListener("click", () => globalThis.KANA_SPRINT_SPEECH?.openSettings());
     $("#kanjiStageList").addEventListener("click", event => {
       const button = event.target.closest("[data-kanji-stage-id]");
@@ -376,6 +481,32 @@
     $("#kanjiStageDialogClose").addEventListener("click", closeStageDialog);
     $("#kanjiStageDialogDone").addEventListener("click", closeStageDialog);
     $("#kanjiStageDialog").addEventListener("click", event => { if (event.target === $("#kanjiStageDialog")) closeStageDialog(); });
+    $("#kanjiPracticeDialogClose").addEventListener("click", closePracticeDialog);
+    $("#kanjiPracticeDialog").addEventListener("click", event => { if (event.target === $("#kanjiPracticeDialog")) closePracticeDialog(); });
+    $("#kanjiPracticeScopeOptions").addEventListener("change", event => {
+      if (!event.target.matches('[name="kanjiPracticeScope"]')) return;
+      practiceDraftScope = event.target.value;
+      renderPracticeSetup();
+    });
+    $("#kanjiPracticeGroupGrid").addEventListener("change", event => {
+      if (!event.target.matches("[data-practice-stage-id]")) return;
+      if (event.target.checked) practiceDraftStageIds.add(event.target.dataset.practiceStageId);
+      else practiceDraftStageIds.delete(event.target.dataset.practiceStageId);
+      practiceDraftScope = "groups";
+      renderPracticeSetup();
+    });
+    $("#kanjiPracticeSelectAll").addEventListener("click", () => {
+      practiceDraftScope = "groups";
+      practiceDraftStageIds = new Set(trackStages().map(stage => stage.id));
+      renderPracticeSetup();
+    });
+    $("#kanjiPracticeClear").addEventListener("click", () => {
+      practiceDraftScope = "groups";
+      practiceDraftStageIds.clear();
+      renderPracticeSetup();
+    });
+    $("#kanjiPracticeFormat").addEventListener("change", event => { practiceDraftFormat = event.target.value; });
+    $("#kanjiPracticeApply").addEventListener("click", applyPracticeSetup);
     $("#kanjiSearch").addEventListener("input", renderMap);
     $("#kanjiMapFilter").addEventListener("change", event => { mapFilter = event.target.value; renderMap(); });
     $("#kanjiMap").addEventListener("click", event => {
@@ -385,10 +516,11 @@
       renderDetail();
     });
     document.addEventListener("keydown", event => {
+      if ($("#kanjiPracticeDialog").open || $("#kanjiStageDialog").open) return;
       if (event.key === "Enter" && !event.target.matches("input,select,textarea,button")) {
         event.preventDefault();
         if (phase === "introduction") startIntroducedQuestion();
-        else if (phase === "answered" || phase === "checkpoint-summary") advance();
+        else if (phase === "answered") advance();
       }
       if (/^[1-4]$/.test(event.key) && phase === "question" && !event.target.matches("input,select,textarea")) {
         const button = $("#kanjiCardBody").querySelectorAll("[data-choice-id]")[Number(event.key) - 1];
@@ -398,19 +530,70 @@
     });
   }
 
+  function closePracticeDialog() {
+    if ($("#kanjiPracticeDialog").open) $("#kanjiPracticeDialog").close();
+  }
+
+  function renderPracticeSetup() {
+    const stageIds = [...practiceDraftStageIds];
+    const pool = practicePool(practiceDraftScope, stageIds);
+    const learnedCount = practicePool("learned").length;
+    $("#kanjiLearnedScopeCount").textContent = learnedCount
+      ? `${learnedCount} introduced or previously practised kanji`
+      : "No kanji have been learned or practised yet";
+    document.querySelectorAll('[name="kanjiPracticeScope"]').forEach(input => { input.checked = input.value === practiceDraftScope; });
+    $("#kanjiPracticeGroups").classList.toggle("kanji-hidden", practiceDraftScope !== "groups");
+    $("#kanjiPracticeFormat").value = practiceDraftFormat;
+    $("#kanjiPracticeGroupGrid").innerHTML = trackStages().map(stage => {
+      const entries = stageEntries(stage);
+      const introduced = entries.filter(entry => itemState(entry).introduced).length;
+      const strong = entries.filter(isMastered).length;
+      const selected = practiceDraftStageIds.has(stage.id);
+      return `<label class="kanji-practice-group ${selected ? "selected" : ""}"><input type="checkbox" data-practice-stage-id="${stage.id}" ${selected ? "checked" : ""}><span class="kanji-practice-group-number">${stage.order}</span><span><strong>${escapeHtml(stage.label)}</strong><small>${entries.length} kanji · ${introduced} introduced${strong ? ` · ${strong} strong` : ""}</small><i><span style="width:${entries.length ? introduced / entries.length * 100 : 0}%"></span></i></span></label>`;
+    }).join("");
+    const valid = pool.length > 0;
+    $("#kanjiPracticeApply").disabled = !valid;
+    $("#kanjiPracticeSelectionSummary").textContent = valid
+      ? `${practiceDraftScope === "groups" ? `${stageIds.length} group${stageIds.length === 1 ? "" : "s"} · ` : ""}${pool.length} kanji selected`
+      : practiceDraftScope === "learned" ? "Learn or practise a kanji first" : "Choose at least one group";
+  }
+
+  function openPracticeDialog() {
+    practiceDraftScope = state.practiceScope || "all";
+    practiceDraftStageIds = new Set(state.practiceStageIds);
+    practiceDraftFormat = state.questionFormat;
+    renderPracticeSetup();
+    if (!$("#kanjiPracticeDialog").open) $("#kanjiPracticeDialog").showModal();
+  }
+
+  function applyPracticeSetup() {
+    const stageIds = [...practiceDraftStageIds];
+    if (!practicePool(practiceDraftScope, stageIds).length) return;
+    const previousKey = practiceSelectionKey();
+    state.practiceScope = practiceDraftScope;
+    state.practiceStageIds = stageIds;
+    state.questionFormat = MODE_KEYS.includes(practiceDraftFormat) ? practiceDraftFormat : "mixed";
+    const nextKey = practiceSelectionKey();
+    if (previousKey !== nextKey) state.practiceCoverage = { key: nextKey, seenIds: [] };
+    $("#kanjiQuestionFormat").value = state.questionFormat;
+    saveState();
+    closePracticeDialog();
+    switchView("practice");
+  }
+
   function switchView(nextView) {
+    if (nextView === "practice" && !state.practiceScope) {
+      openPracticeDialog();
+      return;
+    }
     view = nextView;
     phase = "idle";
     current = null;
-    checkpoint = null;
     document.querySelectorAll("[data-kanji-view]").forEach(button => button.classList.toggle("active", button.dataset.kanjiView === view));
     $("#kanjiWorkspace").classList.toggle("kanji-hidden", view === "progress");
     $("#kanjiProgressPanel").classList.toggle("kanji-hidden", view !== "progress");
     if (view === "progress") renderProgress();
-    else {
-      if (view === "checkpoint") startCheckpoint();
-      else nextActivity();
-    }
+    else nextActivity();
     renderAll();
   }
 
@@ -423,7 +606,13 @@
   function renderControls() {
     $("#kanjiPaceLabel").textContent = paceLabel();
     $("#kanjiPaceDescription").textContent = introductionStatus();
-    $("#kanjiSessionSummary").textContent = `JLPT N5 · ${state.questionFormat === "mixed" ? "mixed practice" : formatLabel(state.questionFormat)} · ${paceLabel().toLowerCase()} pace`;
+    $("#kanjiPaceControl").classList.toggle("kanji-hidden", view !== "learn");
+    $("#kanjiChangePractice").classList.toggle("kanji-hidden", view !== "practice");
+    const direction = state.questionFormat === "mixed" ? "mixed practice" : formatLabel(state.questionFormat);
+    $("#kanjiSessionSummary").textContent = view === "practice"
+      ? `${practiceScopeLabel()} · ${direction}`
+      : view === "review" ? `Introduced kanji · ${direction}`
+        : `JLPT N5 · ${direction} · ${paceLabel().toLowerCase()} pace`;
   }
 
   function renderRoadmap() {
@@ -434,7 +623,9 @@
     const transitionStatus = stageTransitionStatus();
     const hasUnintroduced = totalIntroduced < trackEntries().length;
     const pacingStatus = hasUnintroduced ? introductionStatus() : "";
-    $("#kanjiJourneySummary").textContent = transitionStatus || pacingStatus || `Stage ${activeIndex + 1} of ${stages.length} · ${totalIntroduced}/${trackEntries().length} introduced`;
+    $("#kanjiJourneySummary").textContent = view === "practice"
+      ? `${practiceScopeLabel()} · ${practiceCoverageSummary().text}`
+      : transitionStatus || pacingStatus || `Stage ${activeIndex + 1} of ${stages.length} · ${totalIntroduced}/${trackEntries().length} introduced`;
     $("#kanjiStageList").innerHTML = stages.map((stage, index) => {
       const entries = stageEntries(stage);
       const introduced = entries.filter(entry => itemState(entry).introduced).length;
@@ -447,9 +638,20 @@
     const entries = stageEntries(stage);
     const introduced = entries.filter(entry => itemState(entry).introduced).length;
     const stagePercent = entries.length ? Math.round(introduced / entries.length * 100) : 0;
-    $("#kanjiStageProgress").style.width = `${stagePercent}%`;
-    $(".kanji-stage-progress").setAttribute("aria-valuenow", String(stagePercent));
-    $("#kanjiStageProgressText").textContent = transitionStatus || pacingStatus || `Stage ${currentStageIndex() + 1} of ${stages.length} · ${stage.label} · ${introduced}/${entries.length} introduced`;
+    const practiceCoverage = view === "practice" ? practiceCoverageSummary() : null;
+    const progressPercent = practiceCoverage?.total ? Math.round(practiceCoverage.checked / practiceCoverage.total * 100) : stagePercent;
+    $("#kanjiStageProgress").style.width = `${progressPercent}%`;
+    const progressBar = $(".kanji-stage-progress");
+    progressBar.setAttribute("aria-valuenow", String(progressPercent));
+    progressBar.setAttribute("aria-label", practiceCoverage ? "Practice selection coverage" : "Current stage introductions");
+    $("#kanjiStageProgressText").textContent = practiceCoverage
+      ? `${practiceScopeLabel()} · ${practiceCoverage.text}`
+      : transitionStatus || pacingStatus || `Stage ${currentStageIndex() + 1} of ${stages.length} · ${stage.label} · ${introduced}/${entries.length} introduced`;
+    if (view === "practice" && phase === "answered") {
+      $("#kanjiQuestionCount").textContent = current?.stageId
+        ? `Coverage · Group ${stageById.get(current.stageId)?.order || ""} · ${practiceCoverage.text}`
+        : `Coverage · ${practiceCoverage.text}`;
+    }
   }
 
   function renderDashboard() {
@@ -486,12 +688,15 @@
     currentQuestionQualifiesRecall = false;
     state.reviewsSinceNew = 0;
     const progress = itemState(entry);
+    const hasPracticeEvidence = progress.seen > 0;
     progress.introduced = true;
-    progress.awaitingRecall = true;
-    progress.urgentMode = "";
-    progress.retentionStep = 0;
-    progress.dueAt = 0;
-    progress.dueQuestion = 0;
+    if (!hasPracticeEvidence) {
+      progress.awaitingRecall = true;
+      progress.urgentMode = "";
+      progress.retentionStep = 0;
+      progress.dueAt = 0;
+      progress.dueQuestion = 0;
+    }
     saveState();
     $("#kanjiModeLabel").textContent = "Learn · new kanji";
     $("#kanjiQuestionCount").textContent = reason;
@@ -572,8 +777,9 @@
       const language = format === "meaning" ? "" : ' lang="ja"';
       return `<button class="kanji-choice ${format === "meaning" ? "meaning-choice" : "japanese-choice"}" type="button" data-choice-id="${choice.id}"><span>${choices.indexOf(choice) + 1}</span><span><strong${language}>${escapeHtml(main)}</strong><small class="kanji-choice-secondary" aria-hidden="true">${escapeHtml(detail)}</small></span></button>`;
     };
-    $("#kanjiModeLabel").textContent = `${view === "checkpoint" ? "Checkpoint" : view === "practice" ? "Practice" : "Learn"} · ${formatLabel(format)}`;
-    $("#kanjiQuestionCount").textContent = view === "checkpoint" ? `Question ${checkpoint.index + 1} / ${checkpoint.queue.length}` : currentReason;
+    const viewLabel = view === "review" ? "Review" : view === "practice" ? "Practice" : "Learn";
+    $("#kanjiModeLabel").textContent = `${viewLabel} · ${formatLabel(format)}`;
+    $("#kanjiQuestionCount").textContent = currentReason;
     $("#kanjiCardBody").innerHTML = `<span class="kanji-question-kicker">${label}</span>${prompt}<div class="kanji-options">${choices.map(choiceMarkup).join("")}</div>`;
     $("#kanjiFeedback").className = "feedback kanji-feedback";
     $("#kanjiDontKnow").classList.remove("kanji-hidden");
@@ -588,7 +794,7 @@
     const progress = itemState(current);
     const direction = modeState(current, currentFormat);
     const now = Date.now();
-    progress.introduced = true;
+    if (view !== "practice") progress.introduced = true;
     progress.seen += 1;
     progress.lastSeen = now;
     progress.lastWasCorrect = correct;
@@ -619,11 +825,12 @@
     }
     progress.mastery = overallMastery(current);
     state.total += 1;
+    const initialLearningCheck = !currentQuestionCountsAsReview && progress.awaitingRecall;
     const resolvedReview = correct && currentQuestionQualifiesRecall && !progress.awaitingRecall && !progress.urgentMode;
-    if (!correct || !currentQuestionCountsAsReview || resolvedReview) {
+    if (!correct || initialLearningCheck || resolvedReview) {
       Object.assign(progress, Scheduler.nextKanjiReviewSchedule({
         correct,
-        initial: !currentQuestionCountsAsReview,
+        initial: initialLearningCheck,
         retentionStep: progress.retentionStep,
         questionNumber: state.total,
         now
@@ -632,9 +839,9 @@
     state.recent.push(current.id);
     state.recent = state.recent.slice(-12);
     if (view === "learn" && currentQuestionCountsAsReview && correct) state.reviewsSinceNew += 1;
-    if (view === "checkpoint") {
-      checkpoint.correct += correct ? 1 : 0;
-      checkpoint.results.push({ id: current.id, correct });
+    if (view === "practice") {
+      const coverage = normalizePracticeCoverage();
+      if (!coverage.seenIds.includes(current.id)) coverage.seenIds.push(current.id);
     }
     saveState();
   }
@@ -665,16 +872,11 @@
   }
 
   function nextActivity() {
-    if (view === "checkpoint") {
-      showCheckpointNext();
-      return;
-    }
     if (view === "learn") maybeUnlockNextStage();
-    const selected = view === "practice" ? selectForPractice() : selectForLearn();
+    const selected = view === "review" ? selectForReview() : view === "practice" ? selectForPractice() : selectForLearn();
     if (!selected?.entry) {
-      view = "learn";
-      document.querySelectorAll("[data-kanji-view]").forEach(button => button.classList.toggle("active", button.dataset.kanjiView === view));
-      nextActivity();
+      if (view === "review") renderEmptyMode("Nothing to review yet", "Learn at least one kanji first. Review will then prioritize due, weak, and mistaken kanji.", "Start learning", () => switchView("learn"));
+      else if (view === "practice") renderEmptyMode("Choose some kanji to practise", "Change the Practice scope to all N5 kanji or select one or more curriculum groups.", "Change groups", openPracticeDialog);
       return;
     }
     currentReason = selected.reason;
@@ -684,55 +886,26 @@
 
   function advance() {
     if (phase === "introduction") startIntroducedQuestion();
-    else if (phase === "answered") {
-      if (view === "checkpoint") checkpoint.index += 1;
-      nextActivity();
-    } else if (phase === "checkpoint-summary") startCheckpoint();
+    else if (phase === "answered") nextActivity();
   }
 
-  function startCheckpoint() {
-    const introduced = trackEntries().filter(entry => itemState(entry).introduced);
-    if (!introduced.length) {
-      view = "learn";
-      document.querySelectorAll("[data-kanji-view]").forEach(button => button.classList.toggle("active", button.dataset.kanjiView === view));
-      nextActivity();
-      return;
-    }
-    const queue = [...introduced].sort((left, right) => reviewScore(right) - reviewScore(left)).slice(0, 8);
-    checkpoint = { queue, index: 0, correct: 0, results: [] };
-    showCheckpointNext();
-  }
-
-  function showCheckpointNext() {
-    if (!checkpoint || checkpoint.index >= checkpoint.queue.length) {
-      showCheckpointSummary();
-      return;
-    }
-    const entry = checkpoint.queue[checkpoint.index];
-    const format = MODE_KEYS[checkpoint.index % MODE_KEYS.length];
-    currentReason = "Mixed transfer check";
-    showQuestion(entry, format);
-  }
-
-  function showCheckpointSummary() {
-    phase = "checkpoint-summary";
+  function renderEmptyMode(title, copy, buttonLabel, action) {
+    phase = "empty";
     current = null;
-    const score = Math.round(checkpoint.correct / checkpoint.queue.length * 100);
-    const missed = checkpoint.results.filter(result => !result.correct).map(result => entryById.get(result.id));
-    $("#kanjiModeLabel").textContent = "Checkpoint · complete";
-    $("#kanjiQuestionCount").textContent = `${checkpoint.correct} / ${checkpoint.queue.length} first-pass correct`;
-    $("#kanjiCardBody").innerHTML = `<span class="kanji-question-kicker">Focused checkpoint</span><div class="kanji-character small">${score}%</div><div class="kanji-core-meaning">${score >= 85 ? "Strong first-pass recall" : score >= 60 ? "Useful practice completed" : "Review recommended"}</div><p class="muted">${missed.length ? `Review ${missed.map(entry => entry.character).join("、")} soon. They are already scheduled earlier.` : "Every kanji was correct on the first attempt."}</p>`;
+    $("#kanjiModeLabel").textContent = view === "review" ? "Review" : "Practice";
+    $("#kanjiQuestionCount").textContent = "Setup needed";
+    $("#kanjiCardBody").innerHTML = `<span class="kanji-question-kicker">${view === "review" ? "Adaptive review" : "Selected practice"}</span><div class="kanji-core-meaning">${escapeHtml(title)}</div><p class="muted">${escapeHtml(copy)}</p><button class="big-button" id="kanjiEmptyAction" type="button">${escapeHtml(buttonLabel)}</button>`;
     $("#kanjiFeedback").className = "feedback kanji-feedback";
     $("#kanjiDontKnow").classList.add("kanji-hidden");
-    $("#kanjiNext").classList.remove("kanji-hidden");
-    $("#kanjiNext").textContent = "Start another checkpoint";
-    $("#kanjiKeyboardHint").textContent = "Eight questions are enough for one focused check.";
+    $("#kanjiNext").classList.add("kanji-hidden");
+    $("#kanjiKeyboardHint").textContent = "Choose an option to continue.";
+    $("#kanjiEmptyAction").addEventListener("click", action);
     renderAll();
   }
 
   function statusFor(entry) {
     const progress = itemState(entry);
-    if (!progress.introduced) return "unintroduced";
+    if (!progress.introduced && progress.seen === 0) return "unintroduced";
     if (isMastered(entry)) return "mastered";
     if (Scheduler.reviewIsDue(progress, state.total)) return "due";
     return "learning";
@@ -811,7 +984,10 @@
     selectedDetailId = entry.id;
     const progress = itemState(entry);
     const readings = [...entry.readings.kunyomi.map(reading => `Kun ${reading}`), ...entry.readings.onyomi.map(reading => `On ${reading}`)];
-    $("#kanjiDetail").innerHTML = `<div class="kanji-detail-glyph" lang="ja">${entry.character}</div><div class="kanji-detail-copy"><h3>${escapeHtml(entry.meanings.join(", "))}</h3><p lang="ja"><strong>${escapeHtml(entry.anchor.word)}</strong> · ${escapeHtml(entry.anchor.reading)} · ${escapeHtml(entry.anchor.meaning)}</p><div class="kanji-reading-row">${readings.map(reading => `<span>${escapeHtml(reading)}</span>`).join("")}<span>${entry.strokes} strokes</span><span>Radical ${escapeHtml(entry.radical.character)} · ${escapeHtml(entry.radical.meaning)}</span></div><p>${progress.introduced ? `${escapeHtml(learningLabel(entry))} · ${progress.seen} graded attempt${progress.seen === 1 ? "" : "s"}` : "Not introduced yet"}</p>${entry.anchor.sentence ? `<p lang="ja">${highlightedExample(entry)}<br><small>${escapeHtml(entry.anchor.translation)}</small></p>` : ""}<div class="actions"><button class="ghost" id="kanjiDetailAudio" type="button">🔊 Hear anchor word</button></div></div>`;
+    const progressCopy = progress.seen > 0
+      ? `${escapeHtml(learningLabel(entry))} · ${progress.seen} graded attempt${progress.seen === 1 ? "" : "s"}${progress.introduced ? "" : " · not yet introduced in Learn"}`
+      : "Not introduced or practised yet";
+    $("#kanjiDetail").innerHTML = `<div class="kanji-detail-glyph" lang="ja">${entry.character}</div><div class="kanji-detail-copy"><h3>${escapeHtml(entry.meanings.join(", "))}</h3><p lang="ja"><strong>${escapeHtml(entry.anchor.word)}</strong> · ${escapeHtml(entry.anchor.reading)} · ${escapeHtml(entry.anchor.meaning)}</p><div class="kanji-reading-row">${readings.map(reading => `<span>${escapeHtml(reading)}</span>`).join("")}<span>${entry.strokes} strokes</span><span>Radical ${escapeHtml(entry.radical.character)} · ${escapeHtml(entry.radical.meaning)}</span></div><p>${progressCopy}</p>${entry.anchor.sentence ? `<p lang="ja">${highlightedExample(entry)}<br><small>${escapeHtml(entry.anchor.translation)}</small></p>` : ""}<div class="actions"><button class="ghost" id="kanjiDetailAudio" type="button">🔊 Hear anchor word</button></div></div>`;
     $("#kanjiDetailAudio").addEventListener("click", () => speak(entry.anchor.reading));
   }
 
