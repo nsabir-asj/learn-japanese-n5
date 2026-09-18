@@ -114,3 +114,12 @@ test('kanji stages open an overview and link individual kanji to the map', () =>
   assert.match(styles, /\.kanji-stage-dialog::backdrop/);
   assert.match(styles, /\.kanji-stage-dialog-list\{display:grid;grid-template-columns:repeat\(2/);
 });
+
+test('kanji map search and status controls use the site control styling', () => {
+  const styles = readFileSync(resolve(root, 'features/kanji/kanji.css'), 'utf8');
+
+  assert.match(styles, /\.kanji-map-tools\{display:grid;grid-template-columns:/);
+  assert.match(styles, /\.kanji-map-tools input,\.kanji-map-tools select\{[^}]*height:44px[^}]*border-radius:11px[^}]*background:#0f141a/);
+  assert.match(styles, /\.kanji-map-tools input:hover,\.kanji-map-tools select:hover/);
+  assert.match(styles, /\.kanji-map-tools input:focus-visible,\.kanji-map-tools select:focus-visible/);
+});

@@ -270,6 +270,10 @@
         {
           "pages": ["home"],
           "text": "Each kanji stage now opens a focused overview with its theme, progress, and characters, with direct access to complete kanji details."
+        },
+        {
+          "pages": ["home"],
+          "text": "Kanji map search and status filters now match the polished controls used throughout the lessons."
         }
       ]
     }
