@@ -266,6 +266,10 @@
         {
           "pages": ["home"],
           "text": "Kanji questions now use the full practice area, while the complete JLPT N5 journey remains available in a compact section below."
+        },
+        {
+          "pages": ["home"],
+          "text": "Each kanji stage now opens a focused overview with its theme, progress, and characters, with direct access to complete kanji details."
         }
       ]
     }

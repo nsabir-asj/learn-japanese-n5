@@ -238,7 +238,14 @@
           <div class="kanji-map" id="kanjiMap"></div>
           <div class="kanji-detail" id="kanjiDetail"></div>
         </div>
-      </section>`;
+      </section>
+      <dialog class="kanji-stage-dialog" id="kanjiStageDialog" aria-labelledby="kanjiStageDialogTitle" aria-describedby="kanjiStageDialogDescription">
+        <div class="kanji-stage-dialog-shell">
+          <header><div><span class="tiny" id="kanjiStageDialogEyebrow">Stage overview</span><h2 id="kanjiStageDialogTitle">People & first numbers</h2><p id="kanjiStageDialogDescription"></p></div><button class="kanji-stage-dialog-close" id="kanjiStageDialogClose" type="button" aria-label="Close stage overview">×</button></header>
+          <div class="kanji-stage-dialog-body"><div class="kanji-stage-dialog-stats" id="kanjiStageDialogStats"></div><div><h3>Kanji in this stage</h3><p class="muted">Choose a kanji to open its complete readings, example, and progress in the Kanji map.</p></div><div class="kanji-stage-dialog-list" id="kanjiStageDialogList"></div></div>
+          <footer><span class="tiny" id="kanjiStageDialogHint">Future stages can be previewed before they unlock.</span><button class="ghost" id="kanjiStageDialogDone" type="button">Close</button></footer>
+        </div>
+      </dialog>`;
     host.appendChild(shell);
 
     $("#kanjiQuestionFormat").value = state.questionFormat;
@@ -262,6 +269,17 @@
     $("#kanjiPace").addEventListener("change", saveState);
     $("#kanjiAutoPronounce").addEventListener("change", event => { state.autoPronounce = event.target.checked; saveState(); });
     $("#kanjiManageVoices").addEventListener("click", () => globalThis.KANA_SPRINT_SPEECH?.openSettings());
+    $("#kanjiStageList").addEventListener("click", event => {
+      const button = event.target.closest("[data-kanji-stage-id]");
+      if (button) openStageDialog(button.dataset.kanjiStageId);
+    });
+    $("#kanjiStageDialogList").addEventListener("click", event => {
+      const button = event.target.closest("[data-stage-kanji-id]");
+      if (button) openMapDetail(button.dataset.stageKanjiId);
+    });
+    $("#kanjiStageDialogClose").addEventListener("click", closeStageDialog);
+    $("#kanjiStageDialogDone").addEventListener("click", closeStageDialog);
+    $("#kanjiStageDialog").addEventListener("click", event => { if (event.target === $("#kanjiStageDialog")) closeStageDialog(); });
     $("#kanjiSearch").addEventListener("input", renderMap);
     $("#kanjiMapFilter").addEventListener("change", event => { mapFilter = event.target.value; renderMap(); });
     $("#kanjiMap").addEventListener("click", event => {
@@ -323,7 +341,7 @@
       const strong = entries.filter(isMastered).length;
       const coverage = entries.length ? Math.round(introduced / entries.length * 100) : 0;
       const status = index < activeIndex ? "Complete" : index === activeIndex ? "Current" : "Locked";
-      return `<div class="kanji-stage ${index === activeIndex ? "current" : index > activeIndex ? "locked" : ""}"><span class="kanji-stage-number">${index + 1}</span><span class="kanji-stage-copy"><strong>${escapeHtml(stage.label)}</strong><span class="kanji-stage-meter"><span style="width:${coverage}%"></span></span><small>${introduced}/${entries.length} introduced · ${strong}/${entries.length} strong</small></span><span class="kanji-stage-status">${status}</span></div>`;
+      return `<button class="kanji-stage ${index === activeIndex ? "current" : index > activeIndex ? "locked" : ""}" type="button" data-kanji-stage-id="${stage.id}" aria-label="View stage ${index + 1}, ${escapeHtml(stage.label)}"><span class="kanji-stage-number">${index + 1}</span><span class="kanji-stage-copy"><strong>${escapeHtml(stage.label)}</strong><span class="kanji-stage-meter"><span style="width:${coverage}%"></span></span><small>${introduced}/${entries.length} introduced · ${strong}/${entries.length} strong</small></span><span class="kanji-stage-status">${status}<i aria-hidden="true">›</i></span></button>`;
     }).join("");
     const stage = currentStage();
     const entries = stageEntries(stage);
@@ -590,6 +608,44 @@
     if (isMastered(entry)) return "mastered";
     if (Scheduler.reviewIsDue(progress, state.total)) return "due";
     return "learning";
+  }
+
+  function closeStageDialog() {
+    if ($("#kanjiStageDialog").open) $("#kanjiStageDialog").close();
+  }
+
+  function openStageDialog(stageId) {
+    const stage = stageById.get(stageId);
+    if (!stage) return;
+    const stages = trackStages();
+    const index = stages.findIndex(candidate => candidate.id === stage.id);
+    const activeIndex = currentStageIndex();
+    const entries = stageEntries(stage);
+    const introduced = entries.filter(entry => itemState(entry).introduced);
+    const strong = entries.filter(isMastered);
+    const due = dueEntries(entries);
+    const learning = introduced.filter(entry => !isMastered(entry));
+    const stageStatus = index < activeIndex ? "Completed stage" : index === activeIndex ? "Current stage" : "Preview · unlocks later";
+    $("#kanjiStageDialogEyebrow").textContent = `Stage ${index + 1} of ${stages.length} · ${stageStatus}`;
+    $("#kanjiStageDialogTitle").textContent = stage.label;
+    $("#kanjiStageDialogDescription").textContent = stage.description;
+    $("#kanjiStageDialogStats").innerHTML = [
+      [`${introduced.length}/${entries.length}`, "introduced"],
+      [learning.length, "learning"],
+      [strong.length, "strong"],
+      [due.length, "due now"]
+    ].map(([value, label]) => `<div><strong>${value}</strong><span>${label}</span></div>`).join("");
+    $("#kanjiStageDialogList").innerHTML = entries.map(entry => `<button class="kanji-stage-kanji ${statusFor(entry)}" type="button" data-stage-kanji-id="${entry.id}" aria-label="View ${entry.character}, ${escapeHtml(entry.meanings[0])}, in Kanji map"><span class="kanji-stage-kanji-glyph" lang="ja">${entry.character}</span><span class="kanji-stage-kanji-copy"><strong>${escapeHtml(entry.meanings.join(", "))}</strong><span lang="ja">${escapeHtml(entry.anchor.word)}（${escapeHtml(entry.anchor.reading)}）</span><small>${escapeHtml(entry.anchor.meaning)} · ${escapeHtml(learningLabel(entry))}</small></span><span aria-hidden="true">›</span></button>`).join("");
+    $("#kanjiStageDialogHint").textContent = index > activeIndex ? "Preview this stage now; it will unlock as you progress through the journey." : "Choose any kanji to inspect its complete learning details.";
+    if (!$("#kanjiStageDialog").open) $("#kanjiStageDialog").showModal();
+  }
+
+  function openMapDetail(entryId) {
+    if (!entryById.has(entryId)) return;
+    selectedDetailId = entryId;
+    closeStageDialog();
+    switchView("progress");
+    setTimeout(() => $("#kanjiDetail")?.scrollIntoView({ behavior: "smooth", block: "center" }), 0);
   }
 
   function renderProgress() {

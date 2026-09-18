@@ -99,3 +99,18 @@ test('kanji keeps practice full width and places the journey in a collapsed sect
   assert.match(styles, /\.kanji-workspace\{display:block\}/);
   assert.doesNotMatch(styles, /\.kanji-roadmap-card\{position:sticky/);
 });
+
+test('kanji stages open an overview and link individual kanji to the map', () => {
+  const script = readFileSync(resolve(root, 'features/kanji/kanji.js'), 'utf8');
+  const styles = readFileSync(resolve(root, 'features/kanji/kanji.css'), 'utf8');
+
+  assert.match(script, /data-kanji-stage-id="\$\{stage\.id\}"/);
+  assert.match(script, /id="kanjiStageDialog"/);
+  assert.match(script, /function openStageDialog\(stageId\)/);
+  assert.match(script, /\[learning\.length, "learning"\]/);
+  assert.match(script, /data-stage-kanji-id="\$\{entry\.id\}"/);
+  assert.match(script, /function openMapDetail\(entryId\)/);
+  assert.match(script, /switchView\("progress"\)/);
+  assert.match(styles, /\.kanji-stage-dialog::backdrop/);
+  assert.match(styles, /\.kanji-stage-dialog-list\{display:grid;grid-template-columns:repeat\(2/);
+});
