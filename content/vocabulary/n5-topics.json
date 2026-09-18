@@ -23,8 +23,8 @@
     "site-corrected": 2
   },
   "existingVocabulary": {
-    "matchedRecordCount": 199,
-    "matchedWordIdCount": 200,
+    "matchedRecordCount": 277,
+    "matchedWordIdCount": 278,
     "unmatchedWordIds": [
       "ohayou",
       "arigatou",
@@ -92,7 +92,24 @@
       "wakaru",
       "suffix-to",
       "hitoride",
-      "aida"
+      "aida",
+      "atsui-object",
+      "kiku-ask",
+      "saafin",
+      "omiyage",
+      "eru-saizu",
+      "kakkoii",
+      "kowai",
+      "daikirai",
+      "sugoku",
+      "kyoukasho",
+      "pasokon",
+      "isogu",
+      "tabako-o-suu",
+      "tetsudau",
+      "denwa-suru",
+      "tsurete-kuru",
+      "kekkou-desu"
     ]
   },
   "scopePolicy": {
@@ -1163,7 +1180,13 @@
         "kanji": "～枚",
         "kana": "～まい",
         "meaning": "counter for flat objects (ex. sheets of paper)"
-      }
+      },
+      "existingWordIds": [
+        "suffix-mai"
+      ],
+      "existingStageIds": [
+        "lesson5-actions-conversation"
+      ]
     },
     {
       "id": "n5-0044",
@@ -1366,7 +1389,13 @@
         "kanji": "開ける",
         "kana": "あける",
         "meaning": "to open (a door, etc.); to unwrap; to unlock"
-      }
+      },
+      "existingWordIds": [
+        "akeru"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0056",
@@ -1526,7 +1555,13 @@
         "kanji": "遊ぶ",
         "kana": "あそぶ",
         "meaning": "to play; to have a good time"
-      }
+      },
+      "existingWordIds": [
+        "asobu"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0064",
@@ -1580,7 +1615,13 @@
         "kanji": "新しい",
         "kana": "あたらしい",
         "meaning": "new"
-      }
+      },
+      "existingWordIds": [
+        "atarashii"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0067",
@@ -1616,7 +1657,13 @@
         "kanji": "暑い",
         "kana": "あつい",
         "meaning": "hot (weather, etc.); warm"
-      }
+      },
+      "existingWordIds": [
+        "atsui-weather"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0069",
@@ -1652,7 +1699,13 @@
         "kanji": "後",
         "kana": "あと",
         "meaning": "behind | after; later | more (e.g. five more minutes)"
-      }
+      },
+      "existingWordIds": [
+        "ato-de"
+      ],
+      "existingStageIds": [
+        "lesson6-timing-conversation"
+      ]
     },
     {
       "id": "n5-0071",
@@ -1748,7 +1801,13 @@
         "kanji": "浴びる",
         "kana": "あびる",
         "meaning": "to take a shower"
-      }
+      },
+      "existingWordIds": [
+        "shawaa-o-abiru"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0076",
@@ -2133,7 +2192,13 @@
         "kanji": "忙しい",
         "kana": "いそがしい",
         "meaning": "busy; occupied"
-      }
+      },
+      "existingWordIds": [
+        "isogashii"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0096",
@@ -2272,7 +2337,13 @@
         "kanji": "一緒",
         "kana": "いっしょ",
         "meaning": "together | at the same time"
-      }
+      },
+      "existingWordIds": [
+        "issho-ni"
+      ],
+      "existingStageIds": [
+        "lesson5-actions-conversation"
+      ]
     },
     {
       "id": "n5-0104",
@@ -2664,7 +2735,13 @@
         "kanji": "海",
         "kana": "うみ",
         "meaning": "sea; ocean"
-      }
+      },
+      "existingWordIds": [
+        "umi"
+      ],
+      "existingStageIds": [
+        "lesson5-food-travel-life"
+      ]
     },
     {
       "id": "n5-0125",
@@ -2760,7 +2837,13 @@
       "topicId": "home-and-daily-life",
       "classificationSource": "manual",
       "sourceTopicId": null,
-      "classificationNote": "No reliable site match; editorially assigned to home-and-daily-life from the entry's sense."
+      "classificationNote": "No reliable site match; editorially assigned to home-and-daily-life from the entry's sense.",
+      "existingWordIds": [
+        "eakon"
+      ],
+      "existingStageIds": [
+        "lesson6-study-travel-life"
+      ]
     },
     {
       "id": "n5-0131",
@@ -2979,7 +3062,13 @@
         "kanji": "大きい",
         "kana": "おおきい",
         "meaning": "big; large"
-      }
+      },
+      "existingWordIds": [
+        "ookii"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0143",
@@ -3075,7 +3164,13 @@
         "kanji": "お金",
         "kana": "おかね",
         "meaning": "money"
-      }
+      },
+      "existingWordIds": [
+        "okane"
+      ],
+      "existingStageIds": [
+        "lesson6-study-travel-life"
+      ]
     },
     {
       "id": "n5-0148",
@@ -3237,7 +3332,13 @@
         "kanji": "教える",
         "kana": "おしえる",
         "meaning": "to teach; to instruct"
-      }
+      },
+      "existingWordIds": [
+        "oshieru"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0158",
@@ -3679,7 +3780,13 @@
         "kanji": "面白い",
         "kana": "おもしろい",
         "meaning": "interesting; fascinating"
-      }
+      },
+      "existingWordIds": [
+        "omoshiroi"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0182",
@@ -3697,7 +3804,13 @@
         "kanji": "泳ぐ",
         "kana": "およぐ",
         "meaning": "to swim"
-      }
+      },
+      "existingWordIds": [
+        "oyogu"
+      ],
+      "existingStageIds": [
+        "lesson5-actions-conversation"
+      ]
     },
     {
       "id": "n5-0183",
@@ -3715,7 +3828,13 @@
         "kanji": "降りる",
         "kana": "おりる",
         "meaning": "to descend (e.g. a mountain) | to get off; to dismount"
-      }
+      },
+      "existingWordIds": [
+        "oriru"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0184",
@@ -3946,7 +4065,13 @@
         "kanji": "返す",
         "kana": "かえす",
         "meaning": "to return (something)"
-      }
+      },
+      "existingWordIds": [
+        "kaesu"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0197",
@@ -4451,7 +4576,13 @@
         "kanji": "借りる",
         "kana": "かりる",
         "meaning": "to borrow; to have a loan | to rent"
-      }
+      },
+      "existingWordIds": [
+        "kariru"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0224",
@@ -4551,7 +4682,13 @@
         "kanji": "漢字",
         "kana": "かんじ",
         "meaning": "Chinese characters; kanji"
-      }
+      },
+      "existingWordIds": [
+        "kanji"
+      ],
+      "existingStageIds": [
+        "lesson6-study-travel-life"
+      ]
     },
     {
       "id": "n5-0230",
@@ -4966,7 +5103,13 @@
         "kanji": "嫌い",
         "kana": "きらい",
         "meaning": "dislike; hate"
-      }
+      },
+      "existingWordIds": [
+        "kirai"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0253",
@@ -4998,7 +5141,13 @@
         "kanji": "綺麗",
         "kana": "きれい",
         "meaning": "pretty; beautiful | clean; clear"
-      }
+      },
+      "existingWordIds": [
+        "kirei"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0255",
@@ -5115,7 +5264,13 @@
         "kanji": "果物",
         "kana": "くだもの",
         "meaning": "fruit"
-      }
+      },
+      "existingWordIds": [
+        "kudamono"
+      ],
+      "existingStageIds": [
+        "lesson5-food-travel-life"
+      ]
     },
     {
       "id": "n5-0261",
@@ -5193,7 +5348,13 @@
         "kanji": "国",
         "kana": "くに",
         "meaning": "country; state"
-      }
+      },
+      "existingWordIds": [
+        "kuni"
+      ],
+      "existingStageIds": [
+        "lesson6-study-travel-life"
+      ]
     },
     {
       "id": "n5-0265",
@@ -5388,7 +5549,13 @@
       "topicId": "verbs-of-motion",
       "classificationSource": "manual",
       "sourceTopicId": null,
-      "classificationNote": "No reliable site match; assigned by the record meaning (switch off, turn off, erase)."
+      "classificationNote": "No reliable site match; assigned by the record meaning (switch off, turn off, erase).",
+      "existingWordIds": [
+        "kesu"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0276",
@@ -5477,7 +5644,13 @@
         "kanji": "元気",
         "kana": "げんき",
         "meaning": "healthy; well; lively"
-      }
+      },
+      "existingWordIds": [
+        "genki"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0281",
@@ -6014,7 +6187,13 @@
         "kanji": "今週",
         "kana": "こんしゅう",
         "meaning": "this week"
-      }
+      },
+      "existingWordIds": [
+        "konshuu"
+      ],
+      "existingStageIds": [
+        "lesson6-study-travel-life"
+      ]
     },
     {
       "id": "n5-0309",
@@ -6226,7 +6405,13 @@
         "kanji": "寒い",
         "kana": "さむい",
         "meaning": "cold (e.g. weather)"
-      }
+      },
+      "existingWordIds": [
+        "samui"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0321",
@@ -6436,7 +6621,13 @@
         "kanji": "静か",
         "kana": "しずか",
         "meaning": "quiet; silent"
-      }
+      },
+      "existingWordIds": [
+        "shizuka"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0332",
@@ -6531,7 +6722,13 @@
       "topicId": "body-and-health",
       "classificationSource": "manual",
       "sourceTopicId": null,
-      "classificationNote": "No reliable site match; editorially assigned to body-and-health from the entry's sense."
+      "classificationNote": "No reliable site match; editorially assigned to body-and-health from the entry's sense.",
+      "existingWordIds": [
+        "shinu"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0337",
@@ -6620,7 +6817,13 @@
         "kanji": "閉める",
         "kana": "しめる",
         "meaning": "to close; to shut"
-      }
+      },
+      "existingWordIds": [
+        "shimeru"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0342",
@@ -6677,7 +6880,13 @@
         "kanji": "シャワー",
         "kana": "シャワー",
         "meaning": "shower"
-      }
+      },
+      "existingWordIds": [
+        "shawaa"
+      ],
+      "existingStageIds": [
+        "lesson6-study-travel-life"
+      ]
     },
     {
       "id": "n5-0345",
@@ -6759,7 +6968,13 @@
         "kanji": "宿題",
         "kana": "しゅくだい",
         "meaning": "homework; assignment"
-      }
+      },
+      "existingWordIds": [
+        "shukudai"
+      ],
+      "existingStageIds": [
+        "lesson5-food-travel-life"
+      ]
     },
     {
       "id": "n5-0350",
@@ -6990,7 +7205,13 @@
         "kanji": "好き",
         "kana": "すき",
         "meaning": "like; likable"
-      }
+      },
+      "existingWordIds": [
+        "suki"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0363",
@@ -7026,7 +7247,13 @@
         "kanji": "すぐに",
         "kana": "すぐに",
         "meaning": "immediately; right away"
-      }
+      },
+      "existingWordIds": [
+        "sugu"
+      ],
+      "existingStageIds": [
+        "lesson6-timing-conversation"
+      ]
     },
     {
       "id": "n5-0365",
@@ -7216,7 +7443,13 @@
         "kanji": "座る",
         "kana": "すわる",
         "meaning": "to sit; to squat"
-      }
+      },
+      "existingWordIds": [
+        "suwaru"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0376",
@@ -7754,7 +7987,13 @@
         "kanji": "大好き",
         "kana": "だいすき",
         "meaning": "loveable; like very much"
-      }
+      },
+      "existingWordIds": [
+        "daisuki"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0405",
@@ -7857,7 +8096,13 @@
         "kanji": "大変",
         "kana": "たいへん",
         "meaning": "very; terribly | difficult; hard"
-      }
+      },
+      "existingWordIds": [
+        "taihen"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0411",
@@ -7997,7 +8242,13 @@
       "topicId": "verbs-of-motion",
       "classificationSource": "manual",
       "sourceTopicId": null,
-      "classificationNote": "No reliable site match; assigned by the record meaning (stand up)."
+      "classificationNote": "No reliable site match; assigned by the record meaning (stand up).",
+      "existingWordIds": [
+        "tatsu"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0419",
@@ -8033,7 +8284,13 @@
         "kanji": "楽しい",
         "kana": "たのしい",
         "meaning": "enjoyable; fun"
-      }
+      },
+      "existingWordIds": [
+        "tanoshii"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0421",
@@ -8105,7 +8362,13 @@
         "kanji": "食べ物",
         "kana": "たべもの",
         "meaning": "food"
-      }
+      },
+      "existingWordIds": [
+        "tabemono"
+      ],
+      "existingStageIds": [
+        "lesson5-food-travel-life"
+      ]
     },
     {
       "id": "n5-0425",
@@ -8181,7 +8444,13 @@
       "topicId": "time-and-calendar",
       "classificationSource": "manual",
       "sourceTopicId": null,
-      "classificationNote": "No reliable site match; assigned by the record meaning (birthday)."
+      "classificationNote": "No reliable site match; assigned by the record meaning (birthday).",
+      "existingWordIds": [
+        "tanjoubi"
+      ],
+      "existingStageIds": [
+        "lesson5-food-travel-life"
+      ]
     },
     {
       "id": "n5-0429",
@@ -8217,7 +8486,13 @@
         "kanji": "小さい",
         "kana": "ちいさい",
         "meaning": "small; little; tiny"
-      }
+      },
+      "existingWordIds": [
+        "chiisai"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0431",
@@ -8449,7 +8724,13 @@
         "kanji": "使う",
         "kana": "つかう",
         "meaning": "to use"
-      }
+      },
+      "existingWordIds": [
+        "tsukau"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0444",
@@ -8485,7 +8766,13 @@
         "kanji": "次",
         "kana": "つぎ",
         "meaning": "next; following"
-      }
+      },
+      "existingWordIds": [
+        "tsugi"
+      ],
+      "existingStageIds": [
+        "lesson6-study-travel-life"
+      ]
     },
     {
       "id": "n5-0446",
@@ -8574,7 +8861,13 @@
         "kanji": "つける",
         "kana": "つける",
         "meaning": "to turn on; to switch on"
-      }
+      },
+      "existingWordIds": [
+        "tsukeru"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0451",
@@ -8610,7 +8903,13 @@
         "kanji": "つまらない",
         "kana": "つまらない",
         "meaning": "dull; uninteresting; boring"
-      }
+      },
+      "existingWordIds": [
+        "tsumaranai"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0453",
@@ -8742,7 +9041,13 @@
         "kanji": "出かける",
         "kana": "でかける",
         "meaning": "to go out (ex. on an outing); to set out"
-      }
+      },
+      "existingWordIds": [
+        "dekakeru"
+      ],
+      "existingStageIds": [
+        "lesson5-actions-conversation"
+      ]
     },
     {
       "id": "n5-0461",
@@ -8816,7 +9121,13 @@
         "kanji": "テスト",
         "kana": "テスト",
         "meaning": "test"
-      }
+      },
+      "existingWordIds": [
+        "tesuto"
+      ],
+      "existingStageIds": [
+        "lesson5-food-travel-life"
+      ]
     },
     {
       "id": "n5-0465",
@@ -8926,7 +9237,13 @@
         "kanji": "天気",
         "kana": "てんき",
         "meaning": "weather"
-      }
+      },
+      "existingWordIds": [
+        "tenki"
+      ],
+      "existingStageIds": [
+        "lesson5-food-travel-life"
+      ]
     },
     {
       "id": "n5-0471",
@@ -8944,7 +9261,13 @@
         "kanji": "電気",
         "kana": "でんき",
         "meaning": "electricity | (electric) light"
-      }
+      },
+      "existingWordIds": [
+        "denki"
+      ],
+      "existingStageIds": [
+        "lesson6-study-travel-life"
+      ]
     },
     {
       "id": "n5-0472",
@@ -9438,7 +9761,13 @@
         "kanji": "とても",
         "kana": "とても",
         "meaning": "very"
-      }
+      },
+      "existingWordIds": [
+        "totemo"
+      ],
+      "existingStageIds": [
+        "lesson5-actions-conversation"
+      ]
     },
     {
       "id": "n5-0498",
@@ -9683,7 +10012,13 @@
         "kanji": "どんな",
         "kana": "どんな",
         "meaning": "what; what kind of"
-      }
+      },
+      "existingWordIds": [
+        "donna"
+      ],
+      "existingStageIds": [
+        "lesson5-actions-conversation"
+      ]
     },
     {
       "id": "n5-0511",
@@ -10028,7 +10363,13 @@
       "topicId": "basic-adjectives",
       "classificationSource": "manual",
       "sourceTopicId": null,
-      "classificationNote": "No reliable site match; editorially assigned to basic-adjectives from the entry's sense."
+      "classificationNote": "No reliable site match; editorially assigned to basic-adjectives from the entry's sense.",
+      "existingWordIds": [
+        "nigiyaka"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0531",
@@ -10181,7 +10522,13 @@
         "kanji": "荷物",
         "kana": "にもつ",
         "meaning": "luggage; package"
-      }
+      },
+      "existingWordIds": [
+        "nimotsu"
+      ],
+      "existingStageIds": [
+        "lesson6-study-travel-life"
+      ]
     },
     {
       "id": "n5-0539",
@@ -10365,7 +10712,13 @@
         "kanji": "飲み物",
         "kana": "のみもの",
         "meaning": "drink; beverage"
-      }
+      },
+      "existingWordIds": [
+        "nomimono"
+      ],
+      "existingStageIds": [
+        "lesson5-food-travel-life"
+      ]
     },
     {
       "id": "n5-0549",
@@ -10379,7 +10732,13 @@
       "topicId": "transportation",
       "classificationSource": "manual",
       "sourceTopicId": null,
-      "classificationNote": "No reliable site match; editorially assigned to transportation from the entry's sense."
+      "classificationNote": "No reliable site match; editorially assigned to transportation from the entry's sense.",
+      "existingWordIds": [
+        "noru"
+      ],
+      "existingStageIds": [
+        "lesson5-actions-conversation"
+      ]
     },
     {
       "id": "n5-0550",
@@ -10443,7 +10802,13 @@
         "kanji": "入る",
         "kana": "はいる",
         "meaning": "to enter; to go into | to join; to enroll"
-      }
+      },
+      "existingWordIds": [
+        "hairu"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0554",
@@ -11295,7 +11660,13 @@
         "kanji": "暇",
         "kana": "ひま",
         "meaning": "spare time; free time"
-      }
+      },
+      "existingWordIds": [
+        "hima"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0601",
@@ -11687,7 +12058,13 @@
         "kanji": "古い",
         "kana": "ふるい",
         "meaning": "old (not person); aged; stale"
-      }
+      },
+      "existingWordIds": [
+        "furui"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0623",
@@ -11755,7 +12132,13 @@
         "kanji": "ページ",
         "kana": "ページ",
         "meaning": "page"
-      }
+      },
+      "existingWordIds": [
+        "peeji"
+      ],
+      "existingStageIds": [
+        "lesson6-study-travel-life"
+      ]
     },
     {
       "id": "n5-0627",
@@ -11809,7 +12192,13 @@
         "kanji": "部屋",
         "kana": "へや",
         "meaning": "room"
-      }
+      },
+      "existingWordIds": [
+        "heya"
+      ],
+      "existingStageIds": [
+        "lesson5-food-travel-life"
+      ]
     },
     {
       "id": "n5-0630",
@@ -11978,7 +12367,13 @@
       "topicId": "family-and-people",
       "classificationSource": "manual",
       "sourceTopicId": null,
-      "classificationNote": "No reliable site match; assigned by the record meaning (I (generally young boys, but some adult use as a style))."
+      "classificationNote": "No reliable site match; assigned by the record meaning (I (generally young boys, but some adult use as a style)).",
+      "existingWordIds": [
+        "boku"
+      ],
+      "existingStageIds": [
+        "lesson5-food-travel-life"
+      ]
     },
     {
       "id": "n5-0639",
@@ -12123,7 +12518,13 @@
         "kanji": "本当",
         "kana": "ほんとう",
         "meaning": "truth; reality; actuality"
-      }
+      },
+      "existingWordIds": [
+        "hontou-desu-ka"
+      ],
+      "existingStageIds": [
+        "lesson6-timing-conversation"
+      ]
     },
     {
       "id": "n5-0647",
@@ -12441,7 +12842,13 @@
         "kanji": "窓",
         "kana": "まど",
         "meaning": "window"
-      }
+      },
+      "existingWordIds": [
+        "mado"
+      ],
+      "existingStageIds": [
+        "lesson6-study-travel-life"
+      ]
     },
     {
       "id": "n5-0664",
@@ -12814,7 +13221,13 @@
         "kanji": "難しい",
         "kana": "むずかしい",
         "meaning": "difficult; hard; troublesome"
-      }
+      },
+      "existingWordIds": [
+        "muzukashii"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0684",
@@ -13042,7 +13455,13 @@
       "topicId": "verbs-of-motion",
       "classificationSource": "manual",
       "sourceTopicId": null,
-      "classificationNote": "No reliable site match; editorially assigned to verbs-of-motion from the entry's sense."
+      "classificationNote": "No reliable site match; editorially assigned to verbs-of-motion from the entry's sense.",
+      "existingWordIds": [
+        "motsu"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0697",
@@ -13056,7 +13475,13 @@
       "topicId": "verbs-of-motion",
       "classificationSource": "manual",
       "sourceTopicId": null,
-      "classificationNote": "No reliable site match; editorially assigned to verbs-of-motion from the entry's sense."
+      "classificationNote": "No reliable site match; editorially assigned to verbs-of-motion from the entry's sense.",
+      "existingWordIds": [
+        "motte-kuru"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0698",
@@ -13226,7 +13651,13 @@
         "kanji": "易しい",
         "kana": "やさしい",
         "meaning": "easy; plain; simple"
-      }
+      },
+      "existingWordIds": [
+        "yasashii"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0708",
@@ -13258,7 +13689,13 @@
         "kanji": "安い",
         "kana": "やすい",
         "meaning": "cheap; inexpensive"
-      }
+      },
+      "existingWordIds": [
+        "yasui"
+      ],
+      "existingStageIds": [
+        "lesson5-qualities-preferences"
+      ]
     },
     {
       "id": "n5-0710",
@@ -13276,7 +13713,13 @@
         "kanji": "休み",
         "kana": "やすみ",
         "meaning": "rest | vacation; holiday"
-      }
+      },
+      "existingWordIds": [
+        "yasumi"
+      ],
+      "existingStageIds": [
+        "lesson5-food-travel-life"
+      ]
     },
     {
       "id": "n5-0711",
@@ -13294,7 +13737,13 @@
         "kanji": "休む",
         "kana": "やすむ",
         "meaning": "to take a day off | to rest; to have a break"
-      }
+      },
+      "existingWordIds": [
+        "yasumu"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0712",
@@ -13344,7 +13793,13 @@
       "topicId": "actions-and-behavior",
       "classificationSource": "manual",
       "sourceTopicId": null,
-      "classificationNote": "No reliable site match; editorially assigned to actions-and-behavior from the entry's sense."
+      "classificationNote": "No reliable site match; editorially assigned to actions-and-behavior from the entry's sense.",
+      "existingWordIds": [
+        "yaru"
+      ],
+      "existingStageIds": [
+        "lesson5-actions-conversation"
+      ]
     },
     {
       "id": "n5-0715",
@@ -13436,7 +13891,13 @@
       "topicId": "basic-adjectives",
       "classificationSource": "manual",
       "sourceTopicId": null,
-      "classificationNote": "No reliable site match; editorially assigned to basic-adjectives from the entry's sense."
+      "classificationNote": "No reliable site match; editorially assigned to basic-adjectives from the entry's sense.",
+      "existingWordIds": [
+        "yukkuri"
+      ],
+      "existingStageIds": [
+        "lesson6-timing-conversation"
+      ]
     },
     {
       "id": "n5-0720",
@@ -13634,7 +14095,13 @@
         "kanji": "来週",
         "kana": "らいしゅう",
         "meaning": "next week"
-      }
+      },
+      "existingWordIds": [
+        "raishuu"
+      ],
+      "existingStageIds": [
+        "lesson6-study-travel-life"
+      ]
     },
     {
       "id": "n5-0731",
@@ -13652,7 +14119,13 @@
         "kanji": "来年",
         "kana": "らいねん",
         "meaning": "next year"
-      }
+      },
+      "existingWordIds": [
+        "rainen"
+      ],
+      "existingStageIds": [
+        "lesson6-study-travel-life"
+      ]
     },
     {
       "id": "n5-0732",
@@ -13776,7 +14249,13 @@
       "topicId": "transportation",
       "classificationSource": "manual",
       "sourceTopicId": null,
-      "classificationNote": "No reliable site match; editorially assigned to transportation from the entry's sense."
+      "classificationNote": "No reliable site match; editorially assigned to transportation from the entry's sense.",
+      "existingWordIds": [
+        "ryokou"
+      ],
+      "existingStageIds": [
+        "lesson5-food-travel-life"
+      ]
     },
     {
       "id": "n5-0739",
@@ -14013,7 +14492,13 @@
         "kanji": "忘れる",
         "kana": "わすれる",
         "meaning": "to forget"
-      }
+      },
+      "existingWordIds": [
+        "wasureru"
+      ],
+      "existingStageIds": [
+        "lesson6-situations-actions"
+      ]
     },
     {
       "id": "n5-0752",

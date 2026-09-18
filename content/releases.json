@@ -295,6 +295,21 @@
           "text": "Kanji knowledge now carries between Practice and Learn. Familiar characters receive a quick check, while only accurate, varied, and delayed Practice evidence can count toward the guided journey."
         }
       ]
+    },
+    {
+      "id": "2026-09-18.3",
+      "publishedAt": "2026-09-18",
+      "title": "Genki vocabulary for Lessons 5 and 6",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "The Genki II Course now includes all 99 vocabulary entries from Lessons 5 and 6, organised into focused topics with kana-only example sentences."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "Lesson 5 and Lesson 6 can now be selected directly as practice scopes, while words shared with JLPT N5 keep one learning history."
+        }
+      ]
     }
   ]
 }

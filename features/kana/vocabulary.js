@@ -307,6 +307,134 @@
       reusedWordIds: ["gomen-nasai", "migi", "hidari"]
     },
     {
+      id: "lesson5-food-travel-life", name: "Lesson 5 · Food, travel & daily life", description: "Talk about food, trips, weather, study, rooms, and useful everyday items.",
+      words: [
+        ["tabemono", "たべもの", "tabemono", "food"],
+        ["nomimono", "のみもの", "nomimono", "drink / beverage"],
+        ["kudamono", "くだもの", "kudamono", "fruit"],
+        ["yasumi", "やすみ", "yasumi", "holiday / day off / absence"],
+        ["ryokou", "りょこう", "ryokou", "travel / trip"],
+        ["umi", "うみ", "umi", "sea"],
+        ["saafin", "サーフィン", "saafin", "surfing"],
+        ["omiyage", "おみやげ", "omiyage", "souvenir"],
+        ["tenki", "てんき", "tenki", "weather"],
+        ["shukudai", "しゅくだい", "shukudai", "homework"],
+        ["tesuto", "テスト", "tesuto", "test"],
+        ["tanjoubi", "たんじょうび", "tanjoubi", "birthday"],
+        ["heya", "へや", "heya", "room"],
+        ["boku", "ぼく", "boku", "I / me (used by men)"],
+        ["eru-saizu", "Lサイズ", "eru saizu", "size L"]
+      ],
+      reusedWordIds: ["basu"]
+    },
+    {
+      id: "lesson5-qualities-preferences", name: "Lesson 5 · Qualities & preferences", description: "Describe things, people, weather, preferences, and how an experience feels.",
+      words: [
+        ["atarashii", "あたらしい", "atarashii", "new"],
+        ["furui", "ふるい", "furui", "old (thing)"],
+        ["atsui-weather", "あつい", "atsui", "hot (weather)"],
+        ["samui", "さむい", "samui", "cold (weather)"],
+        ["atsui-object", "あつい", "atsui", "hot (thing)"],
+        ["isogashii", "いそがしい", "isogashii", "busy"],
+        ["ookii", "おおきい", "ookii", "large / big"],
+        ["chiisai", "ちいさい", "chiisai", "small"],
+        ["omoshiroi", "おもしろい", "omoshiroi", "interesting / funny"],
+        ["tsumaranai", "つまらない", "tsumaranai", "boring"],
+        ["yasashii", "やさしい", "yasashii", "easy / kind"],
+        ["muzukashii", "むずかしい", "muzukashii", "difficult"],
+        ["kakkoii", "かっこいい", "kakkoii", "good-looking / cool"],
+        ["kowai", "こわい", "kowai", "frightening / scary"],
+        ["tanoshii", "たのしい", "tanoshii", "fun"],
+        ["yasui", "やすい", "yasui", "inexpensive / cheap"],
+        ["suki", "すき", "suki", "fond of / to like"],
+        ["kirai", "きらい", "kirai", "disgusted with / to dislike"],
+        ["daisuki", "だいすき", "daisuki", "very fond of / to love"],
+        ["daikirai", "だいきらい", "daikirai", "to hate"],
+        ["kirei", "きれい", "kirei", "beautiful / clean"],
+        ["genki", "げんき", "genki", "healthy / energetic"],
+        ["shizuka", "しずか", "shizuka", "quiet"],
+        ["nigiyaka", "にぎやか", "nigiyaka", "lively"],
+        ["hima", "ひま", "hima", "not busy / free (time)"]
+      ]
+    },
+    {
+      id: "lesson5-actions-conversation", name: "Lesson 5 · Activities & conversation", description: "Talk about activities and outings, intensify descriptions, and make plans together.",
+      words: [
+        ["oyogu", "およぐ", "oyogu", "to swim"],
+        ["kiku-ask", "きく", "kiku", "to ask"],
+        ["noru", "のる", "noru", "to ride / board"],
+        ["yaru", "やる", "yaru", "to do / perform"],
+        ["dekakeru", "でかける", "dekakeru", "to go out"],
+        ["issho-ni", "いっしょに", "issho ni", "together"],
+        ["sugoku", "すごく", "sugoku", "extremely"],
+        ["totemo", "とても", "totemo", "very"],
+        ["donna", "どんな", "donna", "what kind of"],
+        ["suffix-mai", "～まい", "mai", "counter for flat objects"]
+      ],
+      reusedWordIds: ["daijoubu"]
+    },
+    {
+      id: "lesson6-study-travel-life", name: "Lesson 6 · Study, travel & daily life", description: "Use classroom, travel, household, country, and calendar vocabulary.",
+      words: [
+        ["kanji", "かんじ", "kanji", "kanji / Chinese character"],
+        ["kyoukasho", "きょうかしょ", "kyoukasho", "textbook"],
+        ["peeji", "ページ", "peeji", "page"],
+        ["tsugi", "つぎ", "tsugi", "next"],
+        ["okane", "おかね", "okane", "money"],
+        ["nimotsu", "にもつ", "nimotsu", "baggage / luggage"],
+        ["pasokon", "パソコン", "pasokon", "personal computer"],
+        ["shawaa", "シャワー", "shawaa", "shower"],
+        ["eakon", "エアコン", "eakon", "air conditioner"],
+        ["denki", "でんき", "denki", "electricity / light"],
+        ["mado", "まど", "mado", "window"],
+        ["kuni", "くに", "kuni", "country / place of origin"],
+        ["konshuu", "こんしゅう", "konshuu", "this week"],
+        ["raishuu", "らいしゅう", "raishuu", "next week"],
+        ["rainen", "らいねん", "rainen", "next year"]
+      ],
+      reusedWordIds: ["densha", "yoru"]
+    },
+    {
+      id: "lesson6-situations-actions", name: "Lesson 6 · Situations & actions", description: "Handle common classroom, travel, home, and social actions in everyday situations.",
+      words: [
+        ["taihen", "たいへん", "taihen", "tough / difficult (situation)"],
+        ["asobu", "あそぶ", "asobu", "to play / spend time pleasantly"],
+        ["isogu", "いそぐ", "isogu", "to hurry"],
+        ["kaesu", "かえす", "kaesu", "to return a thing"],
+        ["kesu", "けす", "kesu", "to turn off / erase"],
+        ["shinu", "しぬ", "shinu", "to die"],
+        ["suwaru", "すわる", "suwaru", "to sit down"],
+        ["tatsu", "たつ", "tatsu", "to stand up"],
+        ["tabako-o-suu", "たばこをすう", "tabako o suu", "to smoke"],
+        ["tsukau", "つかう", "tsukau", "to use"],
+        ["tetsudau", "てつだう", "tetsudau", "to help"],
+        ["hairu", "はいる", "hairu", "to enter"],
+        ["motsu", "もつ", "motsu", "to carry / hold"],
+        ["yasumu", "やすむ", "yasumu", "to be absent / rest"],
+        ["akeru", "あける", "akeru", "to open something"],
+        ["shimeru", "しめる", "shimeru", "to close something"],
+        ["oshieru", "おしえる", "oshieru", "to teach / instruct"],
+        ["wasureru", "わすれる", "wasureru", "to forget / leave behind"],
+        ["oriru", "おりる", "oriru", "to get off"],
+        ["kariru", "かりる", "kariru", "to borrow"],
+        ["shawaa-o-abiru", "シャワーをあびる", "shawaa o abiru", "to take a shower"],
+        ["tsukeru", "つける", "tsukeru", "to turn on"],
+        ["denwa-suru", "でんわする", "denwa suru", "to call"],
+        ["tsurete-kuru", "つれてくる", "tsurete kuru", "to bring a person"],
+        ["motte-kuru", "もってくる", "motte kuru", "to bring a thing"]
+      ]
+    },
+    {
+      id: "lesson6-timing-conversation", name: "Lesson 6 · Timing & conversation", description: "Sequence actions, set a comfortable pace, and respond naturally in conversation.",
+      words: [
+        ["ato-de", "あとで", "ato de", "later on"],
+        ["sugu", "すぐ", "sugu", "right away"],
+        ["yukkuri", "ゆっくり", "yukkuri", "slowly / leisurely"],
+        ["kekkou-desu", "けっこうです", "kekkou desu", "that would be fine / no thank you"],
+        ["hontou-desu-ka", "ほんとうですか", "hontou desu ka", "really?"]
+      ]
+    },
+    {
       id: "practical-extras", name: "Practical extras · Daily essentials", description: "High-frequency language for understanding, routines, meals, and everyday conversation.",
       words: [
         ["iie", "いいえ", "iie", "no"],
@@ -486,7 +614,7 @@
   const Examples = { ...N5_EXAMPLES_BY_WORD_ID, ...(window.KANA_SPRINT_VOCABULARY_EXAMPLES || {}) };
   const SpeechDiagnostics = window.KANA_SPRINT_SPEECH_DIAGNOSTICS;
   const UNIFIED_REVIEW_MODEL = "unified-v1";
-  const SCOPE_LABELS = { adaptive: "Guided Genki II Course", "n5-guided": "Guided JLPT N5", all: "All vocabulary", genki: "Genki II Course", n5: "JLPT N5", lesson1: "Genki II · Lesson 1", lesson2: "Genki II · Lesson 2", lesson3: "Genki II · Lesson 3", lesson4: "Genki II · Lesson 4", custom: "Custom topics", trouble: "Trouble words" };
+  const SCOPE_LABELS = { adaptive: "Guided Genki II Course", "n5-guided": "Guided JLPT N5", all: "All vocabulary", genki: "Genki II Course", n5: "JLPT N5", lesson1: "Genki II · Lesson 1", lesson2: "Genki II · Lesson 2", lesson3: "Genki II · Lesson 3", lesson4: "Genki II · Lesson 4", lesson5: "Genki II · Lesson 5", lesson6: "Genki II · Lesson 6", custom: "Custom topics", trouble: "Trouble words" };
   const SCOPE_STAGE_IDS = {
     all: ALL_STAGES.map(stage => stage.id),
     genki: COURSE_STAGES.map(stage => stage.id),
@@ -494,7 +622,9 @@
     lesson1: COURSE_STAGES.filter(stage => stage.id.startsWith("lesson1-")).map(stage => stage.id),
     lesson2: COURSE_STAGES.filter(stage => stage.id.startsWith("lesson2-")).map(stage => stage.id),
     lesson3: COURSE_STAGES.filter(stage => stage.id.startsWith("lesson3-")).map(stage => stage.id),
-    lesson4: COURSE_STAGES.filter(stage => stage.id.startsWith("lesson4-")).map(stage => stage.id)
+    lesson4: COURSE_STAGES.filter(stage => stage.id.startsWith("lesson4-")).map(stage => stage.id),
+    lesson5: COURSE_STAGES.filter(stage => stage.id.startsWith("lesson5-")).map(stage => stage.id),
+    lesson6: COURSE_STAGES.filter(stage => stage.id.startsWith("lesson6-")).map(stage => stage.id)
   };
   const CHOICE_COUNT_VALUES = ["auto", "4", "6", "8"];
   const JAPANESE_COLLATOR = new Intl.Collator("ja", { usage: "sort", sensitivity: "base", numeric: true });
@@ -854,7 +984,7 @@
 
   function wordsForScope(scope = state.practiceScope) {
     if (scope === "all") return WORDS;
-    if (["genki", "n5", "lesson1", "lesson2", "lesson3", "lesson4"].includes(scope)) {
+    if (["genki", "n5", "lesson1", "lesson2", "lesson3", "lesson4", "lesson5", "lesson6"].includes(scope)) {
       const stageIds = SCOPE_STAGE_IDS[scope];
       return WORDS.filter(word => word.stageIds.some(id => stageIds.includes(id)));
     }
@@ -884,7 +1014,7 @@
   function scopeShortLabel() {
     return state.practiceScope === "custom"
       ? `${state.customStageIds.length} topic${state.customStageIds.length === 1 ? "" : "s"}`
-      : { adaptive: `Genki stage ${unlockedStageIndex() + 1} / ${COURSE_STAGES.length}`, "n5-guided": `N5 topic ${unlockedN5StageIndex() + 1} / ${N5_STAGES.length}`, all: "All words", genki: "Genki II", n5: "JLPT N5", lesson1: "Lesson 1", lesson2: "Lesson 2", lesson3: "Lesson 3", lesson4: "Lesson 4", trouble: "Trouble" }[state.practiceScope];
+      : { adaptive: `Genki stage ${unlockedStageIndex() + 1} / ${COURSE_STAGES.length}`, "n5-guided": `N5 topic ${unlockedN5StageIndex() + 1} / ${N5_STAGES.length}`, all: "All words", genki: "Genki II", n5: "JLPT N5", lesson1: "Lesson 1", lesson2: "Lesson 2", lesson3: "Lesson 3", lesson4: "Lesson 4", lesson5: "Lesson 5", lesson6: "Lesson 6", trouble: "Trouble" }[state.practiceScope];
   }
 
   function regularScope(scope = state.practiceScope) {
@@ -892,7 +1022,7 @@
   }
 
   function curriculumTrack(scope = regularScope()) {
-    if (["adaptive", "genki", "lesson1", "lesson2", "lesson3", "lesson4"].includes(scope)) return "genki";
+    if (["adaptive", "genki", "lesson1", "lesson2", "lesson3", "lesson4", "lesson5", "lesson6"].includes(scope)) return "genki";
     if (["n5-guided", "n5"].includes(scope)) return "n5";
     if (scope === "custom") {
       const hasGenki = state.customStageIds.some(id => SCOPE_STAGE_IDS.genki.includes(id));
@@ -1325,7 +1455,7 @@
                 <button class="vocab-scope-choice vocab-scope-choice-primary" type="button" data-scope-preset="adaptive" aria-pressed="false"><span><span class="vocab-scope-choice-title"><strong>Guided Genki II Course</strong><em>Recommended</em></span><small>Continue from your current stage with automatic review.</small></span><i aria-hidden="true"></i></button>
                 <button class="vocab-scope-choice" type="button" data-scope-preset="genki" aria-pressed="false"><span><strong>Entire Genki II Course</strong><small>Practise all ${wordsForScope("genki").length} course words without stage locks.</small></span><i aria-hidden="true"></i></button>
                 <div class="vocab-scope-lesson-choices" aria-label="Genki II lessons">
-                  ${[1, 2, 3, 4].map(lesson => {
+                  ${[1, 2, 3, 4, 5, 6].map(lesson => {
                     const scope = `lesson${lesson}`;
                     const topicCount = SCOPE_STAGE_IDS[scope].length;
                     return `<button type="button" data-scope-preset="${scope}" aria-pressed="false"><strong>Lesson ${lesson}</strong><small>${topicCount} topics · ${wordsForScope(scope).length} words</small></button>`;
@@ -1801,6 +1931,8 @@
       lesson2: "Only Genki II Lesson 2 vocabulary and expressions.",
       lesson3: "Only Genki II Lesson 3 vocabulary and expressions.",
       lesson4: "Only Genki II Lesson 4 vocabulary and expressions.",
+      lesson5: "Only Genki II Lesson 5 vocabulary and expressions.",
+      lesson6: "Only Genki II Lesson 6 vocabulary and expressions.",
       trouble: "Only weak words from the selected regular scope."
     };
     if (state.practiceScope !== "custom" && state.practiceScope !== "trouble") setOptionalText("#vocabScopeHint", scopeHints[state.practiceScope]);
