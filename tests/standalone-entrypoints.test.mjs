@@ -185,6 +185,9 @@ test('vocabulary answers reveal a highlighted example with separate sentence aud
   assert.match(vocabulary, /id="vocabPlayExample"/);
   assert.match(vocabulary, /speakJapanese\?\.\(Examples\[word\.id\]\?\.\[0\]\)/);
   assert.match(styles, /\.vocab-example p mark/);
+  assert.match(vocabulary, /Break down this sentence/);
+  assert.match(vocabulary, /exampleBreakdownMarkup\(current\)/);
+  assert.match(styles, /\.vocab-example-breakdown/);
 });
 
 test('vocabulary review queue stays scoped and counts each word once', () => {

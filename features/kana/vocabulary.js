@@ -612,6 +612,7 @@
     .filter(word => word.n5SourceId && N5_DATA.examples[word.n5SourceId])
     .map(word => [word.id, N5_DATA.examples[word.n5SourceId]]));
   const Examples = { ...N5_EXAMPLES_BY_WORD_ID, ...(window.KANA_SPRINT_VOCABULARY_EXAMPLES || {}) };
+  const Breakdowns = window.KANA_SPRINT_VOCABULARY_BREAKDOWNS || {};
   const SpeechDiagnostics = window.KANA_SPRINT_SPEECH_DIAGNOSTICS;
   const UNIFIED_REVIEW_MODEL = "unified-v1";
   const SCOPE_LABELS = { adaptive: "Guided Genki II Course", "n5-guided": "Guided JLPT N5", all: "All vocabulary", genki: "Genki II Course", n5: "JLPT N5", lesson1: "Genki II · Lesson 1", lesson2: "Genki II · Lesson 2", lesson3: "Genki II · Lesson 3", lesson4: "Genki II · Lesson 4", lesson5: "Genki II · Lesson 5", lesson6: "Genki II · Lesson 6", custom: "Custom topics", trouble: "Trouble words" };
@@ -1399,6 +1400,16 @@
     if (index < 0) return sentence;
     return `${sentence.slice(0, index)}<mark>${focus}</mark>${sentence.slice(index + focus.length)}`;
   }
+  function escapeExampleText(value) {
+    return String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
+  }
+  function exampleBreakdownMarkup(word) {
+    const breakdown = Breakdowns[word.id];
+    if (!breakdown) return "";
+    const [parts, structure] = breakdown;
+    const rows = parts.map(([japanese, meaning, role, kind]) => `<tr${kind ? ` data-kind="${escapeExampleText(kind)}"` : ""}><th scope="row" lang="ja">${escapeExampleText(japanese)}</th><td>${escapeExampleText(meaning)}</td><td>${escapeExampleText(role)}</td></tr>`).join("");
+    return `<details class="vocab-example-breakdown"><summary>Break down this sentence<span aria-hidden="true">›</span></summary><div class="vocab-example-breakdown-body"><table><thead><tr><th>Japanese</th><th>Meaning here</th><th>Function</th></tr></thead><tbody>${rows}</tbody></table><p><strong>Structure</strong>${escapeExampleText(structure)}</p></div></details>`;
+  }
   function nextQuestionFormat(word, preferredMode) {
     if (preferredMode && allowedModes().includes(preferredMode)) return preferredMode;
     const modes = allowedModes();
@@ -1818,7 +1829,7 @@
     feedback.className = `feedback show ${correct ? "good" : "bad"}`;
     const selectedMarkup = selectedWord ? `<div class="vocab-feedback-choice"><span class="vocab-feedback-choice-label">Your choice</span><strong>${selectedWord.jp} → ${selectedWord.romaji}</strong><span>Meaning: ${selectedWord.meaning}</span></div>` : "";
     const example = Examples[current.id];
-    const exampleMarkup = example ? `<div class="vocab-example"><span class="vocab-example-label">In a sentence</span><p lang="ja">${highlightExample(example[0], example[2] || current.jp.replace("～", ""))}</p><span>${example[1]}</span><button class="ghost" id="vocabPlayExample" type="button">🔊 Play sentence</button></div>` : "";
+    const exampleMarkup = example ? `<div class="vocab-example"><span class="vocab-example-label">In a sentence</span><p lang="ja">${highlightExample(example[0], example[2] || current.jp.replace("～", ""))}</p><span>${example[1]}</span><button class="ghost" id="vocabPlayExample" type="button">🔊 Play sentence</button>${exampleBreakdownMarkup(current)}</div>` : "";
     feedback.innerHTML = `<strong>${correct ? "Correct" : "Remember this one"}</strong><div class="meta">${selectedMarkup}<span class="vocab-feedback-word">Correct answer: ${current.jp} → ${current.romaji}</span><span>Meaning: ${current.meaning} • ${wordContextName(current)}</span><div class="vocab-answer-audio"><button class="ghost speak-again" id="vocabReplayAnswer" type="button" aria-keyshortcuts="R">🔊 Replay word <kbd>R</kbd></button></div>${exampleMarkup}</div>`;
     $("#vocabReplayAnswer").disabled = !japaneseSpeechReady();
     $("#vocabReplayAnswer").addEventListener("click", () => speak(current));
