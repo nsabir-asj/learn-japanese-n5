@@ -2,6 +2,7 @@
   "use strict";
 
   const STORAGE_KEY = "kanaSprintVocabularyV1";
+  const BREAKDOWN_PREFERENCE_KEY = "kanaSprintVocabularyBreakdownOpenV1";
   const VERSION = 1;
   const STAGES = [
     {
@@ -629,6 +630,17 @@
   };
   const CHOICE_COUNT_VALUES = ["auto", "4", "6", "8"];
   const JAPANESE_COLLATOR = new Intl.Collator("ja", { usage: "sort", sensitivity: "base", numeric: true });
+  const PARTICLE_READINGS = { "は": "wa", "を": "o / wo", "へ": "e", "の": "no", "が": "ga", "に": "ni", "で": "de", "と": "to", "か": "ka", "ね": "ne" };
+
+  function loadBreakdownPreference() {
+    try {
+      return localStorage.getItem(BREAKDOWN_PREFERENCE_KEY) === "true";
+    } catch (error) {
+      return false;
+    }
+  }
+
+  let sentenceBreakdownOpen = loadBreakdownPreference();
 
   function emptyModeProgress() {
     return { seen: 0, correct: 0, wrong: 0, mastery: 0, lastWasCorrect: null, lastSeen: 0, dueAt: 0, dueQuestion: 0, recentResults: [] };
@@ -1403,12 +1415,71 @@
   function escapeExampleText(value) {
     return String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
   }
+  function particleUsageText(role, before, after, predicate) {
+    const context = {
+      "Time particle": `It follows ${before} and marks it as when ${predicate} happens.`,
+      "Object particle": `It follows ${before} and marks it as the direct object of ${predicate}.`,
+      "Action-place particle": `It follows ${before} and marks it as the place where ${predicate} happens.`,
+      "Companion particle": `It follows ${before} and marks that person as joining in ${predicate}.`,
+      "Meeting particle": `With a verb such as ${predicate}, it marks ${before} as the person being met.`,
+      "Noun-linking particle": `It links ${before} to ${after}, so ${after} is understood in relation to ${before}.`,
+      "Possessive particle": `It links ${before} to ${after}, showing ownership or a close association.`,
+      "Occasion particle": `It marks ${before} as the occasion or setting in which ${predicate} happens.`,
+      "Purpose / occasion particle": `It makes ${before} the purpose or occasion for the action that follows.`,
+      "Time-boundary particle": `It completes the expression ${before}で and sets it as the time boundary for the following action.`,
+      "Topic particle": `It sets ${before} as what the sentence is about; the rest of the sentence comments on it.`,
+      "Topic / contrast particle": `It sets ${before} as the topic and can contrast it with another time or thing.`,
+      "Direction particle": `It follows ${before} and points toward it as the direction or destination of ${predicate}.`,
+      "Means particle": `It follows ${before} and marks it as the language or means used for ${predicate}.`,
+      "Subject particle": `It marks ${before} as the subject—the person or thing performing ${predicate}.`,
+      "Destination particle": `It follows ${before} and marks it as the destination reached by ${predicate}.`,
+      "Ability particle": `With ${predicate}, it marks ${before} as the thing understood or known.`,
+      "Question particle": "At the end of a polite sentence, it turns the statement into a question.",
+      "Agreement particle": "At the end of the sentence, it invites agreement or shows the speaker is considering what was said.",
+      "Shared-feeling particle": "At the end of the sentence, it invites the listener to share or confirm the speaker’s feeling."
+    };
+    return context[role] || `Here it follows ${before} and functions as a ${role.toLowerCase()}.`;
+  }
+  function particlePronunciationNote(particle) {
+    if (particle === "は") return "Written は, but pronounced wa when it is a particle.";
+    if (particle === "を") return "Usually pronounced o in modern Japanese; wo is also used in romanization.";
+    if (particle === "へ") return "Written へ, but pronounced e when it marks direction.";
+    return "";
+  }
+  function particleGuideMarkup(parts) {
+    const predicatePart = [...parts].reverse().find(part => /(Action|Movement|State|Description|Invitation)/.test(part[2])) || parts.at(-1);
+    const predicate = predicatePart ? `${predicatePart[0]} (“${predicatePart[1]}”)` : "the sentence ending";
+    const particles = parts.flatMap((part, index) => {
+      if (part[3] !== "particle") return [];
+      const before = parts[index - 1]?.[0] || "the preceding phrase";
+      const after = parts[index + 1]?.[0] || "the sentence ending";
+      return [{ particle: part[0], role: part[2], before, after }];
+    });
+    if (!particles.length) return "";
+    const cards = particles.map(({ particle, role, before, after }) => {
+      const pronunciation = PARTICLE_READINGS[particle] || "particle";
+      const note = particlePronunciationNote(particle);
+      return `<article class="vocab-particle-card"><header><strong lang="ja">${escapeExampleText(particle)}</strong><span>${escapeExampleText(pronunciation)}</span><em>${escapeExampleText(role)}</em></header><p>${escapeExampleText(particleUsageText(role, before, after, predicate))}</p>${note ? `<small>${escapeExampleText(note)}</small>` : ""}</article>`;
+    }).join("");
+    return `<section class="vocab-particle-guide" aria-label="Particles in this sentence"><h4>Particles in this sentence</h4><div>${cards}</div></section>`;
+  }
   function exampleBreakdownMarkup(word) {
     const breakdown = Breakdowns[word.id];
     if (!breakdown) return "";
     const [parts, structure] = breakdown;
     const rows = parts.map(([japanese, meaning, role, kind]) => `<tr${kind ? ` data-kind="${escapeExampleText(kind)}"` : ""}><th scope="row" lang="ja">${escapeExampleText(japanese)}</th><td>${escapeExampleText(meaning)}</td><td>${escapeExampleText(role)}</td></tr>`).join("");
-    return `<details class="vocab-example-breakdown"><summary>Break down this sentence<span aria-hidden="true">›</span></summary><div class="vocab-example-breakdown-body"><table><thead><tr><th>Japanese</th><th>Meaning here</th><th>Function</th></tr></thead><tbody>${rows}</tbody></table><p><strong>Structure</strong>${escapeExampleText(structure)}</p></div></details>`;
+    return `<details class="vocab-example-breakdown"${sentenceBreakdownOpen ? " open" : ""}><summary>Break down this sentence<span aria-hidden="true">›</span></summary><div class="vocab-example-breakdown-body"><table><thead><tr><th>Japanese</th><th>Meaning here</th><th>Function</th></tr></thead><tbody>${rows}</tbody></table>${particleGuideMarkup(parts)}<p><strong>Structure</strong>${escapeExampleText(structure)}</p></div></details>`;
+  }
+  function rememberBreakdownPreference(details) {
+    if (!details) return;
+    details.addEventListener("toggle", () => {
+      sentenceBreakdownOpen = details.open;
+      try {
+        localStorage.setItem(BREAKDOWN_PREFERENCE_KEY, String(details.open));
+      } catch (error) {
+        console.warn("Could not remember the sentence breakdown preference.", error);
+      }
+    });
   }
   function nextQuestionFormat(word, preferredMode) {
     if (preferredMode && allowedModes().includes(preferredMode)) return preferredMode;
@@ -1835,6 +1906,7 @@
     $("#vocabReplayAnswer").addEventListener("click", () => speak(current));
     if ($("#vocabPlayExample")) $("#vocabPlayExample").disabled = !japaneseSpeechReady();
     $("#vocabPlayExample")?.addEventListener("click", () => speakExample(current));
+    rememberBreakdownPreference(feedback.querySelector(".vocab-example-breakdown"));
     $("#vocabNext").classList.remove("hidden");
     $("#vocabDontKnow").classList.add("hidden");
     if (state.autoPronounce) speak(current);
