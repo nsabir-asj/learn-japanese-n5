@@ -402,6 +402,17 @@
           "text": "The vocabulary speech setting now keeps its explanation grouped with the toggle and aligns voice management cleanly beside it."
         }
       ]
+    },
+    {
+      "id": "2026-09-20.9",
+      "publishedAt": "2026-09-20",
+      "title": "More compact answer details",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Revealed English-to-Japanese choices now keep the Japanese expression prominent while placing its pronunciation and meaning together on a compact second line."
+        }
+      ]
     }
   ]
 }
