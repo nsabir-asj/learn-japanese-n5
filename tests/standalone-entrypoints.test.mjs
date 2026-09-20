@@ -99,16 +99,27 @@ test('vocabulary choices reveal pronunciation, meanings, or Japanese text only a
   assert.match(styles, /\.vocab-choice-japanese-secondary/);
 });
 
-test('vocabulary session controls explain mixed directions and show scope accuracy', () => {
+test('vocabulary session controls explain mixed directions and align their arrows', () => {
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
   const styles = readFileSync(resolve(root, 'features/kana/vocabulary.css'), 'utf8');
   assert.match(vocabulary, /Rotates through written recognition, listening, and Japanese recall\. Speaking is selected separately\./);
-  assert.match(vocabulary, /function scopeAccuracySummary\(words\)/);
-  assert.match(vocabulary, /% accuracy across/);
-  assert.match(vocabulary, /scopeAccuracySummary\(scopeWords\)/);
   assert.match(styles, /appearance:none/);
   assert.match(styles, /background-position:right 14px center/);
   assert.match(styles, /transform:translateY\(-1px\)/);
+});
+
+test('vocabulary surfaces scope accuracy while keeping session results secondary', () => {
+  const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
+  const styles = readFileSync(resolve(root, 'features/kana/vocabulary.css'), 'utf8');
+  assert.match(vocabulary, /function accuracyForWords\(words\)/);
+  assert.match(vocabulary, /label: "Scope accuracy"/);
+  assert.doesNotMatch(vocabulary, /label: "Session accuracy"/);
+  assert.match(vocabulary, /% this session · \$\{sessionCorrect\}\/\$\{sessionTotal\} correct/);
+  assert.match(vocabulary, /function scopeChoiceAccuracyMarkup\(words\)/);
+  assert.match(vocabulary, /Not practised/);
+  assert.match(vocabulary, /scopeChoiceAccuracyMarkup\(words\)/);
+  assert.match(vocabulary, /accuracy\.outerHTML = scopeChoiceAccuracyMarkup/);
+  assert.match(styles, /\.vocab-scope-accuracy/);
 });
 
 test('vocabulary scope picker supports guided, preset, and custom topic practice', () => {

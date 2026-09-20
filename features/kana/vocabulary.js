@@ -1083,6 +1083,19 @@
     return ALL_STAGES.find(stage => stage.id === stageId)?.name || word.stageName;
   }
 
+  function accuracyForWords(words) {
+    const attempts = words.reduce((sum, word) => sum + itemState(word).seen, 0);
+    const correct = words.reduce((sum, word) => sum + itemState(word).correct, 0);
+    return { attempts, correct, percentage: attempts ? Math.round(correct / attempts * 100) : null };
+  }
+
+  function scopeChoiceAccuracyMarkup(words) {
+    const accuracy = accuracyForWords(words);
+    return accuracy.attempts
+      ? `<span class="vocab-scope-accuracy"><strong>${accuracy.percentage}%</strong><small>${accuracy.attempts} ${accuracy.attempts === 1 ? "answer" : "answers"}</small></span>`
+      : `<span class="vocab-scope-accuracy is-empty"><strong>—</strong><small>Not practised</small></span>`;
+  }
+
   function renderScopeDialog() {
     const dialog = $("#vocabScopeDialog");
     if (!dialog) return;
@@ -1096,7 +1109,15 @@
     dialog.querySelectorAll("[data-scope-preset]").forEach(button => {
       button.setAttribute("aria-pressed", String(scopeDraft === button.dataset.scopePreset));
     });
+    dialog.querySelectorAll(".vocab-scope-lesson-choices [data-scope-preset]").forEach(button => {
+      const accuracy = button.querySelector(".vocab-scope-accuracy");
+      if (accuracy) accuracy.outerHTML = scopeChoiceAccuracyMarkup(wordsForScope(button.dataset.scopePreset));
+    });
     dialog.querySelectorAll("[data-scope-topic]").forEach(input => { input.checked = scopeStageDraft.has(input.value); });
+    dialog.querySelectorAll("[data-topic-stage]").forEach(option => {
+      const accuracy = option.querySelector(".vocab-scope-accuracy");
+      if (accuracy) accuracy.outerHTML = scopeChoiceAccuracyMarkup(wordsInStage(option.dataset.topicStage));
+    });
     const topicTrackIds = scopeTopicTrack === "all" ? SCOPE_STAGE_IDS.all : SCOPE_STAGE_IDS[scopeTopicTrack];
     const query = $("#vocabScopeTopicSearch").value.trim().toLocaleLowerCase();
     dialog.querySelectorAll("[data-topic-stage]").forEach(option => {
@@ -1458,7 +1479,8 @@
                   ${[1, 2, 3, 4, 5, 6].map(lesson => {
                     const scope = `lesson${lesson}`;
                     const topicCount = SCOPE_STAGE_IDS[scope].length;
-                    return `<button type="button" data-scope-preset="${scope}" aria-pressed="false"><strong>Lesson ${lesson}</strong><small>${topicCount} topics · ${wordsForScope(scope).length} words</small></button>`;
+                    const words = wordsForScope(scope);
+                    return `<button type="button" data-scope-preset="${scope}" aria-pressed="false"><span class="vocab-scope-option-copy"><strong>Lesson ${lesson}</strong><small>${topicCount} topics · ${words.length} words</small></span>${scopeChoiceAccuracyMarkup(words)}</button>`;
                   }).join("")}
                 </div>
                 <button class="vocab-scope-topics-link" type="button" data-open-scope-topics="genki"><span>Choose Genki II topics</span><span aria-hidden="true">›</span></button>
@@ -1478,7 +1500,8 @@
                 ${ALL_STAGES.map(stage => {
                   const track = N5_STAGES.some(topic => topic.id === stage.id) ? "n5" : "genki";
                   const label = stage.name.replace(/^Lesson \d · |^JLPT N5 · /, "");
-                  return `<label class="vocab-topic-option" data-topic-stage="${stage.id}" data-topic-track="${track}"><input type="checkbox" value="${stage.id}" data-scope-topic><span><span class="vocab-topic-track-label">${track === "n5" ? "JLPT N5" : "Genki II"}</span><strong>${label}</strong><small>${wordsInStage(stage.id).length} words · ${stage.description}</small></span></label>`;
+                  const words = wordsInStage(stage.id);
+                  return `<label class="vocab-topic-option" data-topic-stage="${stage.id}" data-topic-track="${track}"><input type="checkbox" value="${stage.id}" data-scope-topic><span><span class="vocab-topic-track-label">${track === "n5" ? "JLPT N5" : "Genki II"}</span><strong>${label}</strong><small>${words.length} words · ${stage.description}</small></span>${scopeChoiceAccuracyMarkup(words)}</label>`;
                 }).join("")}
               </div>
             </section>
@@ -1825,12 +1848,6 @@
     return Scheduler.recentAccuracy(results);
   }
 
-  function scopeAccuracySummary(words) {
-    const attempts = words.reduce((sum, word) => sum + itemState(word).seen, 0);
-    const correct = words.reduce((sum, word) => sum + itemState(word).correct, 0);
-    return attempts ? `${Math.round(correct / attempts * 100)}% accuracy across ${attempts} ${attempts === 1 ? "answer" : "answers"}` : "No answers in this scope yet";
-  }
-
   function isMastered(word) {
     const progress = itemState(word);
     return progress.introduced && progress.seen > 0 && progress.mastery >= 72;
@@ -1866,13 +1883,15 @@
     const due = dueReviewBreakdown();
     const sessionTotal = Math.max(0, state.total - sessionStartedTotal);
     const sessionCorrect = Math.max(0, state.correct - sessionStartedCorrect);
-    const statusNote = paceStatus();
+    const scopeAccuracy = accuracyForWords(wordsForScope());
+    const sessionSummary = sessionTotal ? `${Math.round(sessionCorrect / sessionTotal * 100)}% this session · ${sessionCorrect}/${sessionTotal} correct` : "No answers this session";
+    const statusNote = `${paceStatus()} · ${sessionSummary}`;
     window.dispatchEvent(new CustomEvent("kana-sprint-activity-status", { detail: {
       note: statusNote,
       metrics: [
         { label: "Scope", value: scopeShortLabel() },
         { label: "Streak", value: state.streak },
-        { label: "Session accuracy", value: sessionTotal ? `${Math.round(sessionCorrect / sessionTotal * 100)}%` : "—" },
+        { label: "Scope accuracy", value: scopeAccuracy.percentage === null ? "—" : `${scopeAccuracy.percentage}%` },
         { label: "Due words", value: due.total ? due.total : "0" },
         { label: "Mastered", value: `${mastered.length} / ${WORDS.length}` },
         { label: "Challenge", value: phase === "question" || phase === "answered" ? (currentChoiceCount === 0 ? (typedAnswer ? "Typed answer" : "Spoken answer") : `${currentChoiceCount} choices`) : state.choiceCount === "auto" ? "Auto" : `${state.choiceCount} choices` }
@@ -1943,7 +1962,7 @@
       : state.practiceScope === "custom"
         ? `${scopeSelectionSummary(state.practiceScope)}.`
         : scopeHints[state.practiceScope];
-    setOptionalText("#vocabScopeHint", `${scopeHint} · ${scopeAccuracySummary(scopeWords)}`);
+    setOptionalText("#vocabScopeHint", scopeHint);
     const troubleSourceScope = state.practiceScope === "trouble" ? (lastRegularScope === "adaptive" ? "Guided Genki II Course" : SCOPE_LABELS[lastRegularScope]) : SCOPE_LABELS[state.practiceScope];
     setOptionalText("#vocabTroubleHint", `Recent misses in ${troubleSourceScope} matter more than old mistakes.`);
     setOptionalText("#vocabProgressStage", guided ? (guidedN5 ? N5_STAGES[guidedIndex]?.name : COURSE_STAGES[guidedIndex].name) : SCOPE_LABELS[state.practiceScope]);
