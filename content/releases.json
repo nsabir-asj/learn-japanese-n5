@@ -329,7 +329,7 @@
       "changes": [
         {
           "pages": ["vocabulary"],
-          "text": "Session controls now explain exactly which directions Mixed practice uses, keep control arrows comfortably aligned, and show accuracy for the selected practice scope."
+          "text": "Session controls now explain exactly which directions Mixed practice uses and keep control arrows comfortably aligned. The dashboard and scope picker show accuracy for selected lessons and topics, with session results kept as supporting context."
         },
         {
           "pages": ["vocabulary"],
