@@ -86,16 +86,29 @@ test('vocabulary feedback explains the meaning of a selected wrong choice', () =
   assert.match(styles, /\.vocab-feedback-choice/);
 });
 
-test('vocabulary choices reveal pronunciation or Japanese text only after answering', () => {
+test('vocabulary choices reveal pronunciation, meanings, or Japanese text only after answering', () => {
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
   const styles = readFileSync(resolve(root, 'features/kana/vocabulary.css'), 'utf8');
   assert.match(vocabulary, /options\.classList\.remove\("is-answered"\)/);
-  assert.match(vocabulary, /class="vocab-choice-secondary" aria-hidden="true">\$\{choice\.romaji\}/);
+  assert.match(vocabulary, /class="vocab-choice-secondary" aria-hidden="true"><span>\$\{choice\.romaji\}<\/span><span class="vocab-choice-meaning">\$\{choice\.meaning\}<\/span>/);
   assert.match(vocabulary, /class="vocab-choice-secondary vocab-choice-japanese-secondary" aria-hidden="true">\$\{choice\.jp\}/);
   assert.match(vocabulary, /options\.classList\.add\("is-answered"\)/);
   assert.match(vocabulary, /querySelectorAll\("\.vocab-choice-secondary"\)\.forEach\(detail => detail\.removeAttribute\("aria-hidden"\)\)/);
   assert.match(styles, /\.vocab-options:not\(\.is-answered\) \.vocab-choice-secondary\{display:none\}/);
+  assert.match(styles, /\.vocab-choice-meaning/);
   assert.match(styles, /\.vocab-choice-japanese-secondary/);
+});
+
+test('vocabulary session controls explain mixed directions and show scope accuracy', () => {
+  const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
+  const styles = readFileSync(resolve(root, 'features/kana/vocabulary.css'), 'utf8');
+  assert.match(vocabulary, /Rotates through written recognition, listening, and Japanese recall\. Speaking is selected separately\./);
+  assert.match(vocabulary, /function scopeAccuracySummary\(words\)/);
+  assert.match(vocabulary, /% accuracy across/);
+  assert.match(vocabulary, /scopeAccuracySummary\(scopeWords\)/);
+  assert.match(styles, /appearance:none/);
+  assert.match(styles, /background-position:right 14px center/);
+  assert.match(styles, /transform:translateY\(-1px\)/);
 });
 
 test('vocabulary scope picker supports guided, preset, and custom topic practice', () => {

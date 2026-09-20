@@ -1535,7 +1535,7 @@
       speaking: "Speak Japanese, review the transcript, then submit.",
       recall: "Recall questions use similar-looking and similar-sounding Japanese choices.",
       "written-both": "Silent practice alternates between Japanese text → English and English → Japanese.",
-      mixed: ready ? "Mixed practice rotates through all three directions." : "Mixed practice uses reading and recall until a Japanese voice is available."
+      mixed: ready ? "Rotates through written recognition, listening, and Japanese recall. Speaking is selected separately." : "Rotates through written recognition and Japanese recall until a Japanese voice is available. Speaking is selected separately."
     };
     $("#vocabFormatHint").textContent = hints[state.questionFormat];
     const speaking = state.questionFormat === "speaking";
@@ -1702,7 +1702,7 @@
       button.className = "vocab-choice";
       button.dataset.id = choice.id;
       button.innerHTML = recall
-        ? `<span>${index + 1}</span><span class="vocab-choice-japanese"><strong>${choice.jp}</strong><small class="vocab-choice-secondary" aria-hidden="true">${choice.romaji}</small></span>`
+        ? `<span>${index + 1}</span><span class="vocab-choice-japanese"><strong>${choice.jp}</strong><small class="vocab-choice-secondary" aria-hidden="true"><span>${choice.romaji}</span><span class="vocab-choice-meaning">${choice.meaning}</span></small></span>`
         : `<span>${index + 1}</span><span class="vocab-choice-english"><strong>${choice.meaning}</strong><small class="vocab-choice-secondary vocab-choice-japanese-secondary" aria-hidden="true">${choice.jp}</small></span>`;
       button.addEventListener("click", () => answer(choice.id));
       options.appendChild(button);
@@ -1825,6 +1825,12 @@
     return Scheduler.recentAccuracy(results);
   }
 
+  function scopeAccuracySummary(words) {
+    const attempts = words.reduce((sum, word) => sum + itemState(word).seen, 0);
+    const correct = words.reduce((sum, word) => sum + itemState(word).correct, 0);
+    return attempts ? `${Math.round(correct / attempts * 100)}% accuracy across ${attempts} ${attempts === 1 ? "answer" : "answers"}` : "No answers in this scope yet";
+  }
+
   function isMastered(word) {
     const progress = itemState(word);
     return progress.introduced && progress.seen > 0 && progress.mastery >= 72;
@@ -1904,9 +1910,6 @@
     const due = dueReviewBreakdown();
     const dueScopeLabel = SCOPE_LABELS[state.practiceScope];
     setOptionalText("#vocabScopeLabel", SCOPE_LABELS[state.practiceScope]);
-    setOptionalText("#vocabScopeHint", state.practiceScope === "trouble"
-      ? `Recent trouble words within ${SCOPE_LABELS[lastRegularScope].toLowerCase()}.`
-      : scopeSelectionSummary(state.practiceScope));
     setOptionalText("#vocabDueSummary", due.total ? `${due.total} word${due.total === 1 ? "" : "s"} due` : "No words due");
     setOptionalText("#vocabDueBreakdown", `${dueScopeLabel} · one shared review queue · prompts adapt across enabled formats`);
     const guidedN5 = state.practiceScope === "n5-guided";
@@ -1935,7 +1938,12 @@
       lesson6: "Only Genki II Lesson 6 vocabulary and expressions.",
       trouble: "Only weak words from the selected regular scope."
     };
-    if (state.practiceScope !== "custom" && state.practiceScope !== "trouble") setOptionalText("#vocabScopeHint", scopeHints[state.practiceScope]);
+    const scopeHint = state.practiceScope === "trouble"
+      ? `Recent trouble words within ${SCOPE_LABELS[lastRegularScope].toLowerCase()}.`
+      : state.practiceScope === "custom"
+        ? `${scopeSelectionSummary(state.practiceScope)}.`
+        : scopeHints[state.practiceScope];
+    setOptionalText("#vocabScopeHint", `${scopeHint} · ${scopeAccuracySummary(scopeWords)}`);
     const troubleSourceScope = state.practiceScope === "trouble" ? (lastRegularScope === "adaptive" ? "Guided Genki II Course" : SCOPE_LABELS[lastRegularScope]) : SCOPE_LABELS[state.practiceScope];
     setOptionalText("#vocabTroubleHint", `Recent misses in ${troubleSourceScope} matter more than old mistakes.`);
     setOptionalText("#vocabProgressStage", guided ? (guidedN5 ? N5_STAGES[guidedIndex]?.name : COURSE_STAGES[guidedIndex].name) : SCOPE_LABELS[state.practiceScope]);
