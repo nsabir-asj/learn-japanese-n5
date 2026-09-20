@@ -190,9 +190,14 @@ test('vocabulary answers reveal a highlighted example with separate sentence aud
   assert.match(vocabulary, /kanaSprintVocabularyBreakdownOpenV1/);
   assert.match(vocabulary, /rememberBreakdownPreference/);
   assert.match(vocabulary, /Particles in this sentence/);
+  assert.match(vocabulary, /How this sentence fits together/);
+  assert.match(vocabulary, /sentenceChunkLabels/);
   assert.match(vocabulary, /Written は, but pronounced wa/);
   assert.match(vocabulary, /Usually pronounced o in modern Japanese/);
   assert.match(styles, /\.vocab-example-breakdown/);
+  assert.match(styles, /\.vocab-sentence-chunk/);
+  assert.match(styles, /\.vocab-sentence-term/);
+  assert.match(styles, /\.vocab-sentence-plus/);
   assert.match(styles, /\.vocab-particle-guide/);
 });
 

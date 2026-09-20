@@ -1463,12 +1463,39 @@
     }).join("");
     return `<section class="vocab-particle-guide" aria-label="Particles in this sentence"><h4>Particles in this sentence</h4><div>${cards}</div></section>`;
   }
+  function sentenceChunkLabels(sentence, parts) {
+    let cursor = 0;
+    return parts.map((part, index) => {
+      const japanese = part[0];
+      const start = sentence.indexOf(japanese, cursor);
+      if (start < 0) return japanese;
+      const end = start + japanese.length;
+      const nextJapanese = parts[index + 1]?.[0];
+      const nextStart = nextJapanese ? sentence.indexOf(nextJapanese, end) : sentence.length;
+      const punctuation = sentence.slice(end, nextStart < 0 ? end : nextStart);
+      cursor = end + punctuation.length;
+      return `${japanese}${punctuation}`;
+    });
+  }
+  function sentenceChunkMeaning(meaning, role) {
+    if (meaning !== "—") return meaning;
+    return role.replace(/ particle$/i, " marker").toLowerCase();
+  }
+  function sentenceChunksMarkup(sentence, parts) {
+    const labels = sentenceChunkLabels(sentence, parts);
+    const chips = parts.map(([japanese, meaning, role, kind], index) => {
+      const kindAttribute = kind ? ` data-kind="${escapeExampleText(kind)}"` : "";
+      const separator = index ? `<span class="vocab-sentence-plus" aria-hidden="true">+</span>` : "";
+      return `<span class="vocab-sentence-term" role="listitem">${separator}<span class="vocab-sentence-chunk"${kindAttribute} title="${escapeExampleText(role)}"><strong lang="ja">${escapeExampleText(labels[index])}</strong><small>${escapeExampleText(sentenceChunkMeaning(meaning, role))}</small></span></span>`;
+    }).join("");
+    return `<section class="vocab-sentence-map" aria-label="Sentence meaning, chunk by chunk"><header><strong>How this sentence fits together</strong><span>Japanese + meaning</span></header><div class="vocab-sentence-equation" role="list">${chips}</div></section>`;
+  }
   function exampleBreakdownMarkup(word) {
     const breakdown = Breakdowns[word.id];
     if (!breakdown) return "";
     const [parts, structure] = breakdown;
-    const rows = parts.map(([japanese, meaning, role, kind]) => `<tr${kind ? ` data-kind="${escapeExampleText(kind)}"` : ""}><th scope="row" lang="ja">${escapeExampleText(japanese)}</th><td>${escapeExampleText(meaning)}</td><td>${escapeExampleText(role)}</td></tr>`).join("");
-    return `<details class="vocab-example-breakdown"${sentenceBreakdownOpen ? " open" : ""}><summary>Break down this sentence<span aria-hidden="true">›</span></summary><div class="vocab-example-breakdown-body"><table><thead><tr><th>Japanese</th><th>Meaning here</th><th>Function</th></tr></thead><tbody>${rows}</tbody></table>${particleGuideMarkup(parts)}<p><strong>Structure</strong>${escapeExampleText(structure)}</p></div></details>`;
+    const sentence = Examples[word.id]?.[0] || parts.map(part => part[0]).join("");
+    return `<details class="vocab-example-breakdown"${sentenceBreakdownOpen ? " open" : ""}><summary>Break down this sentence<span aria-hidden="true">›</span></summary><div class="vocab-example-breakdown-body">${sentenceChunksMarkup(sentence, parts)}${particleGuideMarkup(parts)}<p><strong>Structure</strong>${escapeExampleText(structure)}</p></div></details>`;
   }
   function rememberBreakdownPreference(details) {
     if (!details) return;
