@@ -391,6 +391,17 @@
           "text": "Listening questions no longer replay automatically after you answer. The prompt and manual replay controls remain available, while automatic pronunciation continues for other directions."
         }
       ]
+    },
+    {
+      "id": "2026-09-20.8",
+      "publishedAt": "2026-09-20",
+      "title": "Cleaner speech controls",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "The vocabulary speech setting now keeps its explanation grouped with the toggle and aligns voice management cleanly beside it."
+        }
+      ]
     }
   ]
 }
