@@ -347,6 +347,17 @@
           "text": "Genki Lesson 3 examples now include an optional sentence breakdown with contextual meanings, particle roles, and a concise explanation of the overall structure."
         }
       ]
+    },
+    {
+      "id": "2026-09-20.4",
+      "publishedAt": "2026-09-20",
+      "title": "Clearer particle guidance",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Lesson 3 sentence breakdowns now explain how each particle works in its particular sentence, including special pronunciations, and remember whether you prefer breakdowns open or closed."
+        }
+      ]
     }
   ]
 }
