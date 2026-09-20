@@ -321,6 +321,21 @@
           "text": "Guided Lesson 2 progress now syncs between signed-in devices instead of remaining queued in the browser."
         }
       ]
+    },
+    {
+      "id": "2026-09-20.2",
+      "publishedAt": "2026-09-20",
+      "title": "Clearer vocabulary sessions",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Session controls now explain exactly which directions Mixed practice uses, keep control arrows comfortably aligned, and show accuracy for the selected practice scope."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "English-to-Japanese questions now reveal the pronunciation and meaning of every answer choice after you respond."
+        }
+      ]
     }
   ]
 }
