@@ -358,6 +358,17 @@
           "text": "Lesson 3 sentence breakdowns now explain how each particle works in its particular sentence, including special pronunciations, and remember whether you prefer breakdowns open or closed."
         }
       ]
+    },
+    {
+      "id": "2026-09-20.5",
+      "publishedAt": "2026-09-20",
+      "title": "Easier sentence breakdowns",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Lesson 3 examples now arrange Japanese phrases, particles, and their contextual meanings into clear visual chunks, matching the familiar learning style used in Kana Mix."
+        }
+      ]
     }
   ]
 }
