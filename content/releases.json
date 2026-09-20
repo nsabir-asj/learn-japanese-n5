@@ -310,6 +310,17 @@
           "text": "Lesson 5 and Lesson 6 can now be selected directly as practice scopes, while words shared with JLPT N5 keep one learning history."
         }
       ]
+    },
+    {
+      "id": "2026-09-20.1",
+      "publishedAt": "2026-09-20",
+      "title": "Reliable Lesson 2 syncing",
+      "changes": [
+        {
+          "pages": ["guided"],
+          "text": "Guided Lesson 2 progress now syncs between signed-in devices instead of remaining queued in the browser."
+        }
+      ]
     }
   ]
 }

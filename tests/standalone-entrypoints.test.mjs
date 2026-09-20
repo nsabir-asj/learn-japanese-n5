@@ -309,6 +309,19 @@ test('published entrypoints receive release-aware update controls', () => {
   assert.doesNotMatch(updateScript, /setInterval/);
 });
 
+test('cloud progress accepts every store monitored by the browser', () => {
+  const syncScript = readFileSync(resolve(root, 'shared/progress-sync.js'), 'utf8');
+  const progressRoute = readFileSync(resolve(root, 'app/api/progress/route.ts'), 'utf8');
+  const clientBlock = syncScript.match(/const STORE_KEYS = \[([\s\S]*?)\];/)?.[1];
+  const serverBlock = progressRoute.match(/const ALLOWED_STORE_KEYS = new Set\(\[([\s\S]*?)\]\);/)?.[1];
+
+  assert.ok(clientBlock, 'Could not find the browser progress-store list');
+  assert.ok(serverBlock, 'Could not find the API progress-store allowlist');
+
+  const quotedValues = block => [...block.matchAll(/'([^']+)'/g)].map(([, value]) => value).sort();
+  assert.deepEqual(quotedValues(serverBlock), quotedValues(clientBlock));
+});
+
 test('speaking practice exposes error, kana interpretation, romaji, and post-submit states', () => {
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
   const styles = readFileSync(resolve(root, 'features/kana/vocabulary.css'), 'utf8');
