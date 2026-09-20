@@ -201,6 +201,24 @@ test('vocabulary answers reveal a highlighted example with separate sentence aud
   assert.match(styles, /\.vocab-particle-guide/);
 });
 
+test('vocabulary answers bring newly revealed feedback into view without forcing focus', () => {
+  const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
+  assert.match(vocabulary, /function revealAnsweredFeedback\(feedback\)/);
+  assert.match(vocabulary, /const fullyVisible = rect\.top >= viewportTop && rect\.bottom <= viewportBottom/);
+  assert.match(vocabulary, /rect\.height <= availableHeight/);
+  assert.match(vocabulary, /prefers-reduced-motion: reduce/);
+  assert.match(vocabulary, /revealAnsweredFeedback\(feedback\)/);
+  assert.doesNotMatch(vocabulary, /feedback\.focus\(\)/);
+});
+
+test('vocabulary restores the practice area when moving on from revealed feedback', () => {
+  const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
+  assert.match(vocabulary, /function revealNextPracticeStep\(\)/);
+  assert.match(vocabulary, /const restorePracticeView = phase === "answered"/);
+  assert.match(vocabulary, /const hasUsefulStartInView = stepRect\.top >= viewportTop && stepRect\.top <= viewportBottom - 160/);
+  assert.match(vocabulary, /if \(restorePracticeView\) revealNextPracticeStep\(\)/);
+});
+
 test('vocabulary review queue stays scoped and counts each word once', () => {
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
   assert.match(vocabulary, /function regularReviewPool/);

@@ -413,6 +413,17 @@
           "text": "Revealed English-to-Japanese choices now keep the Japanese expression prominent while placing its pronunciation and meaning together on a compact second line."
         }
       ]
+    },
+    {
+      "id": "2026-09-20.10",
+      "publishedAt": "2026-09-20",
+      "title": "Smoother question flow",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Vocabulary practice now gently brings revealed feedback into view and returns to the next question when needed, while avoiding unnecessary movement when the relevant content is already visible."
+        }
+      ]
     }
   ]
 }

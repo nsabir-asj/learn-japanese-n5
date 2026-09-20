@@ -1778,6 +1778,52 @@
     return shuffle([word, ...distractors]);
   }
 
+  function revealAnsweredFeedback(feedback) {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const rect = feedback.getBoundingClientRect();
+      const viewport = window.visualViewport;
+      const viewportTop = (viewport?.offsetTop || 0) + 16;
+      const viewportBottom = (viewport?.offsetTop || 0) + (viewport?.height || window.innerHeight) - 20;
+      const availableHeight = viewportBottom - viewportTop;
+      const fullyVisible = rect.top >= viewportTop && rect.bottom <= viewportBottom;
+      if (fullyVisible) return;
+
+      let top;
+      if (rect.height <= availableHeight) {
+        top = rect.bottom > viewportBottom
+          ? window.scrollY + rect.bottom - viewportBottom
+          : window.scrollY + rect.top - viewportTop;
+      } else {
+        if (Math.abs(rect.top - viewportTop) < 24) return;
+        top = window.scrollY + rect.top - viewportTop;
+      }
+      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? "auto" : "smooth" });
+    }));
+  }
+
+  function revealNextPracticeStep() {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const trainer = $(".vocab-trainer");
+      const step = $("#vocabIntroduction").classList.contains("hidden")
+        ? $("#vocabQuestion .question")
+        : $("#vocabIntroduction");
+      const stepRect = step.getBoundingClientRect();
+      const viewport = window.visualViewport;
+      const viewportTop = (viewport?.offsetTop || 0) + 16;
+      const viewportBottom = (viewport?.offsetTop || 0) + (viewport?.height || window.innerHeight) - 20;
+      const hasUsefulStartInView = stepRect.top >= viewportTop && stepRect.top <= viewportBottom - 160;
+      if (hasUsefulStartInView) return;
+
+      const trainerRect = trainer.getBoundingClientRect();
+      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({
+        top: Math.max(0, window.scrollY + trainerRect.top - viewportTop),
+        behavior: reduceMotion ? "auto" : "smooth"
+      });
+    }));
+  }
+
   function showQuestion(word, preferredMode) {
     stopSpeaking();
     current = word;
@@ -1939,15 +1985,18 @@
     $("#vocabDontKnow").classList.add("hidden");
     if (state.autoPronounce && !wasSpokenQuestion) speak(current);
     publishStreak();
+    revealAnsweredFeedback(feedback);
   }
 
   function nextQuestion() {
+    const restorePracticeView = phase === "answered";
     stopSpeaking();
     window.KANA_SPRINT_SPEECH?.stop?.();
     const selected = selectWord();
     if (!selected?.word) return;
     currentReason = selected.reason || "Adaptive review";
     if (selected.introduce) beginIntroduction(selected.word, selected.mode); else showQuestion(selected.word, selected.mode);
+    if (restorePracticeView) revealNextPracticeStep();
   }
 
   function averageModeMastery(mode, words = introducedWords()) {
