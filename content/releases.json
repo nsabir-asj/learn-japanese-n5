@@ -369,6 +369,17 @@
           "text": "Lesson 3 examples now arrange Japanese phrases, particles, and their contextual meanings into clear visual chunks, matching the familiar learning style used in Kana Mix."
         }
       ]
+    },
+    {
+      "id": "2026-09-20.6",
+      "publishedAt": "2026-09-20",
+      "title": "Cleaner vocabulary choices",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Vocabulary answer choices now use clean, concise meanings instead of unfinished source notes, merged examples, or corrupted fragments."
+        }
+      ]
     }
   ]
 }
