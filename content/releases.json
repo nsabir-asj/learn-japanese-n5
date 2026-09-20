@@ -336,6 +336,17 @@
           "text": "English-to-Japanese questions now reveal the pronunciation and meaning of every answer choice after you respond."
         }
       ]
+    },
+    {
+      "id": "2026-09-20.3",
+      "publishedAt": "2026-09-20",
+      "title": "Sentence structure help in vocabulary practice",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Genki Lesson 3 examples now include an optional sentence breakdown with contextual meanings, particle roles, and a concise explanation of the overall structure."
+        }
+      ]
     }
   ]
 }
