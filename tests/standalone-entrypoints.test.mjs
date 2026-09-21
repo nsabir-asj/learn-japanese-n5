@@ -204,6 +204,8 @@ test('vocabulary answers reveal a highlighted example with separate sentence aud
 test('vocabulary answers bring newly revealed feedback into view without forcing focus', () => {
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
   assert.match(vocabulary, /function revealAnsweredFeedback\(feedback\)/);
+  assert.match(vocabulary, /const trainerRect = \$\("\.vocab-trainer"\)\.getBoundingClientRect\(\)/);
+  assert.match(vocabulary, /const rect = trainerRect\.height <= availableHeight \? trainerRect : feedbackRect/);
   assert.match(vocabulary, /const fullyVisible = rect\.top >= viewportTop && rect\.bottom <= viewportBottom/);
   assert.match(vocabulary, /rect\.height <= availableHeight/);
   assert.match(vocabulary, /prefers-reduced-motion: reduce/);

@@ -424,6 +424,17 @@
           "text": "Vocabulary practice now gently brings revealed feedback into view and returns to the next question when needed, while avoiding unnecessary movement when the relevant content is already visible."
         }
       ]
+    },
+    {
+      "id": "2026-09-21.1",
+      "publishedAt": "2026-09-21",
+      "title": "More complete answer context",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "When the completed vocabulary practice card fits on screen, answer review now keeps the entire card visible; smaller screens continue to prioritize the revealed feedback."
+        }
+      ]
     }
   ]
 }

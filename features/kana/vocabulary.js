@@ -1780,11 +1780,13 @@
 
   function revealAnsweredFeedback(feedback) {
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      const rect = feedback.getBoundingClientRect();
       const viewport = window.visualViewport;
       const viewportTop = (viewport?.offsetTop || 0) + 16;
       const viewportBottom = (viewport?.offsetTop || 0) + (viewport?.height || window.innerHeight) - 20;
       const availableHeight = viewportBottom - viewportTop;
+      const feedbackRect = feedback.getBoundingClientRect();
+      const trainerRect = $(".vocab-trainer").getBoundingClientRect();
+      const rect = trainerRect.height <= availableHeight ? trainerRect : feedbackRect;
       const fullyVisible = rect.top >= viewportTop && rect.bottom <= viewportBottom;
       if (fullyVisible) return;
 
