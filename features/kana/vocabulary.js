@@ -1786,6 +1786,14 @@
       const availableHeight = viewportBottom - viewportTop;
       const feedbackRect = feedback.getBoundingClientRect();
       const trainerRect = $(".vocab-trainer").getBoundingClientRect();
+      const reviewAndFooterFits = trainerRect.bottom - feedbackRect.top <= availableHeight;
+      if (trainerRect.height > availableHeight && reviewAndFooterFits) {
+        const top = window.scrollY + trainerRect.bottom - viewportBottom;
+        if (Math.abs(trainerRect.bottom - viewportBottom) < 4) return;
+        const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+        window.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? "auto" : "smooth" });
+        return;
+      }
       const rect = trainerRect.height <= availableHeight ? trainerRect : feedbackRect;
       const fullyVisible = rect.top >= viewportTop && rect.bottom <= viewportBottom;
       if (fullyVisible) return;
