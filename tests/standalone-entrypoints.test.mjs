@@ -217,7 +217,12 @@ test('vocabulary restores the practice area when moving on from revealed feedbac
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
   assert.match(vocabulary, /function revealNextPracticeStep\(\)/);
   assert.match(vocabulary, /const restorePracticeView = phase === "answered"/);
+  assert.match(vocabulary, /const spareHeight = availableHeight - trainerRect\.height/);
+  assert.match(vocabulary, /if \(spareHeight >= 120\)/);
+  assert.match(vocabulary, /desiredTop = viewportTop \+ spareHeight \/ 2/);
+  assert.match(vocabulary, /trainerRect\.top >= viewportTop && trainerRect\.bottom <= viewportBottom/);
   assert.match(vocabulary, /const hasUsefulStartInView = stepRect\.top >= viewportTop && stepRect\.top <= viewportBottom - 160/);
+  assert.match(vocabulary, /top: Math\.max\(0, window\.scrollY \+ trainerRect\.top - desiredTop\)/);
   assert.match(vocabulary, /if \(restorePracticeView\) revealNextPracticeStep\(\)/);
 });
 

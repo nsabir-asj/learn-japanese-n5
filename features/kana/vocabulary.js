@@ -1840,17 +1840,28 @@
       const step = $("#vocabIntroduction").classList.contains("hidden")
         ? $("#vocabQuestion .question")
         : $("#vocabIntroduction");
-      const stepRect = step.getBoundingClientRect();
       const viewport = window.visualViewport;
       const viewportTop = (viewport?.offsetTop || 0) + 16;
       const viewportBottom = (viewport?.offsetTop || 0) + (viewport?.height || window.innerHeight) - 20;
-      const hasUsefulStartInView = stepRect.top >= viewportTop && stepRect.top <= viewportBottom - 160;
-      if (hasUsefulStartInView) return;
-
       const trainerRect = trainer.getBoundingClientRect();
+      const availableHeight = viewportBottom - viewportTop;
+      const spareHeight = availableHeight - trainerRect.height;
+      let desiredTop;
+      if (spareHeight >= 120) {
+        desiredTop = viewportTop + spareHeight / 2;
+        if (Math.abs(trainerRect.top - desiredTop) < 24) return;
+      } else if (spareHeight >= 0) {
+        if (trainerRect.top >= viewportTop && trainerRect.bottom <= viewportBottom) return;
+        desiredTop = trainerRect.top < viewportTop ? viewportTop : viewportBottom - trainerRect.height;
+      } else {
+        const stepRect = step.getBoundingClientRect();
+        const hasUsefulStartInView = stepRect.top >= viewportTop && stepRect.top <= viewportBottom - 160;
+        if (trainerRect.top >= viewportTop && trainerRect.top <= viewportTop + 24 && hasUsefulStartInView) return;
+        desiredTop = viewportTop;
+      }
       const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
       window.scrollTo({
-        top: Math.max(0, window.scrollY + trainerRect.top - viewportTop),
+        top: Math.max(0, window.scrollY + trainerRect.top - desiredTop),
         behavior: reduceMotion ? "auto" : "smooth"
       });
     }));
