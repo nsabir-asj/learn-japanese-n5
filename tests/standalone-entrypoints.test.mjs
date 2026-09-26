@@ -309,6 +309,12 @@ test('vocabulary offers a listening and speaking practice format', () => {
   assert.match(vocabulary, /selected\.reason === "Urgent review"/);
 });
 
+test('vocabulary remembers a changed typing script immediately', () => {
+  const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
+  assert.match(vocabulary, /setTypingScript\("romaji"\); saveState\(\)/);
+  assert.match(vocabulary, /setTypingScript\("japanese"\); saveState\(\)/);
+});
+
 test('standalone activity headers separate navigation from cloud status', () => {
   const shell = readFileSync(resolve(root, 'shared/activity-shell.js'), 'utf8');
   const trainer = readFileSync(resolve(root, 'features/kana/trainer.js'), 'utf8');

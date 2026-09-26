@@ -461,6 +461,21 @@
           "text": "Speaking now recognizes more correct Japanese spellings across Genki and JLPT N5, and short suffixes use complete phrases for clearer speech recognition."
         }
       ]
+    },
+    {
+      "id": "2026-09-26.2",
+      "publishedAt": "2026-09-26",
+      "title": "A smoother next question",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "The next vocabulary question settles nearer the middle of the screen when the whole card fits comfortably, while taller cards remain easy to read from the top."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "The chosen Japanese or romaji typing mode is now remembered as soon as it changes."
+        }
+      ]
     }
   ]
 }

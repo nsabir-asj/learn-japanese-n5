@@ -2260,8 +2260,8 @@
       $("#vocabRomajiKana").textContent = Speaking.matchesRomaji(current, value) ? current.jp : (Speaking.romajiToHiragana(value) || "—");
     }
   });
-  $("#vocabTypeJapanese").addEventListener("click", () => setTypingScript("japanese"));
-  $("#vocabTypeRomaji").addEventListener("click", () => setTypingScript("romaji"));
+  $("#vocabTypeJapanese").addEventListener("click", () => { setTypingScript("japanese"); saveState(); });
+  $("#vocabTypeRomaji").addEventListener("click", () => { setTypingScript("romaji"); saveState(); });
   $("#vocabSpeechSubmit").addEventListener("click", submitSpeaking);
   // Capture speaking shortcuts so focused controls cannot trigger a different action.
   document.addEventListener("keydown", event => {
