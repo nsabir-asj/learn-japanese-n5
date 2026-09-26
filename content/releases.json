@@ -446,6 +446,21 @@
           "text": "When the full practice card is too tall, answer review keeps its feedback and Next button together near the bottom of the screen whenever they fit."
         }
       ]
+    },
+    {
+      "id": "2026-09-26.1",
+      "publishedAt": "2026-09-26",
+      "title": "More reliable vocabulary speaking",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "A new listening-and-speaking format balances both question types, with clearer names for every practice format."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "Speaking now recognizes more correct Japanese spellings across Genki and JLPT N5, and short suffixes use complete phrases for clearer speech recognition."
+        }
+      ]
     }
   ]
 }

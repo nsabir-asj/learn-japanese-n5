@@ -9,6 +9,15 @@
     return 8;
   }
 
+  function balancedAudioMode(preferredMode, counts, urgentRetry = false) {
+    if (urgentRetry) return preferredMode;
+    const listening = Math.max(0, Number(counts.spoken) || 0);
+    const speaking = Math.max(0, Number(counts.speaking) || 0);
+    if (listening > speaking) return "speaking";
+    if (speaking > listening) return "spoken";
+    return preferredMode === "speaking" ? "speaking" : "spoken";
+  }
+
   function nextIntroductionDecision(pace, credit = 0) {
     const normalizedPace = clamp(Number(pace) || 50, 10, 90);
     const updatedCredit = clamp(Number(credit) || 0, 0, 1) + normalizedPace / 100;
@@ -109,6 +118,7 @@
   }
 
   globalThis.KANA_SPRINT_VOCABULARY_SCHEDULER = {
+    balancedAudioMode,
     choiceCountForMastery,
     kanjiReviewRequirement,
     nextIntroductionDecision,

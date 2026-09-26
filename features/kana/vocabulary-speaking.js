@@ -24,7 +24,25 @@
     daijoubu: "大丈夫", kazoku: "家族", hito: "人", kyou: "今日", ashita: "明日", kinou: "昨日", asa: "朝", hiru: "昼", yoru: "夜",
     jikan: "時間", iku: "行く", kuru: "来る", kaeru: "帰る", shigoto: "仕事", mizu: "水", ocha: "お茶", gohan: "ご飯|御飯",
     asagohan: "朝ご飯|朝御飯|朝ごはん", taberu: "食べる", nomu: "飲む", mise: "店", eki: "駅", densha: "電車", kuruma: "車",
-    migi: "右", hidari: "左", massugu: "真っ直ぐ|真っすぐ", iriguchi: "入口|入り口", deguchi: "出口"
+    migi: "右", hidari: "左", massugu: "真っ直ぐ|真っすぐ", iriguchi: "入口|入り口", deguchi: "出口",
+    osake: "お酒", hirugohan: "昼ご飯|昼御飯|昼ごはん", bangohan: "晩ご飯|晩御飯|晩ごはん",
+    uchi: "家", shuumatsu: "週末", "suffix-goro": "頃",
+    kiku: "聞く|聴く", hanasu: "話す", yomu: "読む", okiru: "起きる", neru: "寝る", miru: "見る",
+    "benkyou-suru": "勉強する", zenzen: "全然", taitei: "大抵",
+    inu: "犬", neko: "猫", otera: "お寺", basutei: "バス停", honya: "本屋", machi: "町",
+    ichijikan: "一時間|1時間", toki: "時", au: "会う", aru: "有る", kau: "買う", kaku: "書く",
+    toru: "撮る", matsu: "待つ", iru: "居る", wakaru: "分かる|判る|解る", hitoride: "一人で", aida: "間",
+    ryokou: "旅行", omiyage: "お土産", tanjoubi: "誕生日", boku: "僕", "atsui-object": "熱い",
+    tsumaranai: "詰まらない", kowai: "怖い", daikirai: "大嫌い", nigiyaka: "賑やか",
+    oyogu: "泳ぐ", "kiku-ask": "聞く", noru: "乗る", dekakeru: "出かける|出掛ける",
+    "issho-ni": "一緒に", sugoku: "凄く", kyoukasho: "教科書",
+    asobu: "遊ぶ", isogu: "急ぐ", kaesu: "返す", kesu: "消す", shinu: "死ぬ", suwaru: "座る",
+    tatsu: "立つ", "tabako-o-suu": "たばこを吸う|タバコを吸う|煙草を吸う", tsukau: "使う", tetsudau: "手伝う",
+    hairu: "入る", motsu: "持つ", yasumu: "休む", akeru: "開ける", shimeru: "閉める",
+    oshieru: "教える", wasureru: "忘れる", oriru: "降りる", kariru: "借りる",
+    "shawaa-o-abiru": "シャワーを浴びる", tsukeru: "点ける|付ける", "denwa-suru": "電話する",
+    "tsurete-kuru": "連れてくる|連れて来る", "motte-kuru": "持ってくる|持って来る",
+    "ato-de": "後で", "kekkou-desu": "結構です", "hontou-desu-ka": "本当ですか"
   };
   const contextPrompts = {
     "suffix-nensei": { frame: "いち ___", expectedKana: "いちねんせい", spellings: "一年生|1年生" },
@@ -35,6 +53,44 @@
     "suffix-sai": { frame: "ご ___", expectedKana: "ごさい", spellings: "五歳|五才|5歳|5才" },
     "suffix-ban": { frame: "いち ___", expectedKana: "いちばん", spellings: "一番|1番" },
     "suffix-en": { frame: "ひゃく ___", expectedKana: "ひゃくえん", spellings: "百円|100円" },
+    "suffix-mai": { frame: "いち ___", expectedKana: "いちまい", spellings: "一枚|1枚" },
+    "suffix-jikan": { frame: "いち ___", expectedKana: "いちじかん", spellings: "一時間|1時間" },
+    "suffix-goro": { frame: "さんじ ___", expectedKana: "さんじごろ", spellings: "三時ごろ|3時ごろ" },
+    "suffix-gurai": { frame: "いちじかん ___", expectedKana: "いちじかんぐらい", spellings: "一時間ぐらい|1時間ぐらい" },
+    "suffix-to": { frame: "ともだち ___", expectedKana: "ともだちと", spellings: "友達と|友だちと" },
+    "n5-0003": { frame: "に ___", expectedKana: "にかい", spellings: "二階|2階" },
+    "n5-0004": { frame: "さん ___", expectedKana: "さんかい", spellings: "三回|3回" },
+    "n5-0005": { frame: "みっ ___", expectedKana: "みっかかん", spellings: "三日間|3日間" },
+    "n5-0006": { frame: "いっ ___", expectedKana: "いっかげつ", spellings: "一か月|1か月|一ヶ月|1ヶ月" },
+    "n5-0007": { frame: "よみ ___", expectedKana: "よみかた", spellings: "読み方" },
+    "n5-0008": { frame: "いち ___", expectedKana: "いちがつ", spellings: "一月|1月" },
+    "n5-0009": { frame: "たべた ___", expectedKana: "たべたがります", spellings: "食べたがります" },
+    "n5-0010": { frame: "みぎ ___", expectedKana: "みぎがわ", spellings: "右側" },
+    "n5-0011": { frame: "いち ___", expectedKana: "いちキロ", spellings: "1キロ|一キロ" },
+    "n5-0012": { frame: "いち ___", expectedKana: "いちキロ", spellings: "1キロ|一キロ" },
+    "n5-0014": { frame: "ひゃく ___", expectedKana: "ひゃくグラム", spellings: "100グラム|百グラム" },
+    "n5-0015": { frame: "いっ ___", expectedKana: "いっこ", spellings: "一個|1個" },
+    "n5-0019": { frame: "いっ ___", expectedKana: "いっさつ", spellings: "一冊|1冊" },
+    "n5-0023": { frame: "いっ ___", expectedKana: "いっしゅうかん", spellings: "一週間|1週間" },
+    "n5-0025": { frame: "じゅうじ ___", expectedKana: "じゅうじすぎ", spellings: "十時過ぎ|10時過ぎ" },
+    "n5-0026": { frame: "ひとつ ___", expectedKana: "ひとつずつ", spellings: "一つずつ|1つずつ" },
+    "n5-0028": { frame: "いち ___", expectedKana: "いちだい", spellings: "一台|1台" },
+    "n5-0029": { frame: "わたし ___", expectedKana: "わたしたち", spellings: "私たち" },
+    "n5-0030": { frame: "じゅぎょう ___", expectedKana: "じゅぎょうちゅう", spellings: "授業中" },
+    "n5-0031": { frame: "ひと ___", expectedKana: "ひとつ", spellings: "一つ|1つ" },
+    "n5-0032": { frame: "いち ___", expectedKana: "いちど", spellings: "一度|1度" },
+    "n5-0033": { frame: "じゅういち ___", expectedKana: "じゅういちにち", spellings: "十一日|11日" },
+    "n5-0034": { frame: "さん ___", expectedKana: "さんにん", spellings: "三人|3人" },
+    "n5-0035": { frame: "に ___", expectedKana: "にねん", spellings: "二年|2年" },
+    "n5-0036": { frame: "いっ ___", expectedKana: "いっぱい", spellings: "一杯|1杯" },
+    "n5-0039": { frame: "いっ ___", expectedKana: "いっぴき", spellings: "一匹|1匹" },
+    "n5-0040": { frame: "いっ ___", expectedKana: "いっぷん", spellings: "一分|1分" },
+    "n5-0041": { frame: "いち ___", expectedKana: "いちページ", spellings: "1ページ|一ページ" },
+    "n5-0042": { frame: "いっ ___", expectedKana: "いっぽん", spellings: "一本|1本" },
+    "n5-0044": { frame: "さんねん ___", expectedKana: "さんねんまえ", spellings: "三年前|3年前" },
+    "n5-0045": { frame: "いち ___", expectedKana: "いちメートル", spellings: "1メートル|一メートル" },
+    "n5-0046": { frame: "ほん ___", expectedKana: "ほんや", spellings: "本屋" },
+    "n5-0138": { frame: "___ ちゃ", expectedKana: "おちゃ", spellings: "お茶" },
   };
   function normalize(value) {
     return String(value).normalize("NFKC").toLowerCase()
@@ -43,8 +99,13 @@
   }
   function matches(word, transcript) {
     const input = normalize(transcript);
-    const accepted = [...word.jp.split(/[／/]/), ...(spellings[word.id] || "").split("|")];
+    const accepted = [...word.jp.split(/[／/]/), ...(spellings[word.id] || "").split("|"), ...(word.speechSpellings || [])];
     return Boolean(input) && accepted.some(value => normalize(value) === input);
+  }
+  function sourceSpellingsFor(word, sourceWord) {
+    const targets = String(word.jp).split(/[／/]/).map(normalize);
+    const readings = String(sourceWord.kana || "").split(/[／/、,]/);
+    return readings.some(reading => targets.includes(normalize(reading))) ? sourceWord.spellings || [] : [];
   }
   function promptFor(word) {
     return contextPrompts[word?.id] || null;
@@ -114,6 +175,7 @@
   function interpretation(words, transcript, targetWord) {
     const prompt = promptFor(targetWord);
     if (prompt && matchesSpoken(targetWord, transcript)) return prompt.expectedKana;
+    if (targetWord && matchesSpoken(targetWord, transcript)) return targetWord.jp;
     const known = words.find(word => matches(word, transcript));
     if (known) return known.jp;
     const raw = String(transcript).normalize("NFKC").trim();
@@ -206,5 +268,5 @@
     }
     return { start, stop, cancel };
   }
-  globalThis.KANA_SPRINT_VOCABULARY_SPEAKING = { normalize, matches, matchesSpoken, matchesRomaji, romajiToHiragana, interpretation, promptFor, createSession };
+  globalThis.KANA_SPRINT_VOCABULARY_SPEAKING = { normalize, matches, matchesSpoken, sourceSpellingsFor, matchesRomaji, romajiToHiragana, interpretation, promptFor, createSession };
 })();

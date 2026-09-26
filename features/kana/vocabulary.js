@@ -4,6 +4,7 @@
   const STORAGE_KEY = "kanaSprintVocabularyV1";
   const BREAKDOWN_PREFERENCE_KEY = "kanaSprintVocabularyBreakdownOpenV1";
   const VERSION = 1;
+  const Speaking = window.KANA_SPRINT_VOCABULARY_SPEAKING;
   const STAGES = [
     {
       id: "lesson1-greetings", name: "Lesson 1 · Greetings & courtesy", description: "Complete social expressions for meeting, leaving, returning, and sharing a meal.",
@@ -536,10 +537,11 @@
         if (!existing.tracks.includes("n5")) existing.tracks.push("n5");
         existing.n5SourceId = sourceWord.sourceId;
         existing.n5VariantIndex = variantIndex;
+        existing.speechSpellings = [...new Set([...(existing.speechSpellings || []), ...Speaking.sourceSpellingsFor(existing, sourceWord)])];
         return;
       }
       const original = ORIGINAL_WORDS_BY_ID.get(id);
-      WORDS_BY_ID.set(id, {
+      const entry = {
         id,
         jp: original?.jp || sourceWord.kana.replace(/^～/, ""),
         romaji: original?.romaji || sourceWord.romaji.replace(/^~/, ""),
@@ -552,7 +554,9 @@
         tracks: ["n5"],
         n5SourceId: sourceWord.sourceId,
         n5VariantIndex: variantIndex
-      });
+      };
+      entry.speechSpellings = Speaking.sourceSpellingsFor(entry, sourceWord);
+      WORDS_BY_ID.set(id, entry);
     });
   });
   const WORDS = [...WORDS_BY_ID.values()];
@@ -608,7 +612,6 @@
   const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
   const Scheduler = window.KANA_SPRINT_VOCABULARY_SCHEDULER;
   const MODE_KEYS = ["written", "spoken", "recall", "speaking"];
-  const Speaking = window.KANA_SPRINT_VOCABULARY_SPEAKING;
   const N5_EXAMPLES_BY_WORD_ID = Object.fromEntries(WORDS
     .filter(word => word.n5SourceId && N5_DATA.examples[word.n5SourceId])
     .map(word => [word.id, N5_DATA.examples[word.n5SourceId]]));
@@ -739,7 +742,7 @@
 
   let state = loadState();
   if (state.questionFormat === "both") state.questionFormat = "mixed";
-  if (!["written", "spoken", "recall", "speaking", "written-both", "mixed"].includes(state.questionFormat)) state.questionFormat = "mixed";
+  if (!["written", "spoken", "recall", "speaking", "written-both", "audio-both", "mixed"].includes(state.questionFormat)) state.questionFormat = "mixed";
   if (state.practiceScope === "core") state.practiceScope = "genki";
   if (state.practiceScope === "extras") state.practiceScope = "n5";
   if (!Object.hasOwn(SCOPE_LABELS, state.practiceScope)) state.practiceScope = "adaptive";
@@ -761,6 +764,7 @@
   let phase = "idle";
   let questionNumber = 0;
   let lastFormat = "";
+  let audioFormatCounts = { spoken: 0, speaking: 0 };
   let currentChoiceIds = [];
   let currentChoiceCount = 4;
   let currentMode = "written";
@@ -988,6 +992,7 @@
     if (state.questionFormat === "recall") return ["recall"];
     if (state.questionFormat === "speaking") return ["speaking"];
     if (state.questionFormat === "written-both") return ["written", "recall"];
+    if (state.questionFormat === "audio-both") return japaneseSpeechReady() ? ["spoken", "speaking"] : ["speaking"];
     return japaneseSpeechReady() ? ["written", "spoken", "recall"] : ["written", "recall"];
   }
 
@@ -1508,7 +1513,14 @@
       }
     });
   }
-  function nextQuestionFormat(word, preferredMode) {
+  function nextQuestionFormat(word, preferredMode, urgentRetry = false) {
+    if (state.questionFormat === "audio-both") {
+      const modes = allowedModes();
+      const preferred = modes.includes(preferredMode) ? preferredMode : modes[0];
+      const next = modes.length === 1 ? preferred : Scheduler.balancedAudioMode(preferred, audioFormatCounts, urgentRetry);
+      audioFormatCounts[next]++;
+      return next;
+    }
     if (preferredMode && allowedModes().includes(preferredMode)) return preferredMode;
     const modes = allowedModes();
     const weakest = [...modes].sort((left, right) => modeState(word, left).mastery - modeState(word, right).mastery);
@@ -1560,7 +1572,7 @@
         <div class="vocab-setup">
           <div><h2>Vocabulary practice</h2><p class="muted">Guided practice moves through Genki II lessons or JLPT N5 topics in order. You can also practise a whole track or combine topics. Changing the format changes the question, not the word’s review schedule.</p></div>
           <div class="vocab-scope-field"><span>Practice scope</span><button class="vocab-scope-trigger" id="vocabPracticeScope" type="button" aria-haspopup="dialog" aria-controls="vocabScopeDialog"><strong id="vocabScopeLabel">Guided Genki II Course</strong><span aria-hidden="true">›</span></button><small id="vocabScopeHint">New words follow the Genki II sequence.</small></div>
-          <label><span>Question direction</span><select id="vocabQuestionFormat"><option value="mixed">Mixed practice</option><option value="written-both">Japanese ↔ English (written)</option><option value="written">Japanese text → English</option><option value="spoken">Spoken Japanese → English</option><option value="recall">English → Japanese</option><option value="speaking">English → Japanese (Speaking)</option></select><small id="vocabFormatHint" aria-live="polite"></small></label>
+          <label><span>Practice format</span><select id="vocabQuestionFormat"><option value="mixed">Mixed practice (no speaking)</option><option value="written-both">Japanese ↔ English (written)</option><option value="audio-both">Japanese ↔ English (listen &amp; speak)</option><option value="written">Read Japanese → choose English</option><option value="spoken">Listen to Japanese → choose English</option><option value="recall">Read English → choose Japanese</option><option value="speaking">English prompt → speak Japanese</option></select><small id="vocabFormatHint" aria-live="polite"></small></label>
           <label><span>Answer choices</span><select id="vocabChoiceCount"><option value="auto">Auto (adaptive)</option><option value="4">4 choices</option><option value="6">6 choices</option><option value="8">8 choices</option><option value="not-used" disabled>Not used for speaking</option></select><small id="vocabChoiceCountHint">Auto uses 4, 6, or 8 choices based on mastery.</small></label>
           <label class="vocab-pace"><span>New-word pace: <strong id="vocabPaceName">Balanced</strong></span><input id="vocabPace" type="range" min="10" max="90" step="10"><span class="vocab-pace-labels"><span>More review</span><span>More new</span></span></label>
           <div class="vocab-due-summary" aria-live="polite"><span class="tiny">Review queue</span><strong id="vocabDueSummary">No words due</strong><small id="vocabDueBreakdown">Guided Genki II Course · one shared review queue · prompts adapt across enabled formats</small></div>
@@ -1656,7 +1668,8 @@
     const choiceSelect = $("#vocabChoiceCount");
     const ready = japaneseSpeechReady();
     select.querySelector('option[value="spoken"]').disabled = !ready;
-    if (!ready && state.questionFormat === "spoken") {
+    select.querySelector('option[value="audio-both"]').disabled = !ready;
+    if (!ready && ["spoken", "audio-both"].includes(state.questionFormat)) {
       state.questionFormat = "mixed";
       select.value = "mixed";
       saveState();
@@ -1666,14 +1679,15 @@
       spoken: ready ? "Listen without seeing the Japanese prompt." : "Listening requires a Japanese voice in Settings & Data.",
       speaking: "Speak Japanese, review the transcript, then submit.",
       recall: "Recall questions use similar-looking and similar-sounding Japanese choices.",
-      "written-both": "Silent practice alternates between Japanese text → English and English → Japanese.",
+      "written-both": "Silent practice combines Japanese reading with English-to-Japanese choices.",
+      "audio-both": "Balances listening choices and Japanese speaking; urgent retries may repeat a format. Answer choices apply only to listening.",
       mixed: ready ? "Rotates through written recognition, listening, and Japanese recall. Speaking is selected separately." : "Rotates through written recognition and Japanese recall until a Japanese voice is available. Speaking is selected separately."
     };
     $("#vocabFormatHint").textContent = hints[state.questionFormat];
     const speaking = state.questionFormat === "speaking";
     choiceSelect.disabled = speaking;
     choiceSelect.value = speaking ? "not-used" : state.choiceCount;
-    $("#vocabChoiceCountHint").textContent = speaking ? "Multiple-choice settings don’t apply here." : choiceCountHint();
+    $("#vocabChoiceCountHint").textContent = choiceCountFormatHint();
   }
 
   function switchToVocabulary() {
@@ -1716,6 +1730,14 @@
     return state.choiceCount === "auto"
       ? "Auto uses 4, 6, or 8 choices based on mastery."
       : `Uses ${state.choiceCount} choices from the next question.`;
+  }
+
+  function choiceCountFormatHint() {
+    if (state.questionFormat === "speaking") return "Multiple-choice settings don’t apply here.";
+    if (state.questionFormat === "audio-both") return state.choiceCount === "auto"
+      ? "Listening questions use 4, 6, or 8 choices based on mastery."
+      : `Listening questions use ${state.choiceCount} choices.`;
+    return choiceCountHint();
   }
 
   function editSimilarity(left, right) {
@@ -1834,7 +1856,7 @@
     }));
   }
 
-  function showQuestion(word, preferredMode) {
+  function showQuestion(word, preferredMode, urgentRetry = false) {
     stopSpeaking();
     current = word;
     phase = "question";
@@ -1846,7 +1868,7 @@
     $("#vocabFeedback").innerHTML = "";
     $("#vocabNext").classList.add("hidden");
     $("#vocabDontKnow").classList.remove("hidden");
-    const format = nextQuestionFormat(word, preferredMode);
+    const format = nextQuestionFormat(word, preferredMode, urgentRetry);
     currentMode = format;
     const spoken = format === "spoken";
     const speaking = format === "speaking";
@@ -2005,7 +2027,7 @@
     const selected = selectWord();
     if (!selected?.word) return;
     currentReason = selected.reason || "Adaptive review";
-    if (selected.introduce) beginIntroduction(selected.word, selected.mode); else showQuestion(selected.word, selected.mode);
+    if (selected.introduce) beginIntroduction(selected.word, selected.mode); else showQuestion(selected.word, selected.mode, selected.reason === "Urgent review");
     if (restorePracticeView) revealNextPracticeStep();
   }
 
@@ -2094,7 +2116,7 @@
     setOptionalText("#vocabProgressWeak", weak.length);
     setOptionalText("#vocabProgressBestStreak", state.bestStreak);
     $("#vocabPaceName").textContent = paceLabel();
-    setOptionalText("#vocabChoiceCountHint", state.questionFormat === "speaking" ? "Multiple-choice settings don’t apply here." : choiceCountHint());
+    setOptionalText("#vocabChoiceCountHint", choiceCountFormatHint());
     setOptionalText("#vocabPaceStatus", paceStatus());
     const due = dueReviewBreakdown();
     const dueScopeLabel = SCOPE_LABELS[state.practiceScope];
@@ -2358,6 +2380,7 @@
   $("#vocabManageVoices").addEventListener("click", () => window.KANA_SPRINT_SPEECH?.openSettings?.());
   $("#vocabQuestionFormat").addEventListener("change", event => {
     state.questionFormat = event.target.value;
+    if (state.questionFormat === "audio-both") audioFormatCounts = { spoken: 0, speaking: 0 };
     updateFormatAvailability();
     saveState();
     current = null;

@@ -4,6 +4,22 @@ import { resolve } from 'node:path';
 const root = resolve(import.meta.dirname, '..');
 const topics = JSON.parse(readFileSync(resolve(root, 'content/vocabulary/n5-topics.json'), 'utf8'));
 const examples = JSON.parse(readFileSync(resolve(root, 'content/vocabulary/n5-examples.json'), 'utf8'));
+const speechSpellings = JSON.parse(readFileSync(resolve(root, 'content/vocabulary/n5-speech-spellings.json'), 'utf8'));
+
+const normalizeKana = value => String(value).normalize('NFKC')
+  .replace(/[\u30a1-\u30f6]/g, char => String.fromCharCode(char.charCodeAt(0) - 0x60))
+  .replace(/[\s\p{P}~～]/gu, '');
+
+function recordedSpellings(word) {
+  const curated = speechSpellings[word.id];
+  const variants = [word.kanji, ...(curated || [])];
+  const source = word.sourceMatch;
+  // Curated entries supersede a same-sounding source match that may be a different word.
+  if (!curated && !String(word.kana).startsWith('～') && source?.kanji && String(source.kana || '').split(/[／/、,]/).some(reading => normalizeKana(reading) === normalizeKana(word.kana))) {
+    variants.push(source.kanji);
+  }
+  return [...new Set(variants.filter(Boolean))];
+}
 
 const payload = {
   officialEntryCount: topics.recordCount,
@@ -18,7 +34,8 @@ const payload = {
     romaji: word.romaji,
     meaning: word.meaning,
     topicId: word.topicId,
-    existingWordIds: word.existingWordIds || []
+    existingWordIds: word.existingWordIds || [],
+    spellings: recordedSpellings(word)
   })),
   examples: examples.examples
 };

@@ -288,8 +288,20 @@ test('vocabulary offers a silent bidirectional written mode', () => {
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
   assert.match(vocabulary, /<option value="written-both">Japanese ↔ English \(written\)<\/option>/);
   assert.match(vocabulary, /if \(state\.questionFormat === "written-both"\) return \["written", "recall"\]/);
-  assert.match(vocabulary, /"written-both": "Silent practice alternates between Japanese text → English and English → Japanese\."/);
-  assert.match(vocabulary, /\["written", "spoken", "recall", "speaking", "written-both", "mixed"\]/);
+  assert.match(vocabulary, /"written-both": "Silent practice combines Japanese reading with English-to-Japanese choices\."/);
+  assert.match(vocabulary, /\["written", "spoken", "recall", "speaking", "written-both", "audio-both", "mixed"\]/);
+});
+
+test('vocabulary offers a listening and speaking practice format', () => {
+  const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
+  assert.match(vocabulary, /<span>Practice format<\/span>/);
+  assert.match(vocabulary, /<option value="audio-both">Japanese ↔ English \(listen &amp; speak\)<\/option>/);
+  assert.match(vocabulary, /if \(state\.questionFormat === "audio-both"\) return japaneseSpeechReady\(\) \? \["spoken", "speaking"\] : \["speaking"\]/);
+  assert.match(vocabulary, /select\.querySelector\('option\[value="audio-both"\]'\)\.disabled = !ready/);
+  assert.match(vocabulary, /Listening questions use 4, 6, or 8 choices based on mastery/);
+  assert.match(vocabulary, /Scheduler\.balancedAudioMode\(preferred, audioFormatCounts, urgentRetry\)/);
+  assert.match(vocabulary, /audioFormatCounts\[next\]\+\+/);
+  assert.match(vocabulary, /selected\.reason === "Urgent review"/);
 });
 
 test('standalone activity headers separate navigation from cloud status', () => {

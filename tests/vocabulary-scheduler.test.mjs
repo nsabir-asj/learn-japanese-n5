@@ -5,6 +5,20 @@ await import('../features/kana/vocabulary-scheduler.js');
 
 const scheduler = globalThis.KANA_SPRINT_VOCABULARY_SCHEDULER;
 
+test('audio practice includes speaking promptly while preserving urgent retry directions', () => {
+  const counts = { spoken: 0, speaking: 0 };
+  const directions = [];
+  for (let index = 0; index < 8; index++) {
+    const mode = scheduler.balancedAudioMode('spoken', counts);
+    directions.push(mode);
+    counts[mode]++;
+  }
+  assert.deepEqual(directions, ['spoken', 'speaking', 'spoken', 'speaking', 'spoken', 'speaking', 'spoken', 'speaking']);
+  assert.equal(scheduler.balancedAudioMode('spoken', counts, true), 'spoken');
+  counts.spoken += 2;
+  assert.equal(scheduler.balancedAudioMode('spoken', counts), 'speaking');
+});
+
 function introductionCount(pace, decisions = 100) {
   let credit = 0;
   let introductions = 0;
