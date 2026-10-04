@@ -832,9 +832,9 @@
       starting: "Press <kbd>Enter</kbd> to stop recording.",
       listening: "Press <kbd>Enter</kbd> to stop recording.",
       processing: "Finishing transcription…",
-      review: "Press <kbd>Enter</kbd> to submit · <kbd>R</kbd> to try again.",
+      review: "Press <kbd>Enter</kbd> to submit.",
       accepted: "Correct answer recognized…",
-      mismatch: "Press <kbd>R</kbd> to try again, or type your answer.",
+      mismatch: "Press <kbd>Enter</kbd> to try again, or type your answer.",
       error: "Press <kbd>Enter</kbd> to try again, or type your answer.",
     };
     hint.innerHTML = messages[speechStatus] || "";
@@ -956,9 +956,9 @@
         updateInterpretation(snapshot.text, false);
       }
       const recording = ["starting", "listening", "processing"].includes(speechStatus);
-      if (["review", "mismatch"].includes(speechStatus)) {
-        $("#vocabRecord").innerHTML = "🎤 Try again <kbd>R</kbd>";
-        $("#vocabRecord").setAttribute("aria-keyshortcuts", "R");
+      if (["review", "mismatch", "error"].includes(speechStatus)) {
+        $("#vocabRecord").innerHTML = "🎤 Try again <kbd>Enter</kbd>";
+        $("#vocabRecord").setAttribute("aria-keyshortcuts", "Enter");
       } else {
         $("#vocabRecord").textContent = recording ? (speechStatus === "processing" ? "Processing…" : "Stop recording") : "🎤 Try again";
         $("#vocabRecord").removeAttribute("aria-keyshortcuts");
@@ -2372,13 +2372,6 @@
   document.addEventListener("keydown", event => {
     if (!$("#panel-vocabulary").classList.contains("active") || phase !== "question" || currentMode !== "speaking") return;
     if (event.isComposing || event.keyCode === 229) return;
-    const typingTarget = event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement || event.target?.isContentEditable;
-    if (event.key.toLowerCase() === "r" && ["review", "mismatch"].includes(speechStatus) && !typedAnswer && !typingTarget) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      if (!event.repeat) $("#vocabRecord").click();
-      return;
-    }
     if (event.key !== "Enter") return;
     if (event.target.closest?.("select,a") || event.target.matches?.("button:not(#vocabRecord):not(#vocabSpeechSubmit)")) return;
     event.preventDefault();
@@ -2386,7 +2379,7 @@
     if (event.repeat) return;
     if (["starting", "listening"].includes(speechStatus)) stopSpeechRecording();
     else if (speechStatus === "review" || typedAnswer) submitSpeaking();
-    else if (["idle", "error"].includes(speechStatus)) $("#vocabRecord").click();
+    else if (["idle", "error", "mismatch"].includes(speechStatus)) $("#vocabRecord").click();
   }, true);
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && speechSession) {

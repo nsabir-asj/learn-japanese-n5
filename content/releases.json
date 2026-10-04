@@ -534,6 +534,10 @@
         {
           "pages": ["vocabulary"],
           "text": "The typing suggestion gently pulses twice when it first appears, with a static highlight for reduced-motion preferences."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "Use Enter to retry speaking after a recognition mismatch or error, while R stays reserved for pronunciation replay."
         }
       ]
     }

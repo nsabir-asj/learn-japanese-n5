@@ -4,6 +4,43 @@ import test from 'node:test';
 import { createContext, runInContext } from 'node:vm';
 
 const source = readFileSync(new URL('../features/kana/vocabulary.js', import.meta.url), 'utf8');
+test('Enter retries mismatches, starts and stops recording, submits typing, and ignores held keys', () => {
+  const actions = [];
+  let handler;
+  const page = createContext({
+    phase: 'question', currentMode: 'speaking', speechStatus: 'mismatch', typedAnswer: false,
+    $: () => ({ classList: { contains: () => true }, click: () => actions.push('record') }),
+    document: { addEventListener(_type, callback) { handler = callback; } },
+    stopSpeechRecording: () => actions.push('stop'), submitSpeaking: () => actions.push('submit'),
+  });
+  const start = source.indexOf('  // Capture speaking shortcuts');
+  const end = source.indexOf('  document.addEventListener("visibilitychange"', start);
+  runInContext(source.slice(start, end), page);
+  const press = (key = 'Enter', repeat = false, isComposing = false) => handler({
+    key, repeat, isComposing, target: { closest: () => false, matches: () => false },
+    preventDefault() {}, stopImmediatePropagation() {},
+  });
+  press();
+  assert.deepEqual(actions.splice(0), ['record']);
+  press('Enter', true);
+  press('Enter', false, true);
+  press('r');
+  assert.deepEqual(actions, []);
+  page.speechStatus = 'listening';
+  press();
+  assert.deepEqual(actions.splice(0), ['stop']);
+  page.speechStatus = 'idle';
+  press();
+  assert.deepEqual(actions.splice(0), ['record']);
+  page.speechStatus = 'error';
+  press();
+  assert.deepEqual(actions.splice(0), ['record']);
+  page.typedAnswer = true;
+  page.speechStatus = 'typed';
+  press();
+  assert.deepEqual(actions.splice(0), ['submit']);
+});
+
 function pageFunction(name) {
   const start = source.indexOf(`  function ${name}(`);
   assert.ok(start >= 0);

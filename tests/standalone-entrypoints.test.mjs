@@ -472,9 +472,9 @@ test('speaking practice exposes error, kana interpretation, romaji, and post-sub
   assert.match(vocabulary, /\$\("#vocabSpeechActions"\)\.classList\.add\("hidden"\)/);
   assert.match(vocabulary, /Press <kbd>Enter<\/kbd> to start speaking/);
   assert.match(vocabulary, /Press <kbd>Enter<\/kbd> to stop recording/);
-  assert.match(vocabulary, /Press <kbd>Enter<\/kbd> to submit · <kbd>R<\/kbd> to try again/);
-  assert.match(vocabulary, /Try again <kbd>R<\/kbd>/);
-  assert.match(vocabulary, /\["review", "mismatch"\]\.includes\(speechStatus\) && !typedAnswer && !typingTarget/);
+  assert.match(vocabulary, /Press <kbd>Enter<\/kbd> to submit/);
+  assert.match(vocabulary, /Try again <kbd>Enter<\/kbd>/);
+  assert.match(vocabulary, /\["idle", "error", "mismatch"\]\.includes\(speechStatus\)/);
   assert.match(vocabulary, /Type an answer to enable Submit answer/);
   assert.match(vocabulary, /Press <kbd>Enter<\/kbd> for the next question/);
   assert.match(styles, /vocabSpeechStatus\[data-status="error"\]/);
