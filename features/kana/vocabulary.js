@@ -917,7 +917,8 @@
     $("#vocabRecord").innerHTML = "🎤 Speak <kbd>Enter</kbd>";
     $("#vocabRecord").setAttribute("aria-keyshortcuts", "Enter");
     $("#vocabRecord").setAttribute("aria-pressed", "false");
-    $("#vocabTypeInstead").textContent = "Type instead";
+    $("#vocabTypeInstead").innerHTML = "Type instead <kbd>T</kbd>";
+    $("#vocabTypeInstead").setAttribute("aria-keyshortcuts", "T");
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     $("#vocabRecord").disabled = !Recognition;
     setSpeechStatus(Recognition ? "idle" : "error", Recognition
@@ -1648,7 +1649,7 @@
             <div class="vocab-interpretation hidden" id="vocabSpeechInterpretation"><span>Interpreted as</span><strong id="vocabSpeechKana" lang="ja"></strong><small>Browser transcript is shown above.</small></div>
             <div class="vocab-typing-modes hidden" id="vocabTypingModes" aria-label="Typing script"><span>Type with</span><div class="vocab-segmented"><button id="vocabTypeJapanese" type="button" aria-pressed="true">Japanese</button><button id="vocabTypeRomaji" type="button" aria-pressed="false">Romaji</button></div></div>
             <div class="vocab-romaji-preview hidden" id="vocabRomajiPreview"><span>Kana preview</span><strong id="vocabRomajiKana" lang="ja">—</strong></div>
-            <div class="actions" id="vocabSpeechActions"><button class="big-button" id="vocabRecord" type="button" aria-keyshortcuts="Enter">🎤 Speak <kbd>Enter</kbd></button><button class="ghost" id="vocabTypeInstead" type="button">Type instead</button><button class="big-button hidden" id="vocabSpeechSubmit" type="button" disabled>Submit answer</button></div>
+            <div class="actions" id="vocabSpeechActions"><button class="big-button" id="vocabRecord" type="button" aria-keyshortcuts="Enter">🎤 Speak <kbd>Enter</kbd></button><button class="ghost" id="vocabTypeInstead" type="button" aria-keyshortcuts="T">Type instead <kbd>T</kbd></button><button class="big-button hidden" id="vocabSpeechSubmit" type="button" aria-keyshortcuts="Enter" disabled>Submit answer <kbd>Enter</kbd></button></div>
             <p class="tiny vocab-typing-suggestion hidden" id="vocabTypingSuggestion" role="status" aria-live="polite">Having trouble with recognition? You can type your answer instead.</p>
             <p class="tiny">Your browser may send audio to its speech service. Recognition retries don’t affect your streak. This checks word recall, not pronunciation quality.</p>
           </div>
@@ -2350,6 +2351,7 @@
     $("#vocabRecord").removeAttribute("aria-keyshortcuts");
     $("#vocabRecord").setAttribute("aria-pressed", "false");
     $("#vocabTypeInstead").textContent = "Use microphone";
+    $("#vocabTypeInstead").removeAttribute("aria-keyshortcuts");
     $("#vocabSpeechText").readOnly = false;
     $("#vocabTypingModes").classList.remove("hidden");
     $("#vocabSpeechInterpretation").classList.add("hidden");
@@ -2372,6 +2374,14 @@
   document.addEventListener("keydown", event => {
     if (!$("#panel-vocabulary").classList.contains("active") || phase !== "question" || currentMode !== "speaking") return;
     if (event.isComposing || event.keyCode === 229) return;
+    if (event.ctrlKey || event.altKey || event.metaKey) return;
+    if (event.key.toLowerCase() === "t") {
+      if (typedAnswer || event.target.closest?.("input,textarea,select,a,[contenteditable]:not([contenteditable='false'])")) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (!event.repeat) $("#vocabTypeInstead").click();
+      return;
+    }
     if (event.key !== "Enter") return;
     if (event.target.closest?.("select,a") || event.target.matches?.("button:not(#vocabRecord):not(#vocabSpeechSubmit)")) return;
     event.preventDefault();

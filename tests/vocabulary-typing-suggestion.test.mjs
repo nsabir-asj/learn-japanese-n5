@@ -41,6 +41,35 @@ test('Enter retries mismatches, starts and stops recording, submits typing, and 
   assert.deepEqual(actions.splice(0), ['submit']);
 });
 
+test('T switches to typing only in a speaking question outside editable controls', () => {
+  const actions = [];
+  let handler;
+  const page = createContext({
+    phase: 'question', currentMode: 'speaking', typedAnswer: false,
+    $: selector => ({ classList: { contains: () => true }, click: () => actions.push(selector) }),
+    document: { addEventListener(_type, callback) { handler = callback; } },
+  });
+  const start = source.indexOf('  // Capture speaking shortcuts');
+  runInContext(source.slice(start, source.indexOf('  document.addEventListener("visibilitychange"', start)), page);
+  const press = (patch = {}) => handler({ key: 't', target: { closest: () => false },
+    preventDefault() {}, stopImmediatePropagation() {}, ...patch });
+  press();
+  press({ key: 'T' });
+  assert.deepEqual(actions.splice(0), ['#vocabTypeInstead', '#vocabTypeInstead']);
+  for (const patch of [{ repeat: true }, { isComposing: true }, { keyCode: 229 },
+    { ctrlKey: true }, { altKey: true }, { metaKey: true }, { target: { closest: () => true } }]) press(patch);
+  page.typedAnswer = true;
+  press();
+  page.typedAnswer = false;
+  page.phase = 'answered';
+  press();
+  page.phase = 'question';
+  page.currentMode = 'listening';
+  press();
+  assert.deepEqual(actions, []);
+  assert.match(source, /Submit answer <kbd>Enter<\/kbd>/);
+});
+
 function pageFunction(name) {
   const start = source.indexOf(`  function ${name}(`);
   assert.ok(start >= 0);

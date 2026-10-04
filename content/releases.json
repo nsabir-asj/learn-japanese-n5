@@ -555,6 +555,17 @@
           "text": "The Speak button now shows its Enter keyboard shortcut."
         }
       ]
+    },
+    {
+      "id": "2026-10-05.4",
+      "publishedAt": "2026-10-05",
+      "title": "Faster keyboard typing fallback",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Press T during a speaking question to type instead. The typing submit button now shows its Enter shortcut."
+        }
+      ]
     }
   ]
 }
