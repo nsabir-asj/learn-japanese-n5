@@ -540,6 +540,21 @@
           "text": "Use Enter to retry speaking after a recognition mismatch or error, while R stays reserved for pronunciation replay."
         }
       ]
+    },
+    {
+      "id": "2026-10-05.3",
+      "publishedAt": "2026-10-05",
+      "title": "More reliable speaking answers",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Speaking practice accepts equivalent Japanese spellings for ‘around three o’clock’."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "The Speak button now shows its Enter keyboard shortcut."
+        }
+      ]
     }
   ]
 }

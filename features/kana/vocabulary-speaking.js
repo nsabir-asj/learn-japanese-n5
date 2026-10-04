@@ -55,7 +55,7 @@
     "suffix-en": { frame: "ひゃく ___", expectedKana: "ひゃくえん", spellings: "百円|100円" },
     "suffix-mai": { frame: "いち ___", expectedKana: "いちまい", spellings: "一枚|1枚" },
     "suffix-jikan": { frame: "いち ___", expectedKana: "いちじかん", spellings: "一時間|1時間" },
-    "suffix-goro": { frame: "さんじ ___", expectedKana: "さんじごろ", spellings: "三時ごろ|3時ごろ" },
+    "suffix-goro": { frame: "さんじ ___", expectedKana: "さんじごろ", spellings: "三時ごろ|3時ごろ|三時頃|3時頃" },
     "suffix-gurai": { frame: "いちじかん ___", expectedKana: "いちじかんぐらい", spellings: "一時間ぐらい|1時間ぐらい" },
     "suffix-to": { frame: "ともだち ___", expectedKana: "ともだちと", spellings: "友達と|友だちと" },
     "n5-0003": { frame: "に ___", expectedKana: "にかい", spellings: "二階|2階" },

@@ -83,6 +83,16 @@ test('short Genki and N5 suffixes use complete phrases for speech recognition', 
   }
 });
 
+test('around three oclock accepts equivalent kanji spellings but not other times or bare suffixes', () => {
+  const word = { id: 'suffix-goro', jp: '～ごろ' };
+  for (const transcript of ['さんじごろ', '三時ごろ', '3時ごろ', '三時頃', '3時頃', '３時頃。']) {
+    assert.equal(matchesSpoken(word, transcript), true, transcript);
+  }
+  for (const transcript of ['ごろ', '頃', '三時', '四時頃', '3時半', '三時ころ', '']) {
+    assert.equal(matchesSpoken(word, transcript), false, transcript);
+  }
+});
+
 test('curated N5 spellings cover checked kanji transcripts without borrowing unrelated spellings', async () => {
   await import('../features/kana/vocabulary-n5.js');
   const sources = globalThis.KANA_SPRINT_N5_VOCABULARY.words;

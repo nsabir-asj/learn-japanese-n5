@@ -101,6 +101,8 @@ function speakingPage() {
 
 test('three completed failures suggest typing without switching modes or grading answers', () => {
   const page = speakingPage();
+  assert.match(page.element('#vocabRecord').innerHTML, /Speak <kbd>Enter<\/kbd>/);
+  assert.equal(page.element('#vocabRecord').getAttribute('aria-keyshortcuts'), 'Enter');
   page.fail('one');
   page.fail('two', { status: 'error', text: '', errorCode: 'no-speech' });
   assert.equal(page.suggested(), false);
