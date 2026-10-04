@@ -738,6 +738,13 @@
     progress.lastMode = typeof progress.lastMode === "string" ? progress.lastMode : "";
     progress.urgentMode = typeof progress.urgentMode === "string" ? progress.urgentMode : "";
     progress.urgentRetryPending = Boolean(progress.urgentRetryPending);
+    // Repair retries left behind by the old speaking-to-typing fallback.
+    if (progress.urgentRetryPending && progress.urgentMode === "speaking"
+      && progress.lastMode === "recall" && progress.lastWasCorrect === true) {
+      progress.urgentRetryPending = false;
+      progress.urgentMode = "";
+      Object.assign(progress, Scheduler.nextReviewSchedule(progress.mastery, true, state.total, progress.lastSeen));
+    }
     return progress;
   }
 
@@ -781,6 +788,7 @@
   let questionNumber = 0;
   let lastFormat = "";
   let audioFormatCounts = { spoken: 0, speaking: 0 };
+  const sessionReviewCounts = new Map();
   let currentChoiceIds = [];
   let currentChoiceCount = 4;
   let currentMode = "written";
@@ -1389,14 +1397,17 @@
         state.practiceScope = lastRegularScope;
         return selectWord();
       }
-      return { ...selectReviewWord(introduced, new Set(state.recent.slice(-5)), false), introduce: false, reason: "Trouble-word review" };
+      return { ...selectReviewWord(leastPracticedWords(introduced), new Set(state.recent.slice(-5)), false), introduce: false, reason: "Trouble-word review" };
     }
     if (!introduced.length && unseen.length) return { word: unseen[0], mode: allowedModes()[0], introduce: true, reason: "Introducing the first word" };
     const recent = new Set(state.recent.slice(-5));
     const incomplete = introduced.filter(word => itemState(word).seen === 0);
     if (incomplete.length) return { ...selectReviewWord(incomplete, recent, false), introduce: false, reason: "Completing the first practice check" };
-    const due = introduced.filter(word => wordIsDue(word));
-    const urgent = urgentReviewEntries(introduced);
+    const coveragePool = leastPracticedWords(introduced);
+    const due = coveragePool.filter(word => wordIsDue(word));
+    // Allow one early retry, but do not let repeated misses monopolize the lesson.
+    const retryPool = leastPracticedWords(introduced, 1);
+    const urgent = urgentReviewEntries(retryPool);
     if (urgent.length) return { ...selectReviewEntry(urgent), introduce: false, reason: "Urgent review" };
     if (unseen.length) {
       const decision = Scheduler.nextIntroductionDecision(state.pace, state.newWordCredit);
@@ -1405,12 +1416,25 @@
     }
     if (due.length) return { ...selectReviewWord(due, recent, true), introduce: false, reason: "Due review" };
     if (unseen.length) {
-      const scheduled = introduced.filter(word => allowedModes().some(mode => modeState(word, mode).seen > 0));
+      const scheduled = coveragePool.filter(word => allowedModes().some(mode => modeState(word, mode).seen > 0));
       const scheduledChoice = selectReviewWord(scheduled, recent, false, false);
       if (scheduledChoice.word) return { ...scheduledChoice, introduce: false, reason: "Adaptive review" };
       return { word: unseen[0], mode: allowedModes()[0], introduce: true, reason: "Building the review pool" };
     }
-    return { ...selectReviewWord(introduced, recent, false), introduce: false, reason: guided ? "Reviewing the current stage" : "Adaptive review" };
+    return { ...selectReviewWord(coveragePool, recent, false), introduce: false, reason: guided ? "Reviewing the current stage" : "Adaptive review" };
+  }
+
+  function reviewCountsForSelection() {
+    const key = `${scopeSelectionKey()}:${state.questionFormat}`;
+    if (!sessionReviewCounts.has(key)) sessionReviewCounts.set(key, new Map());
+    return sessionReviewCounts.get(key);
+  }
+
+  function leastPracticedWords(words, extraAllowance = 0) {
+    if (!words.length) return [];
+    const counts = reviewCountsForSelection();
+    const minimum = Math.min(...words.map(word => counts.get(word.id) || 0));
+    return words.filter(word => (counts.get(word.id) || 0) <= minimum + extraAllowance);
   }
 
   function selectReviewWord(words, recent, onlyDue, allowRecent = true) {
@@ -1950,11 +1974,14 @@
     publishDashboard();
   }
 
-  function applyResult(correct, selectedId) {
+  function applyResult(correct, selectedId, typedSpeakingFallback = false) {
     const progress = itemState(current);
     const direction = modeState(current, currentMode);
     const now = Date.now();
     const wasUrgentRetry = progress.urgentRetryPending && progress.urgentMode === currentMode;
+    const resolvedByTyping = typedSpeakingFallback && progress.urgentRetryPending && progress.urgentMode === "speaking";
+    const reviewCounts = reviewCountsForSelection();
+    reviewCounts.set(current.id, (reviewCounts.get(current.id) || 0) + 1);
     progress.introduced = true;
     const distractorIds = currentChoiceIds.filter(id => id !== current.id);
     progress.recentDistractors.push(...distractorIds);
@@ -1969,7 +1996,7 @@
     if (correct) {
       progress.correct++;
       progress.mastery = Math.min(100, progress.mastery + Math.max(6, 20 * (1 - progress.mastery / 140)));
-      if (wasUrgentRetry) {
+      if (wasUrgentRetry || resolvedByTyping) {
         progress.urgentRetryPending = false;
         progress.urgentMode = "";
       }
@@ -2022,7 +2049,7 @@
     const correct = !unknown && selectedId === current.id;
     if (wasSpeakingQuestion && !correct) speechEvidence = null;
     const selectedWord = !correct && selectedId ? WORDS.find(word => word.id === selectedId) : null;
-    applyResult(correct, selectedId);
+    applyResult(correct, selectedId, wasSpeakingQuestion && typedAnswer);
     const options = $("#vocabOptions");
     options.classList.add("is-answered");
     options.querySelectorAll(".vocab-choice-secondary").forEach(detail => detail.removeAttribute("aria-hidden"));

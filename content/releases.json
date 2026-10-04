@@ -491,6 +491,21 @@
           "text": "Vocabulary practice now warns when browser storage cannot save changes."
         }
       ]
+    },
+    {
+      "id": "2026-10-04.1",
+      "publishedAt": "2026-10-04",
+      "title": "More balanced vocabulary review",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Practice gives every introduced word a turn before normal repeats, while allowing an early retry after a mistake."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "A correct typed answer clears a pending speaking retry without increasing speaking mastery."
+        }
+      ]
     }
   ]
 }

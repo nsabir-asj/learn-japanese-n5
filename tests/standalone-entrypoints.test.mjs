@@ -262,7 +262,7 @@ test('vocabulary uses global unlocks with one shared urgent schedule', () => {
   assert.match(vocabulary, /const wasUrgentRetry = progress\.urgentRetryPending && progress\.urgentMode === currentMode/);
   assert.match(vocabulary, /Scheduler\.nextReviewSchedule\(progress\.mastery, scheduleCorrect, state\.total, now\)/);
   assert.match(vocabulary, /return progress\.introduced && progress\.seen > 0 && progress\.mastery >= 72/);
-  assert.match(vocabulary, /if \(wasUrgentRetry\) \{\s*progress\.urgentRetryPending = false;/);
+  assert.match(vocabulary, /if \(wasUrgentRetry \|\| resolvedByTyping\) \{\s*progress\.urgentRetryPending = false;/);
 });
 
 test('vocabulary introduction and TTS controls have keyboard access', () => {
