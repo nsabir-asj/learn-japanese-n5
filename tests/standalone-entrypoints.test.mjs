@@ -102,7 +102,7 @@ test('vocabulary choices reveal pronunciation, meanings, or Japanese text only a
 test('vocabulary session controls explain mixed directions and align their arrows', () => {
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
   const styles = readFileSync(resolve(root, 'features/kana/vocabulary.css'), 'utf8');
-  assert.match(vocabulary, /Rotates through written recognition, listening, and Japanese recall\. Speaking is selected separately\./);
+  assert.match(vocabulary, /Combines Japanese reading, Japanese listening, and English-to-Japanese choices\. No speaking\./);
   assert.match(styles, /appearance:none/);
   assert.match(styles, /background-position:right 14px center/);
   assert.match(styles, /transform:translateY\(-1px\)/);
@@ -291,7 +291,7 @@ test('vocabulary answer choices support an adaptive default and manual override'
 
 test('vocabulary offers a silent bidirectional written mode', () => {
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
-  assert.match(vocabulary, /<option value="written-both">Japanese ↔ English \(written\)<\/option>/);
+  assert.match(vocabulary, /<option value="written-both">Japanese ↔ English — reading choices<\/option>/);
   assert.match(vocabulary, /if \(state\.questionFormat === "written-both"\) return \["written", "recall"\]/);
   assert.match(vocabulary, /"written-both": "Silent practice combines Japanese reading with English-to-Japanese choices\."/);
   assert.match(vocabulary, /\["written", "spoken", "recall", "speaking", "written-both", "audio-both", "mixed"\]/);
@@ -300,7 +300,7 @@ test('vocabulary offers a silent bidirectional written mode', () => {
 test('vocabulary offers a listening and speaking practice format', () => {
   const vocabulary = readFileSync(resolve(root, 'features/kana/vocabulary.js'), 'utf8');
   assert.match(vocabulary, /<span>Practice format<\/span>/);
-  assert.match(vocabulary, /<option value="audio-both">Japanese ↔ English \(listen &amp; speak\)<\/option>/);
+  assert.match(vocabulary, /<option value="audio-both">Japanese ↔ English — listening &amp; speaking<\/option>/);
   assert.match(vocabulary, /if \(state\.questionFormat === "audio-both"\) return japaneseSpeechReady\(\) \? \["spoken", "speaking"\] : \["speaking"\]/);
   assert.match(vocabulary, /select\.querySelector\('option\[value="audio-both"\]'\)\.disabled = !ready && state\.questionFormat !== "audio-both"/);
   assert.match(vocabulary, /Listening questions use 4, 6, or 8 choices based on mastery/);

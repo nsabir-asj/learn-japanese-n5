@@ -45,7 +45,7 @@ function practice(scope = 'lesson3', size) {
   for (const name of [
     'emptyModeProgress', 'itemState', 'modeState', 'scopeSelectionKey',
     'wordIsDue', 'urgentReviewEntries', 'chooseMode', 'selectWord',
-    'reviewCountsForSelection', 'leastPracticedWords', 'selectReviewWord',
+    'reviewCountsForSelection', 'balancedReviewPool', 'selectReviewWord',
     'selectReviewEntry', 'applyResult',
   ]) runInContext(pageFunction(name), page);
   runInContext(`
@@ -73,19 +73,18 @@ function practice(scope = 'lesson3', size) {
   return page;
 }
 
-test('Genki lessons and N5 cover every introduced word before normal repeats', () => {
+test('Genki lessons and N5 retain bounded coverage while adapting review frequency', () => {
   for (const scope of ['lesson1', 'lesson2', 'lesson3', 'lesson4', 'lesson5', 'lesson6', 'n5']) {
     const page = practice(scope);
     assert.ok(page.scopeWords.length > 0, scope);
     const seen = new Set();
-    for (let index = 0; index < page.scopeWords.length; index++) {
+    for (let index = 0; index < page.scopeWords.length * 3 && seen.size < page.scopeWords.length; index++) {
       const selected = page.selectWord();
       assert.equal(selected.introduce, false);
-      assert.equal(seen.has(selected.word.id), false, `${scope}: premature repeat of ${selected.word.id}`);
       seen.add(selected.word.id);
       page.complete(selected);
     }
-    assert.equal(seen.size, page.scopeWords.length);
+    assert.equal(seen.size, page.scopeWords.length, `${scope}: neglected vocabulary`);
   }
 });
 
@@ -95,7 +94,7 @@ test('one mistake gets an early retry without starving the rest of Lesson 3', ()
   page.complete(missed, false);
   const counts = new Map([[missed.word.id, 1]]);
   let earlyRetry = false;
-  for (let index = 0; index < page.scopeWords.length; index++) {
+  for (let index = 0; index < page.scopeWords.length * 3 && counts.size < page.scopeWords.length; index++) {
     const selected = page.selectWord();
     earlyRetry ||= selected.word.id === missed.word.id && selected.reason === 'Urgent review';
     counts.set(selected.word.id, (counts.get(selected.word.id) || 0) + 1);
@@ -103,7 +102,7 @@ test('one mistake gets an early retry without starving the rest of Lesson 3', ()
   }
   assert.equal(earlyRetry, true);
   assert.equal(counts.size, page.scopeWords.length);
-  assert.equal(counts.get(missed.word.id), 2);
+  assert.ok(counts.get(missed.word.id) >= 2);
 });
 
 test('repeated failures cannot monopolize practice before the other words get a turn', () => {
@@ -111,13 +110,18 @@ test('repeated failures cannot monopolize practice before the other words get a 
   const missed = page.selectWord();
   page.complete(missed, false);
   const seen = new Set([missed.word.id]);
-  let repeats = 0;
+  let attempts = 1;
+  let lastMiss = 0;
   while (seen.size < page.scopeWords.length) {
     const selected = page.selectWord();
-    if (selected.word.id === missed.word.id) repeats++;
-    assert.ok(repeats <= 1, 'Repeated urgent retries blocked lesson coverage');
+    if (selected.word.id === missed.word.id) {
+      assert.ok(attempts - lastMiss >= 4, 'Retry ignored the repeat gap');
+      lastMiss = attempts;
+    }
+    assert.ok(attempts <= page.scopeWords.length * 3, 'Repeated urgent retries blocked lesson coverage');
     seen.add(selected.word.id);
     page.complete(selected, selected.word.id !== missed.word.id);
+    attempts++;
   }
 });
 
@@ -150,7 +154,7 @@ test('saved stuck retries are repaired, while unresolved speaking mistakes stay 
   assert.equal(page.itemState(word).dueQuestion, due, 'Repair should run only once');
 });
 
-test('coverage continues over multiple rounds, small pools, and format changes', () => {
+test('small pools remain usable and each practice format keeps separate coverage history', () => {
   for (const size of [1, 2, 5, 20]) {
     const page = practice('lesson3', size);
     const counts = new Map();
@@ -159,11 +163,53 @@ test('coverage continues over multiple rounds, small pools, and format changes',
       counts.set(selected.word.id, (counts.get(selected.word.id) || 0) + 1);
       page.complete(selected);
     }
-    assert.deepEqual([...counts.values()], Array(size).fill(3));
+    assert.equal(counts.size, size);
+    for (const count of counts.values()) assert.ok(count > 0);
     page.state.questionFormat = 'recall';
-    assert.equal(page.reviewCountsForSelection().size, 0);
+    assert.equal(page.reviewCountsForSelection().words.size, 0);
     page.state.questionFormat = 'speaking';
-    assert.equal(page.reviewCountsForSelection().size, size);
+    assert.equal(page.reviewCountsForSelection().words.size, size);
+  }
+});
+
+test('weak words can return before full coverage and receive more turns than mastered words', () => {
+  const page = practice('lesson3', 20);
+  const weak = new Set(page.scopeWords.slice(0, 5).map(word => word.id));
+  for (const word of page.scopeWords) {
+    Object.assign(page.itemState(word), { mastery: weak.has(word.id) ? 10 : 100, dueQuestion: 100 });
+  }
+  const counts = new Map();
+  const recent = [];
+  let repeatedBeforeCoverage = false;
+  for (let index = 0; index < 40; index++) {
+    const selected = page.selectWord();
+    assert.equal(recent.slice(-3).includes(selected.word.id), false, 'Normal review ignored the repeat gap');
+    repeatedBeforeCoverage ||= counts.has(selected.word.id) && counts.size < page.scopeWords.length;
+    counts.set(selected.word.id, (counts.get(selected.word.id) || 0) + 1);
+    recent.push(selected.word.id);
+    // Model words the learner still struggles with, rather than making all words mastered.
+    page.complete(selected, !weak.has(selected.word.id));
+  }
+  const weakAttempts = [...counts].filter(([id]) => weak.has(id)).reduce((sum, [, count]) => sum + count, 0);
+  const masteredAttempts = 40 - weakAttempts;
+  assert.equal(repeatedBeforeCoverage, true);
+  assert.ok(weakAttempts / weak.size > masteredAttempts / (page.scopeWords.length - weak.size));
+});
+
+test('a small due subset cannot force recent repeats while other words are available', () => {
+  const page = practice('lesson3', 20);
+  for (const word of page.scopeWords) page.itemState(word).dueQuestion = 999999;
+  const dueWord = page.scopeWords[0];
+  page.itemState(dueWord).dueQuestion = page.state.total;
+  const selected = page.selectWord();
+  assert.equal(selected.word.id, dueWord.id);
+  page.complete(selected);
+  // Even an already-expired time-based review must respect the repeat gap.
+  page.itemState(dueWord).dueAt = 1;
+  for (let index = 0; index < 3; index++) {
+    const next = page.selectWord();
+    assert.notEqual(next.word.id, dueWord.id);
+    page.complete(next);
   }
 });
 

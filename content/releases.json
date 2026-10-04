@@ -506,6 +506,25 @@
           "text": "A correct typed answer clears a pending speaking retry without increasing speaking mastery."
         }
       ]
+    },
+    {
+      "id": "2026-10-05.1",
+      "publishedAt": "2026-10-05",
+      "title": "Clearer formats and adaptive review",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Weaker vocabulary can return more often, with spaced repeats and regular turns for words that have waited longest."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "Practice formats are grouped into single and combined directions, with clearer labels explaining each activity."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "After three unsuccessful speech recognition attempts, a gentle hint highlights the option to type instead."
+        }
+      ]
     }
   ]
 }

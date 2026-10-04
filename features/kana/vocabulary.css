@@ -54,6 +54,8 @@
 .vocab-speaking.hidden { display: none; }
 .vocab-speaking p { margin: 0; }
 .vocab-speaking .actions { flex-wrap: wrap; }
+.vocab-speaking #vocabTypeInstead.is-suggested{border-color:var(--accent);background:rgba(88,166,255,.12);box-shadow:0 0 0 2px rgba(88,166,255,.16)}
+.vocab-typing-suggestion{color:#b9dcff;line-height:1.5}
 .vocab-transcript { display: grid; gap: .5rem; }
 .vocab-transcript label { font-size: 1rem; font-weight: 600; }
 .vocab-transcript input { width: 100%; box-sizing: border-box; font-size: 1.5rem; padding: .8rem; color: inherit; background: transparent; border: 1px solid var(--line); border-radius: .75rem; }
