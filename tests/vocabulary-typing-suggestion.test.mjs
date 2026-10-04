@@ -32,7 +32,7 @@ function speakingPage() {
   };
   const page = createContext({
     $: element, phase: 'question', currentMode: 'speaking', current: { id: 'ocha' },
-    speechFailedAttempts: 0, speechStoppedByUser: false,
+    speechFailedAttempts: 0, speechStoppedByUser: false, typingSuggestionPulsePlayed: false,
     speechSession: null, speechStatus: 'idle', typedAnswer: false, speechEvidence: null,
     window: { SpeechRecognition: function Recognition() {} },
     SpeechDiagnostics: null, updateSpeakingKeyboardHint() {}, updateInterpretation() {},
@@ -74,6 +74,26 @@ test('three completed failures suggest typing without switching modes or grading
   assert.equal(page.typedAnswer, false);
   assert.equal(page.currentMode, 'speaking');
   assert.deepEqual({ ...page.state }, { total: 10, correct: 8, streak: 2, typingScript: 'romaji' });
+});
+
+test('typing suggestion pulses once per question, not after every retry or mode toggle', () => {
+  const page = speakingPage();
+  const button = page.element('#vocabTypeInstead');
+  for (const id of ['one', 'two', 'three']) page.fail(id);
+  assert.equal(button.classList.contains('is-suggestion-pulsing'), true);
+  // Simulate the completed animation: subsequent recognition updates must not restart it.
+  button.classList.remove('is-suggestion-pulsing');
+  page.fail('four');
+  assert.equal(button.classList.contains('is-suggestion-pulsing'), false);
+  page.typedAnswer = true;
+  page.setSpeechStatus('typed', 'Type your answer.');
+  page.setupSpeaking();
+  assert.equal(page.suggested(), true);
+  assert.equal(button.classList.contains('is-suggestion-pulsing'), false);
+  page.showQuestion({ id: 'mizu' }, 'speaking');
+  page.setupSpeaking();
+  for (const id of ['new-one', 'new-two', 'new-three']) page.fail(id);
+  assert.equal(button.classList.contains('is-suggestion-pulsing'), true);
 });
 
 test('interim text, duplicate terminal callbacks, and correct transcripts do not inflate failures', () => {

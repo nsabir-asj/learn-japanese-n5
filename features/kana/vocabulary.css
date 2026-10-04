@@ -55,6 +55,9 @@
 .vocab-speaking p { margin: 0; }
 .vocab-speaking .actions { flex-wrap: wrap; }
 .vocab-speaking #vocabTypeInstead.is-suggested{border-color:var(--accent);background:rgba(88,166,255,.12);box-shadow:0 0 0 2px rgba(88,166,255,.16)}
+.vocab-speaking #vocabTypeInstead.is-suggested.is-suggestion-pulsing{animation:vocab-typing-suggestion-pulse 1s ease-in-out 2}
+@keyframes vocab-typing-suggestion-pulse{0%,100%{border-color:var(--accent);background:rgba(88,166,255,.12);box-shadow:0 0 0 2px rgba(88,166,255,.16)}50%{border-color:#b9dcff;background:rgba(88,166,255,.22);box-shadow:0 0 0 5px rgba(88,166,255,.22),0 0 16px rgba(88,166,255,.25)}}
+@media(prefers-reduced-motion:reduce){.vocab-speaking #vocabTypeInstead.is-suggested.is-suggestion-pulsing{animation:none}}
 .vocab-typing-suggestion{color:#b9dcff;line-height:1.5}
 .vocab-transcript { display: grid; gap: .5rem; }
 .vocab-transcript label { font-size: 1rem; font-weight: 600; }

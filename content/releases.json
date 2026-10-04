@@ -525,6 +525,17 @@
           "text": "After three unsuccessful speech recognition attempts, a gentle hint highlights the option to type instead."
         }
       ]
+    },
+    {
+      "id": "2026-10-05.2",
+      "publishedAt": "2026-10-05",
+      "title": "A clearer typing suggestion",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "The typing suggestion gently pulses twice when it first appears, with a static highlight for reduced-motion preferences."
+        }
+      ]
     }
   ]
 }

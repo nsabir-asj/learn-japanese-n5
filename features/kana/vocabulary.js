@@ -801,6 +801,7 @@
   let speechStatus = "idle";
   let typedAnswer = false;
   let speechFailedAttempts = 0;
+  let typingSuggestionPulsePlayed = false;
   let speechStoppedByUser = false;
   let typingScript = state.typingScript === "romaji" ? "romaji" : "japanese";
   let speechEvidence = null;
@@ -854,6 +855,11 @@
     $("#vocabTypingSuggestion").classList.toggle("hidden", !suggested);
     const button = $("#vocabTypeInstead");
     button.classList.toggle("is-suggested", suggested);
+    if (suggested && !typingSuggestionPulsePlayed) {
+      button.classList.add("is-suggestion-pulsing");
+      typingSuggestionPulsePlayed = true;
+    }
+    if (!suggested) button.classList.remove("is-suggestion-pulsing");
     if (suggested) button.setAttribute("aria-describedby", "vocabTypingSuggestion");
     else button.removeAttribute("aria-describedby");
   }
@@ -1960,6 +1966,7 @@
   function showQuestion(word, preferredMode, urgentRetry = false) {
     stopSpeaking();
     speechFailedAttempts = 0;
+    typingSuggestionPulsePlayed = false;
     speechStoppedByUser = false;
     current = word;
     phase = "question";
