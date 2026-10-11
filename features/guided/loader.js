@@ -8,7 +8,7 @@
     return;
   }
 
-  const version = "20261011-6";
+  const version = "20261011-7";
   const lessonScript = document.createElement("script");
   lessonScript.src = `../content/guided/lesson-${String(lessonNumber).padStart(2, "0")}.js?v=${version}`;
   lessonScript.onload = () => {

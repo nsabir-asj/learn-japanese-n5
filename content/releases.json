@@ -622,6 +622,19 @@
           "text": "After answering a verb question, open a collapsible Japanese example sentence with its English meaning and optional audio."
         }
       ]
+    },
+    {
+      "id": "2026-10-11.3",
+      "publishedAt": "2026-10-11",
+      "title": "Keep sentence examples open",
+      "changes": [
+        {
+          "pages": [
+            "guided"
+          ],
+          "text": "Lesson 3 remembers whether verb sentence examples are expanded or collapsed, including between visits."
+        }
+      ]
     }
   ]
 }
