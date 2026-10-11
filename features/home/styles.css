@@ -58,6 +58,9 @@ section + section { margin-top: 44px; }
 .lesson-card-shopping { background: linear-gradient(110deg, rgba(240,173,78,.14), transparent 45%), linear-gradient(145deg, rgba(28,36,48,.96), rgba(22,27,34,.96)); }
 .lesson-card-shopping:hover { background: linear-gradient(110deg, rgba(240,173,78,.2), transparent 45%), linear-gradient(145deg, #202a37, #181e27); }
 .lesson-card-shopping .lesson-number { border-color: rgba(240,173,78,.5); background: rgba(240,173,78,.1); color: #ffd28f; }
+.lesson-card-plans { background: linear-gradient(110deg, rgba(56,199,175,.14), transparent 45%), linear-gradient(145deg, rgba(28,36,48,.96), rgba(22,27,34,.96)); }
+.lesson-card-plans:hover { background: linear-gradient(110deg, rgba(56,199,175,.2), transparent 45%), linear-gradient(145deg, #202a37, #181e27); }
+.lesson-card-plans .lesson-number { border-color: rgba(56,199,175,.5); background: rgba(56,199,175,.1); color: #8de5d5; }
 .lesson-number { display: grid; place-items: center; width: 66px; height: 66px; border: 1px solid rgba(163,113,247,.5); border-radius: 18px; background: rgba(163,113,247,.1); color: #d2baff; font-size: 1.35rem; font-weight: 900; }
 .lesson-card .activity-copy > span { min-height: 0; }
 .lesson-card .card-action { margin: 0; white-space: nowrap; }

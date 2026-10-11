@@ -12,6 +12,7 @@
     kanaSprintKanjiV1: { label: "Kanji", version: 1 },
     kanaSprintGuidedLessonsV1: { label: "Guided lessons", version: 1 },
     kanaSprintGuidedLesson2V1: { label: "Guided Lesson 2", version: 1 },
+    kanaSprintGuidedLesson3V1: { label: "Guided Lesson 3", version: 1 },
     kanaSprintSpeechV1: { label: "Speech & voices", version: 1 }
   };
   const $ = selector => document.querySelector(selector);
@@ -45,7 +46,7 @@
       const introduced = Object.values(value.items || {}).filter(item => item.introduced).length;
       return `${value.total || 0} answers · ${introduced} kanji introduced`;
     }
-    if (key === "kanaSprintGuidedLessonsV1" || key === "kanaSprintGuidedLesson2V1") {
+    if (key === "kanaSprintGuidedLessonsV1" || key === "kanaSprintGuidedLesson2V1" || key === "kanaSprintGuidedLesson3V1") {
       const completed = Object.values(value.activities || {}).filter(item => item.completed).length;
       return `${value.total || 0} answers · ${completed} activities completed`;
     }

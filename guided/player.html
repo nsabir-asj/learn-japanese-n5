@@ -8,9 +8,12 @@
 <link rel="alternate icon" href="../favicon.ico" />
 <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
 <link rel="stylesheet" href="../features/kana/trainer.css?v=20260910-1" />
-<link rel="stylesheet" href="../features/guided/styles.css?v=20260908-3" />
-<script defer src="../shared/progress-sync.js?v=20260903-1"></script>
-<script defer src="../features/guided/loader.js?v=20260908-3"></script>
+<link rel="stylesheet" href="../features/guided/styles.css?v=20261011-5" />
+<script defer src="../shared/progress-sync.js?v=20261011-1"></script>
+<script defer src="../features/kana/vocabulary-speaking.js?v=20261011-5"></script>
+<script defer src="../features/guided/answers.js?v=20261011-5"></script>
+<script defer src="../features/guided/section-practice.js?v=20261011-3"></script>
+<script defer src="../features/guided/loader.js?v=20261011-5"></script>
 </head>
 <body>
   <div class="wrap lesson-wrap">
@@ -59,6 +62,11 @@
         </aside>
 
         <div class="lesson-main-column">
+          <div id="lessonPracticeFocus" class="lesson-practice-focus hidden">
+            <label for="lessonPracticeFocusSelect">Practise</label>
+            <select id="lessonPracticeFocusSelect"></select>
+            <span id="lessonPracticeFocusHint">Review covered material or practise any section to unlock it in Learn.</span>
+          </div>
           <section class="trainer lesson-trainer" id="lessonTrainer" aria-live="polite">
             <div class="trainer-top">
               <div class="mode-tag"><span class="dot"></span><span id="lessonModeLabel">Learn · guided retrieval</span></div>

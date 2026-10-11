@@ -566,6 +566,49 @@
           "text": "Press T during a speaking question to type instead. The typing submit button now shows its Enter shortcut."
         }
       ]
+    },
+    {
+      "id": "2026-10-11.1",
+      "publishedAt": "2026-10-11",
+      "title": "Lesson 3: Make Weekend Plans",
+      "changes": [
+        {
+          "pages": [
+            "guided"
+          ],
+          "text": "Learn all Lesson 3 verb forms, build sentences with meaningful extra choices, and practise routines and invitations through a complete guided journey."
+        },
+        {
+          "pages": [
+            "home"
+          ],
+          "text": "Open the new Lesson 3 guided journey from the home page."
+        },
+        {
+          "pages": [
+            "vocabulary"
+          ],
+          "text": "Lesson links open the matching vocabulary practice directly."
+        },
+        {
+          "pages": [
+            "settings"
+          ],
+          "text": "Include Guided Lesson 3 progress in complete backups and restores."
+        },
+        {
+          "pages": [
+            "guided"
+          ],
+          "text": "Practise any section immediately, or mix all 13 verbs in both forms without verb-group hints. Correct answers stay saved and passing a section opens it in Learn."
+        },
+        {
+          "pages": [
+            "guided"
+          ],
+          "text": "See a live hiragana preview while typing romaji, with a clearer layout on smaller screens."
+        }
+      ]
     }
   ]
 }

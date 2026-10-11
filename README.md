@@ -19,6 +19,7 @@ No installation or web server is needed. Open `index.html` for the activity laun
 - `kana_sprint.html`
 - `guided/player.html?lesson=1`
 - `guided/player.html?lesson=2`
+- `guided/player.html?lesson=3`
 
 The root launcher links directly to each guided lesson. The lesson query selects the curriculum loaded by the reusable guided player.
 
@@ -89,7 +90,11 @@ The number scheduler tracks patterns rather than memorizing individual generated
 
 Lesson 2 follows a visual day-out journey. Its ten stages change viewpoints while teaching `これ／それ／あれ`, attach nouns with `この／その／あの`, build and hear prices, complete a flea-market purchase, locate places, return lost property, distinguish `ね` from `よ`, order lunch, use classroom repair phrases, and finish with linked conversation missions.
 
+Lesson 3, **Make Weekend Plans**, has ten stages. Three verb-workshop stages require affirmative and negative recall for all thirteen Lesson 3 verbs, accepting kana, kanji, or romaji. Sentence building includes incorrect verb forms, opposite-polarity forms, and wrong actions, with targeted feedback. The remaining stages teach objects, destinations and activity places, time, habits, invitations, natural replies, and a final conversation mission. Practice can focus on verb conversion or assess any section, including sections still locked in Learn. Every graded skill needs one correct answer; saved successes allow retrying only missed skills. Passing opens that section and its successor without opening unrelated skipped sections. Mixed reviews remain limited to covered material, and checkpoints sample the main lesson areas. The related vocabulary link opens the existing Lesson 3 word scope directly. Lesson 3 has its own saved progress, cloud-sync record, and complete-backup entry.
+
 Each idea moves from a concise model to retrieval through situational choices, audio-only comprehension, sentence construction, error repair, typed numeric details, and a mixed checkpoint. Expandable examples explain both the full sentence meaning and each meaningful piece. Practice draws from curated concept families across settings such as orientation, clubs, dorms, libraries, and language exchanges; recent families, prompt variants, and scenarios are temporarily excluded. A delayed recovery changes both the example and its setting when another suitable scenario is available. Checkpoints sample distinct concept families for broader transfer. Correct recall expands the next review interval from minutes to days and weeks; a lapse schedules a near-term related example without immediately repeating the same prompt.
+
+The **All verb conversions · mixed** option is available immediately. It shuffles all 26 Lesson 3 verb forms, always requires typed recall, and hides group labels and source-stage titles until feedback. Successful forms are saved separately for this mixed round and also count toward the corresponding verb workshops.
 
 Audio has an explicit assessment role. Listening comprehension and numeric dictation play it as the prompt; sentence construction, grammar, and error repair make pronunciation available only after the learner submits an answer.
 

@@ -19,6 +19,7 @@ const ALLOWED_STORE_KEYS = new Set([
   'kanaSprintKanjiV1',
   'kanaSprintGuidedLessonsV1',
   'kanaSprintGuidedLesson2V1',
+  'kanaSprintGuidedLesson3V1',
   'kanaSprintSpeechV1',
 ]);
 

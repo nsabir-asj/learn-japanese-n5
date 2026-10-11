@@ -764,6 +764,9 @@
   }
 
   let state = loadState();
+  // Lesson links select the matching existing scope before the first question.
+  const linkedScope = new URLSearchParams(location.search).get("scope");
+  if (/^lesson[1-6]$/.test(linkedScope || "")) state.practiceScope = linkedScope;
   if (state.questionFormat === "both") state.questionFormat = "mixed";
   if (!["written", "spoken", "recall", "speaking", "written-both", "audio-both", "mixed"].includes(state.questionFormat)) state.questionFormat = "mixed";
   if (state.practiceScope === "core") state.practiceScope = "genki";

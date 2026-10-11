@@ -25,7 +25,7 @@
   };
   const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
-  const normalize = value => String(value ?? "").toLowerCase().trim().replace(/[\s。、・,.!?！？:：'’_-]+/g, "").replace(/ō/g, "ou");
+  const normalize = GUIDED_ANSWERS.normalize;
   const {
     commonMistakeGuidance: COMMON_MISTAKE_GUIDANCE,
     choiceGlosses: CHOICE_GLOSSES = {},
@@ -43,6 +43,17 @@
     $("#lessonHeadline").textContent = LESSON.headline;
     $("#lessonSubtitle").textContent = LESSON.subtitle;
     $("#lessonJourneyTitle").textContent = LESSON.journeyTitle;
+    document.body.classList.toggle("lesson-verb-journey", Boolean(LESSON.practiceFocuses));
+    if (LESSON.practiceFocuses) {
+      const select = $("#lessonPracticeFocusSelect");
+      renderPracticeOptions();
+      select.addEventListener("change", () => {
+        practiceFocus = select.value;
+        practiceRecoveryQueue = [];
+        startPracticeSession();
+      });
+    }
+    if (LESSON.profile === false) $("#lessonProfileForm").closest(".card").classList.add("hidden");
     const foundation = $("#lessonFoundation");
     if (!LESSON.foundation) {
       foundation?.classList.add("hidden");
@@ -61,7 +72,7 @@
   function defaultState() {
     return {
       version: VERSION, unlockedStage: 0, currentStage: 0, total: 0, correct: 0, streak: 0, bestStreak: 0,
-      activities: {}, recent: [], recentFamilies: [], recentScenarios: [], variantHistory: {}, viewedGuides: [], profile: { name: "", home: "", role: "", field: "", year: "", age: "" }, savedAt: 0
+      activities: {}, sectionPractice: {}, recent: [], recentFamilies: [], recentScenarios: [], variantHistory: {}, viewedGuides: [], profile: { name: "", home: "", role: "", field: "", year: "", age: "" }, savedAt: 0
     };
   }
 
@@ -80,7 +91,8 @@
   state.unlockedStage = clamp(Number(state.unlockedStage) || 0, 0, STAGES.length - 1);
   const savedUnlockedStage = state.unlockedStage;
   reconcileUnlockedStages();
-  state.currentStage = clamp(Number(state.currentStage) || 0, 0, state.unlockedStage);
+  state.currentStage = clamp(Number(state.currentStage) || 0, 0, STAGES.length - 1);
+  if (!isStageUnlocked(state.currentStage)) state.currentStage = 0;
   if (state.unlockedStage !== savedUnlockedStage) {
     state.savedAt = Date.now();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -105,6 +117,10 @@
   let practiceResults = [];
   let practiceSessionComplete = false;
   let speechVoices = [];
+  let submittedAnswer = "";
+  let practiceFocus = "all";
+  let sectionPhase = "intro";
+  let sectionQueue = [];
   let emptyNextMode = null;
 
   function activityState(activity) {
@@ -123,7 +139,40 @@
   }
 
   function stageComplete(stageIndex) {
-    return STAGES[stageIndex].activities.every(activity => activityState(activity).completed);
+    return GUIDED_SECTIONS.passed(state, STAGES[stageIndex]) || STAGES[stageIndex].activities.every(activity => activityState(activity).completed);
+  }
+
+  function isStageUnlocked(index) {
+    return GUIDED_SECTIONS.canOpen(state, STAGES, index);
+  }
+
+  function practiceSectionIndex() {
+    const match = LESSON.practiceSections && /^section-(\d+)$/.exec(practiceFocus);
+    const index = match ? Number(match[1]) : -1;
+    return index >= 0 && index < STAGES.length ? index : -1;
+  }
+
+  function isSectionPractice() {
+    return mode === "practice" && Boolean(practiceSection());
+  }
+
+  function practiceSection() {
+    return practiceFocus === "mixed-verbs" ? LESSON.mixedVerbPractice : STAGES[practiceSectionIndex()];
+  }
+
+  function isMixedVerbPractice() {
+    return isSectionPractice() && practiceFocus === "mixed-verbs";
+  }
+
+  function renderPracticeOptions() {
+    if (!LESSON.practiceFocuses) return;
+    const select = $("#lessonPracticeFocusSelect");
+    const reviews = LESSON.practiceFocuses.map(focus => `<option value="${escapeHtml(focus.id)}">${escapeHtml(focus.label)}</option>`).join("");
+    const sections = STAGES.map((stage, index) => `<option value="section-${index}">${index + 1}. ${escapeHtml(stage.title)}${GUIDED_SECTIONS.passed(state, stage) ? " · Passed" : !isStageUnlocked(index) ? " · New" : ""}</option>`).join("");
+    const mixed = LESSON.mixedVerbPractice ? `<optgroup label="Practice all verb types"><option value="mixed-verbs">${escapeHtml(LESSON.mixedVerbPractice.title)}</option></optgroup>` : "";
+    select.innerHTML = LESSON.practiceSections ? `${mixed}<optgroup label="Review covered material">${reviews}</optgroup><optgroup label="Practice any section">${sections}</optgroup>` : reviews;
+    select.value = practiceFocus;
+    $("#lessonPracticeFocusHint").textContent = LESSON.practiceSections ? "Review covered material or practise any section to unlock it in Learn." : "Six questions using material you have covered.";
   }
 
   function retentionState(activity) {
@@ -174,9 +223,9 @@
       const complete = stageComplete(index);
       const retention = stageRetention(stage);
       const secure = complete && retention.secure === retention.total;
-      const locked = index > state.unlockedStage;
+      const locked = !isStageUnlocked(index);
       const current = index === state.currentStage && mode === "learn";
-      const status = locked ? "Locked" : secure ? "Secure" : complete ? `Covered · ${retention.secure}/${retention.total} secure` : current ? "Now" : "Open";
+      const status = locked ? "Locked" : secure ? "Secure" : GUIDED_SECTIONS.passed(state, stage) ? "Passed in Practice" : complete ? `Covered · ${retention.secure}/${retention.total} secure` : current ? "Now" : "Open";
       return `<button class="lesson-roadmap-step ${complete ? "covered" : ""} ${secure ? "secure" : ""} ${current ? "active" : ""}" data-stage="${index}" type="button" ${locked ? "disabled" : ""}><span class="lesson-roadmap-number">${complete ? "✓" : index + 1}</span><span class="lesson-roadmap-copy"><strong>${stage.title}</strong><span>${stage.short}</span></span><span class="lesson-roadmap-status">${status}</span></button>`;
     }).join("");
     $("#lessonRoadmap").querySelectorAll("[data-stage]").forEach(button => button.addEventListener("click", () => {
@@ -189,6 +238,7 @@
   }
 
   function clearControls() {
+    submittedAnswer = "";
     ["#lessonDontKnow", "#lessonClear", "#lessonSubmit", "#lessonNext"].forEach(selector => $(selector).classList.add("hidden"));
     $("#lessonTrainer").classList.remove("awaiting-answer", "summary-state");
     $("#lessonFeedback").className = "feedback lesson-feedback";
@@ -204,7 +254,7 @@
     currentActivity = activity;
     currentIsRecovery = Boolean(activity.recoveryOf);
     clearControls();
-    $("#lessonNext").innerHTML = `${mode === "practice" ? "Next review" : mode === "checkpoint" ? "Next question" : "Continue"} <kbd>Enter</kbd>`;
+    $("#lessonNext").innerHTML = `${isSectionPractice() || mode === "checkpoint" ? "Next question" : mode === "practice" ? "Next review" : "Continue"} <kbd>Enter</kbd>`;
     const progress = activityState(activity);
     const stage = STAGES[activity.stageIndex];
     const stageCompleted = stage.activities.filter(item => activityState(item).completed).length;
@@ -213,13 +263,15 @@
       : mode === "checkpoint" && checkpointQueue.length
         ? checkpointIndex / checkpointQueue.length * 100
         : mode === "practice"
-          ? practiceIndex / PRACTICE_SESSION_LENGTH * 100
+          ? practiceIndex / (isSectionPractice() ? sectionQueue.length : PRACTICE_SESSION_LENGTH) * 100
           : stageCompleted / stage.activities.length * 100;
     $("#lessonStageProgress").style.width = `${stageProgress}%`;
     const previousAttempts = `${progress.seen} previous ${progress.seen === 1 ? "attempt" : "attempts"}`;
-    $("#lessonQuestionCount").textContent = currentIsRecovery ? "Delayed memory check" : mode === "checkpoint" ? `Question ${checkpointIndex + 1} of ${checkpointQueue.length}` : mode === "practice" ? `Review ${practiceIndex + 1} of ${PRACTICE_SESSION_LENGTH} · ${previousAttempts}` : `Activity ${activity.activityIndex + 1} of ${stage.activities.length}`;
-    $("#lessonSessionTitle").textContent = stage.outcome;
-    $("#lessonSessionCopy").textContent = activity.explanation || activity.instruction || "Retrieve the idea in a new form before moving on.";
+    $("#lessonQuestionCount").textContent = currentIsRecovery ? "Delayed memory check" : mode === "checkpoint" ? `Question ${checkpointIndex + 1} of ${checkpointQueue.length}` : isSectionPractice() ? `Section question ${practiceIndex + 1} of ${sectionQueue.length}` : mode === "practice" ? `Review ${practiceIndex + 1} of ${PRACTICE_SESSION_LENGTH} · ${previousAttempts}` : `Activity ${activity.activityIndex + 1} of ${stage.activities.length}`;
+    $("#lessonSessionTitle").textContent = activity.hideStageOrigin ? "Recall the form without a verb-group hint" : stage.outcome;
+    $("#lessonSessionCopy").textContent = LESSON.hideAnswerHints && activity.type !== "teach"
+      ? "Recall the answer before checking. Feedback will explain the verb form, meaning, and particles after your attempt."
+      : activity.explanation || activity.instruction || "Retrieve the idea in a new form before moving on.";
     if (activity.type === "teach") renderTeach(activity);
     if (activity.type === "choice") renderChoice(activity);
     if (activity.type === "repair") renderRepair(activity);
@@ -232,7 +284,7 @@
 
   function activityHeading(activity) {
     const stage = STAGES[activity.stageIndex];
-    const origin = (mode !== "learn" || currentIsRecovery) && stage ? `<span class="lesson-activity-origin">Stage ${activity.stageIndex + 1} of ${STAGES.length} · ${escapeHtml(stage.title)} · ${escapeHtml(activity.skill)}</span>` : "";
+    const origin = !activity.hideStageOrigin && (mode !== "learn" || currentIsRecovery) && stage ? `<span class="lesson-activity-origin">Stage ${activity.stageIndex + 1} of ${STAGES.length} · ${escapeHtml(stage.title)} · ${escapeHtml(activity.skill)}</span>` : "";
     return `<div class="lesson-activity-heading"><span class="lesson-activity-kicker">${activity.kicker}</span>${origin}<h2>${activity.title}</h2>${activity.instruction ? `<p>${activity.instruction}</p>` : ""}</div>`;
   }
 
@@ -385,11 +437,23 @@
   }
 
   function renderInput(activity) {
-    $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + `<input class="lesson-answer-input" id="lessonAnswerInput" inputmode="${activity.inputMode || "text"}" autocomplete="off" spellcheck="false" placeholder="${escapeHtml(activity.placeholder || "Type your answer")}" />`;
+    const showKanaPreview = (activity.answers || []).some(answer => /[\u3041-\u3096\u4e00-\u9fff]/.test(answer));
+    const previewMarkup = showKanaPreview ? `<div class="lesson-kana-preview" id="lessonKanaPreview" hidden aria-live="off"><span>Hiragana preview</span><output id="lessonKanaPreviewText" for="lessonAnswerInput" lang="ja" aria-live="off"></output></div>` : "";
+    $("#lessonActivity").innerHTML = activityHeading(activity) + promptMarkup(activity) + `<input class="lesson-answer-input" id="lessonAnswerInput" aria-label="${escapeHtml(activity.inputLabel || "Your answer")}" ${showKanaPreview ? 'aria-describedby="lessonKanaPreview"' : ""} inputmode="${activity.inputMode || "text"}" autocomplete="off" spellcheck="false" placeholder="${escapeHtml(activity.placeholder || "Type your answer")}" />` + previewMarkup;
+    if (showKanaPreview) {
+      const input = $("#lessonAnswerInput");
+      const updatePreview = () => {
+        const kana = GUIDED_ANSWERS.hiraganaPreview(input.value);
+        $("#lessonKanaPreviewText").textContent = kana;
+        $("#lessonKanaPreview").hidden = !kana;
+      };
+      input.addEventListener("input", event => { if (!event.isComposing) updatePreview(); });
+      input.addEventListener("compositionend", updatePreview);
+    }
     bindPromptAudio(activity);
     $("#lessonSubmit").classList.remove("hidden");
     $("#lessonDontKnow").classList.remove("hidden");
-    $("#lessonKeyboardHint").textContent = "Type what you heard. Press Enter to check.";
+    $("#lessonKeyboardHint").textContent = activity.inputHint || (hasPromptAudio(activity) ? "Type what you heard. Press Enter to check." : "Recall the answer, then type it. Press Enter to check.");
     setTimeout(() => $("#lessonAnswerInput")?.focus(), 0);
   }
 
@@ -416,7 +480,7 @@
 
   function mistakeExplanation(selectedChoice, revealed) {
     if (revealed) return "You revealed the answer. Read the contrast once; the concept will return after other material.";
-    if (selectedChoice === null || selectedChoice === undefined) return "Your response did not match the model. Compare the order and meaning with the answer below.";
+    if (selectedChoice === null || selectedChoice === undefined) return GUIDED_ANSWERS.diagnose(currentActivity, submittedAnswer, tileSelection.map(token => token.text));
     const selected = selectedAnswerText(selectedChoice);
     const targeted = currentActivity.mistakes?.[selectedChoice];
     return targeted || COMMON_MISTAKE_GUIDANCE[selected] || `You chose “${selected}”. Compare its meaning or conversational job with the correct answer below.`;
@@ -445,7 +509,7 @@
     progress.seen++;
     progress.lastSeen = Date.now();
     progress.lastWasCorrect = correct;
-    progress.completed = true;
+    if (!isSectionPractice()) progress.completed = true;
     state.total++;
     if (correct) {
       progress.correct++;
@@ -478,6 +542,17 @@
       state.recentScenarios.push(activity.scenarioKey);
       if (state.recentScenarios.length > 10) state.recentScenarios.shift();
     }
+    if (isSectionPractice()) {
+      const stage = practiceSection();
+      if (GUIDED_SECTIONS.record(state, stage, activity.id, correct)) {
+        stage.activities.forEach(item => { activityState(item).completed = true; });
+        renderPracticeOptions();
+      }
+      if (isMixedVerbPractice()) {
+        const sourceStage = STAGES[activity.stageIndex];
+        if (GUIDED_SECTIONS.record(state, sourceStage, activity.id, correct)) sourceStage.activities.forEach(item => { activityState(item).completed = true; });
+      }
+    }
     saveState();
   }
 
@@ -487,6 +562,7 @@
   }
 
   function scheduleDelayedRecovery(activity) {
+    if (isSectionPractice()) return;
     if (mode === "checkpoint") return;
     const source = sourceActivityFor(activity);
     if (mode === "learn") {
@@ -524,6 +600,7 @@
     $("#lessonNext").classList.remove("hidden");
     if (correct && currentIsRecovery) $("#lessonKeyboardHint").textContent = "Recovered after other material. That is stronger evidence than an immediate repeat.";
     else if (!correct && mode === "checkpoint") $("#lessonKeyboardHint").textContent = "The checkpoint keeps your first attempt and sends this idea to later Practice.";
+    else if (!correct && isSectionPractice()) $("#lessonKeyboardHint").textContent = "Finish this round, then retry the missed skills. Correct answers stay saved.";
     else if (!correct) $("#lessonKeyboardHint").textContent = "Continue now. This concept will return after other material in a changed example.";
     if (mode === "checkpoint" && scoredCorrect) checkpointCorrect++;
     if (currentActivity.audioText && correct) speakJapanese(currentActivity.audioText);
@@ -533,12 +610,11 @@
     if (!currentActivity || currentAnswered) return;
     if (currentActivity.type === "tiles") {
       if (!tileBankRevealed) return;
-      const actual = normalize(tileSelection.map(token => token.text).join(""));
-      const expected = normalize(currentActivity.answer.join(""));
-      gradeAnswer(actual === expected);
+      submittedAnswer = tileSelection.map(token => token.text).join("");
+      gradeAnswer(GUIDED_ANSWERS.matches(currentActivity, submittedAnswer));
     } else if (currentActivity.type === "input") {
-      const value = normalize($("#lessonAnswerInput").value);
-      gradeAnswer(currentActivity.answers.some(answer => normalize(answer) === value));
+      submittedAnswer = $("#lessonAnswerInput").value;
+      gradeAnswer(GUIDED_ANSWERS.matches(currentActivity, submittedAnswer));
     }
   }
 
@@ -582,7 +658,7 @@
       const personalized = text.replace("［your name］", `［${state.profile.name || "your name"}］`);
       return `<div class="lesson-stage-turn"><span>${escapeHtml(speaker)}</span><strong>${escapeHtml(personalized)}</strong></div>`;
     }).join("") || "";
-    const milestone = wrapup?.coreMilestone ? `<div class="lesson-core-milestone"><strong>Core conversation ready</strong><span>You can now greet, introduce yourself, ask a personal question, and acknowledge the answer. The remaining stages expand your range.</span></div>` : "";
+    const milestone = wrapup?.coreMilestone ? `<div class="lesson-core-milestone"><strong>${escapeHtml(wrapup.milestoneTitle || "Core conversation ready")}</strong><span>${escapeHtml(wrapup.milestoneCopy || "You can now greet, introduce yourself, ask a personal question, and acknowledge the answer. The remaining stages expand your range.")}</span></div>` : "";
     const challenge = wrapup ? `<div class="lesson-stage-challenge"><span>Conversation check</span><p>${escapeHtml(wrapup.challenge)}</p><small>Think it or say it aloud before revealing the model. This reflection is not scored.</small><button class="ghost" type="button" data-reveal-stage-model>Reveal model</button><div class="lesson-stage-model" hidden>${modelTurns}</div></div>` : "";
     $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><div class="lesson-stage-summary-icon">✓</div><span class="lesson-activity-kicker">Stage covered</span><h2>${stage.title}</h2><p>${stage.outcome} Coverage opens the next stage; durable recall continues through Practice.</p>${milestone}<div class="lesson-stage-summary-stats"><div class="mini"><strong>${average}%</strong><span class="tiny">current mastery</span></div><div class="mini"><strong>${attempts ? Math.round(correct / attempts * 100) : 0}%</strong><span class="tiny">first-pass accuracy</span></div><div class="mini"><strong>${retention.secure}/${retention.total}</strong><span class="tiny">secure after delay</span></div></div>${challenge}</div>`;
     $("#lessonActivity").querySelector("[data-reveal-stage-model]")?.addEventListener("click", event => {
@@ -593,7 +669,7 @@
     });
     $("#lessonNext").textContent = stageIndex < STAGES.length - 1 ? "Open next stage" : "View lesson progress";
     $("#lessonNext").classList.remove("hidden");
-    $("#lessonSessionTitle").textContent = wrapup?.coreMilestone ? "Your core conversation is ready" : "Turn this stage into conversation";
+    $("#lessonSessionTitle").textContent = wrapup?.milestoneTitle || (wrapup?.coreMilestone ? "Your core conversation is ready" : "Turn this stage into conversation");
     $("#lessonSessionCopy").textContent = "Produce the conversation check before revealing its model. Practice will return weak ideas in new combinations after a delay.";
     $("#lessonKeyboardHint").textContent = "Coverage opens the next conversational job; secure status requires successful delayed recall.";
   }
@@ -607,7 +683,6 @@
     }
     if (stageCursor >= stage.activities.length) {
       if (state.currentStage < STAGES.length - 1) {
-        state.unlockedStage = Math.max(state.unlockedStage, state.currentStage + 1);
         state.currentStage++;
         replayingStage = false;
         stageCursor = firstIncompleteIndex(state.currentStage);
@@ -636,11 +711,11 @@
     return PRACTICE_FAMILY_BY_ID[activity.id] || activity.id;
   }
 
-  function buildPracticeVariant(activity, sourceMode = "practice", excludedVariantKey = "", excludedScenarioKey = "") {
+  function buildPracticeVariant(activity, sourceMode = "practice", excludedVariantKey = "", excludedScenarioKey = "", requiredType = "") {
     const family = practiceFamily(activity);
     const familyVariants = PRACTICE_FAMILIES[family] || [];
     const allowedKeys = PRACTICE_VARIANT_KEYS_BY_ID[activity.id];
-    const variants = allowedKeys ? familyVariants.filter(variant => allowedKeys.includes(variant.key)) : familyVariants;
+    const variants = familyVariants.filter(variant => (!allowedKeys || allowedKeys.includes(variant.key)) && (!requiredType || variant.type === requiredType));
     if (!variants.length) return activity;
     const recentVariants = new Set((state.variantHistory[family] || []).slice(-3));
     const recentScenarios = new Set(state.recentScenarios.slice(-5));
@@ -672,7 +747,8 @@
   }
 
   function selectPracticeActivity() {
-    const pool = completedGraded();
+    const focus = LESSON.practiceFocuses?.find(item => item.id === practiceFocus);
+    const pool = completedGraded().filter(activity => !focus?.skill || activity.skill === focus.skill);
     if (!pool.length) return null;
     const recent = new Set(state.recent.slice(-4));
     const recentFamilies = new Set(state.recentFamilies.slice(-3));
@@ -698,7 +774,7 @@
     }
     const activity = selectPracticeActivity();
     if (!activity) {
-      renderEmptyMode("Practice opens after your first retrieval activity", "Start the Learn journey so the app has something meaningful to adapt.", "Start learning");
+      renderEmptyMode("Build your practice pool", LESSON.practiceSections ? "Choose any section above to practise immediately, even if it is locked in Learn. Mixed review becomes available as you cover material." : "Start the Learn journey so the app has something meaningful to adapt.", "Start learning");
       return;
     }
     renderActivity(buildPracticeVariant(activity));
@@ -708,11 +784,21 @@
     practiceIndex = 0;
     practiceResults = [];
     practiceSessionComplete = false;
+    $("#lessonModeLabel").textContent = isMixedVerbPractice() ? "Practice · mixed verbs" : isSectionPractice() ? "Practice · section skills" : "Practice · adaptive review";
+    if (isSectionPractice()) {
+      sectionPhase = "intro";
+      renderSectionIntro();
+      return;
+    }
     practiceRecoveryQueue.forEach(entry => { entry.dueIndex = Math.min(entry.dueIndex, 2); });
     renderPractice();
   }
 
   function advancePractice() {
+    if (isSectionPractice()) {
+      advanceSectionPractice();
+      return;
+    }
     if (practiceSessionComplete) {
       startPracticeSession();
       return;
@@ -723,6 +809,90 @@
       return;
     }
     renderPractice();
+  }
+
+  function renderSectionIntro() {
+    emptyNextMode = null;
+    clearControls();
+    currentActivity = null;
+    currentIsRecovery = false;
+    $("#lessonTrainer").classList.add("summary-state");
+    const index = practiceSectionIndex();
+    const stage = practiceSection();
+    const total = GUIDED_SECTIONS.graded(stage).length;
+    const remaining = GUIDED_SECTIONS.remaining(state, stage).length;
+    const passed = GUIDED_SECTIONS.passed(state, stage);
+    const guides = stage.activities.filter(activity => activity.type === "teach");
+    const guideMarkup = guides.length ? `<details class="lesson-section-guide"><summary>Review the section guide</summary>${guides.map(activity => `<div class="lesson-section-guide-item"><h3>${escapeHtml(activity.title)}</h3>${activity.body}</div>`).join("")}</details>` : "";
+    $("#lessonStageProgress").style.width = `${(total - remaining) / total * 100}%`;
+    $("#lessonQuestionCount").textContent = isMixedVerbPractice() ? "13 verbs · affirmative and negative" : `Section ${index + 1} of ${STAGES.length}`;
+    $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><span class="lesson-activity-kicker">Practice any section</span><h2>${escapeHtml(stage.title)}</h2><p>${escapeHtml(stage.outcome)}</p><div class="lesson-core-milestone"><strong>${passed ? "Already passed in Practice" : `${total - remaining} of ${total} skills passed`}</strong><span>${passed ? "Practise the full section again, or open its guide in Learn at any time." : "Answer every skill correctly to complete this section and open it in Learn. Correct answers are saved; missed skills can be retried after the round."}</span></div>${guideMarkup}</div>`;
+    $("#lessonNext").textContent = `Start ${passed ? total : remaining}-question ${isMixedVerbPractice() ? "mixed round" : "section"}`;
+    $("#lessonNext").classList.remove("hidden");
+    $("#lessonSessionTitle").textContent = "A second route through the lesson";
+    $("#lessonSessionCopy").textContent = isMixedVerbPractice() ? "All verb types and both endings are mixed together. No group labels or answer choices appear before you answer. Correct forms also count toward the verb sections in Learn." : "You can practise this section before reaching it in Learn. Passing opens this section and the next one; other skipped sections stay locked.";
+    $("#lessonKeyboardHint").textContent = isMixedVerbPractice() ? "Identify the verb type yourself, then type the whole polite form." : "Review the guide if needed, then try without looking at it.";
+  }
+
+  function startSectionRound() {
+    sectionPhase = "questions";
+    practiceIndex = 0;
+    practiceResults = [];
+    const stage = practiceSection();
+    const remaining = new Set(GUIDED_SECTIONS.remaining(state, stage).map(activity => activity.id));
+    const eligible = new Set(stage.activities.map(activity => activity.id));
+    sectionQueue = GRADED_ACTIVITIES.filter(activity => eligible.has(activity.id) && (!remaining.size || remaining.has(activity.id)))
+      .map(activity => activityState(activity).seen ? buildPracticeVariant(activity, "practice", "", "", activity.skill === "Conjugation" && activity.type === "input" ? "input" : "") : { ...activity, kicker: "Practice · section skills" });
+    if (isMixedVerbPractice()) {
+      sectionQueue = shuffle(sectionQueue).map(activity => {
+        const mixed = stage.activities.find(item => item.id === activity.id);
+        return { ...activity, context: mixed.context, kicker: mixed.kicker, hideStageOrigin: true };
+      });
+    }
+    renderActivity(sectionQueue[0]);
+  }
+
+  function advanceSectionPractice() {
+    if (sectionPhase === "intro") {
+      startSectionRound();
+      return;
+    }
+    if (sectionPhase === "summary") {
+      const index = practiceSectionIndex();
+      if (GUIDED_SECTIONS.passed(state, practiceSection())) {
+        state.currentStage = isMixedVerbPractice() ? 0 : index;
+        stageCursor = 0;
+        replayingStage = true;
+        saveState();
+        setMode("learn");
+      } else startSectionRound();
+      return;
+    }
+    practiceIndex++;
+    if (practiceIndex >= sectionQueue.length) renderSectionSummary();
+    else renderActivity(sectionQueue[practiceIndex]);
+  }
+
+  function renderSectionSummary() {
+    clearControls();
+    currentActivity = null;
+    sectionPhase = "summary";
+    $("#lessonTrainer").classList.add("summary-state");
+    const index = practiceSectionIndex();
+    const stage = practiceSection();
+    const total = GUIDED_SECTIONS.graded(stage).length;
+    const remaining = GUIDED_SECTIONS.remaining(state, stage).length;
+    const passed = GUIDED_SECTIONS.passed(state, stage);
+    $("#lessonStageProgress").style.width = `${(total - remaining) / total * 100}%`;
+    $("#lessonQuestionCount").textContent = passed ? "Section passed" : "Section round complete";
+    $("#lessonActivity").innerHTML = `<div class="lesson-stage-summary"><div class="lesson-stage-summary-icon">${passed ? "✓" : "↻"}</div><span class="lesson-activity-kicker">${total - remaining} of ${total} skills passed</span><h2>${passed ? "Unlocked in Learn" : "Keep your correct answers"}</h2><p><strong>${escapeHtml(stage.title)}</strong></p><p>${passed ? `You demonstrated every skill in this section. It${index < STAGES.length - 1 ? " and the next section are" : " is"} now open in Learn. Return to its guide whenever you want, and use mixed review for lasting recall.` : `${remaining} ${remaining === 1 ? "skill needs" : "skills need"} another correct answer. Retry just those skills; your other correct answers stay saved, even if you leave now.`}</p></div>`;
+    if (passed && isMixedVerbPractice()) $("#lessonActivity").querySelector("p:last-child").textContent = "You recalled every verb in both forms without group hints. The verb sections are open in Learn. Return to their guides whenever you want, and use mixed review for lasting recall.";
+    $("#lessonNext").textContent = passed ? isMixedVerbPractice() ? "Open verb sections in Learn" : "Open this section in Learn" : `Retry ${remaining} missed ${remaining === 1 ? "skill" : "skills"}`;
+    $("#lessonNext").classList.remove("hidden");
+    $("#lessonSessionTitle").textContent = passed ? "Section completed through practice" : "A useful stopping point";
+    $("#lessonSessionCopy").textContent = passed ? "Passing opens the section. Secure status still grows through successful recall after a delay." : "Stop here or retry the remaining skills. Choosing this section later resumes your saved progress.";
+    $("#lessonKeyboardHint").textContent = passed ? "Your Learn journey and practice progress are saved together." : "A revealed answer does not count as a passed skill.";
+    renderPracticeOptions();
   }
 
   function renderPracticeSummary() {
@@ -757,7 +927,7 @@
     }
     const representatives = new Map();
     shuffle(pool).forEach(activity => {
-      const family = practiceFamily(activity);
+      const family = LESSON.checkpointGroups ? activity.checkpointGroup || practiceFamily(activity) : practiceFamily(activity);
       if (!representatives.has(family)) representatives.set(family, activity);
     });
     checkpointQueue = shuffle([...representatives.values()]).slice(0, Math.min(10, representatives.size)).map(activity => buildPracticeVariant(activity, "checkpoint"));
@@ -785,6 +955,10 @@
       const results = checkpointResults.filter(result => result.skill === skill);
       const correct = results.filter(result => result.correct).length;
       const labels = {
+        Conjugation: "Convert dictionary verbs into affirmative and negative forms",
+        Particles: "Choose objects, activity places, and destinations",
+        Time: "Add exact and relative times",
+        Habits: "Describe habits and future plans",
         Conversation: "Choose natural conversational responses",
         Grammar: "Build the key sentence patterns",
         Listening: "Understand spoken Japanese details",
@@ -822,6 +996,7 @@
 
   function setMode(nextMode) {
     mode = nextMode;
+    $("#lessonPracticeFocus").classList.toggle("hidden", mode !== "practice" || !LESSON.practiceFocuses);
     $("#lessonProgressPanel").classList.toggle("hidden", mode !== "progress");
     $("#lessonWorkspace").classList.toggle("hidden", mode === "progress");
     $("#lessonWorkspace").classList.toggle("lesson-focused-workspace", mode === "practice" || mode === "checkpoint");
@@ -856,7 +1031,7 @@
   }
 
   function skillScores() {
-    const skills = ["Conversation", "Grammar", "Listening", "Production", "Vocabulary", "Details"];
+    const skills = [...new Set(GRADED_ACTIVITIES.map(activity => activity.skill))];
     return skills.map(skill => {
       const activities = GRADED_ACTIVITIES.filter(activity => activity.skill === skill && activityState(activity).completed);
       return { skill, score: Math.round(masteryAverage(activities)), count: activities.length };
@@ -986,6 +1161,7 @@
   $("#lessonProfileForm").addEventListener("submit", saveProfile);
   $("#lessonTestSpeech").addEventListener("click", () => speakJapanese("はじめまして。よろしくおねがいします。"));
   document.addEventListener("keydown", event => {
+    if (event.isComposing || event.keyCode === 229 || event.ctrlKey || event.altKey || event.metaKey) return;
     if (mode === "progress") return;
     if (/^[1-4]$/.test(event.key) && ["choice", "repair"].includes(currentActivity?.type) && !currentAnswered) {
       const button = $("#lessonActivity").querySelector(`[data-key="${event.key}"]`);
