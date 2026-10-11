@@ -486,6 +486,14 @@
     return targeted || COMMON_MISTAKE_GUIDANCE[selected] || `You chose “${selected}”. Compare its meaning or conversational job with the correct answer below.`;
   }
 
+  function highlightedExampleSentence(activity) {
+    const sentence = String(activity.example?.[0] || "");
+    const form = String(activity.exampleForm || "");
+    const start = sentence.indexOf(form);
+    if (!form || start < 0) return escapeHtml(sentence);
+    return `${escapeHtml(sentence.slice(0, start))}<mark>${escapeHtml(form)}</mark>${escapeHtml(sentence.slice(start + form.length))}`;
+  }
+
   function showFeedback(correct, selectedChoice = null, corrected = false, revealed = false) {
     const feedback = $("#lessonFeedback");
     feedback.className = `feedback lesson-feedback show ${correct ? "good" : "bad"}`;
@@ -499,8 +507,11 @@
     const correction = contrastMarkup ? "" : `<span class="lesson-correction">${escapeHtml(currentActivity.correction || "Review the model")}</span>`;
     const explanationLabel = contrastMarkup ? "<b>Key difference:</b> " : "";
     const heading = corrected ? "Recovered after a delay" : correct ? "Correct" : "Build this memory";
-    feedback.innerHTML = `<strong>${heading}</strong><div class="meta">${contrastMarkup}${diagnosis}${correction}${breakdownMarkup}<span class="lesson-feedback-explanation">${explanationLabel}${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span>${answerAudio}</div>`;
+    const formLabel = currentActivity.form === "negative" ? "a negative" : "an affirmative";
+    const verbExample = currentActivity.example ? `<details class="lesson-verb-example"><summary>See ${escapeHtml(currentActivity.verbDictionary || "this verb")} in ${formLabel} sentence<span aria-hidden="true">›</span></summary><div class="lesson-verb-example-body"><p lang="ja">${highlightedExampleSentence(currentActivity)}</p><span>${escapeHtml(currentActivity.example[1])}</span><button class="ghost" type="button" data-verb-example-audio>🔊 Hear sentence</button></div></details>` : "";
+    feedback.innerHTML = `<strong>${heading}</strong><div class="meta">${contrastMarkup}${diagnosis}${correction}${breakdownMarkup}<span class="lesson-feedback-explanation">${explanationLabel}${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span>${answerAudio}${verbExample}</div>`;
     feedback.querySelector("[data-answer-audio]")?.addEventListener("click", () => speakJapanese(currentActivity.audioText));
+    feedback.querySelector("[data-verb-example-audio]")?.addEventListener("click", () => speakJapanese(currentActivity.example[0]));
     refreshActivityAudioControls();
   }
 

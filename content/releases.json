@@ -609,6 +609,19 @@
           "text": "See a live hiragana preview while typing romaji, with a clearer layout on smaller screens."
         }
       ]
+    },
+    {
+      "id": "2026-10-11.2",
+      "publishedAt": "2026-10-11",
+      "title": "See verbs in context",
+      "changes": [
+        {
+          "pages": [
+            "guided"
+          ],
+          "text": "After answering a verb question, open a collapsible Japanese example sentence with its English meaning and optional audio."
+        }
+      ]
     }
   ]
 }

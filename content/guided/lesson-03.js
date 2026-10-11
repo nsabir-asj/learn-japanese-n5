@@ -17,6 +17,21 @@
     { id: "benkyousuru", group: "irregular", dictionary: "べんきょうする", meaning: "study", affirmative: "べんきょうします", negative: "べんきょうしません", stem: "べんきょうし", wrongStem: "べんきょうすり", kanjiStem: "勉強し", romajiStem: "benkyoushi" },
     { id: "kuru", group: "irregular", dictionary: "くる", meaning: "come", affirmative: "きます", negative: "きません", stem: "き", wrongStem: "くり", kanjiStem: "来", romajiStem: "ki" }
   ];
+  const VERB_EXAMPLES = {
+    taberu: { affirmative: ["わたしは あさごはんを たべます。", "I eat breakfast."], negative: ["わたしは あさごはんを たべません。", "I do not eat breakfast."] },
+    miru: { affirmative: ["わたしは にちようびに えいがを みます。", "I watch a movie on Sunday."], negative: ["わたしは にちようびに えいがを みません。", "I do not watch a movie on Sunday."] },
+    okiru: { affirmative: ["わたしは まいあさ ろくじに おきます。", "I get up at six every morning."], negative: ["わたしは まいあさ ろくじに おきません。", "I do not get up at six every morning."] },
+    neru: { affirmative: ["わたしは まいばん じゅういちじに ねます。", "I go to bed at eleven every night."], negative: ["わたしは まいばん じゅういちじに ねません。", "I do not go to bed at eleven every night."] },
+    iku: { affirmative: ["わたしは にちようびに こうえんへ いきます。", "I go to the park on Sunday."], negative: ["わたしは にちようびに こうえんへ いきません。", "I do not go to the park on Sunday."] },
+    kaeru: { affirmative: ["わたしは よる うちに かえります。", "I return home in the evening."], negative: ["わたしは よる うちに かえりません。", "I do not return home in the evening."] },
+    kiku: { affirmative: ["わたしは まいにち おんがくを ききます。", "I listen to music every day."], negative: ["わたしは まいにち おんがくを ききません。", "I do not listen to music every day."] },
+    nomu: { affirmative: ["わたしは ともだちと コーヒーを のみます。", "I drink coffee with a friend."], negative: ["わたしは ともだちと コーヒーを のみません。", "I do not drink coffee with a friend."] },
+    hanasu: { affirmative: ["わたしは ともだちと にほんごを はなします。", "I speak Japanese with a friend."], negative: ["わたしは ともだちと にほんごを はなしません。", "I do not speak Japanese with a friend."] },
+    yomu: { affirmative: ["わたしは まいにち ほんを よみます。", "I read a book every day."], negative: ["わたしは まいにち ほんを よみません。", "I do not read a book every day."] },
+    suru: { affirmative: ["わたしは まいにち しゅくだいを します。", "I do homework every day."], negative: ["わたしは まいにち しゅくだいを しません。", "I do not do homework every day."] },
+    benkyousuru: { affirmative: ["わたしは だいがくで にほんごを べんきょうします。", "I study Japanese at the university."], negative: ["わたしは だいがくで にほんごを べんきょうしません。", "I do not study Japanese at the university."] },
+    kuru: { affirmative: ["ともだちは どようびに うちへ きます。", "My friend comes to my home on Saturday."], negative: ["ともだちは どようびに うちへ きません。", "My friend does not come to my home on Saturday."] }
+  };
   const PRACTICE_FAMILIES = {};
   const PRACTICE_FAMILY_BY_ID = {};
   const PRACTICE_VARIANT_KEYS_BY_ID = {};
@@ -56,6 +71,7 @@
         : `Remember the irregular pair: ${verb.dictionary} → ${verb.affirmative} / ${verb.negative}.`;
     const activity = {
       id: `verb-${verb.id}-${form}`, type: "input", skill: "Conjugation", verbId: verb.id, form,
+      verbDictionary: verb.dictionary, exampleForm: verb[form], example: VERB_EXAMPLES[verb.id][form],
       checkpointGroup: `verbs-${form}`, kicker: `${GROUP_NAMES[verb.group]} · ${form}`,
       title: `${verb.dictionary} → ${affirmative ? "affirmative" : "negative"}`,
       context: `${verb.dictionary} · ${verb.meaning} · ${GROUP_NAMES[verb.group]}`,
