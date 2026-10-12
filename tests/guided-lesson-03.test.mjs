@@ -47,6 +47,26 @@ test('conjugation accepts supported scripts and diagnoses group or polarity erro
   assert.ok(!grader.matches(returnNegative, ''));
 });
 
+test('all 26 verb examples explain every particle in its sentence context', () => {
+  const verbs = activities.filter(activity => activity.id.startsWith('verb-') && activity.type === 'input');
+  assert.equal(verbs.length, 26);
+  for (const activity of [...verbs, ...lesson.mixedVerbPractice.activities]) {
+    const sentence = activity.example[0];
+    const expectedPhrases = sentence.split(' ').filter(phrase => /[はをにへでと]$/.test(phrase));
+    assert.deepEqual(Array.from(activity.exampleParticles, note => note[1]), expectedPhrases, activity.id);
+    for (const [particle, phrase, explanation] of activity.exampleParticles) {
+      assert.ok(particle.startsWith(phrase.at(-1)), activity.id);
+      assert.ok(explanation.length > 30, activity.id);
+    }
+  }
+  const notes = id => verbs.find(activity => activity.id === id).exampleParticles;
+  assert.match(notes('verb-okiru-affirmative')[1][2], /when.*six/);
+  assert.match(notes('verb-kaeru-negative')[1][2], /destination.*home/);
+  assert.match(notes('verb-benkyousuru-affirmative')[1][2], /where.*university/);
+  assert.match(notes('verb-nomu-negative')[1][2], /with a friend/);
+  assert.match(notes('verb-kuru-affirmative')[0][2], /my friend.*pronounced wa/);
+});
+
 test('sentence building rejects wrong actions and endings and accepts valid order changes', () => {
   const wake = activities.find(activity => activity.id === 'time-wake');
   assert.ok(grader.matches(wake, 'しちじにおきます。'));

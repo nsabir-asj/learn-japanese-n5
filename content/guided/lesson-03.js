@@ -32,6 +32,26 @@
     benkyousuru: { affirmative: ["わたしは だいがくで にほんごを べんきょうします。", "I study Japanese at the university."], negative: ["わたしは だいがくで にほんごを べんきょうしません。", "I do not study Japanese at the university."] },
     kuru: { affirmative: ["ともだちは どようびに うちへ きます。", "My friend comes to my home on Saturday."], negative: ["ともだちは どようびに うちへ きません。", "My friend does not come to my home on Saturday."] }
   };
+  // Explicit sentence notes avoid mistaking kana inside a word for a particle.
+  const topic = (phrase = "わたしは", meaning = "me") => ["は (wa)", phrase, `Marks the topic: this sentence is about ${meaning}. Written は, pronounced wa.`];
+  const object = (phrase, meaning) => ["を (o)", phrase, `Marks what the action acts on: ${meaning}. Written を, pronounced o; you may type wo in romaji.`];
+  const time = (phrase, meaning) => ["に (ni)", phrase, `Marks when the action happens: ${meaning}. Use に with specific clock times and days of the week.`];
+  const companion = ["と (to)", "ともだちと", "Marks who you do the action with: with a friend. Place と after the person."];
+  const VERB_EXAMPLE_PARTICLES = {
+    taberu: [topic(), object("あさごはんを", "breakfast is what I eat")],
+    miru: [topic(), time("にちようびに", "on Sunday"), object("えいがを", "a movie is what I watch")],
+    okiru: [topic(), time("ろくじに", "at six o’clock")],
+    neru: [topic(), time("じゅういちじに", "at eleven o’clock")],
+    iku: [topic(), time("にちようびに", "on Sunday"), ["へ (e)", "こうえんへ", "Marks the direction of movement: to the park. Written へ, pronounced e. With いく, destination に also works; time に cannot be replaced by へ."]],
+    kaeru: [topic(), ["に (ni)", "うちに", "Marks the destination: home is where I return. With movement verbs such as かえる, に or へ can mark the destination; で marks where an activity happens."]],
+    kiku: [topic(), object("おんがくを", "music is what I listen to")],
+    nomu: [topic(), companion, object("コーヒーを", "coffee is what I drink")],
+    hanasu: [topic(), companion, object("にほんごを", "Japanese is what I speak")],
+    yomu: [topic(), object("ほんを", "a book is what I read")],
+    suru: [topic(), object("しゅくだいを", "homework is what I do")],
+    benkyousuru: [topic(), ["で (de)", "だいがくで", "Marks where the action happens: I study at the university. Use で for the place of an activity, and に or へ for a movement destination."], object("にほんごを", "Japanese is what I study")],
+    kuru: [topic("ともだちは", "my friend"), time("どようびに", "on Saturday"), ["へ (e)", "うちへ", "Marks the direction of movement: to my home. Written へ, pronounced e. With くる, destination に also works."]]
+  };
   const PRACTICE_FAMILIES = {};
   const PRACTICE_FAMILY_BY_ID = {};
   const PRACTICE_VARIANT_KEYS_BY_ID = {};
@@ -72,6 +92,7 @@
     const activity = {
       id: `verb-${verb.id}-${form}`, type: "input", skill: "Conjugation", verbId: verb.id, form,
       verbDictionary: verb.dictionary, exampleForm: verb[form], example: VERB_EXAMPLES[verb.id][form],
+      exampleParticles: VERB_EXAMPLE_PARTICLES[verb.id],
       checkpointGroup: `verbs-${form}`, kicker: `${GROUP_NAMES[verb.group]} · ${form}`,
       title: `${verb.dictionary} → ${affirmative ? "affirmative" : "negative"}`,
       context: `${verb.dictionary} · ${verb.meaning} · ${GROUP_NAMES[verb.group]}`,

@@ -18,6 +18,13 @@
     }
   }
   let verbExampleOpen = loadVerbExamplePreference();
+  const PARTICLE_EXPLANATION_PREFERENCE_KEY = "kanaSprintGuidedParticleExplanationOpenV1";
+  let particleExplanationOpen = false;
+  try {
+    particleExplanationOpen = localStorage.getItem(PARTICLE_EXPLANATION_PREFERENCE_KEY) === "true";
+  } catch (error) {
+    // Keep the explanation usable when browser storage is unavailable.
+  }
   document.title = `Lesson ${LESSON.number} · ${LESSON.title}`;
   const SPEECH_STORAGE_KEY = "kanaSprintSpeechV1";
   const VERSION = 1;
@@ -515,6 +522,23 @@
     });
   }
 
+  function particleExplanationMarkup(activity) {
+    if (!activity.exampleParticles?.length) return "";
+    return `<details class="lesson-particle-explanation"${particleExplanationOpen ? " open" : ""}><summary>Why these particles?<span aria-hidden="true">›</span></summary><ul>${activity.exampleParticles.map(([particle, phrase, explanation]) => `<li><div><strong>${escapeHtml(particle)}</strong><span lang="ja">${escapeHtml(phrase)}</span></div><p>${escapeHtml(explanation)}</p></li>`).join("")}</ul></details>`;
+  }
+
+  function rememberParticleExplanationPreference(details) {
+    if (!details) return;
+    details.addEventListener("toggle", () => {
+      particleExplanationOpen = details.open;
+      try {
+        localStorage.setItem(PARTICLE_EXPLANATION_PREFERENCE_KEY, String(details.open));
+      } catch (error) {
+        console.warn("Could not remember the particle explanation preference.", error);
+      }
+    });
+  }
+
   function showFeedback(correct, selectedChoice = null, corrected = false, revealed = false) {
     const feedback = $("#lessonFeedback");
     feedback.className = `feedback lesson-feedback show ${correct ? "good" : "bad"}`;
@@ -529,11 +553,12 @@
     const explanationLabel = contrastMarkup ? "<b>Key difference:</b> " : "";
     const heading = corrected ? "Recovered after a delay" : correct ? "Correct" : "Build this memory";
     const formLabel = currentActivity.form === "negative" ? "a negative" : "an affirmative";
-    const verbExample = currentActivity.example ? `<details class="lesson-verb-example"${verbExampleOpen ? " open" : ""}><summary>See ${escapeHtml(currentActivity.verbDictionary || "this verb")} in ${formLabel} sentence<span aria-hidden="true">›</span></summary><div class="lesson-verb-example-body"><p lang="ja">${highlightedExampleSentence(currentActivity)}</p><span>${escapeHtml(currentActivity.example[1])}</span><button class="ghost" type="button" data-verb-example-audio>🔊 Hear sentence</button></div></details>` : "";
+    const verbExample = currentActivity.example ? `<details class="lesson-verb-example"${verbExampleOpen ? " open" : ""}><summary>See ${escapeHtml(currentActivity.verbDictionary || "this verb")} in ${formLabel} sentence<span aria-hidden="true">›</span></summary><div class="lesson-verb-example-body"><p lang="ja">${highlightedExampleSentence(currentActivity)}</p><span>${escapeHtml(currentActivity.example[1])}</span><button class="ghost" type="button" data-verb-example-audio>🔊 Hear sentence</button>${particleExplanationMarkup(currentActivity)}</div></details>` : "";
     feedback.innerHTML = `<strong>${heading}</strong><div class="meta">${contrastMarkup}${diagnosis}${correction}${breakdownMarkup}<span class="lesson-feedback-explanation">${explanationLabel}${escapeHtml(currentActivity.explanation || "Retrieve the idea again after some variety.")}</span>${answerAudio}${verbExample}</div>`;
     feedback.querySelector("[data-answer-audio]")?.addEventListener("click", () => speakJapanese(currentActivity.audioText));
     feedback.querySelector("[data-verb-example-audio]")?.addEventListener("click", () => speakJapanese(currentActivity.example[0]));
     rememberVerbExamplePreference(feedback.querySelector(".lesson-verb-example"));
+    rememberParticleExplanationPreference(feedback.querySelector(".lesson-particle-explanation"));
     refreshActivityAudioControls();
   }
 

@@ -635,6 +635,17 @@
           "text": "Lesson 3 remembers whether verb sentence examples are expanded or collapsed, including between visits."
         }
       ]
+    },
+    {
+      "id": "2026-10-12.1",
+      "publishedAt": "2026-10-12",
+      "title": "Understand particles in verb examples",
+      "changes": [
+        {
+          "pages": ["guided"],
+          "text": "Open ‘Why these particles?’ in Lesson 3 verb examples for short explanations of each particle’s role and pronunciation. Your choice to expand or collapse the explanations is remembered between questions and visits."
+        }
+      ]
     }
   ]
 }
