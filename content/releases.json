@@ -657,6 +657,17 @@
           "text": "Lesson 3 sentence-building questions now ask you to recall the words yourself, with vocabulary translations removed from prompts in Learn, Practice, and Checkpoint."
         }
       ]
+    },
+    {
+      "id": "2026-10-12.3",
+      "publishedAt": "2026-10-12",
+      "title": "Choose particles yourself",
+      "changes": [
+        {
+          "pages": ["guided"],
+          "text": "Lesson 3 sentence-building prompts no longer tell you which particle to use. Particle explanations remain available after answering."
+        }
+      ]
     }
   ]
 }
