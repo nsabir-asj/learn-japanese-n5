@@ -646,6 +646,17 @@
           "text": "Open ‘Why these particles?’ in Lesson 3 verb examples for short explanations of each particle’s role and pronunciation. Your choice to expand or collapse the explanations is remembered between questions and visits."
         }
       ]
+    },
+    {
+      "id": "2026-10-12.2",
+      "publishedAt": "2026-10-12",
+      "title": "Recall vocabulary while building sentences",
+      "changes": [
+        {
+          "pages": ["guided"],
+          "text": "Lesson 3 sentence-building questions now ask you to recall the words yourself, with vocabulary translations removed from prompts in Learn, Practice, and Checkpoint."
+        }
+      ]
     }
   ]
 }
