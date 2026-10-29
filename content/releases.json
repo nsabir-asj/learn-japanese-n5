@@ -679,6 +679,25 @@
           "text": "Explore word-by-word meanings and sentence structure for every Lesson 4 example. Particle explanations are now shorter and more compact throughout vocabulary practice."
         }
       ]
+    },
+    {
+      "id": "2026-10-30.1",
+      "publishedAt": "2026-10-30",
+      "title": "Build sentences at your own pace",
+      "changes": [
+        {
+          "pages": ["home", "guided"],
+          "text": "Sentence Practice brings open lesson and topic collections, supported and independent sentence building, particle gaps, and polite verb practice. Choose among related extra words and contrasting verb forms, see live kana previews while typing romaji, and review specific mistakes with familiar-vocabulary filters."
+        },
+        {
+          "pages": ["guided"],
+          "text": "Sentence Practice has clearer audio buttons and keyboard labels, simple Enter-to-check controls, familiar plus/minus controls for expandable sections, comfortably inset dropdown arrows, and a tidier collection selector. Session statistics appear in the top status bar, with a full-width exercise and one Hint button."
+        },
+        {
+          "pages": ["settings"],
+          "text": "Sentence Practice progress is included in cloud sync and complete backups, with its own export, restore, and reset options."
+        }
+      ]
     }
   ]
 }
