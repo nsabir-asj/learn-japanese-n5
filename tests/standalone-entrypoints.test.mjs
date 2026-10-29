@@ -192,8 +192,8 @@ test('vocabulary answers reveal a highlighted example with separate sentence aud
   assert.match(vocabulary, /Particles in this sentence/);
   assert.match(vocabulary, /How this sentence fits together/);
   assert.match(vocabulary, /sentenceChunkLabels/);
-  assert.match(vocabulary, /Written は, but pronounced wa/);
-  assert.match(vocabulary, /Usually pronounced o in modern Japanese/);
+  assert.match(vocabulary, /Pronounced wa/);
+  assert.match(vocabulary, /Pronounced o \(also romanized wo\)/);
   assert.match(styles, /\.vocab-example-breakdown/);
   assert.match(styles, /\.vocab-sentence-chunk/);
   assert.match(styles, /\.vocab-sentence-term/);

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { runInNewContext } from 'node:vm';
 
 await import('../features/kana/vocabulary-examples.js');
 
@@ -22,6 +23,38 @@ test('every vocabulary word has a complete example sentence', () => {
   });
 });
 
+test('Lesson 4 particle explanations use contextual roles and compact markup', () => {
+  const functions = vocabularySource.slice(vocabularySource.indexOf('  function escapeExampleText('), vocabularySource.indexOf('  function sentenceChunkLabels('));
+  const context = {
+    PARTICLE_READINGS: { 'は': 'wa', 'を': 'o / wo', 'へ': 'e', 'の': 'no', 'が': 'ga', 'に': 'ni', 'で': 'de', 'と': 'to', 'か': 'ka', 'から': 'kara', 'まで': 'made' },
+  };
+  runInNewContext(functions, context);
+  const guide = id => context.particleGuideMarkup(breakdowns[id][0]);
+  assert.match(guide('inu'), /where someone or something is/);
+  assert.match(guide('shashin'), /where the action happens/);
+  assert.match(guide('aida'), /Joins えき and こうえん as a pair/);
+  assert.match(guide('geemu'), /who joins in the action/);
+  assert.match(guide('migi'), /corner turned at, not an object/);
+  assert.match(guide('kaku'), /surface written on/);
+  assert.match(guide('kurasu'), /kara/);
+  assert.match(guide('suffix-gurai'), /made/);
+  assert.match(guide('sorekara'), /あさごはん: the direct object of the action/);
+  assert.equal(guide('gomen-nasai'), '');
+  for (const [id, [parts]] of Object.entries(breakdowns)) {
+    for (const part of parts) {
+      assert.ok(part.slice(0, 3).every(value => typeof value === 'string' && value.trim()), `${id}: empty chunk`);
+      if (part[3] === 'particle') {
+        assert.ok(context.PARTICLE_READINGS[part[0]] || part[0] === 'ね', `${id}: missing particle reading`);
+      }
+    }
+  }
+  const markup = guide('anata');
+  assert.match(markup, /Pronounced wa/);
+  assert.doesNotMatch(markup, /<em>/);
+  assert.match(markup, /class="vocab-particle-explanation"/);
+  assert.doesNotMatch(markup, /<p>|<small>/);
+});
+
 test('each example contains the vocabulary term or its declared focus text', () => {
   const wordTerms = new Map(
     [...stageSource.matchAll(/^\s*\["([^"]+)",\s*"([^"]+)"/gm)]
@@ -33,8 +66,8 @@ test('each example contains the vocabulary term or its declared focus text', () 
   });
 });
 
-test('Genki Lesson 3 examples have authored sentence breakdowns', () => {
-  const lesson3Source = stageSource.slice(stageSource.indexOf('id: "lesson3-'), stageSource.indexOf('id: "lesson4-'));
+for (const lesson of [3, 4]) test(`Genki Lesson ${lesson} examples have authored sentence breakdowns`, () => {
+  const lesson3Source = stageSource.slice(stageSource.indexOf(`id: "lesson${lesson}-`), stageSource.indexOf(`id: "lesson${lesson + 1}-`));
   const directIds = [...lesson3Source.matchAll(/^\s*\["([^"]+)",/gm)].map(match => match[1]);
   const reusedIds = [...lesson3Source.matchAll(/reusedWordIds:\s*\[([^\]]+)\]/g)]
     .flatMap(match => [...match[1].matchAll(/"([^"]+)"/g)].map(idMatch => idMatch[1]));

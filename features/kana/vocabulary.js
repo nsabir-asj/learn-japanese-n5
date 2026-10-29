@@ -649,7 +649,7 @@
   };
   const CHOICE_COUNT_VALUES = ["auto", "4", "6", "8"];
   const JAPANESE_COLLATOR = new Intl.Collator("ja", { usage: "sort", sensitivity: "base", numeric: true });
-  const PARTICLE_READINGS = { "は": "wa", "を": "o / wo", "へ": "e", "の": "no", "が": "ga", "に": "ni", "で": "de", "と": "to", "か": "ka", "ね": "ne" };
+  const PARTICLE_READINGS = { "は": "wa", "を": "o / wo", "へ": "e", "の": "no", "が": "ga", "に": "ni", "で": "de", "と": "to", "か": "ka", "ね": "ne", "から": "kara", "まで": "made" };
 
   function loadBreakdownPreference() {
     try {
@@ -1513,33 +1513,41 @@
   }
   function particleUsageText(role, before, after, predicate) {
     const context = {
-      "Time particle": `It follows ${before} and marks it as when ${predicate} happens.`,
-      "Object particle": `It follows ${before} and marks it as the direct object of ${predicate}.`,
-      "Action-place particle": `It follows ${before} and marks it as the place where ${predicate} happens.`,
-      "Companion particle": `It follows ${before} and marks that person as joining in ${predicate}.`,
-      "Meeting particle": `With a verb such as ${predicate}, it marks ${before} as the person being met.`,
-      "Noun-linking particle": `It links ${before} to ${after}, so ${after} is understood in relation to ${before}.`,
-      "Possessive particle": `It links ${before} to ${after}, showing ownership or a close association.`,
-      "Occasion particle": `It marks ${before} as the occasion or setting in which ${predicate} happens.`,
-      "Purpose / occasion particle": `It makes ${before} the purpose or occasion for the action that follows.`,
-      "Time-boundary particle": `It completes the expression ${before}で and sets it as the time boundary for the following action.`,
-      "Topic particle": `It sets ${before} as what the sentence is about; the rest of the sentence comments on it.`,
-      "Topic / contrast particle": `It sets ${before} as the topic and can contrast it with another time or thing.`,
-      "Direction particle": `It follows ${before} and points toward it as the direction or destination of ${predicate}.`,
-      "Means particle": `It follows ${before} and marks it as the language or means used for ${predicate}.`,
-      "Subject particle": `It marks ${before} as the subject—the person or thing performing ${predicate}.`,
-      "Destination particle": `It follows ${before} and marks it as the destination reached by ${predicate}.`,
-      "Ability particle": `With ${predicate}, it marks ${before} as the thing understood or known.`,
-      "Question particle": "At the end of a polite sentence, it turns the statement into a question.",
-      "Agreement particle": "At the end of the sentence, it invites agreement or shows the speaker is considering what was said.",
-      "Shared-feeling particle": "At the end of the sentence, it invites the listener to share or confirm the speaker’s feeling."
+      "Time particle": `${before}: when the action happens.`,
+      "Object particle": `${before}: the direct object of the action.`,
+      "Action-place particle": `${before}: where the action happens.`,
+      "Companion particle": `${before}: who joins in the action.`,
+      "Meeting particle": `${before}: the person being met.`,
+      "Noun-linking particle": `Links ${before} to ${after}: description or relative location.`,
+      "Possessive particle": `${before}’s ${after}: ownership or association.`,
+      "Occasion particle": `${before}: the occasion for the action.`,
+      "Purpose / occasion particle": `${before}: the purpose or occasion.`,
+      "Time-boundary particle": `${before}で: the time boundary for the action.`,
+      "Topic particle": `${before}: what the sentence is about.`,
+      "Topic / contrast particle": `${before}: the topic, possibly contrasted with something else.`,
+      "Direction particle": `${before}: direction or destination.`,
+      "Means particle": `${before}: the language or means used.`,
+      "Subject particle": `${before}: the subject of the sentence.`,
+      "Existence subject particle": `${before}: the person, thing, or event that exists.`,
+      "Existence-location particle": `${before}: where someone or something is.`,
+      "Writing-target particle": `${before}: the surface written on.`,
+      "Starting-point particle": `${before}: when it starts.`,
+      "Endpoint particle": `${before}: the endpoint.`,
+      "Listing particle": `Joins ${before} and ${after} as a pair.`,
+      "Route particle": `${before}: the corner turned at, not an object.`,
+      "Turning-direction particle": `${before}: the direction of the turn.`,
+      "Destination particle": `${before}: the destination reached.`,
+      "Ability particle": `${before}: what is understood or known.`,
+      "Question particle": "Turns the polite sentence into a question.",
+      "Agreement particle": "Invites agreement or signals consideration.",
+      "Shared-feeling particle": "Invites a shared feeling or confirmation."
     };
     return context[role] || `Here it follows ${before} and functions as a ${role.toLowerCase()}.`;
   }
   function particlePronunciationNote(particle) {
-    if (particle === "は") return "Written は, but pronounced wa when it is a particle.";
-    if (particle === "を") return "Usually pronounced o in modern Japanese; wo is also used in romanization.";
-    if (particle === "へ") return "Written へ, but pronounced e when it marks direction.";
+    if (particle === "は") return "Pronounced wa.";
+    if (particle === "を") return "Pronounced o (also romanized wo).";
+    if (particle === "へ") return "Pronounced e.";
     return "";
   }
   function particleGuideMarkup(parts) {
@@ -1555,9 +1563,9 @@
     const cards = particles.map(({ particle, role, before, after }) => {
       const pronunciation = PARTICLE_READINGS[particle] || "particle";
       const note = particlePronunciationNote(particle);
-      return `<article class="vocab-particle-card"><header><strong lang="ja">${escapeExampleText(particle)}</strong><span>${escapeExampleText(pronunciation)}</span><em>${escapeExampleText(role)}</em></header><p>${escapeExampleText(particleUsageText(role, before, after, predicate))}</p>${note ? `<small>${escapeExampleText(note)}</small>` : ""}</article>`;
+      return `<article class="vocab-particle-card"><header title="${escapeExampleText([role, note].filter(Boolean).join(". "))}"><strong lang="ja">${escapeExampleText(particle)}</strong><span>${escapeExampleText(pronunciation)}</span></header> <span class="vocab-particle-explanation">${escapeExampleText(particleUsageText(role, before, after, predicate))}</span></article>`;
     }).join("");
-    return `<section class="vocab-particle-guide" aria-label="Particles in this sentence"><h4>Particles in this sentence</h4><div>${cards}</div></section>`;
+    return `<section class="vocab-particle-guide" aria-label="Particles in this sentence"><h4>Particles</h4><div>${cards}</div></section>`;
   }
   function sentenceChunkLabels(sentence, parts) {
     let cursor = 0;

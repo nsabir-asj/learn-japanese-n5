@@ -668,6 +668,17 @@
           "text": "Lesson 3 sentence-building prompts no longer tell you which particle to use. Particle explanations remain available after answering."
         }
       ]
+    },
+    {
+      "id": "2026-10-29.1",
+      "publishedAt": "2026-10-29",
+      "title": "Lesson 4 sentence breakdowns",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Explore word-by-word meanings and sentence structure for every Lesson 4 example. Particle explanations are now shorter and more compact throughout vocabulary practice."
+        }
+      ]
     }
   ]
 }
