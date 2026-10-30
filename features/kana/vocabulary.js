@@ -1926,15 +1926,15 @@
 
   function choiceCountHint() {
     return state.choiceCount === "auto"
-      ? "Auto uses 4, 6, or 8 choices based on mastery. Small related groups may use fewer."
-      : `Uses up to ${state.choiceCount} choices from the next question; small related groups may use fewer.`;
+      ? "Auto uses 4, 6, or 8 choices based on mastery. Related groups always have at least 4."
+      : `Uses up to ${state.choiceCount} choices from the next question, with at least 4 options.`;
   }
 
   function choiceCountFormatHint() {
     if (state.questionFormat === "speaking") return "Multiple-choice settings don’t apply here.";
     if (state.questionFormat === "audio-both") return state.choiceCount === "auto"
-      ? "Listening questions use 4, 6, or 8 choices based on mastery. Small related groups may use fewer."
-      : `Listening questions use up to ${state.choiceCount} choices; small related groups may use fewer.`;
+      ? "Listening questions use 4, 6, or 8 choices based on mastery, with at least 4 options."
+      : `Listening questions use up to ${state.choiceCount} choices, with at least 4 options.`;
     return choiceCountHint();
   }
 
@@ -2028,9 +2028,22 @@
     const choices = [word];
     for (const { candidate } of ranked) {
       if (choices.some(selected => choicesOverlap(selected, candidate))) continue;
-      // Never pad a small related family with unrelated or ambiguous answers.
       choices.push(candidate);
       if (choices.length >= count) break;
+    }
+    // Tiny families are a priority, not a two-choice quiz. Expand only enough
+    // to reach four, preserving the same ambiguity filters for every option.
+    if (choices.length < 4) {
+      const supplements = eligible.filter(candidate => !choices.includes(candidate))
+        .map(candidate => ({ candidate,
+          tier: choiceGrammar(candidate) === grammar ? (sharedContrastGroups(word, candidate) ? 0 : 1) : 2,
+          score: distractorScore(word, candidate, format)
+        })).sort((a, b) => a.tier - b.tier || b.score - a.score);
+      for (const { candidate } of supplements) {
+        if (choices.some(selected => choicesOverlap(selected, candidate))) continue;
+        choices.push(candidate);
+        if (choices.length >= 4) break;
+      }
     }
     return shuffle(choices);
   }

@@ -58,17 +58,18 @@ test('weekdays remain weekdays at every choice count and format, even after rece
   }
 });
 
-test('small semantic sets are not padded with unrelated answers', () => {
+test('small semantic sets keep close alternatives but always expand to at least four', () => {
   const page = choicesPage();
   for (const [target, count, allowed] of [
     ['n5-0578', 4, ['n5-0053', 'n5-0515', 'n5-0578', 'n5-0620']],
-    ['konshuu', 3, ['senshuu', 'konshuu', 'raishuu']],
-    ['nihongo', 2, ['nihongo', 'eigo']],
-    ['akeru', 2, ['akeru', 'shimeru']],
+    ['konshuu', 4, ['senshuu', 'konshuu', 'raishuu']],
+    ['nihongo', 4, ['nihongo', 'eigo']],
+    ['akeru', 4, ['akeru', 'shimeru']],
   ]) {
     const result = page.makeChoices(page.word(target), 'written');
     assert.equal(result.length, count, target);
-    assert.ok(result.every(word => allowed.includes(word.id)), target);
+    assert.ok(allowed.every(id => result.some(word => word.id === id)), target);
+    assert.ok(result.every(word => page.choiceGrammar(word) === page.choiceGrammar(page.word(target))), target);
   }
 });
 
@@ -81,6 +82,22 @@ test('activities and Lesson 4 places do not fall back to unrelated generic nouns
   const park = page.makeChoices(page.word('kouen'), 'written');
   assert.equal(park.length, 8);
   assert.ok(park.every(word => page.groups.some(group => group.includes('kouen') && group.includes(word.id))));
+});
+
+test('every vocabulary word has at least four unique safe choices in every choice direction', () => {
+  const page = choicesPage();
+  for (const [index, target] of page.words.entries()) {
+    page.state.choiceCount = String([4, 6, 8][index % 3]);
+    for (const format of ['written', 'spoken', 'recall']) {
+      const result = page.makeChoices(target, format);
+      assert.ok(result.length >= 4, `${target.id}/${format}: ${result.length} choices`);
+      assert.ok(result.length <= Number(page.state.choiceCount));
+      assert.equal(result.filter(word => word.id === target.id).length, 1);
+      for (let i = 0; i < result.length; i++) for (let j = i + 1; j < result.length; j++) {
+        assert.equal(page.choicesOverlap(result[i], result[j]), false, `${target.id}: ambiguous alternatives`);
+      }
+    }
+  }
 });
 
 test('homophones and overlapping English meanings cannot compete as wrong answers', () => {

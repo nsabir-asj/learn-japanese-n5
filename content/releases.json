@@ -730,6 +730,17 @@
           "text": "Incorrectly selected words get a spaced check-in without losing mastery until directly tested. Next and I don’t know sit on the right, with keyboard guidance on the left and hidden on touch screens."
         }
       ]
+    },
+    {
+      "id": "2026-10-31.2",
+      "publishedAt": "2026-10-31",
+      "title": "At least four answer choices",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Small vocabulary groups now include at least four answer choices, keeping close alternatives first and adding distinct options when needed."
+        }
+      ]
     }
   ]
 }
