@@ -588,6 +588,65 @@
     ["inu", "neko", "kodomo", "hito"],
     ["mae", "ushiro", "naka", "ue", "shita", "chikaku", "tonari", "aida", "migi", "hidari"]
   ];
+  // Small, authored families take priority over recency and spelling similarity.
+  // IDs shared by Genki and N5 refer to the same practice word.
+  const CLOSE_CHOICE_GROUPS = [
+    ["getsuyoubi", "kayoubi", "suiyoubi", "mokuyoubi", "kinyoubi", "doyoubi", "nichiyoubi"],
+    ["n5-0053", "n5-0515", "n5-0578", "n5-0620"], // seasons
+    ["kyou", "ashita", "kinou"],
+    ["senshuu", "konshuu", "raishuu"],
+    ["n5-0384", "n5-0307", "n5-0729"], // last / this / next month
+    ["n5-0168", "n5-0251", "n5-0298", "rainen", "n5-0321"],
+    ["asa", "hiru", "yoru", "gozen", "gogo", "n5-0715", "n5-0582"],
+    ["n5-0048", "n5-0050", "n5-0232", "n5-0270", "n5-0356"], // colour adjectives
+    ["n5-0049", "n5-0269", "n5-0438"], // colour nouns
+    ["kore", "sore", "are", "dore"],
+    ["kono", "sono", "ano", "dono"],
+    ["koko", "soko", "asoko", "doko"],
+    ["nihon", "amerika", "igirisu", "oosutoraria", "kankoku", "kanada", "chuugoku", "indo", "ejiputo", "firipin"],
+    ["nihongo", "eigo"],
+    ["okaasan", "otousan", "oneesan", "oniisan", "imouto", "otouto"],
+    ["n5-0575", "n5-0437", "n5-0071", "n5-0072", "imouto", "otouto"],
+    ["isha", "kaishain", "kangoshi", "shufu", "bengoshi", "sensei"],
+    ["daigaku", "koukou"],
+    ["gakusei", "daigakusei", "ryuugakusei", "koukousei", "daigakuinsei"],
+    ["ajia-kenkyuu", "keizai", "kougaku", "kokusai-kankei", "seiji", "seibutsugaku", "bijinesu", "bungaku", "rekishi"],
+    ["mae", "ushiro", "naka", "ue", "shita", "chikaku", "tonari", "aida", "migi", "hidari"],
+    ["asagohan", "hirugohan", "bangohan"],
+    ["mizu", "ocha", "koohii", "osake"],
+    ["geemu", "tenisu", "saafin", "kaimono", "ryokou"],
+    ["kurasu", "tesuto", "shukudai", "repooto", "senkou"],
+    ["eiga", "ongaku", "zasshi", "terebi"],
+    ["ginkou", "konbini", "toire", "toshokan", "yuubinkyoku", "mise", "eki", "otera", "kouen", "suupaa", "basutei", "byouin", "hoteru", "honya", "resutoran"],
+    ["densha", "basu", "kuruma", "jitensha"],
+    ["isu", "tsukue", "mado", "denki", "eakon"],
+    ["hon", "zasshi", "shinbun", "shashin", "repooto", "kyoukasho", "nooto"],
+    ["pan", "sakana", "tonkatsu", "niku", "yasai", "gohan", "tabemono", "kudamono"],
+    ["kutsu", "tiishatsu", "jiinzu", "boushi"],
+    ["inu", "neko"],
+    ["amari", "zenzen", "taitei", "tokidoki", "yoku"],
+    ["atarashii", "furui"], ["ookii", "chiisai"],
+    ["atsui-weather", "samui"],
+    ["omoshiroi", "tsumaranai", "tanoshii"],
+    ["suki", "kirai", "daisuki", "daikirai"],
+    ["shizuka", "nigiyaka"], ["yasashii", "muzukashii"],
+    ["iku", "kuru", "kaeru"],
+    ["akeru", "shimeru"], ["hairu", "dekakeru"], ["noru", "oriru"],
+    ["kau", "n5-0125", "kariru", "n5-0206", "kaesu"],
+    ["kesu", "tsukeru"], ["suwaru", "tatsu"], ["okiru", "neru"],
+    ["tsurete-kuru", "motte-kuru"],
+    ["aru", "iru"],
+    ["n5-0097", "n5-0529", "n5-0322", "n5-0325", "n5-0281", "n5-0746", "n5-0569", "n5-0244", "n5-0258", "n5-0346", "n5-0382", "n5-0601", "n5-0383", "n5-0665"],
+    ["n5-0597", "n5-0615", "n5-0675", "n5-0724", "n5-0104", "n5-0684", "n5-0517", "n5-0712", "n5-0290", "n5-0486"],
+    ["n5-0442", "n5-0618", "n5-0674", "n5-0102", "n5-0681", "n5-0520", "n5-0720", "n5-0289", "n5-0489", "n5-0570"],
+    ["suffix-ji", "suffix-jikan", "n5-0040", "n5-0006", "n5-0023", "n5-0035"],
+    ["ohayou", "ohayou-gozaimasu", "konnichiwa", "konbanwa", "oyasumi-nasai"],
+    ["ittekimasu", "itterasshai", "tadaima", "okaeri-nasai"],
+    ["arigatou", "arigatou-gozaimasu", "sumimasen", "gomen-nasai", "doumo"]
+  ];
+  const CHOICE_SOURCE_BY_ID = new Map(N5_DATA.words.flatMap(source =>
+    (source.existingWordIds.length ? source.existingWordIds : [source.sourceId]).map(id => [id, source])));
+  const CHOICE_ADJECTIVE_IDS = new Set(STAGES.filter(stage => stage.id === "lesson5-qualities-preferences").flatMap(stage => stage.words.map(word => word[0])));
   const CONTEXT_PROMPTS = {
     "sumimasen": "You need to get a stranger’s attention politely. What do you say?",
     "itadakimasu": "You are about to begin a meal. What do you say?",
@@ -738,6 +797,8 @@
     progress.lastMode = typeof progress.lastMode === "string" ? progress.lastMode : "";
     progress.urgentMode = typeof progress.urgentMode === "string" ? progress.urgentMode : "";
     progress.urgentRetryPending = Boolean(progress.urgentRetryPending);
+    if (progress.confusionCheck && (!MODE_KEYS.includes(progress.confusionCheck.mode)
+      || !Number.isFinite(progress.confusionCheck.dueQuestion) || progress.confusionCheck.dueQuestion <= 0)) delete progress.confusionCheck;
     // Repair retries left behind by the old speaking-to-typing fallback.
     if (progress.urgentRetryPending && progress.urgentMode === "speaking"
       && progress.lastMode === "recall" && progress.lastWasCorrect === true) {
@@ -788,6 +849,7 @@
   state.n5UnlockedStage = clamp(Number(state.n5UnlockedStage) || 0, 0, Math.max(0, N5_STAGES.length - 1));
   let current = null;
   let phase = "idle";
+  let nextReadyAt = 0;
   let questionNumber = 0;
   let lastFormat = "";
   let audioFormatCounts = { spoken: 0, speaking: 0 };
@@ -1393,6 +1455,29 @@
     });
   }
 
+  function scheduleConfusionCheck(selectedId) {
+    if (!["written", "spoken", "recall"].includes(currentMode) || !currentChoiceIds.includes(selectedId)) return;
+    const selected = WORDS_BY_ID.get(selectedId);
+    if (!selected || selected.id === current.id) return;
+    const progress = itemState(selected);
+    // Confusion is evidence for a check, not evidence of a failed direct attempt.
+    progress.confusions[current.id] = (Number(progress.confusions[current.id]) || 0) + 1;
+    if (!progress.confusionCheck) progress.confusionCheck = {
+      sourceId: current.id, mode: currentMode, dueQuestion: state.total + 5
+    };
+  }
+
+  function confusionCheckEntry(words) {
+    const eligible = words.filter(word => {
+      const progress = itemState(word);
+      return progress.introduced && progress.confusionCheck && progress.confusionCheck.dueQuestion <= state.total;
+    }).sort((a, b) => itemState(a).confusionCheck.dueQuestion - itemState(b).confusionCheck.dueQuestion);
+    const word = eligible[0];
+    if (!word) return null;
+    const preferred = itemState(word).confusionCheck.mode;
+    return { word, mode: allowedModes().includes(preferred) ? preferred : chooseMode(word) };
+  }
+
   function chooseMode(word, onlyDue = false) {
     const modes = allowedModes();
     return [...modes].sort((left, right) => {
@@ -1450,6 +1535,11 @@
       const decision = Scheduler.nextIntroductionDecision(state.pace, state.newWordCredit);
       state.newWordCredit = decision.credit;
       if (decision.introduce) return { word: unseen[0], mode: allowedModes()[0], introduce: true, reason: "Introducing a new word" };
+    }
+    // At most one check-in per three reviews; urgent retries and coverage retain priority.
+    if (reviewCountsForSelection().total % 3 === 1) {
+      const check = confusionCheckEntry(coveragePool);
+      if (check) return { ...check, introduce: false, reason: "Checking a recently confused word" };
     }
     if (due.length) return { ...selectReviewWord(due, recent, true), introduce: false, reason: "Due review" };
     if (unseen.length) {
@@ -1666,7 +1756,7 @@
           </div>
           <div class="feedback" id="vocabFeedback"></div>
         </div>
-        <div class="footer-actions"><div class="actions"><button class="ghost" id="vocabDontKnow">I don’t know</button><button class="ghost hidden" id="vocabNext">Next <kbd>Enter</kbd></button></div><span class="tiny" id="vocabKeyboardHint">Use <kbd>1</kbd>–<kbd>4</kbd> to choose an answer.</span></div>
+        <div class="footer-actions vocab-footer-actions"><span class="tiny" id="vocabKeyboardHint">Use <kbd>1</kbd>–<kbd>4</kbd> to choose an answer.</span><div class="actions vocab-footer-buttons"><button class="ghost" id="vocabDontKnow">I don’t know</button><button class="big-button hidden" id="vocabNext" type="button">Next <kbd>Enter</kbd></button></div></div>
       </div>
       <details class="card vocab-setup-card" id="vocabSessionControls">
         <summary><span><strong>Session controls</strong><small id="vocabPaceStatus">Balanced introduction and review</small></span></summary>
@@ -1836,15 +1926,15 @@
 
   function choiceCountHint() {
     return state.choiceCount === "auto"
-      ? "Auto uses 4, 6, or 8 choices based on mastery."
-      : `Uses ${state.choiceCount} choices from the next question.`;
+      ? "Auto uses 4, 6, or 8 choices based on mastery. Small related groups may use fewer."
+      : `Uses up to ${state.choiceCount} choices from the next question; small related groups may use fewer.`;
   }
 
   function choiceCountFormatHint() {
     if (state.questionFormat === "speaking") return "Multiple-choice settings don’t apply here.";
     if (state.questionFormat === "audio-both") return state.choiceCount === "auto"
-      ? "Listening questions use 4, 6, or 8 choices based on mastery."
-      : `Listening questions use ${state.choiceCount} choices.`;
+      ? "Listening questions use 4, 6, or 8 choices based on mastery. Small related groups may use fewer."
+      : `Listening questions use up to ${state.choiceCount} choices; small related groups may use fewer.`;
     return choiceCountHint();
   }
 
@@ -1890,22 +1980,59 @@
     return score + Math.random() * 18;
   }
 
+  function choiceReadings(word) {
+    return word.jp.normalize("NFKC").split(/[／/]/).map(value => value
+      .replace(/[\u30a1-\u30f6]/g, char => String.fromCharCode(char.charCodeAt(0) - 0x60))
+      .replace(/[\s\p{P}~～]/gu, "")).filter(Boolean);
+  }
+
+  function choiceMeanings(word) {
+    return word.meaning.toLowerCase().replace(/\[[^\]]*\]/g, "")
+      .replace(/i[’']m sorry/g, "sorry").split(/\s*[\/;,]\s*/)
+      .map(value => value.replace(/^to\s+/, "").replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/\s+/g, " ").trim())
+      .filter(Boolean);
+  }
+
+  function choicesOverlap(left, right) {
+    if (left.n5SourceId && left.n5SourceId === right.n5SourceId) return true;
+    const readings = choiceReadings(left);
+    const meanings = choiceMeanings(left);
+    return choiceReadings(right).some(value => readings.includes(value))
+      || choiceMeanings(right).some(value => meanings.includes(value));
+  }
+
+  function choiceGrammar(word) {
+    const source = CHOICE_SOURCE_BY_ID.get(word.id);
+    if (word.id.startsWith("suffix-") || source?.kana.startsWith("～")) return "suffix";
+    if (CHOICE_ADJECTIVE_IDS.has(word.id) || /\[(?:i|na)-adj/.test(source?.meaning || "")) return "adjective";
+    if (/^to\s/i.test(word.meaning) || /(?:ます|ません|ました|ませんでした)[。]?$/u.test(source?.kana || word.jp)) return "verb";
+    if (/(?:です|ですか|ませんか)[。]?$/u.test(word.jp) || /[!？?]/.test(word.meaning)) return "expression";
+    return "noun-or-other";
+  }
+
   function makeChoices(word, format) {
     const count = choiceCountFor(word, format);
-    const answerValue = candidate => format === "recall" ? candidate.jp : candidate.meaning;
-    const answers = new Set([answerValue(word)]);
-    const ranked = WORDS
-      .filter(candidate => candidate.id !== word.id && answerValue(candidate) !== answerValue(word))
-      .map(candidate => ({ candidate, score: distractorScore(word, candidate, format) }))
-      .sort((a, b) => b.score - a.score);
-    const distractors = [];
+    const eligible = WORDS.filter(candidate => candidate.id !== word.id && !choicesOverlap(word, candidate));
+    const families = CLOSE_CHOICE_GROUPS.filter(group => group.includes(word.id))
+      .map(group => eligible.filter(candidate => group.includes(candidate.id)))
+      .filter(pool => pool.length);
+    // Prefer the family with the most valid alternatives when membership overlaps.
+    const family = families.sort((a, b) => b.length - a.length)[0];
+    const grammar = choiceGrammar(word);
+    const compatible = eligible.filter(candidate => choiceGrammar(candidate) === grammar);
+    const pool = family || (compatible.length ? compatible : eligible);
+    const ranked = pool.map(candidate => ({ candidate,
+      tier: family ? 0 : choiceGrammar(candidate) === grammar ? (sharedContrastGroups(word, candidate) ? 0 : 1) : 2,
+      score: distractorScore(word, candidate, format)
+    })).sort((a, b) => a.tier - b.tier || b.score - a.score);
+    const choices = [word];
     for (const { candidate } of ranked) {
-      if (answers.has(answerValue(candidate))) continue;
-      distractors.push(candidate);
-      answers.add(answerValue(candidate));
-      if (distractors.length === count - 1) break;
+      if (choices.some(selected => choicesOverlap(selected, candidate))) continue;
+      // Never pad a small related family with unrelated or ambiguous answers.
+      choices.push(candidate);
+      if (choices.length >= count) break;
     }
-    return shuffle([word, ...distractors]);
+    return shuffle(choices);
   }
 
   function revealAnsweredFeedback(feedback) {
@@ -2056,7 +2183,11 @@
     const distractorIds = currentChoiceIds.filter(id => id !== current.id);
     progress.recentDistractors.push(...distractorIds);
     progress.recentDistractors = progress.recentDistractors.slice(-16);
-    if (!correct && selectedId) progress.confusions[selectedId] = (Number(progress.confusions[selectedId]) || 0) + 1;
+    delete progress.confusionCheck;
+    if (!correct && selectedId) {
+      progress.confusions[selectedId] = (Number(progress.confusions[selectedId]) || 0) + 1;
+      if (!typedSpeakingFallback) scheduleConfusionCheck(selectedId);
+    }
     progress.seen++;
     progress.lastSeen = now;
     progress.lastWasCorrect = correct;
@@ -2115,8 +2246,8 @@
     if (wasSpeakingQuestion) {
       $("#vocabSpeechActions").classList.add("hidden");
       $("#vocabTypingModes").classList.add("hidden");
-      $("#vocabKeyboardHint").innerHTML = "Press <kbd>Enter</kbd> for the next question.";
     }
+    $("#vocabKeyboardHint").innerHTML = "Press <kbd>Enter</kbd> for the next question.";
     const correct = !unknown && selectedId === current.id;
     if (wasSpeakingQuestion && !correct) speechEvidence = null;
     const selectedWord = !correct && selectedId ? WORDS.find(word => word.id === selectedId) : null;
@@ -2140,6 +2271,7 @@
     if ($("#vocabPlayExample")) $("#vocabPlayExample").disabled = !japaneseSpeechReady();
     $("#vocabPlayExample")?.addEventListener("click", () => speakExample(current));
     rememberBreakdownPreference(feedback.querySelector(".vocab-example-breakdown"));
+    prepareNextButton();
     $("#vocabNext").classList.remove("hidden");
     $("#vocabDontKnow").classList.add("hidden");
     if (state.autoPronounce && !wasSpokenQuestion) speak(current);
@@ -2147,7 +2279,18 @@
     revealAnsweredFeedback(feedback);
   }
 
+  function prepareNextButton() {
+    const button = $("#vocabNext");
+    const reviewedWord = current;
+    nextReadyAt = Date.now() + 350;
+    button.disabled = true;
+    setTimeout(() => {
+      if (phase === "answered" && current === reviewedWord && Date.now() >= nextReadyAt) button.disabled = false;
+    }, 350);
+  }
+
   function nextQuestion() {
+    if (phase === "answered" && Date.now() < nextReadyAt) return;
     const restorePracticeView = phase === "answered";
     stopSpeaking();
     window.KANA_SPRINT_SPEECH?.stop?.();

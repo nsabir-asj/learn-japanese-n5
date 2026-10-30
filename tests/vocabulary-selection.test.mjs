@@ -44,11 +44,12 @@ function practice(scope = 'lesson3', size) {
   runInContext(vocabularyDefinitions, page);
   for (const name of [
     'emptyModeProgress', 'itemState', 'modeState', 'scopeSelectionKey',
-    'wordIsDue', 'urgentReviewEntries', 'chooseMode', 'selectWord',
+    'wordIsDue', 'urgentReviewEntries', 'scheduleConfusionCheck', 'confusionCheckEntry', 'chooseMode', 'selectWord',
     'reviewCountsForSelection', 'balancedReviewPool', 'selectReviewWord',
     'selectReviewEntry', 'applyResult',
   ]) runInContext(pageFunction(name), page);
   runInContext(`
+    globalThis.allWords = WORDS;
     globalThis.scopeWords = WORDS.filter(word => ${scope === 'n5'
       ? 'word.tracks.includes("n5")'
       : `word.stageIds.some(id => id.startsWith("${scope}-"))`});
@@ -72,6 +73,91 @@ function practice(scope = 'lesson3', size) {
   };
   return page;
 }
+
+test('confusion check-ins record the pair without penalizing or rescheduling the selected word', () => {
+  const page = practice('lesson3', 12);
+  const [sourceWord, selectedWord] = page.scopeWords;
+  const progress = page.itemState(selectedWord);
+  const prior = JSON.parse(JSON.stringify(progress));
+  const total = page.state.total;
+  page.current = sourceWord;
+  page.currentMode = 'written';
+  page.currentChoiceIds = [sourceWord.id, selectedWord.id];
+  page.applyResult(false, selectedWord.id);
+  assert.equal(page.state.total, total + 1);
+  assert.equal(progress.confusionCheck.sourceId, sourceWord.id);
+  assert.equal(progress.confusionCheck.dueQuestion, total + 5);
+  assert.equal(progress.confusions[sourceWord.id], 1);
+  assert.equal(page.itemState(sourceWord).confusions[selectedWord.id], 1);
+  for (const key of ['mastery', 'seen', 'correct', 'wrong', 'dueAt', 'dueQuestion', 'lastWasCorrect', 'modes']) {
+    assert.deepEqual(JSON.parse(JSON.stringify(progress[key])), prior[key], key);
+  }
+  assert.equal(page.confusionCheckEntry(page.scopeWords), null, 'Check must wait for intervening answers');
+  const due = progress.confusionCheck.dueQuestion;
+  page.applyResult(false, selectedWord.id);
+  assert.equal(progress.confusionCheck.dueQuestion, due, 'Repeated confusion must not duplicate or postpone the check');
+  page.state.total = due;
+  assert.equal(page.confusionCheckEntry(page.scopeWords).word.id, selectedWord.id);
+});
+
+test('confusion check-ins preserve scope, coverage turns, spacing and urgent-retry priority', () => {
+  const page = practice('lesson3', 12);
+  const word = page.scopeWords[1];
+  const progress = page.itemState(word);
+  progress.confusionCheck = { sourceId: page.scopeWords[0].id, mode: 'written', dueQuestion: page.state.total };
+  for (const item of page.scopeWords) Object.assign(page.itemState(item), { dueQuestion: 9999, dueAt: Date.now() + 86400000 });
+  const session = page.reviewCountsForSelection();
+  session.total = 1;
+  let selected = page.selectWord();
+  assert.equal(selected.word.id, word.id);
+  assert.equal(selected.reason, 'Checking a recently confused word');
+  assert.equal(selected.mode, 'speaking', 'Use an available format after switching formats');
+  session.total = 2;
+  assert.notEqual(page.selectWord().reason, 'Checking a recently confused word', 'Coverage turn must stay reserved');
+  session.total = 4;
+  session.words.set(word.id, 4);
+  assert.notEqual(page.selectWord().reason, 'Checking a recently confused word', 'Recent words must respect the gap');
+  session.words.clear();
+  const urgent = page.scopeWords[2];
+  Object.assign(page.itemState(urgent), { urgentRetryPending: true, urgentMode: 'speaking', dueQuestion: page.state.total, lastWasCorrect: false });
+  assert.equal(page.selectWord().reason, 'Urgent review');
+  const other = page.allWords.find(item => !page.scopeWords.includes(item));
+  page.itemState(other).confusionCheck = { mode: 'written', dueQuestion: 1 };
+  delete progress.confusionCheck;
+  assert.equal(page.confusionCheckEntry(page.scopeWords), null, 'Out-of-scope words must not enter the queue');
+});
+
+test('a direct answer clears a confusion check and only a direct mistake incurs its normal penalty', () => {
+  for (const correct of [true, false]) {
+    const page = practice('lesson3', 12);
+    const word = page.scopeWords[1];
+    const progress = page.itemState(word);
+    progress.mastery = 80;
+    progress.confusionCheck = { mode: 'written', dueQuestion: 1 };
+    page.complete({ word, mode: 'written' }, correct);
+    assert.equal(progress.confusionCheck, undefined);
+    assert.equal(progress.mastery, correct ? 80 + 20 * (1 - 80 / 140) : 68);
+  }
+});
+
+test('unseen distractors remain locked and non-choice answers cannot create confusion checks', () => {
+  const page = practice('lesson3', 8);
+  page.current = page.scopeWords[0];
+  const unseen = page.allWords.find(word => !page.scopeWords.includes(word));
+  page.currentChoiceIds = [page.current.id, unseen.id];
+  page.currentMode = 'written';
+  page.applyResult(false, unseen.id);
+  assert.equal(page.itemState(unseen).introduced, false);
+  assert.equal(page.itemState(unseen).seen, 0);
+  assert.ok(page.itemState(unseen).confusionCheck);
+  const third = page.scopeWords[2];
+  page.applyResult(false, third.id);
+  assert.equal(page.itemState(third).confusionCheck, undefined, 'An ID not offered as a choice must not be checked');
+  page.currentChoiceIds.push(third.id);
+  page.currentMode = 'speaking';
+  page.applyResult(false, third.id);
+  assert.equal(page.itemState(third).confusionCheck, undefined);
+});
 
 test('Genki lessons and N5 retain bounded coverage while adapting review frequency', () => {
   for (const scope of ['lesson1', 'lesson2', 'lesson3', 'lesson4', 'lesson5', 'lesson6', 'n5']) {

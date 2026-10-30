@@ -679,6 +679,32 @@
           "text": "Explore word-by-word meanings and sentence structure for every Lesson 4 example. Particle explanations are now shorter and more compact throughout vocabulary practice."
         }
       ]
+    },
+    {
+      "id": "2026-10-30.1",
+      "publishedAt": "2026-10-30",
+      "title": "Tighter particle explanation spacing",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Particle explanations now wrap with normal line spacing, without the extra gap below the first line."
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31.1",
+      "publishedAt": "2026-10-31",
+      "title": "More meaningful answer choices",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Related words now stay together in answer choices, even after repeated practice. Small related groups use fewer options instead of unrelated filler, and matching readings or overlapping meanings are kept apart."
+        },
+        {
+          "pages": ["vocabulary"],
+          "text": "Incorrectly selected words get a spaced check-in without losing mastery until directly tested. Next and I don’t know sit on the right, with keyboard guidance on the left and hidden on touch screens."
+        }
+      ]
     }
   ]
 }

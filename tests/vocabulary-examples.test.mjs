@@ -23,6 +23,16 @@ test('every vocabulary word has a complete example sentence', () => {
   });
 });
 
+test('inline particle labels reset page-header margins so wrapped lines stay compact', () => {
+  const styles = readFileSync(resolve('features/kana/vocabulary.css'), 'utf8');
+  const inlineLabel = [...styles.matchAll(/\.vocab-particle-card header\{([^}]+)\}/g)].at(-1)?.[1];
+  assert.ok(inlineLabel);
+  assert.match(inlineLabel, /margin:0(?:;|$)/);
+  assert.match(inlineLabel, /padding:0(?:;|$)/);
+  assert.match(inlineLabel, /vertical-align:baseline(?:;|$)/);
+  assert.match(inlineLabel, /line-height:inherit(?:;|$)/);
+});
+
 test('Lesson 4 particle explanations use contextual roles and compact markup', () => {
   const functions = vocabularySource.slice(vocabularySource.indexOf('  function escapeExampleText('), vocabularySource.indexOf('  function sentenceChunkLabels('));
   const context = {

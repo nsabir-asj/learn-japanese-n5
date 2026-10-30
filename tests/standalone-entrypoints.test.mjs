@@ -286,7 +286,7 @@ test('vocabulary answer choices support an adaptive default and manual override'
   assert.match(vocabulary, /if \(state\.choiceCount !== "auto"\) return Number\(state\.choiceCount\)/);
   assert.match(vocabulary, /currentChoiceCount = choices\.length/);
   assert.match(vocabulary, /state\.choiceCount = CHOICE_COUNT_VALUES\.includes\(event\.target\.value\) \? event\.target\.value : "auto"/);
-  assert.match(vocabulary, /Uses \$\{state\.choiceCount\} choices from the next question/);
+  assert.match(vocabulary, /Uses up to \$\{state\.choiceCount\} choices from the next question/);
 });
 
 test('vocabulary offers a silent bidirectional written mode', () => {
