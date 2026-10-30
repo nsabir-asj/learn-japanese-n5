@@ -76,6 +76,12 @@ The curriculum covers the complete vocabulary lists and useful expressions from 
 
 Vocabulary mastery is tracked independently for reading, listening, and recall, while a word is introduced only once across every direction. Words introduced through a focused filter remain available to the Guided course for review; they are never taught as new a second time. Recent-performance windows and question-count spacing make the review queue react to current weakness, while a focused trouble-word mode is available from the page. Practice can be scoped to the Guided course, All vocabulary (Lessons 1–2 plus Practical extras), Core lessons (Lessons 1–2 without extras), an individual lesson, Practical extras, or trouble words. The top dashboard shows scope, session accuracy, reviews due, mastered words, and current choice difficulty.
 
+### Sentence Practice
+
+Open `sentences.html` or choose **Sentence Practice** on the home page. Build sentences with noun–particle chunks in Supported mode or separate words and reusable particles in Independent mode. Related extra words and contrasting verb forms expand the bank to six chunks or eight words by default, with optional eight- and twelve-choice banks. Extra choices respect strict vocabulary filters. Particle practice supplies the word order and accepts choices or kana/romaji typing; verb practice covers the thirteen Lesson 3 verbs in polite affirmative and negative forms, with choices or kana/kanji/romaji recall. Both typing activities offer Romaji/Japanese controls and a live kana preview that reflects the typed response, including conventional particle spellings.
+
+The first content collection includes selected patterns from Lessons 1–3. The lesson/topic picker combines collections without guided-lesson locks. Short pattern and word introductions precede supported first attempts; unaided practice is tracked separately for each activity and format. Familiar-vocabulary preferences read Vocabulary progress without modifying it, and strict introduced/mastered filters never broaden automatically. Sentence Practice has its own progress store, cloud sync, and complete/component backup support.
+
 ### Numbers
 
 The dedicated **Numbers** page begins with 0–10, then covers teens, tens, hundreds, thousands, irregular readings such as `sanbyaku`, `roppyaku`, `happyaku`, `sanzen`, and `hassen`, and the Japanese 10,000 unit `man`.

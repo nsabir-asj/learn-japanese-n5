@@ -31,6 +31,7 @@ const pageScopes = new Map([
   ['vocabulary.html', 'vocabulary'],
   ['numbers.html', 'numbers'],
   ['kanji.html', 'kanji'],
+  ['sentences.html', 'guided'],
   ['settings.html', 'settings'],
   [path.join('guided', 'player.html'), 'guided'],
 ]);

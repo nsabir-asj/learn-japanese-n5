@@ -10,6 +10,7 @@
     kanaSprintVocabularyV1: { label: "Vocabulary", version: 1 },
     kanaSprintNumbersV1: { label: "Numbers", version: 1 },
     kanaSprintKanjiV1: { label: "Kanji", version: 1 },
+    kanaSprintSentencesV1: { label: "Sentence Practice", version: 1 },
     kanaSprintGuidedLessonsV1: { label: "Guided lessons", version: 1 },
     kanaSprintGuidedLesson2V1: { label: "Guided Lesson 2", version: 1 },
     kanaSprintGuidedLesson3V1: { label: "Guided Lesson 3", version: 1 },
@@ -45,6 +46,9 @@
     if (key === "kanaSprintKanjiV1") {
       const introduced = Object.values(value.items || {}).filter(item => item.introduced).length;
       return `${value.total || 0} answers · ${introduced} kanji introduced`;
+    }
+    if (key === "kanaSprintSentencesV1") {
+      return `${value.total || 0} attempts · ${Object.values(value.introduced || {}).filter(Boolean).length} patterns introduced`;
     }
     if (key === "kanaSprintGuidedLessonsV1" || key === "kanaSprintGuidedLesson2V1" || key === "kanaSprintGuidedLesson3V1") {
       const completed = Object.values(value.activities || {}).filter(item => item.completed).length;

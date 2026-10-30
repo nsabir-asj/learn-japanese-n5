@@ -14,6 +14,7 @@ const entrypoints = [
   'vocabulary.html',
   'numbers.html',
   'kanji.html',
+  'sentences.html',
   'settings.html',
   'guided/player.html',
 ];
@@ -45,6 +46,7 @@ test('the root launcher links to every learning experience', () => {
     './vocabulary.html',
     './numbers.html',
     './kanji.html',
+    './sentences.html',
     './settings.html',
     './guided/player.html?lesson=1',
     './guided/player.html?lesson=2',

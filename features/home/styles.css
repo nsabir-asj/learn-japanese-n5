@@ -35,7 +35,7 @@ section + section { margin-top: 44px; }
 .section-heading > p { max-width: 590px; margin: 0; color: var(--muted); line-height: 1.55; }
 .activity-grid { display: grid; gap: 14px; }
 .activity-grid-sprints { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.activity-grid-foundations { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.activity-grid-foundations { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .activity-card { position: relative; display: grid; min-width: 0; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(145deg, rgba(28,36,48,.96), rgba(22,27,34,.96)); color: var(--text); padding: 22px; text-decoration: none; box-shadow: 0 18px 55px rgba(0,0,0,.18); transition: transform .16s ease, border-color .16s ease, background .16s ease; }
 .activity-card:hover { transform: translateY(-3px); border-color: #637083; background: linear-gradient(145deg, #202a37, #181e27); }
 .activity-card:focus-visible { outline: 3px solid rgba(88,166,255,.5); outline-offset: 3px; }
@@ -58,6 +58,8 @@ section + section { margin-top: 44px; }
 .lesson-card-shopping { background: linear-gradient(110deg, rgba(240,173,78,.14), transparent 45%), linear-gradient(145deg, rgba(28,36,48,.96), rgba(22,27,34,.96)); }
 .lesson-card-shopping:hover { background: linear-gradient(110deg, rgba(240,173,78,.2), transparent 45%), linear-gradient(145deg, #202a37, #181e27); }
 .lesson-card-shopping .lesson-number { border-color: rgba(240,173,78,.5); background: rgba(240,173,78,.1); color: #ffd28f; }
+.sentences-card { background:linear-gradient(140deg,rgba(75,164,143,.18),rgba(22,27,34,.96)); }
+.sentences-card .foundation-mark { color:#a3e4cf; }
 .lesson-card-plans { background: linear-gradient(110deg, rgba(56,199,175,.14), transparent 45%), linear-gradient(145deg, rgba(28,36,48,.96), rgba(22,27,34,.96)); }
 .lesson-card-plans:hover { background: linear-gradient(110deg, rgba(56,199,175,.2), transparent 45%), linear-gradient(145deg, #202a37, #181e27); }
 .lesson-card-plans .lesson-number { border-color: rgba(56,199,175,.5); background: rgba(56,199,175,.1); color: #8de5d5; }
