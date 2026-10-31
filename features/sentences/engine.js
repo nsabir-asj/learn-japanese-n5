@@ -42,7 +42,7 @@
     const units = supported ? exercise.chunks : pieces(exercise).filter(x => !x.role).map(x => [x]);
     const describe = unit => unit.map(piece => {
       const verb = C.verbs.find(v => v.id === piece.wordId);
-      return verb ? `${verb.meaning} · ${piece.text.endsWith("ません") ? "negative" : "affirmative"}` : C.words[piece.wordId]?.meaning;
+      return verb ? `${verb.meaning} · ${piece.text.endsWith("ました") || piece.text.endsWith("でした") ? "past " : ""}${piece.text.includes("ません") ? "negative" : "affirmative"}` : C.words[piece.wordId]?.meaning;
     }).filter(Boolean).join(" · ") || "polite ending";
     const tile = (unit, extra = false) => ({ text:unit.map(x => x.text).join(""), meaning:describe(unit), wordIds:[...new Set(unit.map(x => x.wordId).filter(Boolean))], distractor:extra });
     const source = units.map(unit => tile(unit));
@@ -64,9 +64,11 @@
         const verb = C.verbs.find(v => v.id === piece.wordId);
         const replace = (text,id,priority) => add(unit.map((x,i) => i === index ? {...x,text,wordId:id} : x),priority);
         if (verb) {
-          const negative = piece.text.endsWith("ません");
-          replace(verb.stem + (negative ? "ます" : "ません"),verb.id,45);
-          related.forEach(id => { const other=C.verbs.find(v=>v.id===id); if(other)replace(other.stem+(negative ? "ません" : "ます"),id,35); });
+          const negative = piece.text.includes("ません");
+          const past = piece.text.endsWith("ました") || piece.text.endsWith("でした");
+          const suffix = past ? (negative ? "ませんでした" : "ました") : (negative ? "ません" : "ます");
+          replace(verb.stem + (past ? (negative ? "ました" : "ませんでした") : (negative ? "ます" : "ません")),verb.id,45);
+          related.forEach(id => { const other=C.verbs.find(v=>v.id===id); if(other && (other.lesson || 3) <= lesson)replace(other.stem+suffix,id,35); });
         } else related.forEach(id => {
           // An extra choice may use earlier material, but never a later lesson's word.
           const earliest = Math.min(...C.sentences.filter(s => pieces(s).some(x => x.wordId === id)).map(s => C.topics.find(t => t.id === s.topic).lesson));
@@ -101,11 +103,14 @@
     return Object.hasOwn(aliases,raw) ? aliases[raw] : hiraganaPreview(raw);
   }
   function verbExercises() {
-    return C.verbs.flatMap(verb => ["affirmative","negative"].map(form => ({
-      id: `${verb.id}-${form}`, topic: `verbs-${verb.group}`, verb, form,
-      answer: verb.stem + (form === "affirmative" ? "ます" : "ません"),
-      romaji: verb.romajiStem + (form === "affirmative" ? "masu" : "masen"),
-      kanji: verb.kanjiStem + (form === "affirmative" ? "ます" : "ません"),
+    return C.verbs.flatMap(verb => [
+      ["affirmative","ます","masu"], ["negative","ません","masen"],
+      ["past affirmative","ました","mashita"], ["past negative","ませんでした","masendeshita"]
+    ].map(([form,suffix,romajiSuffix]) => ({
+      id: `${verb.id}-${form.replace(/ /g,"-")}`, topic: form.startsWith("past") ? "verbs-past" : verb.lesson === 4 ? "verbs-lesson4" : `verbs-${verb.group}`, verb, form, suffix,
+      answer: verb.stem + suffix,
+      romaji: verb.romajiStem + romajiSuffix,
+      kanji: verb.kanjiStem + suffix,
       wordIds: [verb.id]
     })));
   }

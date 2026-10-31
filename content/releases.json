@@ -775,6 +775,19 @@
       "publishedAt": "2026-10-31",
       "title": "Compact verb cards with grammar details",
       "changes": [{"pages": ["vocabulary"], "text": "Sentence breakdowns show compact verb cards with their verb group and time meaning. Tap a verb to open its dictionary form, conjugation rule and sentence explanation in a dialog."}]
+    },
+    {
+      "id": "2026-10-31.7",
+      "publishedAt": "2026-10-31",
+      "title": "Lesson 4 sentence practice",
+      "changes": [
+        {
+          "pages": [
+            "guided"
+          ],
+          "text": "Choose Lesson 4 for existence and location, past tense, duration, and noun lists. Practise eight new verbs and past forms of earlier verbs, with sentence building, particle gaps, and typed or choice answers. All practice modes start directly without automatic introductions. A clearly outlined Hint button offers rules and optional word meanings; answers count as unaided unless you open help."
+        }
+      ]
     }
   ]
 }

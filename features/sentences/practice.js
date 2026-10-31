@@ -15,8 +15,8 @@
       for (const activity of ["build","particles","verbs"]) state.settings.scopes[activity] = Array.isArray(state.settings.scopes[activity]) ? state.settings.scopes[activity].filter(id => C.topics.some(t => t.id === id)) : defaults().settings.scopes[activity];
     }
   } catch { /* A broken saved snapshot should not stop practice. */ }
-  let current = null, selected = [], bank = [], answers = [], activeSlot = 0, answered = false, assisted = false, recent = [], sessionTotal = 0, sessionCorrect = 0, sessionUnaided = 0;
-  let draft = new Set(), scopeView = "lessons", scopeSearch = "", teaching = false;
+  let current = null, selected = [], bank = [], answers = [], activeSlot = 0, answered = false, assisted = false, assistanceReason = "", recent = [], sessionTotal = 0, sessionCorrect = 0, sessionUnaided = 0;
+  let draft = new Set(), scopeView = "lessons", scopeSearch = "";
   const settings = () => ({...state.settings,topics:state.settings.scopes[state.settings.activity]});
   const modeName = () => ({build:state.settings.support === "supported" ? "Supported building" : "Independent building",particles:state.settings.input === "choice" ? "Particle choices" : "Particle recall",verbs:state.settings.input === "choice" ? "Verb choices" : "Verb recall"}[state.settings.activity]);
   const availableTopics = () => C.topics.filter(t => state.settings.activity === "verbs" ? t.verbGroup : !t.verbGroup);
@@ -58,7 +58,7 @@
     const topicCount = settings().topics.filter(id => availableTopics().some(t => t.id === id)).length;
     $("#scopeCount").textContent = `${topicCount} ${topicCount === 1 ? "topic" : "topics"} · ${pool().length} exercises`;
     $("#modeControls").innerHTML = s.activity === "build" ? ["supported","independent"].map(id => `<button type="button" data-support="${id}" aria-pressed="${s.support === id}">${id === "supported" ? "Supported" : "Independent"}</button>`).join("") : ["choice","typing"].map(id => `<button type="button" data-input="${id}" aria-pressed="${s.input === id}">${id === "choice" ? "Choose" : "Type"}</button>`).join("");
-    $("#modeDescription").textContent = s.activity === "build" ? s.support === "supported" ? "Start with useful chunks. Particles stay attached to their words." : "Choose words and particles separately. Extra particles can remain unused." : s.activity === "particles" ? "The words are in place. Choose what connects them; sometimes no particle is needed." : "Start from the dictionary form. Make the polite affirmative or negative form.";
+    $("#modeDescription").textContent = s.activity === "build" ? s.support === "supported" ? "Start with useful chunks. Particles stay attached to their words." : "Choose words and particles separately. Extra particles can remain unused." : s.activity === "particles" ? "The words are in place. Choose what connects them; sometimes no particle is needed." : "Start from the dictionary form. Practise polite affirmative, negative, and past forms.";
     $("#vocabularyFilter").value = s.vocabulary; $("#reviewFilter").value = s.review;
     $("#bankSize").value = s.bankSize; $("#bankSizeSetting").hidden = s.activity !== "build";
     $("#settingsSummary").textContent = `${$("#vocabularyFilter").selectedOptions[0].textContent} · ${s.review === "trouble" ? "Trouble only" : "New + review"}`;
@@ -85,7 +85,7 @@
   }
   function next() {
     window.KANA_SPRINT_SPEECH?.stop();
-    answered = false; assisted = false; selected = []; answers = []; activeSlot = 0; teaching = false;
+    answered = false; assisted = false; assistanceReason = ""; selected = []; answers = []; activeSlot = 0;
     const config = settings(), vocab = vocabulary();
     current = E.choose(pool(),config,state,recent,vocab);
     renderChrome();
@@ -94,17 +94,11 @@
       return;
     }
     recent.push(current.id); recent = recent.slice(-8);
-    const topic = C.topics.find(t => t.id === current.topic);
-    const missing = E.wordIds(current).filter(id => !E.familiar(id,vocab) && !state.wordsSeen[id]);
-    if (!state.introduced[topic.id] || missing.length) {
-      teaching = true;
-      $("#questionCard").innerHTML = `<div class="sp-card-top"><span class="sp-eyebrow">${!state.introduced[topic.id] ? "Meet a new pattern" : "A few words before you begin"}</span><span class="sp-lesson-tag">Lesson ${topic.lesson}</span></div><h2>${esc(topic.title)}</h2>${!state.introduced[topic.id] ? ruleMarkup(topic) : ""}${missing.length ? `<div class="sp-word-intro"><h3>Words for this sentence</h3><p>You can study these here without changing your Vocabulary progress.</p>${missing.map(id => `<div><strong lang="ja">${esc(C.words[id].jp)}</strong><span>${esc(C.words[id].romaji)}</span><span>${esc(C.words[id].meaning)}</span></div>`).join("")}</div>` : ""}<p class="sp-muted">This first attempt will be supported. An unaided check will follow in later practice.</p><button class="sp-primary" type="button" data-action="start" aria-keyshortcuts="Enter">Try the pattern <kbd>Enter</kbd></button>`;
-    } else renderExercise();
+    renderExercise();
   }
   function renderExercise() {
-    teaching = false;
     const s = state.settings, topic = C.topics.find(t => t.id === current.topic);
-    $("#questionCard").innerHTML = `<div class="sp-card-top"><span class="sp-eyebrow">${esc(modeName())}</span><span class="sp-lesson-tag">Lesson ${topic.lesson}</span></div><p class="sp-task-label">${s.activity === "verbs" ? `Make the polite ${current.form} form` : "Say this in Japanese"}</p><h2 id="exercisePrompt" tabindex="-1">${esc(s.activity === "verbs" ? current.verb.meaning : current.meaning)}</h2>${current.context ? `<p class="sp-context-note">${esc(current.context)}</p>` : ""}<div id="exerciseBody"></div><div class="sp-answer-feedback" id="answerFeedback" role="status" aria-live="polite"></div><div class="sp-footer"><div class="sp-actions"><button class="sp-primary" type="button" data-action="check" id="checkAnswer" aria-keyshortcuts="Enter">Check answer <kbd>Enter</kbd></button><button class="sp-secondary" type="button" data-action="next" id="nextExercise" aria-keyshortcuts="Enter" hidden>Next sentence →</button><button class="sp-text-button" type="button" data-action="unknown" id="dontKnow">I don’t know</button></div><button class="sp-text-button" type="button" data-action="hint" id="hintButton">Hint</button></div><p class="sp-keyboard" id="keyboardNote"></p>`;
+    $("#questionCard").innerHTML = `<div class="sp-card-top"><span class="sp-eyebrow">${esc(modeName())}</span><span class="sp-lesson-tag">Lesson ${topic.lesson}</span></div><p class="sp-task-label">${s.activity === "verbs" ? `Make the polite ${current.form} form` : "Say this in Japanese"}</p><h2 id="exercisePrompt" tabindex="-1">${esc(s.activity === "verbs" ? current.verb.meaning : current.meaning)}</h2>${current.context ? `<p class="sp-context-note">${esc(current.context)}</p>` : ""}<div id="exerciseBody"></div><div class="sp-answer-feedback" id="answerFeedback" role="status" aria-live="polite"></div><div class="sp-footer"><div class="sp-actions"><button class="sp-primary" type="button" data-action="check" id="checkAnswer" aria-keyshortcuts="Enter">Check answer <kbd>Enter</kbd></button><button class="sp-secondary" type="button" data-action="next" id="nextExercise" aria-keyshortcuts="Enter" hidden>Next sentence →</button><button class="sp-text-button" type="button" data-action="unknown" id="dontKnow">I don’t know</button></div><button class="sp-hint-button" type="button" data-action="hint" id="hintButton"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6m-5 3h4M8.5 14.5a6 6 0 1 1 7 0c-1 .7-1.5 1.5-1.5 3.5h-4c0-2-.5-2.8-1.5-3.5Z"/></svg><span>Hint</span></button></div><p class="sp-keyboard" id="keyboardNote"></p>`;
     if (s.activity === "build") {
       bank = E.tileBank(current,s.support === "supported",Math.random,{settings:s,vocabulary:vocabulary()});
       $("#exerciseBody").innerHTML = `<div class="sp-answer-zone"><div class="sp-zone-heading"><span>Your sentence</span><button class="sp-text-button" type="button" data-action="clear">Clear</button></div><div id="builtAnswer" class="sp-built-answer" aria-label="Your sentence"></div></div><div class="sp-bank-heading"><span>${s.support === "supported" ? "Sentence chunks" : "Words"} · ${bank.length} choices</span><small>Extra choices can remain. Click an answer tile to remove it.</small></div><div id="wordBank" class="sp-tile-bank"></div>${s.support === "independent" ? `<div class="sp-bank-heading"><span>Particles</span><small>Reusable · extra choices may remain</small></div><div id="particleBank" class="sp-tile-bank sp-particle-bank">${["は","が","を","に","へ","で","の","と","も","か"].map(text => `<button class="sp-tile sp-particle" type="button" data-particle="${text}" lang="ja">${text}</button>`).join("")}</div>` : ""}`;
@@ -117,8 +111,9 @@
       $("#keyboardNote").textContent = s.input === "choice" ? "Keys 1–9, 0, or − choose a particle. Enter checks all gaps." : "Enter checks all gaps. Answers use the Japanese particle spelling.";
     } else {
       const wrongStem = current.verb.jp.slice(0,-1) + (current.verb.group === "ru" ? "り" : current.verb.jp.slice(-1));
-      const end = current.form === "affirmative" ? "ます" : "ません";
-      const options = E.shuffle([...new Set([current.answer,current.verb.stem + (current.form === "affirmative" ? "ません" : "ます"),current.verb.jp + end,wrongStem + end])]);
+      const end = current.suffix;
+      const opposite = current.form.startsWith("past") ? (current.form.endsWith("negative") ? "ました" : "ませんでした") : (current.form === "affirmative" ? "ません" : "ます");
+      const options = E.shuffle([...new Set([current.answer,current.verb.stem + opposite,current.verb.jp + end,wrongStem + end])]);
       $("#exerciseBody").innerHTML = `<div class="sp-verb-source"><span>Dictionary form</span><strong lang="ja">${esc(current.verb.jp)}</strong><small>${esc(current.verb.romaji)}</small></div>${s.input === "typing" ? `${typingControls()}<label class="sp-typed-label"><span id="typedAnswerLabel">Your answer</span><input class="sp-typed-answer" id="verbInput" type="text" placeholder="Type romaji" autocomplete="off" autocapitalize="off" spellcheck="false"></label>${kanaPreviewMarkup()}` : `<div class="sp-verb-choices">${options.map((text,i) => `<button class="sp-tile" type="button" data-verb-choice="${esc(text)}"><kbd>${i+1}</kbd><span lang="ja">${esc(text)}</span></button>`).join("")}</div>`}`;
       $("#keyboardNote").textContent = s.input === "typing" ? "Type the whole form, then press Enter." : "Choose with keys 1–4, then press Enter to check.";
     }
@@ -162,7 +157,7 @@
     return `<div class="sp-particle-feedback">${details.map(slot => `<div class="${slot.correct ? "is-correct" : "is-wrong"}"><strong>${slot.correct ? "✓" : "↻"} ${esc(slot.anchor)} + ${esc(slot.choices.map(x => x || "—").join(" / "))}</strong><span>${esc(C.roles[slot.role].note)}</span>${!slot.correct ? `<small>Your choice: ${esc(slot.answer || "—")}</small>` : ""}</div>`).join("")}</div>`;
   }
   function check(unknown = false) {
-    if (answered || !current || teaching) return;
+    if (answered || !current) return;
     const s = settings();
     let correct = false, details = [], response = "";
     if (s.activity === "build") {
@@ -191,7 +186,7 @@
     save(); updateStats();
     $("#answerFeedback").className = `sp-answer-feedback is-visible ${correct ? "is-correct" : "is-wrong"}`;
     const wrongWords = s.activity === "build" ? selected.filter(x => x.distractor) : [];
-    $("#answerFeedback").innerHTML = `<strong class="sp-feedback-title">${correct ? "✓ That works." : "Let’s look at this one."}</strong>${assisted ? '<p class="sp-assisted-note">Supported attempt · saved for another check. Accuracy and streak are unchanged.</p>' : ""}<div class="sp-model-answer"><span>${s.activity === "verbs" ? "Correct form" : correct ? "One natural answer" : "Model sentence"}</span><strong lang="ja">${esc(s.activity === "verbs" ? current.answer : E.model(current))}</strong>${s.activity === "verbs" ? `<small>${esc(current.romaji)} · ${esc(current.verb.group)}-verb · ${esc(current.form)}</small>` : ""}</div>${!correct && wrongWords.length ? `<div class="sp-word-feedback"><strong>Check the meaning of these choices</strong>${wrongWords.map(word => `<p><span lang="ja">${esc(word.text)}</span><span>${esc(word.meaning)}</span></p>`).join("")}</div>` : ""}${details.length ? feedbackRows(details) : `<p>${esc(C.topics.find(t => t.id === current.topic).rule)}</p>`}${!correct && !wrongWords.length && s.activity === "build" && details.length && details.every(x => x.correct) ? '<p>Your particle choices fit. Check that the noun phrases stay together and the sentence ending comes last.</p>' : ""}<div class="sp-feedback-tools"><button class="sp-audio-button" type="button" data-action="audio"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg><span>Hear the answer</span></button><span id="audioNotice" class="sp-muted" role="status"></span></div><details class="sp-breakdown"><summary>Words &amp; meanings</summary>${wordGlossary()}</details>`;
+    $("#answerFeedback").innerHTML = `<strong class="sp-feedback-title">${correct ? "✓ That works." : "Let’s look at this one."}</strong>${assisted ? `<p class="sp-assisted-note">Hint or rule opened · saved for an unaided check. Accuracy and streak are unchanged.</p>` : ""}<div class="sp-model-answer"><span>${s.activity === "verbs" ? "Correct form" : correct ? "One natural answer" : "Model sentence"}</span><strong lang="ja">${esc(s.activity === "verbs" ? current.answer : E.model(current))}</strong>${s.activity === "verbs" ? `<small>${esc(current.romaji)} · ${esc(current.verb.group)}-verb · ${esc(current.form)}</small>` : ""}</div>${!correct && wrongWords.length ? `<div class="sp-word-feedback"><strong>Check the meaning of these choices</strong>${wrongWords.map(word => `<p><span lang="ja">${esc(word.text)}</span><span>${esc(word.meaning)}</span></p>`).join("")}</div>` : ""}${details.length ? feedbackRows(details) : `<p>${esc(C.topics.find(t => t.id === current.topic).rule)}</p>`}${!correct && !wrongWords.length && s.activity === "build" && details.length && details.every(x => x.correct) ? '<p>Your particle choices fit. Check that the noun phrases stay together and the sentence ending comes last.</p>' : ""}<div class="sp-feedback-tools"><button class="sp-audio-button" type="button" data-action="audio"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg><span>Hear the answer</span></button><span id="audioNotice" class="sp-muted" role="status"></span></div><details class="sp-breakdown"><summary>Words &amp; meanings</summary>${wordGlossary()}</details>`;
     $("#checkAnswer").hidden = true; $("#dontKnow").hidden = true; $("#hintButton").hidden = true;
     $("#nextExercise").hidden = false; $("#nextExercise").innerHTML = `${s.activity === "verbs" ? "Next verb" : "Next sentence"} <kbd>Enter</kbd>`;
     $("#exerciseBody").querySelectorAll("button,input").forEach(x => {x.disabled = true;});
@@ -200,10 +195,10 @@
   function wordGlossary() { return `<div class="sp-word-intro">${E.wordIds(current).map(id => `<div><strong lang="ja">${esc(C.words[id].jp)}</strong><span>${esc(C.words[id].romaji)}</span><span>${esc(C.words[id].meaning)}</span></div>`).join("")}</div>`; }
   function showRule(hint = false) {
     if (!current) return;
-    if (!answered && !teaching) assisted = true;
+    if (!answered) { assisted = true; assistanceReason = "hint"; }
     const topic = C.topics.find(t => t.id === current.topic);
     $("#ruleTitle").textContent = topic.title;
-    $("#ruleBody").innerHTML = `${ruleMarkup(topic)}${hint ? `<h3>Words in this exercise</h3>${wordGlossary()}` : ""}${!answered && !teaching ? '<p class="sp-muted">This attempt will be recorded as supported.</p>' : ""}`;
+    $("#ruleBody").innerHTML = `${ruleMarkup(topic)}${hint ? `<details class="sp-breakdown"><summary>Show word meanings</summary>${wordGlossary()}</details>` : ""}${!answered ? '<p class="sp-muted">Using help marks this attempt as assisted. Accuracy and streak are unchanged.</p>' : ""}`;
     $("#ruleDialog").showModal();
   }
   function openScope() {
@@ -225,7 +220,7 @@
     });
     const count = pool({...settings(),topics:[...draft]}).length;
     $("#selectionCount").textContent = `${draft.size} topics · ${count} matching exercises`;
-    $("#selectionHint").textContent = state.settings.activity === "verbs" ? "First collection: Lesson 3 polite forms. More units can be added later." : "Current collections cover selected patterns from Lessons 1–3.";
+    $("#selectionHint").textContent = state.settings.activity === "verbs" ? "Lesson 3 and 4 verbs, including past forms in Lesson 4." : "Current collections cover selected patterns from Lessons 1–4.";
     $("#applyScope").disabled = !draft.size;
   }
   document.addEventListener("click",event => {
@@ -255,14 +250,11 @@
     const action = button.dataset.action;
     if (action === "scope") return openScope();
     if (action === "settings") {$("#sessionSettings").open = true;$("#sessionSettings").scrollIntoView({block:"center"});return;}
-    if (action === "start") {
-      state.introduced[current.topic]=true; E.wordIds(current).forEach(id=>{state.wordsSeen[id]=true;}); assisted=true;save();renderExercise();return;
-    }
     if (action === "rule" || action === "hint") return showRule(action === "hint");
     if (action === "audio") { if (!window.KANA_SPRINT_SPEECH?.speakJapanese(state.settings.activity === "verbs" ? current.answer : E.model(current))) $("#audioNotice").textContent="No Japanese voice available. Choose a voice in Settings & Data."; return; }
     if (action === "next") {next();$("#exercisePrompt")?.focus();return;}
     if (action === "check" || action === "unknown") return check(action === "unknown");
-    if (answered || teaching || !current) return;
+    if (answered || !current) return;
     if (button.dataset.word) {const tile=bank.find(x=>x.id === button.dataset.word);if (tile && !selected.some(x=>x.id===tile.id)) selected.push(tile);renderTiles();$("#builtAnswer button:last-child")?.focus();}
     if (button.dataset.particle) {selected.push({text:button.dataset.particle,particle:true});renderTiles();}
     if (button.dataset.remove !== undefined) {const removed=selected.splice(Number(button.dataset.remove),1)[0];renderTiles();if(removed?.id) $("#wordBank").querySelector(`[data-word="${removed.id}"]`)?.focus();else $("#particleBank")?.querySelector("button")?.focus();}
@@ -284,12 +276,6 @@
   document.addEventListener("compositionend",event => {if(event.target.matches("#verbInput,[data-gap-input]")) updateTypingPreview();});
   document.addEventListener("keydown",event => {
     if ($("dialog[open]") || event.isComposing || event.repeat || !current) return;
-    if (teaching) {
-      if (event.key === "Enter" && !event.repeat && !event.target.matches("button,input,select,textarea,summary,a")) {
-        event.preventDefault(); $("[data-action='start']")?.click();
-      }
-      return;
-    }
     const typing = event.target.matches("input,select,textarea,summary");
     if (event.key === "Enter" && !event.target.matches("button,summary,select,a,textarea")) {
       event.preventDefault();if(answered)next();else check();return;

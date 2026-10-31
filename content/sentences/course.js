@@ -17,6 +17,16 @@
     { id: "verbs-ru", lesson: 3, title: "Ru-verbs", subtitle: "Polite affirmative and negative", verbGroup: "ru", rule: "For a ru-verb, remove the final る and add ます or ません. Learn a verb’s group with the word: not every verb ending in る is a ru-verb.", examples: [["たべる → たべます / たべません", "eat / do not eat"], ["みる → みます / みません", "watch / do not watch"]] },
     { id: "verbs-irregular", lesson: 3, title: "Irregular verbs", subtitle: "する and くる", verbGroup: "irregular", rule: "Learn these changes directly: する → します / しません; くる → きます / きません. Compounds such as べんきょうする follow する.", examples: [["する → します / しません", "do / do not do"], ["くる → きます / きません", "come / do not come"]] }
   ];
+  topics.push(
+    { id: "existence", lesson: 4, title: "Say what is there", subtitle: "Place に + thing / person が", rule: "Use に for where something exists and が for what exists. Use あります for things and plants, and います for people and animals. Use で for an activity instead.", examples: [["こうえんに いぬが います。", "There is a dog in the park."], ["つくえのうえに ほんが あります。", "There is a book on the desk."]] },
+    { id: "relative-location", lesson: 4, title: "Locate people and things", subtitle: "Reference noun の + position", rule: "Connect a reference object to a position with の: つくえのした means under the desk. To locate something already being discussed, use topic は + location + です.", examples: [["ねこは つくえのしたです。", "The cat is under the desk."], ["ほんやは ホテルのとなりです。", "The bookstore is next to the hotel."]] },
+    { id: "past-actions", lesson: 4, title: "Talk about past actions", subtitle: "ました / ませんでした", rule: "Add ました to the polite stem for a past action, or ませんでした for a past negative. きのう and せんしゅう usually need no に. Particles for objects, destinations, and activity places keep their roles.", examples: [["きのう ほんを よみました。", "I read a book yesterday."], ["きのう べんきょうしませんでした。", "I did not study yesterday."]] },
+    { id: "past-nouns", lesson: 4, title: "Describe the past", subtitle: "でした / じゃなかったです", rule: "For a past noun sentence, change です to でした. A polite past negative is じゃなかったです. These noun endings differ from verb endings such as ました.", examples: [["きのうは にちようびでした。", "Yesterday was Sunday."], ["せんせいじゃなかったです。", "I was not a teacher."]] },
+    { id: "duration", lesson: 4, title: "Say how long", subtitle: "Duration without に · ぐらい", rule: "A duration such as いちじかん (one hour) takes no に here. Add ぐらい for approximately. Compare a clock time such as しちじに (at seven).", examples: [["いちじかん べんきょうしました。", "I studied for one hour."], ["いちじかんぐらい まちました。", "I waited for about one hour."]] },
+    { id: "listing-nouns", lesson: 4, title: "Join nouns with と", subtitle: "A complete list · and", rule: "と between nouns means and. Put the particle for the whole list after the last noun: ほんとパンをかいました. Compare と after a person meaning with that person.", examples: [["ほんと パンを かいました。", "I bought a book and bread."], ["いぬと ねこが います。", "There are a dog and a cat."]] },
+    { id: "verbs-lesson4", lesson: 4, title: "Lesson 4 verbs", subtitle: "Polite affirmative and negative", verbGroup: "mixed", rule: "For u-verbs, change the final u sound to i and add ます / ません. For the ru-verb いる, remove る. Learn ある → あります and わかる → わかります as u-verbs.", examples: [["まつ → まちます / まちません", "wait / do not wait"], ["いる → います / いません", "be there / not be there (living things)"]] },
+    { id: "verbs-past", lesson: 4, title: "Past verb forms", subtitle: "Earlier verbs + Lesson 4 verbs", verbGroup: "mixed", rule: "Use the same polite stem as ます, then add ました for past affirmative or ませんでした for past negative. This also works for irregular verbs: する → しました; くる → きませんでした.", examples: [["かう → かいました / かいませんでした", "bought / did not buy"], ["たべる → たべました / たべませんでした", "ate / did not eat"]] }
+  );
   // Word IDs match Vocabulary progress. Inflected verbs refer back to dictionary words.
   const words = {};
   const w = (id, jp, romaji, meaning) => { words[id] = { id, jp, romaji, meaning, vocabularyIds: [id] }; };
@@ -36,6 +46,18 @@
   ].forEach(row => w(...row));
   // Clock phrases are already produced by the Numbers course, not Vocabulary words.
   words.shichiji.foundation = true; words.kuji.foundation = true;
+  [
+    ["inu", "いぬ", "inu", "dog"], ["neko", "ねこ", "neko", "cat"], ["kodomo", "こども", "kodomo", "child"],
+    ["isu", "いす", "isu", "chair"], ["tsukue", "つくえ", "tsukue", "desk"], ["shashin", "しゃしん", "shashin", "photograph"],
+    ["hana-flower", "はな", "hana", "flower"], ["repooto", "レポート", "repooto", "report"], ["pan", "パン", "pan", "bread"],
+    ["otera", "おてら", "otera", "temple"], ["kouen", "こうえん", "kouen", "park"], ["suupaa", "スーパー", "suupaa", "supermarket"],
+    ["hoteru", "ホテル", "hoteru", "hotel"], ["honya", "ほんや", "honya", "bookstore"], ["byouin", "びょういん", "byouin", "hospital"],
+    ["kinou", "きのう", "kinou", "yesterday"], ["senshuu", "せんしゅう", "senshuu", "last week"], ["ichijikan", "いちじかん", "ichijikan", "one hour"],
+    ["ue", "うえ", "ue", "on / above"], ["shita", "した", "shita", "under / below"], ["naka", "なか", "naka", "inside"],
+    ["mae", "まえ", "mae", "in front"], ["ushiro", "うしろ", "ushiro", "behind"], ["tonari", "となり", "tonari", "next to"],
+    ["chikaku", "ちかく", "chikaku", "near"], ["migi", "みぎ", "migi", "right"], ["hidari", "ひだり", "hidari", "left"],
+    ["aida", "あいだ", "aida", "between"], ["suffix-gurai", "ぐらい", "gurai", "about / approximately"]
+  ].forEach(row => w(...row));
   const verbs = [
     ["taberu", "たべる", "taberu", "eat", "ru", "たべ", "tabe", "食べ"],
     ["miru", "みる", "miru", "watch", "ru", "み", "mi", "見"],
@@ -55,6 +77,19 @@
     return { id, jp, romaji, meaning, group, stem, romajiStem, kanjiStem };
   });
   words.benkyousuru.vocabularyIds = ["benkyou-suru"];
+  [
+    ["au", "あう", "au", "meet", "u", "あい", "ai", "会い"],
+    ["aru", "ある", "aru", "exist (things)", "u", "あり", "ari", "あり"],
+    ["kau", "かう", "kau", "buy", "u", "かい", "kai", "買い"],
+    ["kaku", "かく", "kaku", "write", "u", "かき", "kaki", "書き"],
+    ["toru", "とる", "toru", "take a photograph", "u", "とり", "tori", "撮り"],
+    ["matsu", "まつ", "matsu", "wait", "u", "まち", "machi", "待ち"],
+    ["iru", "いる", "iru", "exist (people / animals)", "ru", "い", "i", "い"],
+    ["wakaru", "わかる", "wakaru", "understand", "u", "わかり", "wakari", "分かり"]
+  ].forEach(([id,jp,romaji,meaning,group,stem,romajiStem,kanjiStem]) => {
+    w(id,jp,romaji,meaning);
+    verbs.push({id,jp,romaji,meaning,group,stem,romajiStem,kanjiStem,lesson:4});
+  });
   const roles = {
     topic: { title: "Topic", note: "は marks what this sentence is about. Written は, pronounced wa.", choices: ["は"] },
     possession: { title: "Noun relationship", note: "の follows the owner or describing noun and comes before the noun it describes.", choices: ["の"] },
@@ -64,10 +99,14 @@
     destination: { title: "Destination", note: "に or へ marks the destination of this movement. Both are valid here; で marks an activity location.", choices: ["に", "へ"] },
     place: { title: "Activity location", note: "で marks where this activity happens. This place is not a movement destination.", choices: ["で"] },
     time: { title: "Specific time", note: "に follows a specific clock time or day of the week.", choices: ["に"] },
-    bareTime: { title: "Relative / repeated time", note: "きょう and まいにち stand without a particle in this neutral sentence.", choices: [""] },
+    bareTime: { title: "Relative / repeated time", note: "Relative or repeated time expressions such as きょう, きのう, せんしゅう, and まいにち stand without a particle in these neutral sentences.", choices: [""] },
     companion: { title: "Companion", note: "と marks the person you do the activity with.", choices: ["と"] }
   };
   const word = id => ({ text: words[id].jp, wordId: id });
+  roles.existencePlace = { title: "Existence location", note: "に marks where something exists. Use で for an activity instead.", choices: ["に"] };
+  roles.subject = { title: "What exists", note: "が marks the person, animal, or thing whose existence is introduced.", choices: ["が"] };
+  roles.list = { title: "Noun list", note: "と joins nouns in a complete list: A and B. The particle after the last noun applies to the whole list.", choices: ["と"] };
+  roles.duration = { title: "Duration", note: "A duration such as いちじかん takes no に here; に would mark a specific time instead.", choices: [""] };
   const p = role => ({ text: roles[role].choices[0], role });
   const phrase = (id, role) => [word(id), p(role)];
   const ending = text => [{ text }];
@@ -97,7 +136,34 @@
   add("companion-movie", "companion", "I watch a movie with a friend.", [phrase("tomodachi","companion"),phrase("eiga","object"),v("miru")], { orders: [[0,1,2],[1,0,2]] });
   add("companion-coffee", "companion", "I drink coffee with a friend.", [phrase("tomodachi","companion"),phrase("koohii","object"),v("nomu")], { orders: [[0,1,2],[1,0,2]] });
   [["koohii","nomu","I do not drink coffee."],["terebi","miru","I do not watch TV."],["asagohan","taberu","I do not eat breakfast."]].forEach(([a,b,en]) => add(`negative-${a}`, "negative", en, [phrase(a,"object"),v(b,true)]));
+  const past = (id, negative = false) => [{ text: verbs.find(x => x.id === id).stem + (negative ? "ませんでした" : "ました"), wordId: id }];
+  const position = (reference, location, role) => [word(reference), p("possession"), word(location), p(role)];
+  [["kouen","inu","iru","There is a dog in the park."], ["uchi","neko","iru","There is a cat at home."], ["toshokan","kodomo","iru","There is a child in the library."], ["kouen","hana-flower","aru","There is a flower in the park."]].forEach(([place,thing,verb,en]) => add(`existence-${thing}`,"existence",en,[phrase(place,"existencePlace"),phrase(thing,"subject"),v(verb)]));
+  add("existence-book", "existence", "There is a book on the desk.", [position("tsukue","ue","existencePlace"),phrase("hon","subject"),v("aru")]);
+  add("existence-chair", "existence", "There is a chair in front of the desk.", [position("tsukue","mae","existencePlace"),phrase("isu","subject"),v("aru")]);
+  add("existence-no-cat", "existence", "There is no cat at home.", [phrase("uchi","existencePlace"),phrase("neko","subject"),v("iru",true)]);
+  [["neko","tsukue","shita","The cat is under the desk."], ["hon","kaban","naka","The book is inside the bag."], ["honya","hoteru","tonari","The bookstore is next to the hotel."], ["byouin","daigaku","chikaku","The hospital is near the university."], ["inu","isu","ushiro","The dog is behind the chair."], ["otera","honya","migi","The temple is to the right of the bookstore."]].forEach(([thing,reference,location,en]) => add(`location-${thing}`,"relative-location",en,[phrase(thing,"topic"),[word(reference),p("possession"),word(location),{text:"です"}]]));
+  add("location-between", "relative-location", "The library is between the hotel and the bookstore.", [phrase("toshokan","topic"),[word("hoteru"),p("list"),word("honya"),p("possession"),word("aida"),{text:"です"}]]);
+  add("location-left", "relative-location", "The hotel is to the left of the temple.", [phrase("hoteru","topic"),[word("otera"),p("possession"),word("hidari"),{text:"です"}]]);
+  add("past-read", "past-actions", "I read a book yesterday.", [phrase("kinou","bareTime"),phrase("hon","object"),past("yomu")], {orders:[[0,1,2],[1,0,2]]});
+  add("past-no-study", "past-actions", "I did not study yesterday.", [phrase("kinou","bareTime"),past("benkyousuru",true)]);
+  add("past-buy", "past-actions", "I bought bread at the supermarket.", [phrase("suupaa","place"),phrase("pan","object"),past("kau")], {orders:[[0,1,2],[1,0,2]]});
+  add("past-photo", "past-actions", "I took a photograph in the park.", [phrase("kouen","place"),phrase("shashin","object"),past("toru")], {orders:[[0,1,2],[1,0,2]]});
+  add("past-report", "past-actions", "I wrote a report last week.", [phrase("senshuu","bareTime"),phrase("repooto","object"),past("kaku")], {orders:[[0,1,2],[1,0,2]]});
+  add("past-no-go", "past-actions", "I did not go to university yesterday.", [phrase("kinou","bareTime"),phrase("daigaku","destination"),past("iku",true)], {orders:[[0,1,2],[1,0,2]]});
+  add("past-meet", "past-actions", "I met a friend at the library.", [phrase("toshokan","place"),phrase("tomodachi","companion"),past("au")], {orders:[[0,1,2],[1,0,2]]});
+  add("past-sunday", "past-nouns", "Yesterday was Sunday.", [phrase("kinou","topic"),[word("nichiyoubi"),{text:"でした"}]]);
+  add("past-student", "past-nouns", "I was a student.", [phrase("watashi","topic"),[word("gakusei"),{text:"でした"}]]);
+  add("past-not-teacher", "past-nouns", "I was not a teacher.", [phrase("watashi","topic"),[word("sensei"),{text:"じゃなかったです"}]]);
+  add("duration-study", "duration", "I studied for one hour.", [phrase("ichijikan","duration"),past("benkyousuru")]);
+  add("duration-wait", "duration", "I waited for about one hour.", [[word("ichijikan"),word("suffix-gurai"),p("duration")],past("matsu")]);
+  add("duration-read", "duration", "I read a book for one hour.", [phrase("ichijikan","duration"),phrase("hon","object"),past("yomu")], {orders:[[0,1,2],[1,0,2]]});
+  add("list-shopping", "listing-nouns", "I bought a book and bread.", [[word("hon"),p("list"),word("pan"),p("object")],past("kau")]);
+  add("list-animals", "listing-nouns", "There are a dog and a cat in the park.", [phrase("kouen","existencePlace"),[word("inu"),p("list"),word("neko"),p("subject")],v("iru")]);
   const wordGroups = [
+    ["inu","neko","kodomo"], ["isu","tsukue","hon","kaban"], ["kouen","suupaa","hoteru","honya","otera","byouin"],
+    ["ue","shita","naka","mae","ushiro","tonari","chikaku","migi","hidari","aida"], ["kinou","senshuu","kyou","mainichi"],
+    ["aru","iru"], ["kau","kaku","toru","matsu","au"],
     ["watashi", "tomodachi", "sensei"], ["gakusei", "sensei", "nihonjin", "ryuugakusei"],
     ["hon", "kaban", "kasa"], ["kore", "sore", "are"], ["mizu", "ocha", "koohii"],
     ["hon", "eiga", "terebi", "ongaku"], ["daigaku", "toshokan", "uchi"],
@@ -108,6 +174,7 @@
   globalThis.SENTENCE_COURSE = { topics, words, verbs, roles, sentences, wordGroups, lessons: [
     { id: 1, title: "First conversations", description: "Introduce yourself, connect nouns, and ask questions." },
     { id: 2, title: "Things around you", description: "Point out objects and add ‘also’." },
-    { id: 3, title: "Everyday actions", description: "Objects, places, time, companions, and polite verbs." }
+    { id: 3, title: "Everyday actions", description: "Objects, places, time, companions, and polite verbs." },
+    { id: 4, title: "Places and past events", description: "Existence, relative locations, past tense, duration, noun lists, and new verbs." }
   ] };
 })();

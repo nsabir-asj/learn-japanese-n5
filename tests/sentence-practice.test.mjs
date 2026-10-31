@@ -124,6 +124,30 @@ test('progress separates support levels and assisted answers never award unaided
   assert.ok(progress.items[independent].dueAt>2000);
 });
 
+test('all activities start unaided without automatic rule or vocabulary introductions',()=>{
+  const source=readFileSync(new URL('../features/sentences/practice.js',import.meta.url),'utf8');
+  const body=source.match(/function next\(\) \{([\s\S]*?)\n  \}/)[1];
+  for(const [activity,support,expectTeaching] of [['build','independent',false],['particles','independent',false],['verbs','independent',false],['build','supported',false]]){
+    let rendered=0;
+    const harness=vm.createContext({window:{KANA_SPRINT_SPEECH:{stop(){}}},settings:()=>({activity,support}),vocabulary:()=>({}),pool:()=>[{}],state:{introduced:{},wordsSeen:{}},recent:[],E:{choose:()=>({id:'new',topic:'new'}),wordIds:()=>['hon'],familiar:()=>false},C:{topics:[{id:'new',lesson:4,title:'New rule'}],words:{hon:{jp:'ほん',romaji:'hon',meaning:'book'}}},renderChrome(){},renderExercise(){rendered++;},ruleMarkup:()=>'',esc:x=>x,$:()=>({innerHTML:''})});
+    vm.runInContext(`function next(){${body}};next()`,harness);
+    assert.equal(harness.assisted,false,`${activity}/${support} should not silently mark help as used`);
+    assert.equal(rendered,expectTeaching?0:1);
+    assert.equal(harness.assistanceReason,'');
+  }
+});
+
+test('opening a hint before answering marks assistance, while post-answer explanations do not',()=>{
+  const source=readFileSync(new URL('../features/sentences/practice.js',import.meta.url),'utf8');
+  const body=source.match(/function showRule\(hint = false\) \{([\s\S]*?)\n  \}/)[1];
+  const harness=vm.createContext({current:{topic:'new'},answered:false,teaching:false,assisted:false,assistanceReason:'',C:{topics:[{id:'new',title:'Rule'}]},ruleMarkup:()=>'',wordGlossary:()=>'',esc:x=>x,$:()=>({showModal(){}})});
+  vm.runInContext(`function showRule(hint=false){${body}};showRule(true)`,harness);
+  assert.equal(harness.assisted,true);
+  assert.equal(harness.assistanceReason,'hint');
+  vm.runInContext('answered=true;assisted=false;assistanceReason="";showRule(true)',harness);
+  assert.equal(harness.assisted,false);
+});
+
 test('scheduler avoids recent exercises while alternatives are available and tolerates one-item pools',()=>{
   const exercises=E.pool({...config,topics:['objects']});
   const progress={items:{},total:0};
@@ -133,12 +157,47 @@ test('scheduler avoids recent exercises while alternatives are available and tol
 });
 
 test('verbs cover all 13 dictionary forms in both polarities and distinguish ru-like u-verbs',()=>{
-  assert.equal(E.verbs.length,26);
+  assert.equal(E.verbs.filter(x=>C.topics.find(t=>t.id===x.topic).lesson===3).length,26);
   const returning=E.verbs.find(x=>x.id==='kaeru-affirmative');
   assert.equal(returning.answer,'かえります');
   assert.equal(returning.romaji,'kaerimasu');
   assert.equal(returning.verb.group,'u');
   assert.equal(E.verbs.find(x=>x.id==='kuru-negative').answer,'きません');
+});
+
+test('Lesson 4 is selectable in every activity with eight new verbs and past forms',()=>{
+  const topics=Array.from(C.topics.filter(t=>t.lesson===4),t=>t.id);
+  assert.ok(C.lessons.some(l=>l.id===4));
+  for(const activity of ['build','particles']){
+    const pool=E.pool({...config,activity,topics});
+    assert.equal(pool.length,30);
+    assert.equal(new Set(pool.map(s=>s.topic)).size,6);
+    assert.ok(pool.every(s=>E.slots(s).length>0));
+  }
+  const pool=E.pool({...config,activity:'verbs',topics});
+  assert.equal(pool.length,58);
+  assert.equal(new Set(pool.filter(x=>x.topic==='verbs-lesson4').map(x=>x.verb.id)).size,8);
+  assert.equal(new Set(E.verbs.map(x=>x.id)).size,E.verbs.length);
+  for(const [id,answer] of [['matsu-affirmative','まちます'],['iru-negative','いません'],['aru-past-negative','ありませんでした'],['kuru-past-affirmative','きました'],['suru-past-negative','しませんでした'],['kau-past-affirmative','かいました']]){
+    const exercise=pool.find(x=>x.id===id);
+    assert.equal(exercise.answer,answer,id);
+    assert.equal(E.hiraganaPreview(exercise.romaji),answer,id);
+  }
+});
+
+test('Lesson 4 particles distinguish existence, activity, duration, and noun lists',()=>{
+  assert.equal(E.particleAnswer('ga','subject').correct,true);
+  assert.equal(E.particleAnswer('de','existencePlace').correct,false);
+  assert.equal(E.particleAnswer('none','duration').correct,true);
+  assert.equal(E.particleAnswer('ni','duration').correct,false);
+  const existence=C.sentences.find(s=>s.id==='existence-book');
+  assert.ok(E.acceptedSentences(existence).has(E.normalize('つくえのうえにほんがあります')));
+  assert.ok(!E.acceptedSentences(existence).has(E.normalize('つくえのうえでほんがあります')));
+  const list=C.sentences.find(s=>s.id==='list-shopping');
+  assert.ok(E.diagnose(list,['ほん','と','パン','を','かいました']).every(x=>x.correct));
+  const past=C.sentences.find(s=>s.id==='past-no-go');
+  assert.ok(E.acceptedSentences(past).has(E.normalize('きのうだいがくへいきませんでした')));
+  assert.ok(E.tileBank(past,false,()=>.3).some(x=>x.text==='いきました'&&x.distractor));
 });
 
 test('every non-clock content word links to the current Vocabulary ID',()=>{
@@ -158,19 +217,6 @@ test('the full-width status bar includes session attempts and unaided results wi
   assert.equal(detail.metrics.find(x=>x.label==='Unaided correct').value,'—');
   assert.ok(!source.includes('sp-aside'));
   assert.equal((source.match(/data-action="hint"/g)||[]).length,1);
-});
-
-test('Enter starts a teaching card without interfering with controls, dialogs, composition, or held keys',()=>{
-  const source=readFileSync(new URL('../features/sentences/practice.js',import.meta.url),'utf8');
-  const body=source.match(/document\.addEventListener\("keydown",event => \{([\s\S]*?)\n  \}\);/)[1];
-  let starts=0, prevented=0, dialog=false;
-  const harness=vm.createContext({current:{}, teaching:true, $:selector=>selector==='dialog[open]' ? (dialog?{}:null) : {click(){starts++;}}});
-  const handler=vm.runInContext(`(event)=>{${body}}`,harness);
-  const event=(extra={})=>({key:'Enter',repeat:false,isComposing:false,target:{matches:()=>false},preventDefault(){prevented++;},...extra});
-  handler(event());assert.equal(starts,1);assert.equal(prevented,1);
-  handler(event({repeat:true}));handler(event({isComposing:true}));handler(event({target:{matches:()=>true}}));
-  dialog=true;handler(event());
-  assert.equal(starts,1,'native buttons and disclosure summaries keep their own Enter behavior');
 });
 
 test('plain Enter checks sentence building and advances feedback while focused controls keep native behavior',()=>{
