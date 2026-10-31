@@ -120,7 +120,11 @@ test('verb-form notes render inside their own chunks and are escaped', () => {
   const markup = context.sentenceChunksMarkup(examples.nomu[0], breakdowns.nomu[0]);
   assert.match(markup, /のみます。<\/strong><small>drink<\/small><div class="vocab-verb-form">/);
   assert.match(markup, /dictionary · u-verb/);
-  assert.match(markup, /Polite nonpast · Habit \/ routine/);
+  assert.match(markup, /Polite affirmative/);
+  assert.match(markup, /Here: A regular activity/);
+  assert.doesNotMatch(markup.split('<details')[0], /nonpast|Habit \/ routine/);
+  assert.match(breakdowns.nomu[0].at(-1)[5].rule, /Change む to み/);
+  assert.match(breakdowns.mizu[0].at(-1)[5].rule, /まいあさ/);
   assert.match(markup, /<details class="vocab-verb-why"><summary/);
   assert.doesNotMatch(markup, /vocab-verb-why" open/);
   assert.match(context.sentenceChunksMarkup('きます。', [['きます', 'come', 'Movement', undefined, '<test>']]), /&lt;test&gt;/);

@@ -558,7 +558,7 @@
       const form = note.split(/ of | from /)[0];
       const ending = part[0].slice(stem.length);
       const stemRule = group === "ru-verb" ? `Drop final る: ${dictionary} → ${stem}.`
-        : group === "u-verb" ? `Change the final u-row sound to its i-row sound: ${dictionary} → ${stem}.`
+        : group === "u-verb" ? `Change ${dictionary.at(-1)} to ${stem.at(-1)} in the same kana column: ${dictionary} → ${stem}.`
         : `Irregular stem: ${dictionary} → ${stem}.`;
       const rule = part[0] === "まがってください"
         ? "まがる is a u-verb. Its te-form is まがって (る → って): まがって + ください → まがってください (“please turn”)."
@@ -573,7 +573,18 @@
       else if (habitExamples.has(id)) { usage = "Habit / routine"; timing = "Here the sentence describes a usual or repeated action, not an action happening right now."; }
       else if (stateExamples.has(id)) { usage = "Present state"; timing = "Here the verb describes the current situation, existence or understanding."; }
       else if (scheduleExamples.has(id)) { usage = "Scheduled event"; timing = "Here あります describes an activity on the schedule; whether it is this or a later week depends on context."; }
-      part[5] = { dictionary, group, form, usage, rule: `${rule} ${timing}` };
+      const labels = { "Polite nonpast": "Polite affirmative", "Polite negative nonpast": "Polite negative", "Polite past": "Polite past, affirmative" };
+      const uses = { "Habit / routine": "A regular activity", "Future plan": "A future plan", "Present state": "A present state", "Past action": "A completed action", "Scheduled event": "A scheduled activity", "Timing unspecified": "Time depends on context" };
+      const timePart = parts.find(part => ["Time", "Topic / time", "Frequency adverb"].includes(part[2]));
+      if (usage === "Habit / routine") timing = timePart
+        ? `${timePart[0]} (“${timePart[1]}”) gives the time or frequency. Here the example describes a regular activity, not an action happening right now.`
+        : "Here the example describes a regular activity, not an action happening right now.";
+      if (usage === "Past action") timing = timePart
+        ? `${timePart[0]} (“${timePart[1]}”) places the action in the past. The verb means “${part[1]}” here.`
+        : `Here the verb means “${part[1]}”: the action happened in the past.`;
+      if (usage === "Future plan") timing = `Here the example means “${examples[id][1]}” It describes a future plan${timePart ? `, with ${timePart[0]} (“${timePart[1]}”) giving the time` : ""}.`;
+      if (["Polite nonpast", "Polite negative nonpast"].includes(form)) timing += " The present form can also describe future actions; context decides. It is also called nonpast.";
+      part[5] = { dictionary, group, form, usage, label: labels[form] || form, useLabel: uses[usage] || usage, rule: `${rule} ${timing}` };
     }
   }
 

@@ -1681,7 +1681,7 @@
       const kindAttribute = kind ? ` data-kind="${escapeExampleText(kind)}"` : "";
       const separator = index ? `<span class="vocab-sentence-plus" aria-hidden="true">+</span>` : "";
       const formMarkup = formInfo
-        ? `<div class="vocab-verb-form"><span><b lang="ja">${escapeExampleText(formInfo.dictionary)}</b> · dictionary · ${escapeExampleText(formInfo.group)}</span><span>${escapeExampleText(formInfo.form)} · ${escapeExampleText(formInfo.usage)}</span><details class="vocab-verb-why"><summary aria-label="Why this form: ${escapeExampleText(japanese)}">Why this form?</summary><p>${escapeExampleText(formInfo.rule)}</p></details></div>`
+        ? `<div class="vocab-verb-form"><span><b lang="ja">${escapeExampleText(formInfo.dictionary)}</b> · dictionary · ${escapeExampleText(formInfo.group)}</span><span>${escapeExampleText(formInfo.label || formInfo.form)}</span><span>Here: ${escapeExampleText(formInfo.useLabel || formInfo.usage)}</span><details class="vocab-verb-why"><summary aria-label="Why this form: ${escapeExampleText(japanese)}">Why this form?</summary><p>${escapeExampleText(formInfo.rule)}</p></details></div>`
         : verbFormNote ? `<span class="vocab-verb-form">${escapeExampleText(verbFormNote)}</span>` : "";
       return `<div class="vocab-sentence-term" role="listitem">${separator}<div class="vocab-sentence-chunk"${kindAttribute} title="${escapeExampleText(role)}"><strong lang="ja">${escapeExampleText(labels[index])}</strong><small>${escapeExampleText(sentenceChunkMeaning(meaning, role))}</small>${formMarkup}</div></div>`;
     }).join("");

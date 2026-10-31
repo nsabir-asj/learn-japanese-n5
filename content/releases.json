@@ -763,6 +763,12 @@
           "text": "Verb boxes now explain the dictionary form, verb group and time meaning in context. Expand “Why this form?” for a short conjugation rule."
         }
       ]
+    },
+    {
+      "id": "2026-10-31.5",
+      "publishedAt": "2026-10-31",
+      "title": "Simpler verb explanations",
+      "changes": [{"pages": ["vocabulary"], "text": "Verb explanations separate polite affirmative or negative forms from their meaning in the sentence, with clearer kana-change rules and time clues."}]
     }
   ]
 }
