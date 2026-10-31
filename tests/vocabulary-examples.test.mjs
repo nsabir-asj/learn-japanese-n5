@@ -113,21 +113,52 @@ test('past, negative, invitation and request labels keep their distinct meanings
   assert.match(examples.kuru[1], /will/);
 });
 
-test('verb-form notes render inside their own chunks and are escaped', () => {
-  const functions = vocabularySource.slice(vocabularySource.indexOf('  function sentenceChunkLabels('), vocabularySource.indexOf('  function exampleBreakdownMarkup('));
+test('compact verb buttons keep group and time visible while details live in a dialog', () => {
+  const functions = vocabularySource.slice(vocabularySource.indexOf('  function verbExplanationMarkup('), vocabularySource.indexOf('  function exampleBreakdownMarkup('));
   const context = { escapeExampleText: value => String(value).replaceAll('<', '&lt;').replaceAll('>', '&gt;') };
   runInNewContext(functions, context);
   const markup = context.sentenceChunksMarkup(examples.nomu[0], breakdowns.nomu[0]);
-  assert.match(markup, /のみます。<\/strong><small>drink<\/small><div class="vocab-verb-form">/);
-  assert.match(markup, /dictionary · u-verb/);
-  assert.match(markup, /Polite affirmative/);
-  assert.match(markup, /Here: A regular activity/);
-  assert.doesNotMatch(markup.split('<details')[0], /nonpast|Habit \/ routine/);
+  assert.match(markup, /<button type="button" class="vocab-sentence-chunk vocab-verb-card" data-verb-part="3" aria-haspopup="dialog"/);
+  const summary = markup.match(/<button[^>]+vocab-verb-card[^>]*>(.*?)<\/button>/s)[1];
+  assert.match(summary, /のみます。<\/strong>/);
+  assert.match(summary, /class="vocab-verb-time" title="A regular activity">Present<\/span>/);
+  assert.match(summary, /<small>drink<span class="vocab-verb-group"> · u-verb<\/span>/);
+  assert.doesNotMatch(summary, /Dictionary:|Rule:|This verb:|Here:|nonpast|Habit \/ routine/);
+  assert.match(summary, /class="vocab-verb-info" aria-hidden="true">i<\/span>/);
+  const explanation = context.verbExplanationMarkup('のみます', breakdowns.nomu[0].at(-1)[5]);
+  assert.match(explanation, /id="vocabVerbDialogTitle" lang="ja">のむ → のみます/);
+  assert.match(explanation, /Polite affirmative/);
+  assert.match(explanation, /General rule<\/h3><p>Change the final u-row kana to its i-row equivalent, then add ます/);
+  assert.match(explanation, /This verb<\/h3><p>Change む to み/);
+  assert.match(explanation, /Meaning here <span>Present<\/span><\/h3><p>あさ/);
   assert.match(breakdowns.nomu[0].at(-1)[5].rule, /Change む to み/);
   assert.match(breakdowns.mizu[0].at(-1)[5].rule, /まいあさ/);
-  assert.match(markup, /<details class="vocab-verb-why"><summary/);
-  assert.doesNotMatch(markup, /vocab-verb-why" open/);
+  assert.doesNotMatch(markup, /<details|vocab-verb-chevron|General rule|This verb|Meaning here/);
   assert.match(context.sentenceChunksMarkup('きます。', [['きます', 'come', 'Movement', undefined, '<test>']]), /&lt;test&gt;/);
+  const unsafe = { ...breakdowns.nomu[0].at(-1)[5], generalRule: '<unsafe>', transformation: '<change>', timing: '<time>' };
+  const escaped = context.verbExplanationMarkup('のみます', unsafe);
+  for (const value of ['unsafe', 'change', 'time']) assert.ok(escaped.includes(`&lt;${value}&gt;`));
+});
+
+test('general conjugation rules match the verb group and actual sentence ending', () => {
+  const info = (id, form) => breakdowns[id][0].find(part => part[0] === form)[5];
+  assert.equal(info('nomu', 'のみます').generalRule, 'Change the final u-row kana to its i-row equivalent, then add ます.');
+  assert.equal(info('taberu', 'たべます').generalRule, 'Remove final る from the dictionary form, then add ます.');
+  assert.match(info('kuru', 'きます').generalRule, /irregular stem き for くる/);
+  assert.match(info('benkyou-suru', 'べんきょうします').generalRule, /irregular stem し for する/);
+  assert.match(info('kaeru', 'かえります').generalRule, /i-row equivalent/);
+  assert.match(info('osake', 'のみません').generalRule, /add ません\./);
+  assert.match(info('kinou', 'みました').generalRule, /Remove final る.*add ました\./);
+  assert.match(info('ocha', 'のみませんか').generalRule, /add ませんか\./);
+  assert.match(info('hoteru', 'あいましょう').generalRule, /add ましょう\./);
+  assert.match(info('migi', 'まがってください').generalRule, /ending in う, つ or る.*って.*ください/);
+  assert.match(info('migi', 'まがってください').transformation, /まがって \+ ください/);
+  assert.equal(info('nomu', 'のみます').timeLabel, 'Present');
+  assert.equal(info('neru', 'ねます').timeLabel, 'Future');
+  assert.equal(info('kinou', 'みました').timeLabel, 'Past');
+  assert.equal(info('shashin', 'とります').timeLabel, 'Present / future');
+  assert.equal(info('ocha', 'のみませんか').timeLabel, 'Invitation');
+  assert.equal(info('migi', 'まがってください').timeLabel, 'Request');
 });
 
 test('verb explanations use checked groups, actual stems and sentence-specific time meanings', () => {
@@ -150,7 +181,7 @@ test('verb explanations use checked groups, actual stems and sentence-specific t
   for (const [id, [parts]] of Object.entries(breakdowns)) for (const part of parts) {
     if (!part[4]) continue;
     assert.ok(part[5], `${id}: missing expanded explanation`);
-    for (const field of ['dictionary', 'group', 'form', 'usage', 'rule']) assert.ok(part[5][field]?.trim(), `${id}: ${field}`);
+    for (const field of ['dictionary', 'group', 'form', 'usage', 'rule', 'generalRule', 'transformation', 'timing', 'timeLabel']) assert.ok(part[5][field]?.trim(), `${id}: ${field}`);
     assert.ok(part[5].rule.includes(part[0]), `${id}: explanation must use the actual sentence form`);
   }
 });

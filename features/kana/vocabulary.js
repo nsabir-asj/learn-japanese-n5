@@ -1657,6 +1657,40 @@
     }).join("");
     return `<section class="vocab-particle-guide" aria-label="Particles in this sentence"><h4>Particles</h4><div>${cards}</div></section>`;
   }
+  function verbExplanationMarkup(japanese, info) {
+    return `<div class="vocab-verb-dialog-shell"><header class="vocab-verb-dialog-header"><div><span class="vocab-verb-dialog-eyebrow">Verb explanation</span><h2 id="vocabVerbDialogTitle" lang="ja">${escapeExampleText(info.dictionary)} → ${escapeExampleText(japanese)}</h2><p>${escapeExampleText(info.group)} · ${escapeExampleText(info.label || info.form)}</p></div><button type="button" class="vocab-verb-dialog-close" aria-label="Close verb explanation" autofocus>×</button></header><div class="vocab-verb-dialog-body"><section><h3>General rule</h3><p>${escapeExampleText(info.generalRule)}</p></section><section><h3>This verb</h3><p>${escapeExampleText(info.transformation)}</p></section><section><h3>Meaning here <span>${escapeExampleText(info.timeLabel)}</span></h3><p>${escapeExampleText(info.timing)}</p></section></div></div>`;
+  }
+  function openVerbExplanation(opener, part) {
+    let dialog = document.getElementById("vocabVerbDialog");
+    if (!dialog) {
+      dialog = document.createElement("dialog");
+      dialog.id = "vocabVerbDialog";
+      dialog.className = "vocab-verb-dialog";
+      dialog.setAttribute("aria-labelledby", "vocabVerbDialogTitle");
+      document.body.appendChild(dialog);
+      dialog.addEventListener("click", event => {
+        if (event.target.closest?.(".vocab-verb-dialog-close")) dialog.close();
+        else if (event.target === dialog) {
+          const rect = dialog.getBoundingClientRect();
+          if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+        }
+      });
+      dialog.addEventListener("close", () => document.documentElement.classList.remove("vocab-verb-modal-open"));
+    }
+    if (dialog.open) return;
+    dialog.innerHTML = verbExplanationMarkup(part[0], part[5]);
+    opener.focus({ preventScroll: true });
+    dialog.showModal();
+    document.documentElement.classList.add("vocab-verb-modal-open");
+  }
+  function bindVerbExplanations(container, parts) {
+    container.querySelectorAll(".vocab-verb-card").forEach(button => {
+      button.addEventListener("click", () => {
+        const part = parts[Number(button.dataset.verbPart)];
+        if (part?.[5]) openVerbExplanation(button, part);
+      });
+    });
+  }
   function sentenceChunkLabels(sentence, parts) {
     let cursor = 0;
     return parts.map((part, index) => {
@@ -1680,10 +1714,13 @@
     const chips = parts.map(([japanese, meaning, role, kind, verbFormNote, formInfo], index) => {
       const kindAttribute = kind ? ` data-kind="${escapeExampleText(kind)}"` : "";
       const separator = index ? `<span class="vocab-sentence-plus" aria-hidden="true">+</span>` : "";
-      const formMarkup = formInfo
-        ? `<div class="vocab-verb-form"><span><b lang="ja">${escapeExampleText(formInfo.dictionary)}</b> · dictionary · ${escapeExampleText(formInfo.group)}</span><span>${escapeExampleText(formInfo.label || formInfo.form)}</span><span>Here: ${escapeExampleText(formInfo.useLabel || formInfo.usage)}</span><details class="vocab-verb-why"><summary aria-label="Why this form: ${escapeExampleText(japanese)}">Why this form?</summary><p>${escapeExampleText(formInfo.rule)}</p></details></div>`
-        : verbFormNote ? `<span class="vocab-verb-form">${escapeExampleText(verbFormNote)}</span>` : "";
-      return `<div class="vocab-sentence-term" role="listitem">${separator}<div class="vocab-sentence-chunk"${kindAttribute} title="${escapeExampleText(role)}"><strong lang="ja">${escapeExampleText(labels[index])}</strong><small>${escapeExampleText(sentenceChunkMeaning(meaning, role))}</small>${formMarkup}</div></div>`;
+      const label = `<strong lang="ja">${escapeExampleText(labels[index])}</strong>`;
+      const gloss = escapeExampleText(sentenceChunkMeaning(meaning, role));
+      if (formInfo) {
+        return `<div class="vocab-sentence-term" role="listitem">${separator}<button type="button" class="vocab-sentence-chunk vocab-verb-card" data-verb-part="${index}" aria-haspopup="dialog" aria-label="${escapeExampleText(`${japanese}: ${meaning}, ${formInfo.group}, ${formInfo.timeLabel}. Open verb explanation`)}">${label}<span class="vocab-verb-time" title="${escapeExampleText(formInfo.useLabel || formInfo.usage)}">${escapeExampleText(formInfo.timeLabel)}</span><small>${gloss}<span class="vocab-verb-group"> · ${escapeExampleText(formInfo.group)}</span></small><span class="vocab-verb-info" aria-hidden="true">i</span></button></div>`;
+      }
+      const formMarkup = verbFormNote ? `<span class="vocab-verb-form">${escapeExampleText(verbFormNote)}</span>` : "";
+      return `<div class="vocab-sentence-term" role="listitem">${separator}<div class="vocab-sentence-chunk"${kindAttribute} title="${escapeExampleText(role)}">${label}<small>${gloss}</small>${formMarkup}</div></div>`;
     }).join("");
     return `<section class="vocab-sentence-map" aria-label="Sentence meaning, chunk by chunk"><header><strong>How this sentence fits together</strong><span>Japanese + meaning</span></header><div class="vocab-sentence-equation" role="list">${chips}</div></section>`;
   }
@@ -2287,6 +2324,7 @@
     if ($("#vocabPlayExample")) $("#vocabPlayExample").disabled = !japaneseSpeechReady();
     $("#vocabPlayExample")?.addEventListener("click", () => speakExample(current));
     rememberBreakdownPreference(feedback.querySelector(".vocab-example-breakdown"));
+    bindVerbExplanations(feedback, Breakdowns[current.id]?.[0] || []);
     prepareNextButton();
     $("#vocabNext").classList.remove("hidden");
     $("#vocabDontKnow").classList.add("hidden");
@@ -2682,9 +2720,11 @@
   window.addEventListener("kana-sprint-speech-voices-changed", updateFormatAvailability);
   document.addEventListener("keydown", event => {
     if (!$("#panel-vocabulary").classList.contains("active")) return;
+    if (document.getElementById("vocabVerbDialog")?.open) return;
     const target = event.target;
     const isInteractive = target instanceof HTMLElement && target.matches("button,a,select,input,textarea,[contenteditable='true']");
     const key = event.key.toLowerCase();
+    if (event.key === "Enter" && target.closest?.("summary,.vocab-verb-card")) return;
     if (event.key === "Enter" && phase === "introduction" && !isInteractive) {
       event.preventDefault();
       $("#vocabStartCheck")?.click();

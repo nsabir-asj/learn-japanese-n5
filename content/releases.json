@@ -769,6 +769,12 @@
       "publishedAt": "2026-10-31",
       "title": "Simpler verb explanations",
       "changes": [{"pages": ["vocabulary"], "text": "Verb explanations separate polite affirmative or negative forms from their meaning in the sentence, with clearer kana-change rules and time clues."}]
+    },
+    {
+      "id": "2026-10-31.6",
+      "publishedAt": "2026-10-31",
+      "title": "Compact verb cards with grammar details",
+      "changes": [{"pages": ["vocabulary"], "text": "Sentence breakdowns show compact verb cards with their verb group and time meaning. Tap a verb to open its dictionary form, conjugation rule and sentence explanation in a dialog."}]
     }
   ]
 }

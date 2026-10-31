@@ -563,6 +563,11 @@
       const rule = part[0] === "まがってください"
         ? "まがる is a u-verb. Its te-form is まがって (る → って): まがって + ください → まがってください (“please turn”)."
         : `${stemRule} Add ${ending}: ${stem} + ${ending} → ${part[0]}.`;
+      const generalRule = part[0] === "まがってください"
+        ? "For u-verbs ending in う, つ or る, replace that ending with って to make the te-form, then add ください (“please”)."
+        : group === "ru-verb" ? `Remove final る from the dictionary form, then add ${ending}.`
+        : group === "u-verb" ? `Change the final u-row kana to its i-row equivalent, then add ${ending}.`
+        : `Use the irregular stem ${dictionary.endsWith("する") ? "し for する" : "き for くる"}, then add ${ending}.`;
       let usage = "Timing unspecified";
       let timing = "Nonpast can describe a habit, a present state or a future action; context decides. This sentence has no definite time reference.";
       if (form === "Polite past") { usage = "Past action"; timing = "Here the action is completed: the English translation uses the past tense."; }
@@ -575,6 +580,7 @@
       else if (scheduleExamples.has(id)) { usage = "Scheduled event"; timing = "Here あります describes an activity on the schedule; whether it is this or a later week depends on context."; }
       const labels = { "Polite nonpast": "Polite affirmative", "Polite negative nonpast": "Polite negative", "Polite past": "Polite past, affirmative" };
       const uses = { "Habit / routine": "A regular activity", "Future plan": "A future plan", "Present state": "A present state", "Past action": "A completed action", "Scheduled event": "A scheduled activity", "Timing unspecified": "Time depends on context" };
+      const timeLabels = { "Habit / routine": "Present", "Future plan": "Future", "Present state": "Present", "Past action": "Past", "Scheduled event": "Present / future", "Timing unspecified": "Present / future", "Would you like to…?": "Invitation", "Let’s…": "Suggestion", "Please…": "Request" };
       const timePart = parts.find(part => ["Time", "Topic / time", "Frequency adverb"].includes(part[2]));
       if (usage === "Habit / routine") timing = timePart
         ? `${timePart[0]} (“${timePart[1]}”) gives the time or frequency. Here the example describes a regular activity, not an action happening right now.`
@@ -584,7 +590,7 @@
         : `Here the verb means “${part[1]}”: the action happened in the past.`;
       if (usage === "Future plan") timing = `Here the example means “${examples[id][1]}” It describes a future plan${timePart ? `, with ${timePart[0]} (“${timePart[1]}”) giving the time` : ""}.`;
       if (["Polite nonpast", "Polite negative nonpast"].includes(form)) timing += " The present form can also describe future actions; context decides. It is also called nonpast.";
-      part[5] = { dictionary, group, form, usage, label: labels[form] || form, useLabel: uses[usage] || usage, rule: `${rule} ${timing}` };
+      part[5] = { dictionary, group, form, usage, label: labels[form] || form, useLabel: uses[usage] || usage, timeLabel: timeLabels[usage], generalRule, transformation: rule, timing, rule: `${rule} ${timing}` };
     }
   }
 

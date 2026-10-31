@@ -80,11 +80,32 @@
 .vocab-particle-card header{display:inline-flex;align-items:baseline;gap:4px;white-space:nowrap;margin:0;padding:0;vertical-align:baseline;line-height:inherit}
 .vocab-particle-card header strong{font-size:.85rem}
 .vocab-particle-explanation{display:inline;overflow-wrap:break-word}
-.vocab-verb-form{display:grid;gap:2px;max-width:230px;color:var(--muted);font:500 .7rem/1.4 Inter,ui-sans-serif,system-ui,sans-serif;overflow-wrap:break-word}
-.vocab-verb-form b{color:#b9dcff;font-weight:650}
-.vocab-verb-why>summary{width:fit-content;cursor:pointer;color:#9fd0ff;font-size:.68rem;line-height:1.4;padding:2px 0}
-.vocab-verb-why>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
-.vocab-example .vocab-verb-why>p{grid-column:auto;margin:3px 0 0;color:var(--muted);font:500 .7rem/1.45 Inter,ui-sans-serif,system-ui,sans-serif}
+.vocab-sentence-equation{align-items:flex-start}
+.vocab-sentence-term{max-width:100%;min-width:0}
+.vocab-example .vocab-verb-card{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:3px 8px;grid-column:auto;grid-row:auto;justify-self:auto;margin:0;padding:7px 9px;min-width:0;max-width:100%;white-space:normal;font:inherit;text-align:left;cursor:pointer}
+.vocab-verb-card>small{grid-column:1/-1;grid-row:2}
+.vocab-verb-card:hover{background:#17212c;border-color:#6c89a8}
+.vocab-verb-card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.vocab-verb-group{color:var(--muted);font-weight:500;white-space:nowrap}
+.vocab-verb-time{grid-column:2;grid-row:1;color:#b9cfe6;font:500 .65rem/1.3 Inter,ui-sans-serif,system-ui,sans-serif}
+.vocab-verb-info{grid-column:3;grid-row:1;display:grid;place-items:center;width:14px;height:14px;border:1px solid #7699bd;border-radius:50%;color:#b9dcff;font:700 .6rem/1 Georgia,serif}
+.vocab-verb-form{display:grid;gap:6px;color:var(--muted);font:500 .75rem/1.5 Inter,ui-sans-serif,system-ui,sans-serif;overflow-wrap:break-word}
+html.vocab-verb-modal-open{overflow:hidden}
+.vocab-verb-dialog{width:min(520px,calc(100% - 32px));max-width:none;max-height:calc(100dvh - 48px);padding:0;border:1px solid #46586b;border-radius:17px;background:var(--panel);color:var(--text);box-shadow:0 24px 90px rgba(0,0,0,.65);overflow:hidden}
+.vocab-verb-dialog::backdrop{background:rgba(3,7,12,.72);backdrop-filter:blur(3px)}
+.vocab-verb-dialog-shell{display:grid;grid-template-rows:auto minmax(0,1fr);max-height:inherit}
+.vocab-verb-dialog-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:0;border-bottom:1px solid var(--line);padding:18px 16px 15px 20px}
+.vocab-verb-dialog-eyebrow{display:block;margin-bottom:7px;color:#8fc5ff;font-size:.67rem;font-weight:850;letter-spacing:.07em;text-transform:uppercase}
+.vocab-verb-dialog-header h2{margin:0;color:var(--text);font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;font-size:1.4rem;line-height:1.4;overflow-wrap:anywhere}
+.vocab-verb-dialog-header p{margin:5px 0 0;color:var(--muted);font-size:.77rem;line-height:1.5}
+.vocab-verb-dialog-close{display:grid;place-items:center;flex:0 0 auto;width:36px;height:36px;margin:-5px -3px 0 0;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--muted);padding:0;font:500 1.6rem/1 system-ui;cursor:pointer}
+.vocab-verb-dialog-close:hover{border-color:#46586b;background:rgba(255,255,255,.04);color:var(--text)}
+.vocab-verb-dialog-close:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.vocab-verb-dialog-body{display:grid;gap:17px;padding:18px 20px 20px;overflow:auto;overscroll-behavior:contain}
+.vocab-verb-dialog-body h3{display:flex;align-items:center;gap:8px;margin:0 0 5px;color:#b9dcff;font-size:.8rem;line-height:1.4}
+.vocab-verb-dialog-body h3 span{border:1px solid var(--line);border-radius:5px;padding:2px 5px;color:var(--muted);font-size:.65rem;font-weight:500}
+.vocab-verb-dialog-body p{margin:0;color:#c8d1dc;font-size:.84rem;font-weight:400;line-height:1.6;overflow-wrap:break-word}
+@media(max-width:520px){.vocab-example .vocab-verb-card{padding:6px 8px}.vocab-verb-dialog{position:fixed;inset:auto 0 0;width:100%;max-height:calc(100dvh - 20px);margin:0 auto;border-radius:18px 18px 0 0;border-bottom:0}.vocab-verb-dialog-body{padding-bottom:max(20px,env(safe-area-inset-bottom))}.vocab-verb-dialog-close{width:44px;height:44px;margin-top:-8px}}
 .vocab-interpretation,.vocab-romaji-preview{display:grid;gap:3px;border:1px solid var(--line);border-radius:11px;background:var(--panel3);padding:11px 13px}
 .vocab-interpretation span,.vocab-interpretation small,.vocab-romaji-preview span{color:var(--muted);font-size:.78rem}.vocab-interpretation strong,.vocab-romaji-preview strong{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;font-size:1.45rem}.vocab-interpretation.is-unavailable strong{font-family:inherit;font-size:.9rem;color:var(--muted)}
 .vocab-typing-modes{display:flex;align-items:center;justify-content:space-between;gap:12px}.vocab-typing-modes>span{font-weight:700}.vocab-segmented{display:flex;border:1px solid var(--line);border-radius:10px;padding:3px;background:var(--panel3)}.vocab-segmented button{border:0;border-radius:7px;background:transparent;color:var(--muted);padding:8px 13px;font:inherit;font-weight:700;cursor:pointer}.vocab-segmented button[aria-pressed="true"]{outline:0;background:var(--accent);color:#07111c}

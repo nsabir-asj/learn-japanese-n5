@@ -46,3 +46,37 @@ test('a rapid tap or Enter after answering cannot immediately advance past the r
   timers[1].callback();
   assert.equal(button.disabled, true, 'An old callback must not enable a different question');
 });
+
+test('Enter activates verb cards and dialog controls instead of advancing the question', () => {
+  let onKey;
+  let advances = 0;
+  class Element {
+    constructor(kind) { this.kind = kind; }
+    matches() { return false; }
+    closest(selector) { return selector.split(',').includes(this.kind) ? this : null; }
+  }
+  const page = createContext({
+    HTMLElement: Element, phase: 'answered',
+    $: () => ({ classList: { contains: () => true } }),
+    nextQuestion: () => advances++,
+    document: { addEventListener: (name, handler) => { onKey = handler; }, getElementById: () => dialog },
+  });
+  const start = source.lastIndexOf('  document.addEventListener("keydown", event => {');
+  runInContext(source.slice(start, source.indexOf('\n  });', start) + '\n  });'.length), page);
+  let prevented = false;
+  let dialog = { open: false };
+  const event = { key: 'Enter', preventDefault: () => { prevented = true; } };
+  for (const kind of ['summary', '.vocab-verb-card']) {
+    onKey({ ...event, target: new Element(kind) });
+    assert.equal(advances, 0);
+    assert.equal(prevented, false, 'Native card and summary activation must remain available');
+  }
+  dialog.open = true;
+  onKey({ ...event, target: new Element('close-button') });
+  onKey({ ...event, key: 'r', target: new Element('dialog') });
+  assert.equal(advances, 0);
+  assert.equal(prevented, false, 'Dialog controls retain native keyboard handling');
+  dialog.open = false;
+  onKey({ ...event, target: new Element('container') });
+  assert.equal(advances, 1, 'Enter elsewhere still advances to the next question');
+});
