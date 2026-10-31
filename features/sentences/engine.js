@@ -157,19 +157,48 @@
   function recordKey(exercise, settings) { return `${settings.activity}:${settings.activity === "build" ? settings.support : settings.input}:${exercise.id}`; }
   function choose(pool, settings, progress, recent = [], vocabulary = {}, random = Math.random, now = Date.now()) {
     if (!pool.length) return null;
-    const available = pool.filter(x => !recent.slice(-Math.min(5, pool.length - 1)).includes(x.id));
-    // With a one-item pool slice(-0) would include all history; fall back safely.
-    const candidates = available.length ? available : pool;
-    const ranked = candidates.map(exercise => {
-      const item = progress.items?.[recordKey(exercise,settings)];
-      const due = item && item.dueAt <= now && item.dueQuestion <= progress.total;
-      const known = settings.vocabulary === "prefer" ? wordIds(exercise).filter(id => familiar(id,vocabulary)).length / wordIds(exercise).length : 0;
-      return { exercise, score: (due ? 100 : !item ? 55 : 0) + (item?.lastWasCorrect === false ? 12 : 0) + known * 14 + random() * 10 };
-    });
-    return ranked.sort((a,b) => b.score - a.score)[0].exercise;
+    const itemFor = exercise => progress.items?.[recordKey(exercise,settings)];
+    const last = pool.find(x=>x.id===recent.at(-1));
+    const pending = pool.filter(x=>{ const r=itemFor(x); return r && (r.lastWasCorrect===false || r.lastAssisted) && r.lastQuestion != null && progress.total-r.lastQuestion>=2 && !r.transferDone; }).sort((a,b)=>itemFor(a).lastQuestion-itemFor(b).lastQuestion);
+    const eligible = pool.filter(x=>x.id!==recent.at(-1) || pool.length===1);
+    // First transfer a weak skill to a different authored example. Never take
+    // an exercise outside the selected / vocabulary-filtered pool.
+    const canRetry=progress.total-(progress.lastRetryQuestion ?? -3)>=3;
+    for(const original of canRetry ? pending : []){
+      const r=itemFor(original);
+      const siblings=eligible.filter(x=>x.id!==original.id && !recent.slice(-2).includes(x.id) && (r.weakRoles?.length ? slots(x).some(slot=>r.weakRoles.includes(slot.role)) : r.weakWords?.length ? wordIds(x).some(id=>r.weakWords.includes(id)) : x.topic===original.topic));
+      if(siblings.length){
+        const chosen=shuffle(siblings,random).sort((a,b)=>(itemFor(a)?.lastQuestion??-1)-(itemFor(b)?.lastQuestion??-1))[0];
+        r.transferDone=true; progress.lastRetryQuestion=progress.total;
+        return chosen;
+      }
+    }
+    // Exact retries follow transfer, after at least four intervening answers.
+    const retry=eligible.filter(x=>{const r=itemFor(x);return r && (r.lastWasCorrect===false || r.lastAssisted) && r.lastQuestion!=null && progress.total-r.lastQuestion>=4 && !recent.slice(-2).includes(x.id);}).sort((a,b)=>itemFor(a).lastQuestion-itemFor(b).lastQuestion);
+    if(canRetry && retry.length){progress.lastRetryQuestion=progress.total;return retry[0];}
+    // Least-recently practised first gives every eligible sentence a turn.
+    // Topic variety and familiar vocabulary only break ties in that rotation.
+    return shuffle(eligible,random).sort((a,b)=>{
+      const ra=itemFor(a),rb=itemFor(b);
+      const turn=(ra?.lastQuestion??(ra?.seen ? -0.5 : -1))-(rb?.lastQuestion??(rb?.seen ? -0.5 : -1));
+      if(turn)return turn;
+      const topic=Number(a.topic===last?.topic)-Number(b.topic===last?.topic);
+      if(topic)return topic;
+      const known=x=>settings.vocabulary==='prefer' ? wordIds(x).filter(id=>familiar(id,vocabulary)).length/Math.max(1,wordIds(x).length):0;
+      return known(b)-known(a);
+    })[0];
   }
-  function record(progress, key, correct, assisted, now = Date.now()) {
+
+  function record(progress, key, correct, assisted, now = Date.now(), evidence = {}) {
     const item = progress.items[key] || { seen:0, correct:0, wrong:0, assisted:0, run:0 };
+    if(key.startsWith("verbs:choice:") || key.startsWith("verbs:typing:")) {
+      const id=key.split(":").slice(2).join(":");
+      item.challengeUnlocked ||= verbChoiceCount({id},{verbChoices:"auto"},progress)===6;
+    }
+    const delayed = item.dueAt != null && item.dueAt <= now && item.dueQuestion <= progress.total;
+    item.history = [...(item.history || []), {correct,assisted,at:now,question:progress.total,delayed,response:evidence.response || ""}].slice(-16);
+    item.lastQuestion=progress.total; item.lastAssisted=assisted; item.transferDone=false;
+    item.weakRoles=evidence.weakRoles || []; item.weakWords=evidence.weakWords || [];
     item.seen++; item[assisted ? "assisted" : correct ? "correct" : "wrong"]++;
     item.run = correct && !assisted ? item.run + 1 : 0;
     item.lastWasCorrect = correct && !assisted; item.lastSeen = now;
@@ -178,5 +207,35 @@
     progress.items[key] = item;
     return item;
   }
-  globalThis.SENTENCE_ENGINE = { normalize, shuffle, pieces, slots, model, acceptedSentences, particleAnswer, diagnose, unexpectedWords, tileBank, hiraganaPreview, particlePreview, verbs, wordIds, familiar, pool, recordKey, choose, record };
+  function verbChoiceCount(exercise, settings, progress) {
+    if (["4","6"].includes(settings.verbChoices)) return Number(settings.verbChoices);
+    const events=["choice","typing"].flatMap(mode=>progress.items?.[`verbs:${mode}:${exercise.id}`]?.history || []).filter(x=>!x.assisted).sort((a,b)=>a.at-b.at || a.question-b.question);
+    let run=0, delayed=false, unlocked=["choice","typing"].some(mode=>progress.items?.[`verbs:${mode}:${exercise.id}`]?.challengeUnlocked), level=4, previous=null;
+    for(const event of events){
+      if(!event.correct){run=0;level=4;delayed=false;previous=event;continue;}
+      if(previous && event.question-previous.question<2)continue;
+      run++; delayed ||= event.delayed;
+      if((!unlocked && run>=3 && delayed) || (unlocked && run>=2)){unlocked=true;level=6;}
+      previous=event;
+    }
+    return level;
+  }
+  function verbChoices(exercise, settings, progress, random=Math.random) {
+    const past = settings.topics?.includes("verbs-past");
+    const suffixes=past ? ["ます","ません","ました","ませんでした"] : ["ます","ません"];
+    const verb=exercise.verb;
+    const wrongGroup=verb.group==="ru" ? verb.stem+"り" : verb.jp.slice(0,-1);
+    const candidates=[];
+    const add=text=>{if(text && normalize(text)!==normalize(exercise.answer) && !candidates.includes(text))candidates.push(text);};
+    const opposite=exercise.form.startsWith("past") ? (exercise.form.endsWith("negative")?"ました":"ませんでした") : (exercise.form==="affirmative"?"ません":"ます");
+    add(verb.stem+opposite);
+    add(wrongGroup+exercise.suffix);
+    const previous=["choice","typing"].flatMap(mode=>progress.items?.[`verbs:${mode}:${exercise.id}`]?.history || []).filter(x=>!x.correct && !x.assisted).sort((a,b)=>b.at-a.at)[0]?.response;
+    const mistakes=suffixes.flatMap(suffix=>[verb.jp+suffix,wrongGroup+suffix]);
+    if(mistakes.includes(previous) || suffixes.some(suffix=>verb.stem+suffix===previous))add(previous);
+    for(const suffix of suffixes)add(verb.stem+suffix);
+    for(const mistake of mistakes)add(mistake);
+    return shuffle([exercise.answer,...candidates.slice(0,verbChoiceCount(exercise,settings,progress)-1)],random);
+  }
+  globalThis.SENTENCE_ENGINE = { normalize, shuffle, pieces, slots, model, acceptedSentences, particleAnswer, diagnose, unexpectedWords, tileBank, hiraganaPreview, particlePreview, verbs, wordIds, familiar, pool, recordKey, choose, record, verbChoiceCount, verbChoices };
 })();

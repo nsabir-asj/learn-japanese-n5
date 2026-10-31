@@ -160,6 +160,36 @@
   add("duration-read", "duration", "I read a book for one hour.", [phrase("ichijikan","duration"),phrase("hon","object"),past("yomu")], {orders:[[0,1,2],[1,0,2]]});
   add("list-shopping", "listing-nouns", "I bought a book and bread.", [[word("hon"),p("list"),word("pan"),p("object")],past("kau")]);
   add("list-animals", "listing-nouns", "There are a dog and a cat in the park.", [phrase("kouen","existencePlace"),[word("inu"),p("list"),word("neko"),p("subject")],v("iru")]);
+  // Authored sentence families: variation is checked here, never improvised at runtime.
+  [
+    ["object-coffee","objects","I drink coffee.",[phrase("koohii","object"),v("nomu")]],
+    ["object-tv","objects","I watch TV.",[phrase("terebi","object"),v("miru")]],
+    ["place-home-book","action-place","I read a book at home.",[phrase("uchi","place"),phrase("hon","object"),v("yomu")]],
+    ["place-home-music","action-place","I listen to music at home.",[phrase("uchi","place"),phrase("ongaku","object"),v("kiku")]],
+    ["place-home-tea","action-place","I drink tea at home.",[phrase("uchi","place"),phrase("ocha","object"),v("nomu")]],
+    ["place-library-study","action-place","I study Japanese at the library.",[phrase("toshokan","place"),phrase("nihongo","object"),v("benkyousuru")]],
+    ["place-university-book","action-place","I read a book at university.",[phrase("daigaku","place"),phrase("hon","object"),v("yomu")]],
+    ["companion-music","companion","I listen to music with a friend.",[phrase("tomodachi","companion"),phrase("ongaku","object"),v("kiku")]],
+    ["companion-book","companion","I read a book with a friend.",[phrase("tomodachi","companion"),phrase("hon","object"),v("yomu")]],
+    ["companion-tea","companion","I drink tea with a friend.",[phrase("tomodachi","companion"),phrase("ocha","object"),v("nomu")]],
+    ["companion-breakfast","companion","I eat breakfast with a friend.",[phrase("tomodachi","companion"),phrase("asagohan","object"),v("taberu")]],
+    ["time-today-music","time","I listen to music today.",[phrase("kyou","bareTime"),phrase("ongaku","object"),v("kiku")]],
+    ["time-daily-tea","time","I drink tea every day.",[phrase("mainichi","bareTime"),phrase("ocha","object"),v("nomu")]],
+    ["time-daily-book","time","I read a book every day.",[phrase("mainichi","bareTime"),phrase("hon","object"),v("yomu")]],
+    ["negative-book","negative","I do not read books.",[phrase("hon","object"),v("yomu",true)]],
+    ["negative-music","negative","I do not listen to music.",[phrase("ongaku","object"),v("kiku",true)]],
+    ["negative-tea","negative","I do not drink tea.",[phrase("ocha","object"),v("nomu",true)]],
+    ["past-tea","past-actions","I drank tea at home.",[phrase("uchi","place"),phrase("ocha","object"),past("nomu")]],
+    ["past-movie","past-actions","I watched a movie with a friend.",[phrase("tomodachi","companion"),phrase("eiga","object"),past("miru")]],
+    ["past-no-coffee","past-actions","I did not drink coffee yesterday.",[phrase("kinou","bareTime"),phrase("koohii","object"),past("nomu",true)]],
+    ["past-no-tv","past-actions","I did not watch TV yesterday.",[phrase("kinou","bareTime"),phrase("terebi","object"),past("miru",true)]],
+    ["duration-movie","duration","I watched a movie for one hour.",[phrase("ichijikan","duration"),phrase("eiga","object"),past("miru")]],
+    ["duration-music","duration","I listened to music for one hour.",[phrase("ichijikan","duration"),phrase("ongaku","object"),past("kiku")]],
+    ["existence-cat-park","existence","There is a cat in the park.",[phrase("kouen","existencePlace"),phrase("neko","subject"),v("iru")]],
+    ["existence-dog-home","existence","There is a dog at home.",[phrase("uchi","existencePlace"),phrase("inu","subject"),v("iru")]],
+    ["existence-bag-desk","existence","There is a bag under the desk.",[position("tsukue","shita","existencePlace"),phrase("kaban","subject"),v("aru")]],
+    ["existence-no-book","existence","There is no book on the desk.",[position("tsukue","ue","existencePlace"),phrase("hon","subject"),v("aru",true)]]
+  ].forEach(([id,topic,en,chunks])=>add(id,topic,en,chunks,chunks.length===3 ? {orders:[[0,1,2],[1,0,2]]}:{}));
   // These alternatives preserve the prompt's meaning. Keep them explicit rather
   // than accepting arbitrary particles, omissions, or word permutations.
   roles.relativeTime = { title: "Time expression", note: "Relative or repeated time can stand alone, or take は to make it the topic. It does not take に here.", choices: ["", "は"] };

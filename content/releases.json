@@ -794,6 +794,12 @@
       "publishedAt": "2026-10-31",
       "title": "Fairer sentence checking",
       "changes": [{"pages": ["guided"], "text": "Sentence Practice accepts reviewed alternatives for optional topics, phrase order, noun lists, time expressions, and meeting particles. Feedback follows the matching sentence structure and no longer flags valid optional words as vocabulary mistakes."}]
+    },
+    {
+      "id": "2026-10-31.9",
+      "publishedAt": "2026-10-31",
+      "title": "More varied sentence and verb practice",
+      "changes": [{"pages": ["guided"], "text": "Practise with 27 additional sentence examples, a fairer rotation, and spaced mistake checks using related examples. Verb questions highlight the requested form, check choices immediately, and offer adaptive four- or six-choice banks. Session settings include optional automatic sentence playback."}]
     }
   ]
 }

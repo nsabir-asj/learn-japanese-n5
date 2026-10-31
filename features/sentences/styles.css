@@ -108,3 +108,20 @@ body[data-activity="sentences"] .activity-stat>span { min-height:2.6em;line-heig
 .sp-hint-button svg { flex:none; }
 .sp-hint-button:hover { background:#22322e;border-color:#89b8a7;color:#e1fff4; }
 .sp-hint-button:focus-visible { outline:2px solid #9ddfcd;outline-offset:3px; }
+
+.sp-verb-prompt { display:flex;align-items:center;flex-wrap:wrap;gap:12px 20px; }
+.sp-verb-prompt h2 { margin:0!important; }
+.sp-verb-prompt p { margin:0;color:var(--muted);font-size:1rem;line-height:2; }
+.sp-verb-prompt mark { color:#d1f9ec;background:#2c4e43;border:1px solid #4f7c6a;padding:4px 9px;border-radius:6px;font-weight:700;white-space:nowrap; }
+.sp-verb-meaning { color:var(--muted);font-size:.85rem;margin:8px 0 24px; }
+.sp-footer { flex-wrap:wrap; }
+.sp-footer .sp-actions { order:1; }
+.sp-footer .sp-keyboard { order:2;flex:1;margin:0;font-size:.72rem; }
+.sp-footer .sp-hint-button { order:3; }
+.sp-instant-footer .sp-keyboard { order:0; }
+.sp-audio-setting { display:flex!important;align-items:flex-start;gap:10px; }
+.sp-audio-setting input { width:18px;height:18px;flex:none;margin-top:3px;accent-color:#9ddfcd; }
+.sp-audio-setting small { display:block;margin-top:6px; }
+@media(max-width:600px) { .sp-footer .sp-keyboard { flex-basis:100%;order:4; }.sp-instant-footer .sp-keyboard { order:0; }.sp-verb-prompt { gap:8px; }.sp-verb-prompt p { font-size:.88rem; } }
+
+#sentencePractice [hidden] { display:none!important; }

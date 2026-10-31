@@ -170,7 +170,7 @@ test('Lesson 4 is selectable in every activity with eight new verbs and past for
   assert.ok(C.lessons.some(l=>l.id===4));
   for(const activity of ['build','particles']){
     const pool=E.pool({...config,activity,topics});
-    assert.equal(pool.length,30);
+    assert.equal(pool.length,40);
     assert.equal(new Set(pool.map(s=>s.topic)).size,6);
     assert.ok(pool.every(s=>E.slots(s).length>0));
   }
@@ -223,7 +223,7 @@ test('plain Enter checks sentence building and advances feedback while focused c
   const source=readFileSync(new URL('../features/sentences/practice.js',import.meta.url),'utf8');
   const body=source.match(/document\.addEventListener\("keydown",event => \{([\s\S]*?)\n  \}\);/)[1];
   let checks=0, advances=0;
-  const harness=vm.createContext({current:{},teaching:false,answered:false,$:()=>null,check:()=>checks++,next:()=>advances++});
+  const harness=vm.createContext({current:{},renderedAt:0,teaching:false,answered:false,$:()=>null,check:()=>checks++,next:()=>advances++});
   const handler=vm.runInContext(`(event)=>{${body}}`,harness);
   const event=(extra={})=>({key:'Enter',repeat:false,isComposing:false,ctrlKey:false,target:{matches:()=>false},preventDefault(){},...extra});
   handler(event());assert.equal(checks,1);
@@ -292,4 +292,74 @@ test('reviewed alternatives never allow arbitrary topics, swapped particles, wro
   const meeting=C.sentences.find(s=>s.id==='past-meet');
   assert.equal(E.particleAnswer('ni',E.slots(meeting).find(s=>s.anchor==='ともだち').role).correct,true);
   assert.equal(E.particleAnswer('ni','companion').correct,false,'ni must not become a generic companion alternative');
+});
+
+
+test('every verb has four or six distinct same-verb choices without leaking past tense into Lesson 3',()=>{
+  for(const exercise of E.verbs)for(const size of ['4','6']){
+    const options=E.verbChoices(exercise,{verbChoices:size,topics:[exercise.topic]}, {items:{}},()=>.4);
+    assert.equal(options.length,Number(size),exercise.id);
+    assert.equal(new Set(options).size,options.length);
+    assert.equal(options.filter(x=>x===exercise.answer).length,1);
+    if(!exercise.form.startsWith('past'))assert.ok(options.every(x=>!x.endsWith('ました')&&!x.endsWith('でした')),exercise.id);
+  }
+});
+
+test('Auto uses spaced evidence for one verb form, supports typed evidence, and recovers after errors',()=>{
+  const exercise=E.verbs.find(x=>x.id==='yomu-affirmative');
+  const progress={items:{},total:0};
+  const settings={activity:'verbs',input:'choice',verbChoices:'auto'};
+  const attempt=(correct,assisted,mode='choice',now=0)=>{
+    progress.total+=6;
+    E.record(progress,`verbs:${mode}:${exercise.id}`,correct,assisted,now);
+  };
+  assert.equal(E.verbChoiceCount(exercise,settings,progress),4);
+  attempt(true,false,'choice',0);attempt(true,false,'choice',700000);
+  assert.equal(E.verbChoiceCount(exercise,settings,progress),4);
+  attempt(true,true,'choice',800000);
+  assert.equal(E.verbChoiceCount(exercise,settings,progress),4);
+  attempt(true,false,'typing',1000000);
+  assert.equal(E.verbChoiceCount(exercise,settings,progress),6);
+  assert.equal(E.verbChoiceCount(E.verbs.find(x=>x.id==='yomu-negative'),settings,progress),4);
+  attempt(false,false,'choice',1100000);
+  assert.equal(E.verbChoiceCount(exercise,settings,progress),4);
+  attempt(true,false,'choice',1200000);
+  assert.equal(E.verbChoiceCount(exercise,settings,progress),4);
+  attempt(true,false,'typing',1300000);
+  assert.equal(E.verbChoiceCount(exercise,settings,progress),6);
+});
+
+test('coverage rotation visits every selected sentence before repeating successes',()=>{
+  const pool=E.pool({...config,topics:['action-place','companion']});
+  const progress={items:{},total:0},recent=[],seen=new Set();
+  for(let i=0;i<pool.length;i++){
+    const chosen=E.choose(pool,config,progress,recent,{},()=>.4,0);
+    assert.ok(!seen.has(chosen.id));seen.add(chosen.id);recent.push(chosen.id);
+    progress.total++;E.record(progress,E.recordKey(chosen,config),true,false,0);
+  }
+  assert.equal(seen.size,pool.length);
+});
+
+test('a mistake transfers to another example after two answers, with bounded exact retries',()=>{
+  const pool=E.pool({...config,topics:['action-place','companion']});
+  const original=pool.find(x=>x.id==='place-library');
+  const progress={items:{},total:1};
+  E.record(progress,E.recordKey(original,config),false,false,0,{weakRoles:['place']});
+  const recent=[original.id];
+  for(let i=0;i<2;i++){
+    const chosen=E.choose(pool,config,progress,recent,{},()=>.4,0);
+    assert.notEqual(chosen.id,original.id);recent.push(chosen.id);progress.total++;
+    E.record(progress,E.recordKey(chosen,config),true,false,0);
+  }
+  const transfer=E.choose(pool,config,progress,recent,{},()=>.4,0);
+  assert.notEqual(transfer.id,original.id);
+  assert.ok(E.slots(transfer).some(x=>x.role==='place'));
+  assert.equal(progress.items[E.recordKey(original,config)].transferDone,true);
+  recent.push(transfer.id);progress.total++;E.record(progress,E.recordKey(transfer,config),true,false,0);
+  for(let i=0;i<2;i++){
+    const normal=E.choose(pool,config,progress,recent,{},()=>.4,0);
+    assert.notEqual(normal.id,original.id);recent.push(normal.id);progress.total++;
+    E.record(progress,E.recordKey(normal,config),true,false,0);
+  }
+  assert.equal(E.choose(pool,config,progress,recent,{},()=>.4,0).id,original.id);
 });

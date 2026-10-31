@@ -4,17 +4,18 @@
   const KEY = "kanaSprintSentencesV1";
   const $ = selector => document.querySelector(selector);
   const esc = value => String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
-  const defaults = () => ({ version:1, total:0, correct:0, streak:0, bestStreak:0, items:{}, skills:{}, introduced:{}, wordsSeen:{}, settings:{ activity:"build", support:"supported", input:"choice", typingScript:"romaji", bankSize:"auto", vocabulary:"prefer", review:"all", scopes:{build:["identity","possession","questions"],particles:["identity","possession","questions"],verbs:["verbs-u","verbs-ru","verbs-irregular"]} } });
+  const defaults = () => ({ version:1, total:0, correct:0, streak:0, bestStreak:0, items:{}, skills:{}, introduced:{}, wordsSeen:{}, settings:{ activity:"build", support:"supported", input:"choice", typingScript:"romaji", bankSize:"auto", verbChoices:"auto", autoAudio:false, vocabulary:"prefer", review:"all", scopes:{build:["identity","possession","questions"],particles:["identity","possession","questions"],verbs:["verbs-u","verbs-ru","verbs-irregular"]} } });
   let state = defaults();
   try {
     const saved = JSON.parse(localStorage.getItem(KEY));
     if (saved?.version === 1) {
       state = { ...state, ...saved, settings:{...state.settings,...saved.settings,scopes:{...state.settings.scopes,...saved.settings?.scopes}} };
       for (const field of ["items","skills","introduced","wordsSeen"]) if (!state[field] || typeof state[field] !== "object" || Array.isArray(state[field])) state[field] = {};
-      for (const [key, options] of Object.entries({activity:["build","particles","verbs"],support:["supported","independent"],input:["choice","typing"],typingScript:["romaji","japanese"],bankSize:["auto","8","12"],vocabulary:["prefer","introduced","mastered","any"],review:["all","trouble"]})) if (!options.includes(state.settings[key])) state.settings[key] = defaults().settings[key];
+      for (const [key, options] of Object.entries({activity:["build","particles","verbs"],support:["supported","independent"],input:["choice","typing"],typingScript:["romaji","japanese"],bankSize:["auto","8","12"],verbChoices:["auto","4","6"],vocabulary:["prefer","introduced","mastered","any"],review:["all","trouble"]})) if (!options.includes(state.settings[key])) state.settings[key] = defaults().settings[key];
       for (const activity of ["build","particles","verbs"]) state.settings.scopes[activity] = Array.isArray(state.settings.scopes[activity]) ? state.settings.scopes[activity].filter(id => C.topics.some(t => t.id === id)) : defaults().settings.scopes[activity];
     }
   } catch { /* A broken saved snapshot should not stop practice. */ }
+  let renderedAt = 0;
   let current = null, selected = [], bank = [], answers = [], activeSlot = 0, answered = false, assisted = false, assistanceReason = "", recent = [], sessionTotal = 0, sessionCorrect = 0, sessionUnaided = 0;
   let draft = new Set(), scopeView = "lessons", scopeSearch = "";
   const settings = () => ({...state.settings,topics:state.settings.scopes[state.settings.activity]});
@@ -42,9 +43,9 @@
       <button type="button" data-activity="verbs"><span class="sp-nav-icon" aria-hidden="true">る</span><span><strong>Practise verbs</strong><small>Find the right form</small></span></button>
     </nav>
     <div class="sp-context"><div class="sp-collection" aria-label="Practice collection"><span class="sp-eyebrow">Practice collection</span><div class="sp-collection-row"><div class="sp-collection-copy"><strong id="scopeName"></strong><span id="scopeCount"></span></div><button class="sp-change" id="openScope" type="button" aria-haspopup="dialog" aria-controls="scopeDialog" aria-label="Change practice collection">Change</button></div></div><div class="sp-segments" id="modeControls" role="group" aria-label="Practice support"></div></div>
-    <p id="modeDescription" class="sp-mode-description"></p>
+    <p id="modeDescription" class="sp-mode-description"></p><p id="availabilityNote" class="sp-muted" hidden></p>
     <section class="sp-workspace" aria-label="Practice exercise"><div class="sp-question-card" id="questionCard"></div></section>
-    <details class="sp-settings" id="sessionSettings"><summary><span><strong>Session settings</strong><small id="settingsSummary"></small></span></summary><div class="sp-settings-grid"><label>Vocabulary<select id="vocabularyFilter"><option value="prefer">Prefer familiar words</option><option value="introduced">Only introduced words</option><option value="mastered">Only mastered words</option><option value="any">Any words in this collection</option></select><small>Uses progress from Vocabulary. Strict filters include every content word; clock phrases without Vocabulary records are excluded.</small></label><label>Practice mix<select id="reviewFilter"><option value="all">New material + review</option><option value="trouble">Trouble exercises only</option></select><small>Trouble practice uses mistakes in the current activity and answer format.</small></label><label id="bankSizeSetting">Word bank size<select id="bankSize"><option value="auto">Auto · 6 chunks / 8 words</option><option value="8">8 choices</option><option value="12">12 choices</option></select><small>Related extra words and contrasting verb forms make you choose from meaning. Strict vocabulary filters may limit the available choices.</small></label><p class="sp-settings-note">Grammar is available immediately. Lesson numbers organize the collections; guided-lesson completion is never required. Vocabulary hints and rules count as support when used before answering.</p></div></details>
+    <details class="sp-settings" id="sessionSettings"><summary><span><strong>Session settings</strong><small id="settingsSummary"></small></span></summary><div class="sp-settings-grid"><label>Vocabulary<select id="vocabularyFilter"><option value="prefer">Prefer familiar words</option><option value="introduced">Only introduced words</option><option value="mastered">Only mastered words</option><option value="any">Any words in this collection</option></select><small>Uses progress from Vocabulary. Strict filters include every content word; clock phrases without Vocabulary records are excluded.</small></label><label>Practice mix<select id="reviewFilter"><option value="all">New material + review</option><option value="trouble">Trouble exercises only</option></select><small>Trouble practice uses mistakes in the current activity and answer format.</small></label><label id="bankSizeSetting">Word bank size<select id="bankSize"><option value="auto">Auto · 6 chunks / 8 words</option><option value="8">8 choices</option><option value="12">12 choices</option></select><small>Related extra words and contrasting verb forms make you choose from meaning. Strict vocabulary filters may limit the available choices.</small></label><label id="verbChoicesSetting">Verb choices<select id="verbChoices"><option value="auto">Auto · 4 or 6 choices</option><option value="4">4 choices</option><option value="6">6 choices</option></select><small>Auto increases each form after three spaced unaided successes including a later review. A mistake reduces choices; two unaided successes restore six.</small></label><label id="autoAudioSetting" class="sp-audio-setting"><input type="checkbox" id="autoSentenceAudio"><span>Automatically play the model sentence after answering<small>Hear the correct sentence after either result. Your preference is saved.</small></span></label><p class="sp-settings-note">Grammar is available immediately. Lesson numbers organize the collections; guided-lesson completion is never required. Vocabulary hints and rules count as support when used before answering.</p></div></details>
     <details class="sp-progress" id="practiceProgress"><summary><span><strong>Progress &amp; trouble spots</strong><small>See what you can do with and without support</small></span></summary><div id="progressBody"></div></details>
     <p class="sp-save-notice" id="saveNotice" role="status"></p>
   </main>
@@ -61,7 +62,13 @@
     $("#modeDescription").textContent = s.activity === "build" ? s.support === "supported" ? "Start with useful chunks. Particles stay attached to their words." : "Choose words and particles separately. Extra particles can remain unused." : s.activity === "particles" ? "The words are in place. Choose what connects them; sometimes no particle is needed." : "Start from the dictionary form. Practise polite affirmative, negative, and past forms.";
     $("#vocabularyFilter").value = s.vocabulary; $("#reviewFilter").value = s.review;
     $("#bankSize").value = s.bankSize; $("#bankSizeSetting").hidden = s.activity !== "build";
+    $("#verbChoices").value=s.verbChoices; $("#verbChoicesSetting").hidden=s.activity!=="verbs";
+    $("#autoSentenceAudio").checked=s.autoAudio===true; $("#autoAudioSetting").hidden=s.activity!=="build";
     $("#settingsSummary").textContent = `${$("#vocabularyFilter").selectedOptions[0].textContent} · ${s.review === "trouble" ? "Trouble only" : "New + review"}`;
+    const available=E.pool(settings(),vocabulary()).length;
+    const full=E.pool({...settings(),vocabulary:"any"}).length;
+    $("#availabilityNote").hidden=available>3 && available===full;
+    $("#availabilityNote").textContent=`${available} of ${full} exercises available with your current filters.${available<=3 ? " A wider selection gives more variety." : ""}`;
     updateStats();
   }
   function updateStats() {
@@ -97,8 +104,9 @@
     renderExercise();
   }
   function renderExercise() {
+    renderedAt=Date.now();
     const s = state.settings, topic = C.topics.find(t => t.id === current.topic);
-    $("#questionCard").innerHTML = `<div class="sp-card-top"><span class="sp-eyebrow">${esc(modeName())}</span><span class="sp-lesson-tag">Lesson ${topic.lesson}</span></div><p class="sp-task-label">${s.activity === "verbs" ? `Make the polite ${current.form} form` : "Say this in Japanese"}</p><h2 id="exercisePrompt" tabindex="-1">${esc(s.activity === "verbs" ? current.verb.meaning : current.meaning)}</h2>${current.context ? `<p class="sp-context-note">${esc(current.context)}</p>` : ""}<div id="exerciseBody"></div><div class="sp-answer-feedback" id="answerFeedback" role="status" aria-live="polite"></div><div class="sp-footer"><div class="sp-actions"><button class="sp-primary" type="button" data-action="check" id="checkAnswer" aria-keyshortcuts="Enter">Check answer <kbd>Enter</kbd></button><button class="sp-secondary" type="button" data-action="next" id="nextExercise" aria-keyshortcuts="Enter" hidden>Next sentence →</button><button class="sp-text-button" type="button" data-action="unknown" id="dontKnow">I don’t know</button></div><button class="sp-hint-button" type="button" data-action="hint" id="hintButton"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6m-5 3h4M8.5 14.5a6 6 0 1 1 7 0c-1 .7-1.5 1.5-1.5 3.5h-4c0-2-.5-2.8-1.5-3.5Z"/></svg><span>Hint</span></button></div><p class="sp-keyboard" id="keyboardNote"></p>`;
+    $("#questionCard").innerHTML = `<div class="sp-card-top"><span class="sp-eyebrow">${esc(modeName())}</span><span class="sp-lesson-tag">Lesson ${topic.lesson}</span></div>${s.activity === "verbs" ? `<div class="sp-verb-prompt"><h2 id="exercisePrompt" tabindex="-1" lang="ja">${esc(current.verb.jp)}</h2><p>→ Make the polite <mark>${esc(current.form)}</mark> form</p></div><p class="sp-verb-meaning">${esc(current.verb.romaji)} · ${esc(current.verb.meaning)}</p>` : `<p class="sp-task-label">Say this in Japanese</p><h2 id="exercisePrompt" tabindex="-1">${esc(current.meaning)}</h2>`}${current.context ? `<p class="sp-context-note">${esc(current.context)}</p>` : ""}<div id="exerciseBody"></div><div class="sp-answer-feedback" id="answerFeedback" role="status" aria-live="polite"></div><div class="sp-footer"><div class="sp-actions"><button class="sp-primary" type="button" data-action="check" id="checkAnswer" aria-keyshortcuts="Enter">Check answer <kbd>Enter</kbd></button><button class="sp-secondary" type="button" data-action="next" id="nextExercise" aria-keyshortcuts="Enter" hidden>Next sentence →</button><button class="sp-text-button" type="button" data-action="unknown" id="dontKnow">I don’t know</button></div><button class="sp-hint-button" type="button" data-action="hint" id="hintButton"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6m-5 3h4M8.5 14.5a6 6 0 1 1 7 0c-1 .7-1.5 1.5-1.5 3.5h-4c0-2-.5-2.8-1.5-3.5Z"/></svg><span>Hint</span></button><p class="sp-keyboard" id="keyboardNote"></p></div>`;
     if (s.activity === "build") {
       bank = E.tileBank(current,s.support === "supported",Math.random,{settings:s,vocabulary:vocabulary()});
       $("#exerciseBody").innerHTML = `<div class="sp-answer-zone"><div class="sp-zone-heading"><span>Your sentence</span><button class="sp-text-button" type="button" data-action="clear">Clear</button></div><div id="builtAnswer" class="sp-built-answer" aria-label="Your sentence"></div></div><div class="sp-bank-heading"><span>${s.support === "supported" ? "Sentence chunks" : "Words"} · ${bank.length} choices</span><small>Extra choices can remain. Click an answer tile to remove it.</small></div><div id="wordBank" class="sp-tile-bank"></div>${s.support === "independent" ? `<div class="sp-bank-heading"><span>Particles</span><small>Reusable · extra choices may remain</small></div><div id="particleBank" class="sp-tile-bank sp-particle-bank">${["は","が","を","に","へ","で","の","と","も","か"].map(text => `<button class="sp-tile sp-particle" type="button" data-particle="${text}" lang="ja">${text}</button>`).join("")}</div>` : ""}`;
@@ -110,12 +118,12 @@
       renderGaps();
       $("#keyboardNote").textContent = s.input === "choice" ? "Keys 1–9, 0, or − choose a particle. Enter checks all gaps." : "Enter checks all gaps. Answers use the Japanese particle spelling.";
     } else {
-      const wrongStem = current.verb.jp.slice(0,-1) + (current.verb.group === "ru" ? "り" : current.verb.jp.slice(-1));
-      const end = current.suffix;
-      const opposite = current.form.startsWith("past") ? (current.form.endsWith("negative") ? "ました" : "ませんでした") : (current.form === "affirmative" ? "ません" : "ます");
-      const options = E.shuffle([...new Set([current.answer,current.verb.stem + opposite,current.verb.jp + end,wrongStem + end])]);
-      $("#exerciseBody").innerHTML = `<div class="sp-verb-source"><span>Dictionary form</span><strong lang="ja">${esc(current.verb.jp)}</strong><small>${esc(current.verb.romaji)}</small></div>${s.input === "typing" ? `${typingControls()}<label class="sp-typed-label"><span id="typedAnswerLabel">Your answer</span><input class="sp-typed-answer" id="verbInput" type="text" placeholder="Type romaji" autocomplete="off" autocapitalize="off" spellcheck="false"></label>${kanaPreviewMarkup()}` : `<div class="sp-verb-choices">${options.map((text,i) => `<button class="sp-tile" type="button" data-verb-choice="${esc(text)}"><kbd>${i+1}</kbd><span lang="ja">${esc(text)}</span></button>`).join("")}</div>`}`;
-      $("#keyboardNote").textContent = s.input === "typing" ? "Type the whole form, then press Enter." : "Choose with keys 1–4, then press Enter to check.";
+      const options = E.verbChoices(current,settings(),state);
+      const instant=s.input==="choice";
+      $("#checkAnswer").hidden=instant;
+      $("#questionCard .sp-footer").classList.toggle("sp-instant-footer",instant);
+      $("#exerciseBody").innerHTML = `${s.input === "typing" ? `${typingControls()}<label class="sp-typed-label"><span id="typedAnswerLabel">Your answer</span><input class="sp-typed-answer" id="verbInput" type="text" placeholder="Type romaji" autocomplete="off" autocapitalize="off" spellcheck="false"></label>${kanaPreviewMarkup()}` : `<div class="sp-verb-choices">${options.map((text,i) => `<button class="sp-tile" type="button" data-verb-choice="${esc(text)}"><kbd>${i+1}</kbd><span lang="ja">${esc(text)}</span></button>`).join("")}</div>`}`;
+      $("#keyboardNote").textContent = s.input === "typing" ? "Type the whole form, then press Enter." : `Choose an answer · Keys 1–${options.length} · Checks immediately`;
     }
     if (s.input === "typing" && s.activity !== "build") updateTypingPreview();
   }
@@ -174,9 +182,10 @@
       if (!unknown && !response.trim()) { $("#answerFeedback").textContent = "Enter or select a verb form first."; return; }
       correct = !unknown && [current.answer,current.romaji,current.kanji].some(x => E.normalize(x) === E.normalize(response));
     }
-    answered = true; state.total++; sessionTotal++;
+    answered = true; renderedAt=Date.now(); state.total++; sessionTotal++;
     if (!assisted) { sessionUnaided++; if (correct) {state.correct++;sessionCorrect++;state.streak++;state.bestStreak = Math.max(state.bestStreak,state.streak);} else state.streak = 0; }
-    E.record(state,E.recordKey(current,s),correct,assisted);
+    const wrongWordsForRetry=s.activity==="build" ? E.unexpectedWords(current,selected) : [];
+    E.record(state,E.recordKey(current,s),correct,assisted,Date.now(),{response:s.activity==="verbs" ? response : "",weakRoles:details.filter(x=>!x.correct).map(x=>x.role),weakWords:wrongWordsForRetry.length ? E.wordIds(current) : []});
     for (const slot of details) {
       const key = `${s.activity}:${s.activity === "build" ? "independent" : s.input}:${slot.role}`;
       const item = state.skills[key] || {role:slot.role,topic:current.topic,correct:0,wrong:0};
@@ -190,7 +199,9 @@
     $("#checkAnswer").hidden = true; $("#dontKnow").hidden = true; $("#hintButton").hidden = true;
     $("#nextExercise").hidden = false; $("#nextExercise").innerHTML = `${s.activity === "verbs" ? "Next verb" : "Next sentence"} <kbd>Enter</kbd>`;
     $("#exerciseBody").querySelectorAll("button,input").forEach(x => {x.disabled = true;});
+    $("#keyboardNote").hidden=true;
     $("#nextExercise").focus();
+    if(s.activity==="build" && s.autoAudio===true && !window.KANA_SPRINT_SPEECH?.speakJapanese(E.model(current))) $("#audioNotice").textContent="No Japanese voice available. Choose a voice in Settings & Data.";
   }
   function wordGlossary() { return `<div class="sp-word-intro">${E.wordIds(current).map(id => `<div><strong lang="ja">${esc(C.words[id].jp)}</strong><span>${esc(C.words[id].romaji)}</span><span>${esc(C.words[id].meaning)}</span></div>`).join("")}</div>`; }
   function showRule(hint = false) {
@@ -252,6 +263,7 @@
     if (action === "settings") {$("#sessionSettings").open = true;$("#sessionSettings").scrollIntoView({block:"center"});return;}
     if (action === "rule" || action === "hint") return showRule(action === "hint");
     if (action === "audio") { if (!window.KANA_SPRINT_SPEECH?.speakJapanese(state.settings.activity === "verbs" ? current.answer : E.model(current))) $("#audioNotice").textContent="No Japanese voice available. Choose a voice in Settings & Data."; return; }
+    if (action === "next" && Date.now()-renderedAt<500) return;
     if (action === "next") {next();$("#exercisePrompt")?.focus();return;}
     if (action === "check" || action === "unknown") return check(action === "unknown");
     if (answered || !current) return;
@@ -262,7 +274,7 @@
     if (button.dataset.slot !== undefined) {activeSlot=Number(button.dataset.slot);renderGaps();$("#gapSentence").querySelector(`[data-slot="${activeSlot}"]`)?.focus();}
     if (button.dataset.gapChoice !== undefined) {answers[activeSlot]=button.dataset.gapChoice === "—" ? "" : button.dataset.gapChoice;const unfilled=answers.findIndex(x=>x===null);if(unfilled>=0)activeSlot=unfilled;renderGaps();}
     if (event.detail > 0 && (button.dataset.word || button.dataset.particle || button.dataset.remove !== undefined)) $("#checkAnswer")?.focus();
-    if (button.dataset.verbChoice) {answers[0]=button.dataset.verbChoice;document.querySelectorAll("[data-verb-choice]").forEach(x=>x.setAttribute("aria-pressed",String(x===button)));}
+    if (button.dataset.verbChoice) {answers[0]=button.dataset.verbChoice;document.querySelectorAll("[data-verb-choice]").forEach(x=>x.setAttribute("aria-pressed",String(x===button)));check();}
   });
   $("#scopeSearch").addEventListener("input",event => {scopeSearch=event.target.value;renderScope();});
   $("#scopeOptions").addEventListener("change",event => {
@@ -271,14 +283,15 @@
     ids.forEach(id=>input.checked ? draft.add(id) : draft.delete(id));renderScope();
     $("#scopeOptions").querySelector(input.dataset.topic ? `[data-topic="${input.dataset.topic}"]` : `[data-lesson="${input.dataset.lesson}"]`)?.focus();
   });
-  for (const [id,key] of [["vocabularyFilter","vocabulary"],["reviewFilter","review"],["bankSize","bankSize"]]) $("#"+id).addEventListener("change",event => {state.settings[key]=event.target.value;save();recent=[];next();});
+  for (const [id,key] of [["vocabularyFilter","vocabulary"],["reviewFilter","review"],["bankSize","bankSize"],["verbChoices","verbChoices"]]) $("#"+id).addEventListener("change",event => {state.settings[key]=event.target.value;save();recent=[];next();});
+  $("#autoSentenceAudio").addEventListener("change",event=>{state.settings.autoAudio=event.target.checked;save();});
   document.addEventListener("input",event => {if (!event.isComposing && event.target.matches("#verbInput,[data-gap-input]")) updateTypingPreview();});
   document.addEventListener("compositionend",event => {if(event.target.matches("#verbInput,[data-gap-input]")) updateTypingPreview();});
   document.addEventListener("keydown",event => {
     if ($("dialog[open]") || event.isComposing || event.repeat || !current) return;
     const typing = event.target.matches("input,select,textarea,summary");
     if (event.key === "Enter" && !event.target.matches("button,summary,select,a,textarea")) {
-      event.preventDefault();if(answered)next();else check();return;
+      event.preventDefault();if(answered){if(Date.now()-renderedAt>=500)next();}else check();return;
     }
     if (typing || event.ctrlKey || event.altKey || event.metaKey || answered || event.repeat) return;
     const n = "1234567890-".indexOf(event.key);
