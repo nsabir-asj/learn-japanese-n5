@@ -752,6 +752,17 @@
           "text": "Simple example sentences now use polite verb forms while vocabulary entries stay in dictionary form. Lesson 3 and 4 breakdowns show short notes connecting each verb form to its dictionary form."
         }
       ]
+    },
+    {
+      "id": "2026-10-31.4",
+      "publishedAt": "2026-10-31",
+      "title": "Understand each verb form",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Verb boxes now explain the dictionary form, verb group and time meaning in context. Expand “Why this form?” for a short conjugation rule."
+        }
+      ]
     }
   ]
 }

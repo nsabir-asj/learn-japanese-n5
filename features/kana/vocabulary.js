@@ -1677,11 +1677,13 @@
   }
   function sentenceChunksMarkup(sentence, parts) {
     const labels = sentenceChunkLabels(sentence, parts);
-    const chips = parts.map(([japanese, meaning, role, kind, verbFormNote], index) => {
+    const chips = parts.map(([japanese, meaning, role, kind, verbFormNote, formInfo], index) => {
       const kindAttribute = kind ? ` data-kind="${escapeExampleText(kind)}"` : "";
       const separator = index ? `<span class="vocab-sentence-plus" aria-hidden="true">+</span>` : "";
-      const formMarkup = verbFormNote ? `<span class="vocab-verb-form">${escapeExampleText(verbFormNote)}</span>` : "";
-      return `<span class="vocab-sentence-term" role="listitem">${separator}<span class="vocab-sentence-chunk"${kindAttribute} title="${escapeExampleText(role)}"><strong lang="ja">${escapeExampleText(labels[index])}</strong><small>${escapeExampleText(sentenceChunkMeaning(meaning, role))}</small>${formMarkup}</span></span>`;
+      const formMarkup = formInfo
+        ? `<div class="vocab-verb-form"><span><b lang="ja">${escapeExampleText(formInfo.dictionary)}</b> · dictionary · ${escapeExampleText(formInfo.group)}</span><span>${escapeExampleText(formInfo.form)} · ${escapeExampleText(formInfo.usage)}</span><details class="vocab-verb-why"><summary aria-label="Why this form: ${escapeExampleText(japanese)}">Why this form?</summary><p>${escapeExampleText(formInfo.rule)}</p></details></div>`
+        : verbFormNote ? `<span class="vocab-verb-form">${escapeExampleText(verbFormNote)}</span>` : "";
+      return `<div class="vocab-sentence-term" role="listitem">${separator}<div class="vocab-sentence-chunk"${kindAttribute} title="${escapeExampleText(role)}"><strong lang="ja">${escapeExampleText(labels[index])}</strong><small>${escapeExampleText(sentenceChunkMeaning(meaning, role))}</small>${formMarkup}</div></div>`;
     }).join("");
     return `<section class="vocab-sentence-map" aria-label="Sentence meaning, chunk by chunk"><header><strong>How this sentence fits together</strong><span>Japanese + meaning</span></header><div class="vocab-sentence-equation" role="list">${chips}</div></section>`;
   }

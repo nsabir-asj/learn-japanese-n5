@@ -118,8 +118,37 @@ test('verb-form notes render inside their own chunks and are escaped', () => {
   const context = { escapeExampleText: value => String(value).replaceAll('<', '&lt;').replaceAll('>', '&gt;') };
   runInNewContext(functions, context);
   const markup = context.sentenceChunksMarkup(examples.nomu[0], breakdowns.nomu[0]);
-  assert.match(markup, /のみます。<\/strong><small>drink<\/small><span class="vocab-verb-form">Polite nonpast of のむ\.<\/span>/);
+  assert.match(markup, /のみます。<\/strong><small>drink<\/small><div class="vocab-verb-form">/);
+  assert.match(markup, /dictionary · u-verb/);
+  assert.match(markup, /Polite nonpast · Habit \/ routine/);
+  assert.match(markup, /<details class="vocab-verb-why"><summary/);
+  assert.doesNotMatch(markup, /vocab-verb-why" open/);
   assert.match(context.sentenceChunksMarkup('きます。', [['きます', 'come', 'Movement', undefined, '<test>']]), /&lt;test&gt;/);
+});
+
+test('verb explanations use checked groups, actual stems and sentence-specific time meanings', () => {
+  const info = (id, form) => breakdowns[id][0].find(part => part[0] === form)[5];
+  assert.equal(info('kaeru', 'かえります').group, 'u-verb');
+  assert.equal(info('iru', 'います').group, 'ru-verb');
+  assert.equal(info('okiru', 'おきます').group, 'ru-verb');
+  assert.equal(info('kuru', 'きます').group, 'irregular');
+  assert.equal(info('benkyou-suru', 'べんきょうします').dictionary, 'べんきょうする');
+  assert.match(info('benkyou-suru', 'べんきょうします').rule, /べんきょうし \+ ます/);
+  assert.equal(info('mizu', 'のみます').usage, 'Habit / routine');
+  assert.equal(info('neru', 'ねます').usage, 'Future plan');
+  assert.equal(info('inu', 'います').usage, 'Present state');
+  assert.equal(info('kinou', 'みました').usage, 'Past action');
+  assert.equal(info('getsuyoubi', 'あります').usage, 'Scheduled event');
+  assert.equal(info('shashin', 'とります').usage, 'Timing unspecified');
+  assert.match(info('shashin', 'とります').rule, /context decides/);
+  assert.match(info('ocha', 'のみませんか').rule, /invite someone/);
+  assert.match(info('migi', 'まがってください').rule, /る → って/);
+  for (const [id, [parts]] of Object.entries(breakdowns)) for (const part of parts) {
+    if (!part[4]) continue;
+    assert.ok(part[5], `${id}: missing expanded explanation`);
+    for (const field of ['dictionary', 'group', 'form', 'usage', 'rule']) assert.ok(part[5][field]?.trim(), `${id}: ${field}`);
+    assert.ok(part[5].rule.includes(part[0]), `${id}: explanation must use the actual sentence form`);
+  }
 });
 
 for (const lesson of [3, 4]) test(`Genki Lesson ${lesson} examples have authored sentence breakdowns`, () => {

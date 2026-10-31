@@ -383,7 +383,7 @@
 
   // Sentence breakdowns are deliberately authored rather than inferred. A
   // particle's English gloss and function depend on the sentence around it.
-  // Each part is [Japanese, contextual meaning, function, optional kind, optional verb-form note].
+  // Each part is [Japanese, meaning, role, optional kind, form note, optional form details].
   const breakdowns = {
     "eiga": [[["しゅうまつ", "weekend", "Time"], ["に", "on", "Time particle", "particle"], ["えいが", "movie", "Object"], ["を", "—", "Object particle", "particle"], ["みます", "watch", "Action"]], "Time + object + action. に marks when the action happens, while を marks what is watched."],
     "ongaku": [[["まいあさ", "every morning", "Time"], ["おんがく", "music", "Object"], ["を", "—", "Object particle", "particle"], ["ききます", "listen to", "Action"]], "Japanese often omits “I” when the subject is clear. を marks the thing being listened to."],
@@ -533,8 +533,48 @@
   verbFormNotes["のみませんか"] = "Polite invitation from のむ.";
   verbFormNotes["あいましょう"] = "Polite suggestion from あう: let’s meet.";
   verbFormNotes["まがってください"] = "Polite request from まがる.";
-  for (const [parts] of Object.values(breakdowns)) {
-    for (const part of parts) if (verbFormNotes[part[0]]) part[4] = verbFormNotes[part[0]];
+  const verbBasics = [
+    ["みる", "ru-verb", "み"], ["たべる", "ru-verb", "たべ"], ["ねる", "ru-verb", "ね"],
+    ["おきる", "ru-verb", "おき"], ["いる", "ru-verb", "い"],
+    ["きく", "u-verb", "きき"], ["よむ", "u-verb", "よみ"], ["のむ", "u-verb", "のみ"],
+    ["いく", "u-verb", "いき"], ["あう", "u-verb", "あい"], ["やすむ", "u-verb", "やすみ"],
+    ["はなす", "u-verb", "はなし"], ["かえる", "u-verb", "かえり"],
+    ["わかる", "u-verb", "わかり"], ["ある", "u-verb", "あり"],
+    ["とる", "u-verb", "とり"], ["かく", "u-verb", "かき"], ["あそぶ", "u-verb", "あそび"],
+    ["かう", "u-verb", "かい"], ["まつ", "u-verb", "まち"], ["まがる", "u-verb", "まがり"],
+    ["する", "irregular", "し"], ["べんきょうする", "irregular", "べんきょうし"], ["くる", "irregular", "き"]
+  ];
+  const futureExamples = new Set(["deeto", "uchi", "itsu", "ashita", "kyou", "neru", "hayai", "iku", "kaeru", "kuru", "repooto", "au", "dakara"]);
+  const habitExamples = new Set(["eiga", "ongaku", "tenisu", "terebi", "osake", "koohii", "hirugohan", "gakkou", "mainichi", "maiban", "shuumatsu", "doyoubi", "nichiyoubi", "suffix-goro", "mizu", "asagohan", "asa", "kiku", "yomu", "okiru", "miru", "suru", "benkyou-suru", "nomu", "taberu", "amari", "zenzen", "taitei", "tokidoki", "yoku", "ee", "kaimono", "pan", "ichijikan", "toki"]);
+  const stateExamples = new Set(["chotto", "wakaru", "inu", "neko", "kodomo", "takusan", "isu", "tsukue", "hana-flower", "machi", "aru", "iru", "naka", "ue", "chikaku", "shita"]);
+  const scheduleExamples = new Set(["arubaito", "getsuyoubi", "kayoubi"]);
+  for (const [id, [parts]] of Object.entries(breakdowns)) {
+    for (const part of parts) {
+      const note = verbFormNotes[part[0]];
+      if (!note) continue;
+      part[4] = note;
+      const [dictionary, group, stem] = verbBasics.find(([base]) =>
+        note.includes(` of ${base}.`) || note.includes(` from ${base}.`) || note.includes(` from ${base}:`));
+      const form = note.split(/ of | from /)[0];
+      const ending = part[0].slice(stem.length);
+      const stemRule = group === "ru-verb" ? `Drop final る: ${dictionary} → ${stem}.`
+        : group === "u-verb" ? `Change the final u-row sound to its i-row sound: ${dictionary} → ${stem}.`
+        : `Irregular stem: ${dictionary} → ${stem}.`;
+      const rule = part[0] === "まがってください"
+        ? "まがる is a u-verb. Its te-form is まがって (る → って): まがって + ください → まがってください (“please turn”)."
+        : `${stemRule} Add ${ending}: ${stem} + ${ending} → ${part[0]}.`;
+      let usage = "Timing unspecified";
+      let timing = "Nonpast can describe a habit, a present state or a future action; context decides. This sentence has no definite time reference.";
+      if (form === "Polite past") { usage = "Past action"; timing = "Here the action is completed: the English translation uses the past tense."; }
+      else if (form === "Polite invitation") { usage = "Would you like to…?"; timing = "ませんか is used here to invite someone, not simply to report a negative action."; }
+      else if (form === "Polite suggestion") { usage = "Let’s…"; timing = "ましょう proposes an action together, rather than asserting a present or past event."; }
+      else if (form === "Polite request") { usage = "Please…"; timing = "てください asks someone to act; it does not describe a completed event."; }
+      else if (futureExamples.has(id)) { usage = "Future plan"; timing = "Here the time phrase or situation points to a future action. Japanese uses nonpast, with no separate future verb ending."; }
+      else if (habitExamples.has(id)) { usage = "Habit / routine"; timing = "Here the sentence describes a usual or repeated action, not an action happening right now."; }
+      else if (stateExamples.has(id)) { usage = "Present state"; timing = "Here the verb describes the current situation, existence or understanding."; }
+      else if (scheduleExamples.has(id)) { usage = "Scheduled event"; timing = "Here あります describes an activity on the schedule; whether it is this or a later week depends on context."; }
+      part[5] = { dictionary, group, form, usage, rule: `${rule} ${timing}` };
+    }
   }
 
   globalThis.KANA_SPRINT_VOCABULARY_EXAMPLES = Object.freeze(examples);
