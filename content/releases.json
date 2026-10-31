@@ -818,6 +818,12 @@
       "publishedAt": "2026-10-31",
       "title": "More examples for every sentence topic",
       "changes": [{"pages": ["guided"], "text": "Sentence Practice now includes 160 checked sentences across Lessons 1–4, with eight to twelve examples per topic. New examples reuse beginner vocabulary and combine familiar patterns, with alternate word orders, reversible noun lists, and strict vocabulary filters preserved."}]
+    },
+    {
+      "id": "2026-10-31.13",
+      "publishedAt": "2026-10-31",
+      "title": "Choose your sentence challenge",
+      "changes": [{"pages": ["guided"], "text": "Choose Focused examples or Challenge sentences that combine familiar patterns in sentence building and particle practice. Auto remains the default and keeps the existing mix and review behavior. Lesson, vocabulary, support, and answer-format choices stay independent."}]
     }
   ]
 }

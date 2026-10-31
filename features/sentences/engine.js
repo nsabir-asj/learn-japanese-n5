@@ -152,6 +152,7 @@
   function pool(settings, vocabulary = {}) {
     const all = settings.activity === "verbs" ? verbs : C.sentences;
     return all.filter(exercise => settings.topics.includes(exercise.topic) &&
+      (settings.activity === "verbs" || !["focused","challenge"].includes(settings.difficulty) || exercise.difficulty === settings.difficulty) &&
       (!["introduced","mastered"].includes(settings.vocabulary) || wordIds(exercise).every(id => familiar(id,vocabulary,settings.vocabulary === "mastered"))));
   }
   function recordKey(exercise, settings) { return `${settings.activity}:${settings.activity === "build" ? settings.support : settings.input}:${exercise.id}`; }

@@ -4,14 +4,14 @@
   const KEY = "kanaSprintSentencesV1";
   const $ = selector => document.querySelector(selector);
   const esc = value => String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
-  const defaults = () => ({ version:1, total:0, correct:0, streak:0, bestStreak:0, items:{}, skills:{}, introduced:{}, wordsSeen:{}, settings:{ activity:"build", support:"supported", input:"choice", typingScript:"romaji", bankSize:"auto", verbChoices:"auto", autoAudio:false, autoVerbAudio:false, autoParticleAudio:false, vocabulary:"prefer", review:"all", scopes:{build:["identity","possession","questions"],particles:["identity","possession","questions"],verbs:["verbs-u","verbs-ru","verbs-irregular"]} } });
+  const defaults = () => ({ version:1, total:0, correct:0, streak:0, bestStreak:0, items:{}, skills:{}, introduced:{}, wordsSeen:{}, settings:{ activity:"build", support:"supported", input:"choice", typingScript:"romaji", difficulty:"auto", bankSize:"auto", verbChoices:"auto", autoAudio:false, autoVerbAudio:false, autoParticleAudio:false, vocabulary:"prefer", review:"all", scopes:{build:["identity","possession","questions"],particles:["identity","possession","questions"],verbs:["verbs-u","verbs-ru","verbs-irregular"]} } });
   let state = defaults();
   try {
     const saved = JSON.parse(localStorage.getItem(KEY));
     if (saved?.version === 1) {
       state = { ...state, ...saved, settings:{...state.settings,...saved.settings,scopes:{...state.settings.scopes,...saved.settings?.scopes}} };
       for (const field of ["items","skills","introduced","wordsSeen"]) if (!state[field] || typeof state[field] !== "object" || Array.isArray(state[field])) state[field] = {};
-      for (const [key, options] of Object.entries({activity:["build","particles","verbs"],support:["supported","independent"],input:["choice","typing"],typingScript:["romaji","japanese"],bankSize:["auto","8","12"],verbChoices:["auto","4","6"],vocabulary:["prefer","introduced","mastered","any"],review:["all","trouble"]})) if (!options.includes(state.settings[key])) state.settings[key] = defaults().settings[key];
+      for (const [key, options] of Object.entries({activity:["build","particles","verbs"],support:["supported","independent"],input:["choice","typing"],typingScript:["romaji","japanese"],difficulty:["auto","focused","challenge"],bankSize:["auto","8","12"],verbChoices:["auto","4","6"],vocabulary:["prefer","introduced","mastered","any"],review:["all","trouble"]})) if (!options.includes(state.settings[key])) state.settings[key] = defaults().settings[key];
       for (const activity of ["build","particles","verbs"]) state.settings.scopes[activity] = Array.isArray(state.settings.scopes[activity]) ? state.settings.scopes[activity].filter(id => C.topics.some(t => t.id === id)) : defaults().settings.scopes[activity];
     }
   } catch { /* A broken saved snapshot should not stop practice. */ }
@@ -44,7 +44,7 @@
       <button type="button" data-activity="verbs"><span class="sp-nav-icon" aria-hidden="true">る</span><span><strong>Practise verbs</strong><small>Find the right form</small></span></button>
     </nav>
     <div class="sp-context"><div class="sp-collection" aria-label="Practice collection"><span class="sp-eyebrow">Practice collection</span><div class="sp-collection-row"><div class="sp-collection-copy"><strong id="scopeName"></strong><span id="scopeCount"></span></div><button class="sp-change" id="openScope" type="button" aria-haspopup="dialog" aria-controls="scopeDialog" aria-label="Change practice collection">Change</button></div></div><div class="sp-segments" id="modeControls" role="group" aria-label="Practice support"></div></div>
-    <p id="modeDescription" class="sp-mode-description"></p><p id="availabilityNote" class="sp-muted" hidden></p>
+    <p id="modeDescription" class="sp-mode-description"></p><div class="sp-difficulty" id="difficultyControl"><div><span class="sp-eyebrow">Difficulty</span><div class="sp-segments" role="group" aria-label="Sentence difficulty">${["auto","focused","challenge"].map(id=>`<button type="button" data-difficulty="${id}">${id==="auto" ? "Auto" : id==="focused" ? "Focused" : "Challenge"}</button>`).join("")}</div></div><p id="difficultyDescription"></p></div><p id="availabilityNote" class="sp-muted" hidden></p>
     <section class="sp-workspace" aria-label="Practice exercise"><div class="sp-question-card" id="questionCard"></div></section>
     <details class="sp-settings" id="sessionSettings"><summary><span><strong>Session settings</strong><small id="settingsSummary"></small></span></summary><div class="sp-settings-grid"><label>Vocabulary<select id="vocabularyFilter"><option value="prefer">Prefer familiar words</option><option value="introduced">Only introduced words</option><option value="mastered">Only mastered words</option><option value="any">Any words in this collection</option></select><small>Uses progress from Vocabulary. Strict filters include every content word; clock phrases without Vocabulary records are excluded.</small></label><label>Practice mix<select id="reviewFilter"><option value="all">New material + review</option><option value="trouble">Trouble exercises only</option></select><small>Trouble practice uses mistakes in the current activity and answer format.</small></label><label id="bankSizeSetting">Word bank size<select id="bankSize"><option value="auto">Auto · 6 chunks / 8 words</option><option value="8">8 choices</option><option value="12">12 choices</option></select><small>Related extra words and contrasting verb forms make you choose from meaning. Strict vocabulary filters may limit the available choices.</small></label><label id="verbChoicesSetting">Verb choices<select id="verbChoices"><option value="auto">Auto · 4 or 6 choices</option><option value="4">4 choices</option><option value="6">6 choices</option></select><small>Auto increases each form after three spaced unaided successes including a later review. A mistake reduces choices; two unaided successes restore six.</small></label><label id="autoAudioSetting" class="sp-audio-setting"><input type="checkbox" id="autoSentenceAudio"><span><span id="autoAudioLabel">Automatically play the model sentence after answering</span><small id="autoAudioNote">Hear the correct sentence after either result. Your preference is saved.</small></span></label><p class="sp-settings-note">Grammar is available immediately. Lesson numbers organize the collections; guided-lesson completion is never required. Vocabulary hints and rules count as support when used before answering.</p></div></details>
     <details class="sp-progress" id="practiceProgress"><summary><span><strong>Progress &amp; trouble spots</strong><small>See what you can do with and without support</small></span></summary><div id="progressBody"></div></details>
@@ -61,6 +61,9 @@
     $("#scopeCount").textContent = `${topicCount} ${topicCount === 1 ? "topic" : "topics"} · ${pool().length} exercises`;
     $("#modeControls").innerHTML = s.activity === "build" ? ["supported","independent"].map(id => `<button type="button" data-support="${id}" aria-pressed="${s.support === id}">${id === "supported" ? "Supported" : "Independent"}</button>`).join("") : ["choice","typing"].map(id => `<button type="button" data-input="${id}" aria-pressed="${s.input === id}">${id === "choice" ? "Choose" : "Type"}</button>`).join("");
     $("#modeDescription").textContent = s.activity === "build" ? s.support === "supported" ? "Start with useful chunks. Particles stay attached to their words." : "Choose words and particles separately. Extra particles can remain unused." : s.activity === "particles" ? "The words are in place. Choose what connects them; sometimes no particle is needed." : "Start from the dictionary form. Practise polite affirmative, negative, and past forms.";
+    $("#difficultyControl").hidden=s.activity==="verbs";
+    document.querySelectorAll("[data-difficulty]").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.difficulty===s.difficulty)));
+    $("#difficultyDescription").textContent=({auto:"Your usual mix and review scheduling. All selected sentence levels stay available.",focused:"Shorter examples centred on one main pattern. Keeps your selected lessons and vocabulary filter.",challenge:"Combine familiar patterns and particle roles within your selected lessons. No new lesson is added."})[s.difficulty];
     $("#vocabularyFilter").value = s.vocabulary; $("#reviewFilter").value = s.review;
     $("#bankSize").value = s.bankSize; $("#bankSizeSetting").hidden = s.activity !== "build";
     $("#verbChoices").value=s.verbChoices; $("#verbChoicesSetting").hidden=s.activity!=="verbs";
@@ -84,7 +87,7 @@
   function renderProgress() {
     const s = settings();
     $("#progressBody").innerHTML = `<p class="sp-muted">Supported building, independent building, choices, and typing have separate records. Independent building and particle practice share scheduling evidence for each particle role. Familiar sentences return less often; activity scores stay separate. Reading a rule or arranging a supported chunk does not establish independent particle recall.</p><div class="sp-progress-grid">${availableTopics().filter(t => s.topics.includes(t.id)).map(topic => {
-      const exercises = E.pool({...s,topics:[topic.id],vocabulary:"any"});
+      const exercises = E.pool({...s,topics:[topic.id],vocabulary:"any",difficulty:"auto"});
       const rows = exercises.map(x => state.items[E.recordKey(x,s)]).filter(Boolean);
       const correct = rows.reduce((a,x) => a + x.correct,0), attempts = rows.reduce((a,x) => a + x.correct + x.wrong,0);
       return `<div><strong>${esc(topic.title)}</strong><span>${rows.length}/${exercises.length} practised · ${attempts ? `${Math.round(correct/attempts*100)}% unaided` : "No unaided answers yet"}</span></div>`;
@@ -100,7 +103,7 @@
     current = E.choose(pool(),config,state,recent,vocab);
     renderChrome();
     if (!current) {
-      $("#questionCard").innerHTML = `<div class="sp-empty"><span class="sp-empty-mark" aria-hidden="true">文</span><h2>${config.review === "trouble" ? "No trouble exercises in this selection" : "No matching exercises yet"}</h2><p>${config.review === "trouble" ? "Try new material and review, or choose another collection." : "Try a wider collection or change your vocabulary filter. Your strict selection has been kept."}</p><div class="sp-actions"><button class="sp-primary" type="button" data-action="scope">Choose topics</button><button class="sp-secondary" type="button" data-action="settings">Session settings</button></div></div>`;
+      $("#questionCard").innerHTML = `<div class="sp-empty"><span class="sp-empty-mark" aria-hidden="true">文</span><h2>${config.review === "trouble" ? "No trouble exercises in this selection" : "No matching exercises yet"}</h2><p>${config.review === "trouble" ? "Try new material and review, or choose another collection." : "Try more topics, another difficulty, or a wider vocabulary filter. Your selections have been kept."}</p><div class="sp-actions"><button class="sp-primary" type="button" data-action="scope">Choose topics</button><button class="sp-secondary" type="button" data-action="settings">Session settings</button></div></div>`;
       return;
     }
     recent.push(current.id); recent = recent.slice(-8);
@@ -247,7 +250,7 @@
     });
     const count = pool({...settings(),topics:[...draft]}).length;
     $("#selectionCount").textContent = `${draft.size} topics · ${count} matching exercises`;
-    $("#selectionHint").textContent = state.settings.activity === "verbs" ? "Lesson 3 and 4 verbs, including past forms in Lesson 4." : "Current collections cover selected patterns from Lessons 1–4.";
+    $("#selectionHint").textContent = state.settings.activity === "verbs" ? "Lesson 3 and 4 verbs, including past forms in Lesson 4." : "Collections cover selected patterns from Lessons 1–4. Difficulty and vocabulary filters also apply.";
     $("#applyScope").disabled = !draft.size;
   }
   document.addEventListener("click",event => {
@@ -263,6 +266,10 @@
       if (button.dataset.support) state.settings.support = button.dataset.support;
       else state.settings.input = button.dataset.input;
       recent=[];save();next();return;
+    }
+    if (button.dataset.difficulty) {
+      if(state.settings.difficulty===button.dataset.difficulty)return;
+      state.settings.difficulty=button.dataset.difficulty;recent=[];save();next();return;
     }
     if (button.dataset.typingScript) {
       state.settings.typingScript=button.dataset.typingScript;save();updateTypingPreview();return;

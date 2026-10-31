@@ -247,3 +247,5 @@ The launchers deliberately use ordinary deferred scripts rather than JavaScript 
 Bundled practice fonts come from the Google Fonts project. Their licence files are included in the `fonts` folder.
 
 Independent sentence building and particle practice share scheduling evidence per sentence and particle role, while preserving separate activity scores. Exact successes receive a cooldown; three distinct successful examples reduce a role’s frequency, with occasional reviews. Mistakes restore priority. Supported and hinted attempts do not establish shared recall. Existing fully correct unaided attempts with recorded timing seed this evidence conservatively.
+
+Sentence building and particle practice offer Auto, Focused, and Challenge. Auto defaults to the existing full selected collection and unchanged scheduling. Focused centres on individual patterns; Challenge combines familiar roles and noun relationships. Difficulty filters the chosen lessons and vocabulary without advancing lessons, changing support/input modes, or creating new score records. A selection with no matching examples stays empty and explains how to broaden it.

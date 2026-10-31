@@ -145,3 +145,8 @@ body[data-activity="sentences"] .activity-stat>span { min-height:2.6em;line-heig
 .sp-verb-option.is-wrong .sp-choice-status { color:#f1c9a5; }
 .sp-verb-choices.is-answered .sp-verb-option { align-items:start; }
 @media(max-width:480px) { .sp-verb-choices { grid-template-columns:1fr; }.sp-question-card.sp-compact-card { padding-bottom:16px; } }
+
+.sp-difficulty { display:flex;align-items:center;gap:16px 24px;padding:14px 17px;border:1px solid #354b46;border-radius:12px;background:#14231f;margin:0 0 20px; }
+.sp-difficulty>div { flex:none;display:flex;align-items:center;gap:13px; }
+.sp-difficulty p { color:#a9c1b7;font-size:.75rem;line-height:1.5;margin:0; }
+@media(max-width:700px) { .sp-difficulty { flex-direction:column;align-items:stretch;gap:10px; }.sp-difficulty>div { flex-wrap:wrap;justify-content:space-between;gap:10px; } }

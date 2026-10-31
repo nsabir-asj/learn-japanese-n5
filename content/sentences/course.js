@@ -285,6 +285,15 @@
       sentence.alternatives = [alternate];
     }
   }
+  // Reviewed difficulty describes grammar combinations, independently of lesson,
+  // vocabulary familiarity, support mode, and answer format.
+  for (const sentence of sentences) {
+    const markers=sentence.chunks.flat().filter(piece=>piece.role);
+    const possessions=markers.filter(piece=>piece.role==="possession").length;
+    const combinedNouns=possessions>=2 || possessions>0 && !["possession","relative-location"].includes(sentence.topic);
+    sentence.difficulty=markers.length>=3 || combinedNouns ? "challenge" : "focused";
+    sentence.difficultyReason=sentence.difficulty==="challenge" ? "Combines familiar patterns or several particle roles." : "Centres on one main sentence pattern.";
+  }
   const wordGroups = [
     ["inu","neko","kodomo"], ["isu","tsukue","hon","kaban"], ["kouen","suupaa","hoteru","honya","otera","byouin"],
     ["ue","shita","naka","mae","ushiro","tonari","chikaku","migi","hidari","aida"], ["kinou","senshuu","kyou","mainichi"],

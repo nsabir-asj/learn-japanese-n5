@@ -560,3 +560,39 @@ test('expanded examples remain fully subject to strict vocabulary filters',()=>{
   assert.ok(E.pool(settings,vocab).some(s=>s.id===sentence.id));
   assert.ok(!E.pool({...settings,vocabulary:'mastered'},vocab).some(s=>s.id===sentence.id));
 });
+
+
+test('Auto preserves the original pool and scheduling sequence as the default',()=>{
+  const legacy={...config},auto={...config,difficulty:'auto'};
+  const legacyPool=E.pool(legacy),autoPool=E.pool(auto);
+  assert.deepEqual(Array.from(autoPool,x=>x.id),Array.from(legacyPool,x=>x.id));
+  const a={items:{},total:0},b={items:{},total:0},recent=[];
+  for(let i=0;i<24;i++){
+    const old=E.choose(legacyPool,legacy,a,recent,{},()=>.37,1000);
+    const current=E.choose(autoPool,auto,b,recent,{},()=>.37,1000);
+    assert.equal(current.id,old.id);
+    recent.push(old.id);a.total++;b.total++;
+    E.record(a,E.recordKey(old,legacy),i%4!==0,false,1000);
+    E.record(b,E.recordKey(current,auto),i%4!==0,false,1000);
+  }
+});
+
+test('difficulty filters selected material without changing lesson, vocabulary, support, or scores',()=>{
+  for(const lesson of C.lessons){
+    const topics=Array.from(C.topics.filter(t=>t.lesson===lesson.id&&!t.verbGroup),t=>t.id);
+    const all=E.pool({...config,topics,difficulty:'auto'});
+    const focused=E.pool({...config,topics,difficulty:'focused'});
+    const challenge=E.pool({...config,topics,difficulty:'challenge'});
+    assert.ok(focused.length>0 && challenge.length>0,`Lesson ${lesson.id}`);
+    assert.equal(focused.length+challenge.length,all.length);
+    assert.ok(challenge.every(x=>x.difficulty==='challenge'&&topics.includes(x.topic)));
+    assert.deepEqual(Array.from(E.pool({...config,topics,support:'supported',difficulty:'challenge'}),x=>x.id),Array.from(challenge,x=>x.id));
+  }
+  assert.equal(E.pool({...config,topics:['identity'],difficulty:'challenge'}).length,0,'never silently substitute easy examples');
+  assert.equal(E.pool({...config,topics:['objects'],difficulty:'challenge',vocabulary:'introduced'},{}).length,0);
+  const example=C.sentences.find(x=>x.id==='companion-home-tv');
+  assert.equal(example.difficulty,'challenge');
+  assert.equal(C.sentences.find(x=>x.id==='object-hon').difficulty,'focused');
+  assert.equal(E.recordKey(example,{...config,difficulty:'auto'}),E.recordKey(example,{...config,difficulty:'challenge'}));
+  assert.equal(E.pool({...config,activity:'verbs',difficulty:'challenge'}).length,E.pool({...config,activity:'verbs'}).length);
+});
