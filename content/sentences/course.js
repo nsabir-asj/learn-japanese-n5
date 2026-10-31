@@ -160,6 +160,28 @@
   add("duration-read", "duration", "I read a book for one hour.", [phrase("ichijikan","duration"),phrase("hon","object"),past("yomu")], {orders:[[0,1,2],[1,0,2]]});
   add("list-shopping", "listing-nouns", "I bought a book and bread.", [[word("hon"),p("list"),word("pan"),p("object")],past("kau")]);
   add("list-animals", "listing-nouns", "There are a dog and a cat in the park.", [phrase("kouen","existencePlace"),[word("inu"),p("list"),word("neko"),p("subject")],v("iru")]);
+  // These alternatives preserve the prompt's meaning. Keep them explicit rather
+  // than accepting arbitrary particles, omissions, or word permutations.
+  roles.relativeTime = { title: "Time expression", note: "Relative or repeated time can stand alone, or take は to make it the topic. It does not take に here.", choices: ["", "は"] };
+  roles.weekday = { title: "Day of the week", note: "A day of the week can take に or stand without it in this sentence.", choices: ["に", ""] };
+  roles.meeting = { title: "Person you meet", note: "With あう, に marks the person you meet; と presents the meeting as a shared action. Both fit this prompt.", choices: ["と", "に"] };
+  for (const sentence of sentences) {
+    if (sentence.meaning.startsWith("I ")) {
+      if (sentence.chunks[0]?.[0]?.wordId === "watashi" && sentence.chunks[0]?.[1]?.role === "topic") sentence.optionalTopic = "omit";
+      else if (!sentence.chunks.flat().some(piece => piece.wordId === "watashi")) sentence.optionalTopic = "add";
+    }
+    sentence.chunks = sentence.chunks.map(chunk => chunk.map(piece => piece.role === "bareTime" ? {...piece,role:"relativeTime"} : piece));
+    if (sentence.id === "time-sunday") sentence.chunks[0][1].role = "weekday";
+    if (sentence.id === "past-meet") sentence.chunks[1][1].role = "meeting";
+    if (sentence.chunks.some(chunk => chunk.some(piece => piece.role === "existencePlace"))) sentence.orders = [[0,1,2],[1,0,2]];
+    if (["list-shopping","list-animals","location-between"].includes(sentence.id)) {
+      const alternate = sentence.chunks.map(chunk => chunk.map(piece => ({...piece})));
+      const list = alternate.find(chunk => chunk.some(piece => piece.role === "list"));
+      const index = list.findIndex(piece => piece.role === "list");
+      [list[index-1],list[index+1]] = [list[index+1],list[index-1]];
+      sentence.alternatives = [alternate];
+    }
+  }
   const wordGroups = [
     ["inu","neko","kodomo"], ["isu","tsukue","hon","kaban"], ["kouen","suupaa","hoteru","honya","otera","byouin"],
     ["ue","shita","naka","mae","ushiro","tonari","chikaku","migi","hidari","aida"], ["kinou","senshuu","kyou","mainichi"],

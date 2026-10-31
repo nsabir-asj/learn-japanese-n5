@@ -10,14 +10,28 @@
   const pieces = exercise => exercise.chunks.flat();
   const slots = exercise => pieces(exercise).flatMap((piece, index, all) => piece.role ? [{ ...piece, index, anchor: all.slice(0,index).filter(x => !x.role).at(-1)?.text || "", choices: C.roles[piece.role].choices }] : []);
   const model = exercise => exercise.chunks.map(chunk => chunk.map(x => x.text).join("")).join(" ") + "。";
-  function acceptedSentences(exercise) {
-    let variants = [[]];
-    for (const chunk of exercise.chunks) {
-      let chunkVariants = [""];
-      for (const piece of chunk) chunkVariants = chunkVariants.flatMap(prefix => (piece.role ? C.roles[piece.role].choices : [piece.text]).map(text => prefix + text));
-      variants = variants.flatMap(prefix => chunkVariants.map(text => [...prefix, text]));
+  function answerForms(exercise) {
+    const forms = [];
+    for (const chunks of [exercise.chunks,...(exercise.alternatives || [])]) {
+      for (const order of exercise.orders || [chunks.map((_,i) => i)]) {
+        const ordered = order.map(i => chunks[i]);
+        forms.push({...exercise,chunks:ordered});
+        if (exercise.optionalTopic === "omit") forms.push({...exercise,chunks:ordered.filter(chunk => !(chunk[0]?.wordId === "watashi" && chunk[1]?.role === "topic"))});
+        if (exercise.optionalTopic === "add") {
+          const topic = [{text:C.words.watashi.jp,wordId:"watashi"},{text:"は",role:"topic"}];
+          for (let i=0;i<ordered.length;i++) forms.push({...exercise,chunks:[...ordered.slice(0,i),topic,...ordered.slice(i)]});
+        }
+      }
     }
-    return new Set(variants.flatMap(chunks => (exercise.orders || [chunks.map((_,i) => i)]).map(order => normalize(order.map(i => chunks[i]).join("")))));
+    return forms;
+  }
+  function formAnswers(form) {
+    let variants = [""];
+    for (const piece of pieces(form)) variants = variants.flatMap(prefix => (piece.role ? C.roles[piece.role].choices : [piece.text]).map(text => prefix + text));
+    return variants.map(normalize);
+  }
+  function acceptedSentences(exercise) {
+    return new Set(answerForms(exercise).flatMap(formAnswers));
   }
   function particleAnswer(value, role) {
     const aliases = { wa:"は", ha:"は", ga:"が", o:"を", wo:"を", ni:"に", e:"へ", he:"へ", de:"で", no:"の", to:"と", mo:"も", ka:"か", none:"", "なし":"", "—":"", "-":"" };
@@ -25,16 +39,31 @@
     const answer = Object.hasOwn(aliases,raw) ? aliases[raw] : raw;
     return { answer, correct: C.roles[role].choices.includes(answer) };
   }
+  function unexpectedWords(exercise, tokens) {
+    const allowed = new Set();
+    for (const form of answerForms(exercise)) {
+      for (const piece of pieces(form)) if (!piece.role) allowed.add(normalize(piece.text));
+      for (const chunk of form.chunks) for (const answer of formAnswers({chunks:[chunk]})) allowed.add(answer);
+    }
+    return tokens.filter(token => token.distractor && !allowed.has(normalize(token.text)));
+  }
   function diagnose(exercise, tokens) {
     // Match each marker to its own preceding word, even when phrases are reordered.
     const texts = tokens.map(x => typeof x === "string" ? x : x.text);
     const markers = new Set(["は","が","を","に","へ","で","の","と","も","か"]);
-    return slots(exercise).map(slot => {
+    const response = normalize(texts.join(""));
+    const forms = answerForms(exercise);
+    const matching = forms.find(form => formAnswers(form).includes(response));
+    const diagnoseForm = form => slots(form).map(slot => {
       const at = texts.indexOf(slot.anchor);
       const next = at >= 0 ? texts[at + 1] : undefined;
       const answer = markers.has(next) ? next : "";
       return { ...slot, answer, correct: at >= 0 && slot.choices.includes(answer) };
     });
+    if (matching) return diagnoseForm(matching);
+    // For a wrong answer, use the closest authored structure. Preserve feedback
+    // for correct phrases even when another particle or the verb is wrong.
+    return forms.map(diagnoseForm).sort((a,b) => a.filter(x=>!x.correct).length - b.filter(x=>!x.correct).length || b.filter(x=>x.correct).length - a.filter(x=>x.correct).length)[0];
   }
   function tileBank(exercise, supported, random = Math.random, options = {}) {
     const config = options.settings || {}, vocabulary = options.vocabulary || {};
@@ -149,5 +178,5 @@
     progress.items[key] = item;
     return item;
   }
-  globalThis.SENTENCE_ENGINE = { normalize, shuffle, pieces, slots, model, acceptedSentences, particleAnswer, diagnose, tileBank, hiraganaPreview, particlePreview, verbs, wordIds, familiar, pool, recordKey, choose, record };
+  globalThis.SENTENCE_ENGINE = { normalize, shuffle, pieces, slots, model, acceptedSentences, particleAnswer, diagnose, unexpectedWords, tileBank, hiraganaPreview, particlePreview, verbs, wordIds, familiar, pool, recordKey, choose, record };
 })();

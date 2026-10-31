@@ -232,3 +232,64 @@ test('plain Enter checks sentence building and advances feedback while focused c
   handler(event({target:{matches:()=>true}}));assert.equal(advances,1);
   assert.ok(!source.includes('Ctrl Enter'));
 });
+
+
+test('reviewed sentence alternatives accept natural topics, phrase order, lists and particles',()=>{
+  const cases=[
+    ['companion-movie',['わたし','は','ともだち','と','えいが','を','みます']],
+    ['object-hon',['わたし','は','ほん','を','よみます']],
+    ['past-read',['きのう','わたし','は','ほん','を','よみました']],
+    ['identity-gakusei',['がくせい','です']],
+    ['past-student',['がくせい','でした']],
+    ['existence-inu',['いぬ','が','こうえん','に','います']],
+    ['existence-book',['ほん','が','つくえ','の','うえ','に','あります']],
+    ['list-shopping',['パン','と','ほん','を','かいました']],
+    ['list-animals',['ねこ','と','いぬ','が','こうえん','に','います']],
+    ['location-between',['としょかん','は','ほんや','と','ホテル','の','あいだ','です']],
+    ['time-today',['きょう','は','ほん','を','よみます']],
+    ['past-read',['きのう','は','ほん','を','よみました']],
+    ['time-sunday',['にちようび','えいが','を','みます']],
+    ['past-meet',['としょかん','で','ともだち','に','あいました']]
+  ];
+  for(const [id,tokens] of cases){
+    const exercise=C.sentences.find(s=>s.id===id);
+    assert.ok(E.acceptedSentences(exercise).has(E.normalize(tokens.join(''))),`${id}: ${tokens.join('')}`);
+    assert.ok(E.diagnose(exercise,tokens).every(slot=>slot.correct),`feedback: ${id}`);
+  }
+  // Every implied-I exercise accepts an explicit topic, and every reviewed
+  // existence exercise accepts the subject before its location.
+  for(const exercise of C.sentences.filter(s=>s.optionalTopic==='add')){
+    assert.ok(E.acceptedSentences(exercise).has(E.normalize('わたしは'+E.model(exercise))),exercise.id);
+  }
+});
+
+test('alternative feedback keeps correct list roles when the ending is wrong and does not blame optional vocabulary',()=>{
+  const exercise=C.sentences.find(s=>s.id==='list-shopping');
+  const tokens=['パン','と','ほん','を','かいませんでした'];
+  assert.ok(!E.acceptedSentences(exercise).has(E.normalize(tokens.join(''))));
+  assert.ok(E.diagnose(exercise,tokens).every(slot=>slot.correct));
+  const movie=C.sentences.find(s=>s.id==='companion-movie');
+  const wrong=E.unexpectedWords(movie,[{text:'わたし',distractor:true},{text:'テレビ',distractor:true},{text:'みません',distractor:true}]);
+  assert.deepEqual(Array.from(wrong,x=>x.text),['テレビ','みません']);
+});
+
+test('reviewed alternatives never allow arbitrary topics, swapped particles, wrong actions or changed meaning',()=>{
+  for(const [id,answer] of [
+    ['companion-movie','わたしがともだちとえいがをみます'],
+    ['companion-movie','せんせいはともだちとえいがをみます'],
+    ['companion-movie','わたしはともだちにえいがをみます'],
+    ['companion-movie','わたしはともだちとえいがをみません'],
+    ['object-hon','わたしはほんがよみます'],
+    ['object-hon','わたしはよみますほんを'],
+    ['existence-inu','いぬがこうえんでいます'],
+    ['existence-inu','いぬにこうえんがいます'],
+    ['existence-inu','いぬがこうえんにあります'],
+    ['list-shopping','パンをほんとかいました'],
+    ['past-read','きのうにほんをよみました'],
+    ['duration-study','いちじかんにべんきょうしました'],
+    ['also-student','がくせいです']
+  ])assert.ok(!E.acceptedSentences(C.sentences.find(s=>s.id===id)).has(E.normalize(answer)),`${id}: ${answer}`);
+  const meeting=C.sentences.find(s=>s.id==='past-meet');
+  assert.equal(E.particleAnswer('ni',E.slots(meeting).find(s=>s.anchor==='ともだち').role).correct,true);
+  assert.equal(E.particleAnswer('ni','companion').correct,false,'ni must not become a generic companion alternative');
+});
