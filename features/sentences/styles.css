@@ -125,3 +125,23 @@ body[data-activity="sentences"] .activity-stat>span { min-height:2.6em;line-heig
 @media(max-width:600px) { .sp-footer .sp-keyboard { flex-basis:100%;order:4; }.sp-instant-footer .sp-keyboard { order:0; }.sp-verb-prompt { gap:8px; }.sp-verb-prompt p { font-size:.88rem; } }
 
 #sentencePractice [hidden] { display:none!important; }
+
+.sp-question-card.sp-compact-card { min-height:0;padding-bottom:20px; }
+.sp-compact-card .sp-verb-prompt { margin-bottom:22px; }
+.sp-compact-card .sp-footer { margin-top:22px;padding-top:16px; }
+.sp-verb-choices { grid-template-columns:repeat(2,minmax(0,1fr));gap:11px; }
+.sp-verb-choices .sp-verb-option { display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:center;min-height:64px;border:1px solid #465b59;border-radius:13px;padding:12px 15px;background:#172422;color:#e5f2ed;text-align:left; }
+.sp-verb-option>kbd { display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#294139;color:#bfe3d5;font-size:.72rem; }
+.sp-verb-option-copy { display:grid;gap:4px;min-width:0; }
+.sp-verb-option-copy strong { font-size:1.12rem;font-weight:650;overflow-wrap:anywhere; }
+.sp-verb-choices .sp-verb-option:hover:not(:disabled) { background:#243a32;border-color:#87bba5; }
+.sp-verb-option:focus-visible { outline:2px solid #9ddfcd;outline-offset:3px; }
+.sp-verb-choices .sp-verb-option:disabled { opacity:1;cursor:default; }
+.sp-verb-choices .sp-verb-option.is-correct { background:#244537;border-color:#9ddfcd; }
+.sp-verb-choices .sp-verb-option.is-wrong { background:#3c3027;border-color:#c69a70; }
+.sp-choice-status { color:#b8d2c7;font-size:.73rem;line-height:1.5; }
+.sp-choice-note { color:#9eada6;font-size:.72rem;line-height:1.5; }
+.sp-verb-option.is-correct .sp-choice-status { color:#c7f9e6; }
+.sp-verb-option.is-wrong .sp-choice-status { color:#f1c9a5; }
+.sp-verb-choices.is-answered .sp-verb-option { align-items:start; }
+@media(max-width:480px) { .sp-verb-choices { grid-template-columns:1fr; }.sp-question-card.sp-compact-card { padding-bottom:16px; } }

@@ -170,7 +170,7 @@ test('Lesson 4 is selectable in every activity with eight new verbs and past for
   assert.ok(C.lessons.some(l=>l.id===4));
   for(const activity of ['build','particles']){
     const pool=E.pool({...config,activity,topics});
-    assert.equal(pool.length,40);
+    assert.equal(pool.length,60);
     assert.equal(new Set(pool.map(s=>s.topic)).size,6);
     assert.ok(pool.every(s=>E.slots(s).length>0));
   }
@@ -362,4 +362,201 @@ test('a mistake transfers to another example after two answers, with bounded exa
     E.record(progress,E.recordKey(normal,config),true,false,0);
   }
   assert.equal(E.choose(pool,config,progress,recent,{},()=>.4,0).id,original.id);
+});
+
+
+test('revealed verb choices distinguish valid forms from incorrect stems for every generated option',()=>{
+  for(const exercise of E.verbs){
+    for(const option of E.verbChoices(exercise,{verbChoices:'6',topics:['verbs-past']},{items:{}})){
+      const info=E.verbChoiceInfo(exercise,option);
+      const valid=E.verbs.some(x=>x.verb.id===exercise.verb.id && x.answer===option);
+      assert.equal(info.valid,valid,`${exercise.id}: ${option}`);
+      assert.ok(info.label && info.note);
+    }
+  }
+  const exercise=E.verbs.find(x=>x.id==='taberu-past-negative');
+  assert.equal(E.verbChoiceInfo(exercise,'たべました').label,'Past affirmative');
+  assert.equal(E.verbChoiceInfo(exercise,'たべります').label,'Incorrect stem');
+  assert.match(E.verbChoiceInfo(exercise,'たべります').note,/remove る/);
+});
+
+test('automatic audio preferences stay separate by activity and preserve the existing building preference',()=>{
+  const settings={activity:'build',autoAudio:true,autoVerbAudio:false,autoParticleAudio:false};
+  assert.equal(E.playbackEnabled(settings),true);
+  settings.activity='verbs';assert.equal(E.playbackEnabled(settings),false);
+  settings[E.playbackKey('verbs')]=true;assert.equal(E.playbackEnabled(settings),true);
+  settings.activity='particles';assert.equal(E.playbackEnabled(settings),false);
+  settings[E.playbackKey('particles')]=true;
+  assert.equal(E.playbackEnabled(JSON.parse(JSON.stringify(settings))),true);
+  assert.equal(E.playbackEnabled({activity:'verbs',autoAudio:true}),false);
+});
+
+test('choice explanations appear only after grading and identify the correct and selected answers',()=>{
+  const source=readFileSync(new URL('../features/sentences/practice.js',import.meta.url),'utf8');
+  const body=source.match(/function verbChoicesMarkup\(\) \{([\s\S]*?)\n  \}/)[1];
+  const current=E.verbs.find(x=>x.id==='taberu-past-negative');
+  const harness=vm.createContext({current,E,esc:x=>x,answered:false,answers:['たべました'],verbOptions:['たべました',current.answer,'たべります']});
+  vm.runInContext(`function markup(){${body}}`,harness);
+  const before=vm.runInContext('markup()',harness);
+  assert.ok(!before.includes('Past affirmative')&&!before.includes('Incorrect stem')&&!before.includes('✓ Correct'));
+  vm.runInContext('answered=true',harness);
+  const after=vm.runInContext('markup()',harness);
+  assert.ok(after.includes('✓ Correct · Past negative'));
+  assert.ok(after.includes('↻ Your choice · Past affirmative'));
+  assert.ok(after.includes('Alternative · Incorrect stem'));
+  assert.equal((after.match(/ disabled/g)||[]).length,3);
+});
+
+
+test('independent building rests the exact sentence in particle practice without awarding particle scores',()=>{
+  const exercise=C.sentences.find(s=>s.id==='place-library');
+  const progress={items:{},total:1};
+  E.recordParticleEvidence(progress,exercise,config,E.slots(exercise).map(x=>({...x,correct:true})),false,1000);
+  const particles={...config,activity:'particles',input:'choice'};
+  assert.equal(E.particlePriority(exercise,particles,progress,1000),2);
+  assert.equal(progress.items[E.recordKey(exercise,particles)],undefined);
+  const other=C.sentences.find(s=>s.id==='place-home');
+  assert.equal(E.choose([exercise,other],particles,progress,[],{},()=>.4,1000).id,other.id);
+  // A turn reserved for review cannot undo a fresh exact-sentence cooldown.
+  progress.total=7;
+  assert.equal(E.choose([exercise,other],particles,progress,[],{},()=>.4,1000).id,other.id);
+  progress.total=20;
+  assert.equal(E.particlePriority(exercise,particles,progress,999999999),0);
+});
+
+test('supported building and hinted answers never establish shared particle evidence',()=>{
+  const exercise=C.sentences.find(s=>s.id==='place-library');
+  for(const [support,assisted] of [['supported',false],['independent',true]]){
+    const progress={items:{},total:1};
+    E.recordParticleEvidence(progress,exercise,{...config,support},E.slots(exercise).map(x=>({...x,correct:true})),assisted,1000);
+    assert.equal(Object.keys(progress.items).length,0);
+  }
+});
+
+test('partial particle successes transfer even when the overall sentence is wrong',()=>{
+  const exercise=C.sentences.find(s=>s.id==='place-library'),progress={items:{},total:1};
+  const details=E.diagnose(exercise,['としょかん','に','ほん','を','よみません']);
+  E.recordParticleEvidence(progress,exercise,config,details,false,1000);
+  assert.equal(progress.items[`particleEvidence:${exercise.id}:object`].correct,1);
+  assert.equal(progress.items[`particleEvidence:${exercise.id}:place`].wrong,1);
+  assert.equal(E.particlePriority(exercise,{...config,activity:'particles'},progress,1000),0);
+});
+
+test('role transfer needs diverse examples, distinguishes roles and returns mistakes sooner',()=>{
+  const progress={items:{},total:0};
+  const practice={...config,activity:'particles'};
+  const answer=(id,correct=true)=>{
+    progress.total+=3;
+    const ex=C.sentences.find(s=>s.id===id);
+    E.recordParticleEvidence(progress,ex,config,E.slots(ex).map(x=>({...x,correct})),false,1000+progress.total);
+  };
+  answer('place-library');answer('place-home');
+  const fresh=C.sentences.find(s=>s.id==='place-home-tea');
+  assert.equal(E.particlePriority(fresh,practice,progress,1020),0);
+  answer('place-university');
+  assert.equal(E.particlePriority(fresh,practice,progress,1020),1);
+  assert.equal(E.particlePriority(C.sentences.find(s=>s.id==='time-seven'),practice,progress,1020),0);
+  answer('place-library',false);
+  assert.equal(E.particlePriority(fresh,practice,progress,1020),0);
+  // Shared success also informs independent building; explicitly narrow pools
+  // continue to produce questions, and Trouble practice retains its purpose.
+  answer('place-home');answer('place-university');answer('place-home-book');
+  assert.equal(E.particlePriority(fresh,config,progress,1100),1);
+  assert.equal(E.choose([fresh],practice,progress,[],{},()=>.4,1100).id,fresh.id);
+  assert.equal(E.particlePriority(fresh,{...practice,review:'trouble'},progress,1100),0);
+});
+
+test('repeated unspaced attempts cannot inflate shared mastery and repeated roles count once',()=>{
+  const ex=C.sentences.find(s=>s.id==='existence-book');
+  const progress={items:{},total:1};
+  const details=E.slots(ex).map(x=>({...x,correct:true}));
+  E.recordParticleEvidence(progress,ex,config,[...details,...details],false,1000);
+  progress.total=2;
+  E.recordParticleEvidence(progress,ex,config,details,false,1100);
+  assert.ok(Object.values(progress.items).every(x=>x.seen===1));
+});
+
+
+test('existing unaided successes can seed shared scheduling without changing activity scores',()=>{
+  const exercise=C.sentences.find(s=>s.id==='place-library');
+  const key=E.recordKey(exercise,config),progress={items:{},total:1};
+  E.record(progress,key,true,false,1000);
+  const before=JSON.stringify(progress.items[key]);
+  assert.equal(E.seedParticleEvidence(progress),true);
+  assert.equal(JSON.stringify(progress.items[key]),before);
+  assert.equal(E.particlePriority(exercise,{...config,activity:'particles'},progress,1000),2);
+  assert.equal(progress.total,1);
+  const snapshot=JSON.stringify(progress);
+  assert.equal(E.seedParticleEvidence(progress),false);
+  assert.equal(JSON.stringify(progress),snapshot);
+  const supported={items:{'build:supported:place-library':progress.items[key]},total:1};
+  E.seedParticleEvidence(supported);
+  assert.equal(E.particlePriority(exercise,{...config,activity:'particles'},supported,1000),0);
+});
+
+
+test('familiar roles get occasional checks while newer roles receive most turns',()=>{
+  const progress={items:{},total:0};
+  const settings={...config,activity:'particles'};
+  for(const id of ['place-library','place-home','place-university']){
+    const ex=C.sentences.find(s=>s.id===id);progress.total+=3;
+    E.recordParticleEvidence(progress,ex,config,E.slots(ex).map(x=>({...x,correct:true})),false,1000);
+  }
+  const familiar=C.sentences.find(s=>s.id==='place-home-tea');
+  const weak=C.sentences.find(s=>s.id==='identity-gakusei');
+  E.record(progress,E.recordKey(weak,settings),true,false,1000);
+  progress.total=14;
+  assert.equal(E.choose([familiar,weak],settings,progress,[],{},()=>.4,1000).id,weak.id);
+  progress.total=15;
+  assert.equal(E.choose([familiar,weak],settings,progress,[],{},()=>.4,1000).id,familiar.id);
+});
+
+
+test('each sentence topic has eight to twelve distinct checked examples',()=>{
+  assert.equal(C.sentences.length,160);
+  const models=new Set();
+  for(const topic of C.topics.filter(t=>!t.verbGroup)){
+    const family=C.sentences.filter(x=>x.topic===topic.id);
+    assert.ok(family.length>=8 && family.length<=12,`${topic.id}: ${family.length}`);
+    for(const sentence of family){
+      const model=E.normalize(E.model(sentence));
+      assert.ok(!models.has(model),`Repeated Japanese sentence: ${sentence.id}`);models.add(model);
+    }
+  }
+});
+
+test('expanded early lessons use only their existing beginner vocabulary and grammar',()=>{
+  const first=['watashi','gakusei','sensei','nihonjin','ryuugakusei','tomodachi','hon','nihongo'];
+  const second=[...first,'kore','sore','are','kono','kaban','kasa','daigaku'];
+  const third=[...second,'mizu','ocha','koohii','asagohan','eiga','terebi','ongaku','toshokan','uchi','shichiji','kuji','nichiyoubi','kyou','mainichi',...C.verbs.filter(v=>v.lesson!==4).map(v=>v.id)];
+  for(const sentence of C.sentences.filter(s=>s.expanded)){
+    const lesson=C.topics.find(t=>t.id===sentence.topic).lesson;
+    const allowed=[null,first,second,third][lesson];
+    if(allowed)assert.ok(E.wordIds(sentence).every(id=>allowed.includes(id)),sentence.id);
+    if(lesson<3)assert.ok(!E.pieces(sentence).some(p=>['object','destination','place','companion','time','bareTime','existencePlace','subject'].includes(p.role)),sentence.id);
+    if(lesson<4)assert.ok(!E.pieces(sentence).some(p=>/ました|でした|じゃなかった/.test(p.text)),sentence.id);
+  }
+});
+
+test('expanded families accept reversed lists and mixed phrase orders without changing meanings',()=>{
+  for(const [id,answer] of [
+    ['list-bag-umbrella','かさとかばんをかいました'],
+    ['list-book-bag-desk','かばんとほんがつくえのうえにあります'],
+    ['companion-home-tv','ともだちとうちでテレビをみます'],
+    ['duration-library-book','ほんをいちじかんとしょかんでよみました'],
+    ['object-friend-book','わたしはともだちのほんをよみます']
+  ])assert.ok(E.acceptedSentences(C.sentences.find(s=>s.id===id)).has(E.normalize(answer)),id);
+  const reversed=['かさ','と','かばん','を','かいました'];
+  assert.ok(E.diagnose(C.sentences.find(s=>s.id==='list-bag-umbrella'),reversed).every(slot=>slot.correct));
+  assert.ok(C.sentences.find(s=>s.id==='past-library-book').context.includes('past'));
+});
+
+test('expanded examples remain fully subject to strict vocabulary filters',()=>{
+  const sentence=C.sentences.find(s=>s.id==='object-friend-book');
+  const settings={...config,vocabulary:'introduced',topics:['objects']};
+  const vocab={items:{hon:{introduced:true},yomu:{introduced:true}}};
+  assert.ok(!E.pool(settings,vocab).some(s=>s.id===sentence.id));
+  vocab.items.tomodachi={introduced:true};
+  assert.ok(E.pool(settings,vocab).some(s=>s.id===sentence.id));
+  assert.ok(!E.pool({...settings,vocabulary:'mastered'},vocab).some(s=>s.id===sentence.id));
 });

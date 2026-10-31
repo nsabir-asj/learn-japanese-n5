@@ -800,6 +800,24 @@
       "publishedAt": "2026-10-31",
       "title": "More varied sentence and verb practice",
       "changes": [{"pages": ["guided"], "text": "Practise with 27 additional sentence examples, a fairer rotation, and spaced mistake checks using related examples. Verb questions highlight the requested form, check choices immediately, and offer adaptive four- or six-choice banks. Session settings include optional automatic sentence playback."}]
+    },
+    {
+      "id": "2026-10-31.10",
+      "publishedAt": "2026-10-31",
+      "title": "Clearer verb answer review",
+      "changes": [{"pages": ["guided"], "text": "Verb practice hides pronunciation and meanings until answering, uses clearer choice cards, and explains every option after submission. Compact cards reduce unused space. Verb and particle practice now have separately saved automatic correct-answer playback settings."}]
+    },
+    {
+      "id": "2026-10-31.11",
+      "publishedAt": "2026-10-31",
+      "title": "Connected particle practice",
+      "changes": [{"pages": ["guided"], "text": "Independent sentence building and particle practice share evidence to reduce repetition of familiar sentences and particle roles. Correct particles retain credit when another part is wrong, while hinted and supported answers do not establish independent recall. Each activity keeps its own scores."}]
+    },
+    {
+      "id": "2026-10-31.12",
+      "publishedAt": "2026-10-31",
+      "title": "More examples for every sentence topic",
+      "changes": [{"pages": ["guided"], "text": "Sentence Practice now includes 160 checked sentences across Lessons 1–4, with eight to twelve examples per topic. New examples reuse beginner vocabulary and combine familiar patterns, with alternate word orders, reversible noun lists, and strict vocabulary filters preserved."}]
     }
   ]
 }

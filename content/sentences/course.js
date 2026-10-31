@@ -190,6 +190,79 @@
     ["existence-bag-desk","existence","There is a bag under the desk.",[position("tsukue","shita","existencePlace"),phrase("kaban","subject"),v("aru")]],
     ["existence-no-book","existence","There is no book on the desk.",[position("tsukue","ue","existencePlace"),phrase("hon","subject"),v("aru",true)]]
   ].forEach(([id,topic,en,chunks])=>add(id,topic,en,chunks,chunks.length===3 ? {orders:[[0,1,2],[1,0,2]]}:{}));
+  // Expanded, individually authored prompts. Use only established vocabulary;
+  // each row chooses its meaning and structure rather than drawing random words.
+  const nounEnd = (id, text="です") => [word(id),{text}];
+  const owned = (owner, id, role) => [word(owner),p("possession"),word(id),...(role ? [p(role)] : [])];
+  const pastNoun = (id, negative=false) => [word(id),{text:negative ? "じゃなかったです" : "でした"}];
+  [
+    ["identity-friend-student","identity","My friend is a student.",[phrase("tomodachi","topic"),nounEnd("gakusei")]],
+    ["identity-friend-teacher","identity","My friend is a teacher.",[phrase("tomodachi","topic"),nounEnd("sensei")]],
+    ["identity-friend-japanese","identity","My friend is Japanese.",[phrase("tomodachi","topic"),nounEnd("nihonjin")]],
+    ["identity-friend-international","identity","My friend is an international student.",[phrase("tomodachi","topic"),nounEnd("ryuugakusei")]],
+    ["possession-friend-book","possession","It is my friend's book.",[owned("tomodachi","hon"),ending("です")]],
+    ["possession-teacher-book","possession","It is the teacher's book.",[owned("sensei","hon"),ending("です")]],
+    ["possession-my-japanese-book","possession","It is my Japanese-language book.",[[word("watashi"),p("possession"),word("nihongo"),p("possession"),word("hon")],ending("です")]],
+    ["possession-my-teacher-book","possession","It is my teacher's book.",[[word("watashi"),p("possession"),word("sensei"),p("possession"),word("hon")],ending("です")]],
+    ["question-you-student","questions","Are you a student?",[[word("gakusei"),{text:"です"},p("question")]]],
+    ["question-you-teacher","questions","Are you a teacher?",[[word("sensei"),{text:"です"},p("question")]]],
+    ["question-you-japanese","questions","Are you Japanese?",[[word("nihonjin"),{text:"です"},p("question")]]],
+    ["question-you-international","questions","Are you an international student?",[[word("ryuugakusei"),{text:"です"},p("question")]]],
+    ["question-friend-japanese","questions","Is your friend Japanese?",[phrase("tomodachi","topic"),[word("nihonjin"),{text:"です"},p("question")]]],
+    ["pointing-sore-book","pointing","That near you is a book.",[phrase("sore","topic"),nounEnd("hon")]],
+    ["pointing-are-umbrella","pointing","That over there is an umbrella.",[phrase("are","topic"),nounEnd("kasa")]],
+    ["pointing-kore-bag","pointing","This is a bag.",[phrase("kore","topic"),nounEnd("kaban")]],
+    ["pointing-kono-bag","pointing","This bag is mine.",[[word("kono"),word("kaban"),p("topic")],[word("watashi"),p("possession"),{text:"です"}]]],
+    ["also-friend-student","also","My friend is a student too.",[phrase("tomodachi","also"),nounEnd("gakusei")],{context:"You are a student. Add that your friend is also a student."}],
+    ["also-me-japanese","also","I am Japanese too.",[phrase("watashi","also"),nounEnd("nihonjin")],{context:"Another person has just said they are Japanese. Say that you are too."}],
+    ["also-friend-international","also","My friend is an international student too.",[phrase("tomodachi","also"),nounEnd("ryuugakusei")],{context:"You are an international student. Say that your friend is one too."}],
+    ["also-this-book","also","This is a book too.",[phrase("kore","also"),nounEnd("hon")],{context:"You have identified one object as a book. Identify another as a book too."}],
+    ["also-that-mine","also","That near you is mine too.",[phrase("sore","also"),[word("watashi"),p("possession"),{text:"です"}]],{context:"You have identified one of your belongings. Say that the object near the listener is yours too."}],
+    ["also-this-umbrella-mine","also","This umbrella is mine too.",[[word("kono"),word("kasa"),p("also")],[word("watashi"),p("possession"),{text:"です"}]],{context:"You have said that a bag is yours. Add that this umbrella is yours too."}],
+    ["object-friend-book","objects","I read my friend's book.",[owned("tomodachi","hon","object"),v("yomu")]],
+    ["object-friend-coffee","objects","I drink my friend's coffee.",[owned("tomodachi","koohii","object"),v("nomu")]],
+    ["destination-go-home","destination","I go home.",[phrase("uchi","destination"),v("iku")]],
+    ["destination-return-university","destination","I return to university.",[phrase("daigaku","destination"),v("kaeru")]],
+    ["destination-friend-comes","destination","My friend comes to university.",[phrase("tomodachi","topic"),phrase("daigaku","destination"),v("kuru")]],
+    ["destination-today-library","destination","I go to the library today.",[phrase("kyou","bareTime"),phrase("toshokan","destination"),v("iku")]],
+    ["destination-daily-university","destination","I go to university every day.",[phrase("mainichi","bareTime"),phrase("daigaku","destination"),v("iku")]],
+    ["destination-with-friend","destination","I go to university with a friend.",[phrase("tomodachi","companion"),phrase("daigaku","destination"),v("iku")]],
+    ["destination-nine-home","destination","I return home at nine.",[phrase("kuji","time"),phrase("uchi","destination"),v("kaeru")]],
+    ["place-home-breakfast","action-place","I eat breakfast at home.",[phrase("uchi","place"),phrase("asagohan","object"),v("taberu")]],
+    ["place-library-friend-book","action-place","I read my friend's book at the library.",[phrase("toshokan","place"),owned("tomodachi","hon","object"),v("yomu")]],
+    ["time-seven-breakfast","time","I eat breakfast at seven.",[phrase("shichiji","time"),phrase("asagohan","object"),v("taberu")]],
+    ["time-nine-home","time","I go home at nine.",[phrase("kuji","time"),phrase("uchi","destination"),v("iku")]],
+    ["companion-tv","companion","I watch TV with a friend.",[phrase("tomodachi","companion"),phrase("terebi","object"),v("miru")]],
+    ["companion-home-tv","companion","I watch TV at home with a friend.",[phrase("uchi","place"),phrase("tomodachi","companion"),phrase("terebi","object"),v("miru")]],
+    ["companion-university-study","companion","I study Japanese at university with a friend.",[phrase("daigaku","place"),phrase("tomodachi","companion"),phrase("nihongo","object"),v("benkyousuru")]],
+    ["negative-water","negative","I do not drink water.",[phrase("mizu","object"),v("nomu",true)]],
+    ["negative-university","negative","I do not go to university.",[phrase("daigaku","destination"),v("iku",true)]],
+    ["negative-home-tv","negative","I do not watch TV at home.",[phrase("uchi","place"),phrase("terebi","object"),v("miru",true)]],
+    ["negative-today-study","negative","I do not study today.",[phrase("kyou","bareTime"),v("benkyousuru",true)]],
+    ["existence-library-book","existence","There is a book in the library.",[phrase("toshokan","existencePlace"),phrase("hon","subject"),v("aru")]],
+    ["location-bag-desk","relative-location","The bag is on the desk.",[phrase("kaban","topic"),[word("tsukue"),p("possession"),word("ue"),{text:"です"}]]],
+    ["location-chair-desk","relative-location","The chair is in front of the desk.",[phrase("isu","topic"),[word("tsukue"),p("possession"),word("mae"),{text:"です"}]]],
+    ["past-library-book","past-actions","I read a book at the library last week.",[phrase("senshuu","bareTime"),phrase("toshokan","place"),phrase("hon","object"),past("yomu")],{context:"Describe a completed visit to the library in the past."}],
+    ["past-friend-student","past-nouns","My friend was a student.",[phrase("tomodachi","topic"),pastNoun("gakusei")]],
+    ["past-friend-teacher","past-nouns","My friend was a teacher.",[phrase("tomodachi","topic"),pastNoun("sensei")]],
+    ["past-me-international","past-nouns","I was an international student.",[phrase("watashi","topic"),pastNoun("ryuugakusei")]],
+    ["past-not-student","past-nouns","I was not a student.",[phrase("watashi","topic"),pastNoun("gakusei",true)]],
+    ["past-not-sunday","past-nouns","Yesterday was not Sunday.",[phrase("kinou","topic"),pastNoun("nichiyoubi",true)]],
+    ["duration-tv","duration","I watched TV for one hour.",[phrase("ichijikan","duration"),phrase("terebi","object"),past("miru")]],
+    ["duration-japanese","duration","I studied Japanese for one hour.",[phrase("ichijikan","duration"),phrase("nihongo","object"),past("benkyousuru")]],
+    ["duration-library-book","duration","I read a book at the library for one hour.",[phrase("toshokan","place"),phrase("ichijikan","duration"),phrase("hon","object"),past("yomu")]],
+    ["duration-about-study","duration","I studied for about one hour.",[[word("ichijikan"),word("suffix-gurai"),p("duration")],past("benkyousuru")]],
+    ["duration-wait-exact","duration","I waited for one hour.",[phrase("ichijikan","duration"),past("matsu")]],
+    ["list-bag-umbrella","listing-nouns","I bought a bag and an umbrella.",[[word("kaban"),p("list"),word("kasa"),p("object")],past("kau")]],
+    ["list-water-tea","listing-nouns","I drank water and tea.",[[word("mizu"),p("list"),word("ocha"),p("object")],past("nomu")]],
+    ["list-tv-movie","listing-nouns","I watched TV and a movie.",[[word("terebi"),p("list"),word("eiga"),p("object")],past("miru")]],
+    ["list-book-bag-desk","listing-nouns","There are a book and a bag on the desk.",[position("tsukue","ue","existencePlace"),[word("hon"),p("list"),word("kaban"),p("subject")],v("aru")]],
+    ["list-cat-dog-home","listing-nouns","There are a cat and a dog at home.",[phrase("uchi","existencePlace"),[word("neko"),p("list"),word("inu"),p("subject")],v("iru")]],
+    ["list-photo-report","listing-nouns","There are a photograph and a report on the desk.",[position("tsukue","ue","existencePlace"),[word("shashin"),p("list"),word("repooto"),p("subject")],v("aru")]]
+  ].forEach(([id,topic,en,chunks,options={}])=>{
+    const orders=chunks.length===3 && chunks[0].at(-1)?.role!=="topic" ? [[0,1,2],[1,0,2]] : chunks.length===4 ? [[0,1,2,3],[0,2,1,3],[1,0,2,3],[1,2,0,3],[2,0,1,3],[2,1,0,3]] : undefined;
+    add(id,topic,en,chunks,{expanded:true,...(orders ? {orders}:{}),...options});
+  });
   // These alternatives preserve the prompt's meaning. Keep them explicit rather
   // than accepting arbitrary particles, omissions, or word permutations.
   roles.relativeTime = { title: "Time expression", note: "Relative or repeated time can stand alone, or take は to make it the topic. It does not take に here.", choices: ["", "は"] };
@@ -204,7 +277,7 @@
     if (sentence.id === "time-sunday") sentence.chunks[0][1].role = "weekday";
     if (sentence.id === "past-meet") sentence.chunks[1][1].role = "meeting";
     if (sentence.chunks.some(chunk => chunk.some(piece => piece.role === "existencePlace"))) sentence.orders = [[0,1,2],[1,0,2]];
-    if (["list-shopping","list-animals","location-between"].includes(sentence.id)) {
+    if (sentence.chunks.some(chunk=>chunk.some(piece=>piece.role==="list"))) {
       const alternate = sentence.chunks.map(chunk => chunk.map(piece => ({...piece})));
       const list = alternate.find(chunk => chunk.some(piece => piece.role === "list"));
       const index = list.findIndex(piece => piece.role === "list");

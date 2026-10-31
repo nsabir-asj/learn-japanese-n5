@@ -82,7 +82,7 @@ Open `sentences.html` or choose **Sentence Practice** on the home page. Build se
 
 The content collections include selected patterns from Lessons 1–4. The lesson/topic picker combines collections without guided-lesson locks. All modes begin directly with an exercise. The outlined Hint button opens a rule guide with optional word meanings; using help before answering marks that attempt as assisted. Unaided practice is tracked separately for each activity and format. Familiar-vocabulary preferences read Vocabulary progress without modifying it, and strict introduced/mastered filters never broaden automatically. Sentence Practice has its own progress store, cloud sync, and complete/component backup support.
 
-Verb choices submit immediately and offer Auto, 4, or 6 options. Auto uses spaced unaided evidence for the individual verb form, including typed recall and a later review; mistakes temporarily reduce the bank. Sentence scheduling rotates through eligible exercises before repeating successes, transfers weak skills to another checked example after two intervening answers where possible, and spaces exact retries. The collection contains 97 curated sentences. Optional automatic model-sentence audio is saved in Session settings and plays only after sentence-building feedback.
+Verb choices submit immediately and offer Auto, 4, or 6 options. Auto uses spaced unaided evidence for the individual verb form, including typed recall and a later review; mistakes temporarily reduce the bank. Sentence scheduling rotates through eligible exercises before repeating successes, transfers weak skills to another checked example after two intervening answers where possible, and spaces exact retries. The collection contains 160 curated sentences, with eight to twelve examples per sentence topic. The expanded examples reuse established vocabulary, mix earlier patterns within each lesson’s grammar level, and retain strict vocabulary filtering. Optional automatic correct-answer audio is saved separately for sentence building, particles, and verbs in Session settings, and plays only after submission. Verb prompts hide romaji and meanings until feedback; revealed choice cards distinguish valid conjugations from stem mistakes.
 
 ### Numbers
 
@@ -245,3 +245,5 @@ The launchers deliberately use ordinary deferred scripts rather than JavaScript 
 ## Font licences
 
 Bundled practice fonts come from the Google Fonts project. Their licence files are included in the `fonts` folder.
+
+Independent sentence building and particle practice share scheduling evidence per sentence and particle role, while preserving separate activity scores. Exact successes receive a cooldown; three distinct successful examples reduce a role’s frequency, with occasional reviews. Mistakes restore priority. Supported and hinted attempts do not establish shared recall. Existing fully correct unaided attempts with recorded timing seed this evidence conservatively.
