@@ -76,6 +76,52 @@ test('each example contains the vocabulary term or its declared focus text', () 
   });
 });
 
+test('dictionary-form vocabulary uses polite nonpast example verbs with matching form notes', () => {
+  const expected = {
+    kiku: ['きく', 'ききます'], hanasu: ['はなす', 'はなします'], yomu: ['よむ', 'よみます'],
+    okiru: ['おきる', 'おきます'], neru: ['ねる', 'ねます'], miru: ['みる', 'みます'],
+    suru: ['する', 'します'], 'benkyou-suru': ['べんきょうする', 'べんきょうします'],
+    au: ['あう', 'あいます'], aru: ['ある', 'あります'], kau: ['かう', 'かいます'],
+    kaku: ['かく', 'かきます'], toru: ['とる', 'とります'], matsu: ['まつ', 'まちます'],
+    iru: ['いる', 'います'], wakaru: ['わかる', 'わかります'], iku: ['いく', 'いきます'],
+    kuru: ['くる', 'きます'], kaeru: ['かえる', 'かえります'],
+    taberu: ['たべる', 'たべます'], nomu: ['のむ', 'のみます'],
+  };
+  for (const [id, [base, polite]] of Object.entries(expected)) {
+    assert.ok(stageSource.includes(`["${id}", "${base}"`), `${id}: dictionary-form entry must remain unchanged`);
+    assert.ok(examples[id][0].endsWith(polite + '。'), id);
+    assert.equal(examples[id][2], polite, `${id}: highlight must use the actual sentence form`);
+    const ending = breakdowns[id][0].at(-1);
+    assert.equal(ending[0], polite, id);
+    assert.equal(ending[4], `Polite nonpast of ${base}.`, id);
+    assert.doesNotMatch(breakdowns[id][1], /plain form|casual/);
+  }
+});
+
+test('past, negative, invitation and request labels keep their distinct meanings', () => {
+  const note = (id, form) => breakdowns[id][0].find(part => part[0] === form)?.[4];
+  assert.equal(note('honya', 'かいました'), 'Polite past of かう.');
+  assert.equal(note('kinou', 'みました'), 'Polite past of みる.');
+  assert.equal(note('osake', 'のみません'), 'Polite negative nonpast of のむ.');
+  assert.equal(note('ocha', 'のみませんか'), 'Polite invitation from のむ.');
+  assert.equal(note('hoteru', 'あいましょう'), 'Polite suggestion from あう: let’s meet.');
+  assert.equal(note('migi', 'まがってください'), 'Polite request from まがる.');
+  for (const id of ['honya', 'senshuu', 'kinou', 'hitoride', 'suffix-jikan']) {
+    assert.match(examples[id][0], /ました/);
+  }
+  assert.match(examples.neru[1], /will/);
+  assert.match(examples.kuru[1], /will/);
+});
+
+test('verb-form notes render inside their own chunks and are escaped', () => {
+  const functions = vocabularySource.slice(vocabularySource.indexOf('  function sentenceChunkLabels('), vocabularySource.indexOf('  function exampleBreakdownMarkup('));
+  const context = { escapeExampleText: value => String(value).replaceAll('<', '&lt;').replaceAll('>', '&gt;') };
+  runInNewContext(functions, context);
+  const markup = context.sentenceChunksMarkup(examples.nomu[0], breakdowns.nomu[0]);
+  assert.match(markup, /のみます。<\/strong><small>drink<\/small><span class="vocab-verb-form">Polite nonpast of のむ\.<\/span>/);
+  assert.match(context.sentenceChunksMarkup('きます。', [['きます', 'come', 'Movement', undefined, '<test>']]), /&lt;test&gt;/);
+});
+
 for (const lesson of [3, 4]) test(`Genki Lesson ${lesson} examples have authored sentence breakdowns`, () => {
   const lesson3Source = stageSource.slice(stageSource.indexOf(`id: "lesson${lesson}-`), stageSource.indexOf(`id: "lesson${lesson + 1}-`));
   const directIds = [...lesson3Source.matchAll(/^\s*\["([^"]+)",/gm)].map(match => match[1]);

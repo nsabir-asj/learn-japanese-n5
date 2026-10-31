@@ -741,6 +741,17 @@
           "text": "Small vocabulary groups now include at least four answer choices, keeping close alternatives first and adding distinct options when needed."
         }
       ]
+    },
+    {
+      "id": "2026-10-31.3",
+      "publishedAt": "2026-10-31",
+      "title": "Clearer verb forms in examples",
+      "changes": [
+        {
+          "pages": ["vocabulary"],
+          "text": "Simple example sentences now use polite verb forms while vocabulary entries stay in dictionary form. Lesson 3 and 4 breakdowns show short notes connecting each verb form to its dictionary form."
+        }
+      ]
     }
   ]
 }

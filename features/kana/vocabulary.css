@@ -80,6 +80,7 @@
 .vocab-particle-card header{display:inline-flex;align-items:baseline;gap:4px;white-space:nowrap;margin:0;padding:0;vertical-align:baseline;line-height:inherit}
 .vocab-particle-card header strong{font-size:.85rem}
 .vocab-particle-explanation{display:inline;overflow-wrap:break-word}
+.vocab-verb-form{max-width:190px;color:var(--muted);font:500 .67rem/1.35 Inter,ui-sans-serif,system-ui,sans-serif;overflow-wrap:break-word}
 .vocab-interpretation,.vocab-romaji-preview{display:grid;gap:3px;border:1px solid var(--line);border-radius:11px;background:var(--panel3);padding:11px 13px}
 .vocab-interpretation span,.vocab-interpretation small,.vocab-romaji-preview span{color:var(--muted);font-size:.78rem}.vocab-interpretation strong,.vocab-romaji-preview strong{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;font-size:1.45rem}.vocab-interpretation.is-unavailable strong{font-family:inherit;font-size:.9rem;color:var(--muted)}
 .vocab-typing-modes{display:flex;align-items:center;justify-content:space-between;gap:12px}.vocab-typing-modes>span{font-weight:700}.vocab-segmented{display:flex;border:1px solid var(--line);border-radius:10px;padding:3px;background:var(--panel3)}.vocab-segmented button{border:0;border-radius:7px;background:transparent;color:var(--muted);padding:8px 13px;font:inherit;font-weight:700;cursor:pointer}.vocab-segmented button[aria-pressed="true"]{outline:0;background:var(--accent);color:#07111c}

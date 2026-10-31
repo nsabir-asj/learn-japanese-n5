@@ -166,14 +166,14 @@
     "itsu": ["いつ、にほんへいきますか。", "When will you go to Japan?"],
     "suffix-goro": ["しちじごろ、あさごはんをたべます。", "I eat breakfast at around seven.", "ごろ"],
 
-    "kiku": ["まいあさ、おんがくをきく。", "I listen to music every morning."],
-    "hanasu": ["ともだちとにほんごではなす。", "I speak Japanese with my friend."],
-    "yomu": ["まいばん、ほんをよむ。", "I read a book every night."],
-    "okiru": ["まいあさ、しちじにおきる。", "I get up at seven every morning."],
-    "neru": ["きょうはじゅうじにねる。", "I will go to bed at ten today."],
-    "miru": ["しゅうまつにテレビをみる。", "I watch TV on the weekend."],
-    "suru": ["にちようびにテニスをする。", "I play tennis on Sunday."],
-    "benkyou-suru": ["まいにち、にほんごをべんきょうする。", "I study Japanese every day."],
+    "kiku": ["まいあさ、おんがくをききます。","I listen to music every morning.","ききます"],
+    "hanasu": ["ともだちとにほんごではなします。","I speak Japanese with my friend.","はなします"],
+    "yomu": ["まいばん、ほんをよみます。","I read a book every night.","よみます"],
+    "okiru": ["まいあさ、しちじにおきます。","I get up at seven every morning.","おきます"],
+    "neru": ["きょうはじゅうじにねます。","I will go to bed at ten today.","ねます"],
+    "miru": ["しゅうまつにテレビをみます。","I watch TV on the weekend.","みます"],
+    "suru": ["にちようびにテニスをします。","I play tennis on Sunday.","します"],
+    "benkyou-suru": ["まいにち、にほんごをべんきょうします。","I study Japanese every day.","べんきょうします"],
     "ii": ["このほんはいいです。", "This book is good."],
     "hayai": ["あしたははやいじかんにおきます。", "I will get up early tomorrow."],
 
@@ -221,14 +221,14 @@
     "suiyoubi": ["すいようびにともだちとあいます。", "I meet my friend on Wednesday."],
     "mokuyoubi": ["もくようびにレポートをかきます。", "I write my report on Thursday."],
     "kinyoubi": ["きんようびにレストランへいきます。", "I go to a restaurant on Friday."],
-    "au": ["あした、えきでともだちにあう。", "I will meet my friend at the station tomorrow."],
-    "aru": ["つくえのうえにほんがある。", "There is a book on the desk."],
-    "kau": ["スーパーでパンをかう。", "I buy bread at the supermarket."],
-    "kaku": ["ノートになまえをかく。", "I write my name in the notebook."],
-    "toru": ["こうえんでしゃしんをとる。", "I take a picture in the park."],
-    "matsu": ["バスていでバスをまつ。", "I wait for the bus at the bus stop."],
-    "iru": ["こうえんにこどもがいる。", "There is a child in the park."],
-    "wakaru": ["このもんだいはよくわかる。", "I understand this question well."],
+    "au": ["あした、えきでともだちにあいます。","I will meet my friend at the station tomorrow.","あいます"],
+    "aru": ["つくえのうえにほんがあります。","There is a book on the desk.","あります"],
+    "kau": ["スーパーでパンをかいます。","I buy bread at the supermarket.","かいます"],
+    "kaku": ["ノートになまえをかきます。","I write my name in the notebook.","かきます"],
+    "toru": ["こうえんでしゃしんをとります。","I take a picture in the park.","とります"],
+    "matsu": ["バスていでバスをまちます。","I wait for the bus at the bus stop.","まちます"],
+    "iru": ["こうえんにこどもがいます。","There is a child in the park.","います"],
+    "wakaru": ["このもんだいはよくわかります。","I understand this question well.","わかります"],
 
     "suffix-gurai": ["えきまでじゅっぷんぐらいです。", "It is about ten minutes to the station.", "ぐらい"],
     "sorekara": ["あさごはんをたべます。それから、がっこうへいきます。", "I eat breakfast, and then I go to school."],
@@ -262,16 +262,16 @@
     "hiru": ["ひるにともだちとごはんをたべます。", "I eat lunch with a friend at noon."],
     "yoru": ["よる、ほんをよみます。", "I read a book at night."],
     "jikan": ["いま、じかんがありますか。", "Do you have time now?"],
-    "iku": ["あした、がっこうへいく。", "I will go to school tomorrow."],
-    "kuru": ["ともだちがうちにくる。", "A friend will come to my house."],
-    "kaeru": ["ごごろくじにうちへかえる。", "I will return home at six p.m."],
+    "iku": ["あした、がっこうへいきます。","I will go to school tomorrow.","いきます"],
+    "kuru": ["ともだちがうちにきます。","A friend will come to my house.","きます"],
+    "kaeru": ["ごごろくじにうちへかえります。","I will return home at six p.m.","かえります"],
     "shigoto": ["ちちはまいにちしごとへいきます。", "My father goes to work every day."],
     "mizu": ["まいあさ、みずをのみます。", "I drink water every morning."],
     "ocha": ["いっしょにおちゃをのみませんか。", "Would you like to drink tea together?"],
     "gohan": ["かぞくとごはんをたべます。", "I eat a meal with my family."],
     "asagohan": ["しちじにあさごはんをたべます。", "I eat breakfast at seven."],
-    "taberu": ["まいにち、やさいをたべる。", "I eat vegetables every day."],
-    "nomu": ["あさ、コーヒーをのむ。", "I drink coffee in the morning."],
+    "taberu": ["まいにち、やさいをたべます。","I eat vegetables every day.","たべます"],
+    "nomu": ["あさ、コーヒーをのみます。","I drink coffee in the morning.","のみます"],
     "mise": ["このみせはやすいです。", "This shop is inexpensive."],
 
     "eki": ["えきでともだちにあいます。", "I meet my friend at the station."],
@@ -383,7 +383,7 @@
 
   // Sentence breakdowns are deliberately authored rather than inferred. A
   // particle's English gloss and function depend on the sentence around it.
-  // Each part is [Japanese, contextual meaning, function, optional kind].
+  // Each part is [Japanese, contextual meaning, function, optional kind, optional verb-form note].
   const breakdowns = {
     "eiga": [[["しゅうまつ", "weekend", "Time"], ["に", "on", "Time particle", "particle"], ["えいが", "movie", "Object"], ["を", "—", "Object particle", "particle"], ["みます", "watch", "Action"]], "Time + object + action. に marks when the action happens, while を marks what is watched."],
     "ongaku": [[["まいあさ", "every morning", "Time"], ["おんがく", "music", "Object"], ["を", "—", "Object particle", "particle"], ["ききます", "listen to", "Action"]], "Japanese often omits “I” when the subject is clear. を marks the thing being listened to."],
@@ -416,21 +416,21 @@
     "ashita": [[["あした", "tomorrow", "Time"], ["としょかん", "library", "Destination"], ["へ", "to", "Direction particle", "particle"], ["いきます", "go", "Movement"]], "Relative day words such as あした normally need no に. へ marks direction."],
     "kyou": [[["きょう", "today", "Topic / time"], ["は", "as for", "Topic / contrast particle", "particle"], ["にほんご", "Japanese", "Object"], ["を", "—", "Object particle", "particle"], ["べんきょうします", "study", "Action"]], "は frames today as the topic, often implying contrast with another day."],
     "asa": [[["あさ", "morning", "Time"], ["コーヒー", "coffee", "Object"], ["を", "—", "Object particle", "particle"], ["のみます", "drink", "Action"]], "A broad time expression like あさ can stand without に; を marks the drink."],
-    "kiku": [[["まいあさ", "every morning", "Time"], ["おんがく", "music", "Object"], ["を", "—", "Object particle", "particle"], ["きく", "listen to", "Action (plain form)"]], "きく is the casual/plain form; ききます is its polite form."],
-    "hanasu": [[["ともだち", "friend", "Companion"], ["と", "with", "Companion particle", "particle"], ["にほんご", "Japanese", "Language / means"], ["で", "in", "Means particle", "particle"], ["はなす", "speak", "Action (plain form)"]], "と marks who you speak with; で marks the language used to do it."],
-    "yomu": [[["まいばん", "every night", "Time"], ["ほん", "book", "Object"], ["を", "—", "Object particle", "particle"], ["よむ", "read", "Action (plain form)"]], "よむ is the casual/plain form. The understood subject is “I.”"],
-    "okiru": [[["まいあさ", "every morning", "Time"], ["しちじ", "seven o’clock", "Time"], ["に", "at", "Time particle", "particle"], ["おきる", "get up", "Action (plain form)"]], "Exact clock times take に, while a repeating time such as まいあさ does not."],
-    "neru": [[["きょう", "today", "Topic / time"], ["は", "as for", "Topic / contrast particle", "particle"], ["じゅうじ", "ten o’clock", "Time"], ["に", "at", "Time particle", "particle"], ["ねる", "go to bed", "Action (plain form)"]], "は highlights today; に marks the exact bedtime."],
-    "miru": [[["しゅうまつ", "weekend", "Time"], ["に", "on", "Time particle", "particle"], ["テレビ", "TV", "Object"], ["を", "—", "Object particle", "particle"], ["みる", "watch", "Action (plain form)"]], "みる is the casual/plain form; みます is polite."],
-    "suru": [[["にちようび", "Sunday", "Time"], ["に", "on", "Time particle", "particle"], ["テニス", "tennis", "Activity"], ["を", "—", "Object particle", "particle"], ["する", "play / do", "Action (plain form)"]], "する combines with an activity noun: テニスをする literally means “do tennis.”"],
-    "benkyou-suru": [[["まいにち", "every day", "Time"], ["にほんご", "Japanese", "Object"], ["を", "—", "Object particle", "particle"], ["べんきょうする", "study", "Action (plain form)"]], "べんきょう is a noun (“study”) that combines with する (“do”) to form the verb “study.”"],
+    "kiku": [[["まいあさ", "every morning", "Time"], ["おんがく", "music", "Object"], ["を", "—", "Object particle", "particle"], ["ききます", "listen to", "Action"]], "Time + object + action. を marks what is listened to."],
+    "hanasu": [[["ともだち", "friend", "Companion"], ["と", "with", "Companion particle", "particle"], ["にほんご", "Japanese", "Language / means"], ["で", "in", "Means particle", "particle"], ["はなします", "speak", "Action"]], "と marks the companion; で marks the language used."],
+    "yomu": [[["まいばん", "every night", "Time"], ["ほん", "book", "Object"], ["を", "—", "Object particle", "particle"], ["よみます", "read", "Action"]], "Time + object + action. The understood subject is “I.”"],
+    "okiru": [[["まいあさ", "every morning", "Time"], ["しちじ", "seven o’clock", "Time"], ["に", "at", "Time particle", "particle"], ["おきます", "get up", "Action"]], "Exact clock times take に; a repeating time such as まいあさ does not."],
+    "neru": [[["きょう", "today", "Topic / time"], ["は", "as for", "Topic / contrast particle", "particle"], ["じゅうじ", "ten o’clock", "Time"], ["に", "at", "Time particle", "particle"], ["ねます", "go to bed", "Action"]], "は highlights today; に marks the exact bedtime."],
+    "miru": [[["しゅうまつ", "weekend", "Time"], ["に", "on", "Time particle", "particle"], ["テレビ", "TV", "Object"], ["を", "—", "Object particle", "particle"], ["みます", "watch", "Action"]], "Time + object + action. を marks what is watched."],
+    "suru": [[["にちようび", "Sunday", "Time"], ["に", "on", "Time particle", "particle"], ["テニス", "tennis", "Activity"], ["を", "—", "Object particle", "particle"], ["します", "play / do", "Action"]], "Activity + を + します: テニスをします means “play tennis.”"],
+    "benkyou-suru": [[["まいにち", "every day", "Time"], ["にほんご", "Japanese", "Object"], ["を", "—", "Object particle", "particle"], ["べんきょうします", "study", "Action"]], "べんきょう means “study”; を marks what is studied."],
     "ii": [[["この", "this", "Noun determiner"], ["ほん", "book", "Topic"], ["は", "as for", "Topic particle", "particle"], ["いい", "good", "Description"], ["です", "is", "Polite ending"]], "この must be followed by a noun. は sets “this book” as the topic."],
     "hayai": [[["あした", "tomorrow", "Topic / time"], ["は", "as for", "Topic / contrast particle", "particle"], ["はやい", "early", "Description"], ["じかん", "time", "Time noun"], ["に", "at", "Time particle", "particle"], ["おきます", "get up", "Action"]], "はやい directly describes じかん. に marks that early time as when the action occurs."],
-    "iku": [[["あした", "tomorrow", "Time"], ["がっこう", "school", "Destination"], ["へ", "to", "Direction particle", "particle"], ["いく", "go", "Movement (plain form)"]], "へ marks direction and is pronounced “e” as a particle. いく is the plain form."],
-    "kaeru": [[["ごごろくじ", "six p.m.", "Time"], ["に", "at", "Time particle", "particle"], ["うち", "home", "Destination"], ["へ", "to", "Direction particle", "particle"], ["かえる", "return", "Movement (plain form)"]], "に marks the exact time; へ points toward home as the destination."],
-    "nomu": [[["あさ", "morning", "Time"], ["コーヒー", "coffee", "Object"], ["を", "—", "Object particle", "particle"], ["のむ", "drink", "Action (plain form)"]], "のむ is the casual/plain form; のみます is polite."],
-    "taberu": [[["まいにち", "every day", "Time"], ["やさい", "vegetables", "Object"], ["を", "—", "Object particle", "particle"], ["たべる", "eat", "Action (plain form)"]], "たべる is the casual/plain form; たべます is polite."],
-    "kuru": [[["ともだち", "friend", "Subject"], ["が", "—", "Subject particle", "particle"], ["うち", "home", "Destination"], ["に", "to", "Destination particle", "particle"], ["くる", "come", "Movement (plain form)"]], "が marks the person coming; に marks the destination reached."],
+    "iku": [[["あした", "tomorrow", "Time"], ["がっこう", "school", "Destination"], ["へ", "to", "Direction particle", "particle"], ["いきます", "go", "Movement"]], "へ marks direction and is pronounced e as a particle."],
+    "kaeru": [[["ごごろくじ", "six p.m.", "Time"], ["に", "at", "Time particle", "particle"], ["うち", "home", "Destination"], ["へ", "to", "Direction particle", "particle"], ["かえります", "return", "Movement"]], "に marks the exact time; へ points toward home as the destination."],
+    "nomu": [[["あさ", "morning", "Time"], ["コーヒー", "coffee", "Object"], ["を", "—", "Object particle", "particle"], ["のみます", "drink", "Action"]], "Time + object + action. を marks what is drunk."],
+    "taberu": [[["まいにち", "every day", "Time"], ["やさい", "vegetables", "Object"], ["を", "—", "Object particle", "particle"], ["たべます", "eat", "Action"]], "Time + object + action. を marks what is eaten."],
+    "kuru": [[["ともだち", "friend", "Subject"], ["が", "—", "Subject particle", "particle"], ["うち", "home", "Destination"], ["に", "to", "Destination particle", "particle"], ["きます", "come", "Movement"]], "が marks the person coming; に marks the destination reached."],
     "amari": [[["コーヒー", "coffee", "Topic"], ["は", "as for", "Topic / contrast particle", "particle"], ["あまり", "not much", "Negative-frequency adverb"], ["のみません", "do not drink", "Negative action"]], "あまり pairs with a negative verb to mean “not much” or “not often.”"],
     "zenzen": [[["テレビ", "TV", "Topic"], ["は", "as for", "Topic / contrast particle", "particle"], ["ぜんぜん", "not at all", "Negative-frequency adverb"], ["みません", "do not watch", "Negative action"]], "At this level, ぜんぜん is paired with a negative verb to mean “not at all.”"],
     "taitei": [[["あさ", "morning", "Topic / time"], ["は", "as for", "Topic particle", "particle"], ["たいてい", "usually", "Frequency adverb"], ["パン", "bread", "Object"], ["を", "—", "Object particle", "particle"], ["たべます", "eat", "Action"]], "Frequency words such as たいてい usually come before the object and verb."],
@@ -465,32 +465,32 @@
     basutei: [[["バスてい", "bus stop", "Place"], ["で", "at", "Action-place particle", "particle"], ["ともだち", "friend", "Object"], ["を", "—", "Object particle", "particle"], ["まちます", "wait for", "Action"]], "まちます takes を for the person or thing being waited for."],
     byouin: [[["びょういん", "hospital", "Topic"], ["は", "as for", "Topic particle", "particle"], ["えき", "station", "Reference object"], ["の", "—", "Noun-linking particle", "particle"], ["まえ", "in front", "Location"], ["です", "is", "Polite ending"]], "えきのまえ means “in front of the station”; は introduces the hospital’s location."],
     hoteru: [[["ホテル", "hotel", "Reference object"], ["の", "—", "Noun-linking particle", "particle"], ["まえ", "in front", "Place"], ["で", "at", "Action-place particle", "particle"], ["あいましょう", "let’s meet", "Invitation"]], "ホテルのまえで gives the meeting place; ましょう suggests doing something together."],
-    honya: [[["ほんや", "bookstore", "Place"], ["で", "at", "Action-place particle", "particle"], ["ざっし", "magazine", "Object"], ["を", "—", "Object particle", "particle"], ["かいました", "bought", "Action (past)"]], "ました is the polite past ending: かいます becomes かいました."],
+    honya: [[["ほんや", "bookstore", "Place"], ["で", "at", "Action-place particle", "particle"], ["ざっし", "magazine", "Object"], ["を", "—", "Object particle", "particle"], ["かいました", "bought", "Action (past)"]], "Place で + object を + action. Here, the buying happened in the past."],
     machi: [[["この", "this", "Noun determiner"], ["まち", "town", "Location"], ["に", "in", "Existence-location particle", "particle"], ["こうえん", "park", "Subject"], ["が", "—", "Existence subject particle", "particle"], ["あります", "there is", "State"]], "この must precede a noun; に marks where the park exists."],
     resutoran: [[["レストラン", "restaurant", "Place"], ["で", "at", "Action-place particle", "particle"], ["ばんごはん", "dinner", "Object"], ["を", "—", "Object particle", "particle"], ["たべます", "eat", "Action"]], "Place で + meal を + たべます describes eating a meal somewhere."],
     "suffix-jikan": [[["きのう", "yesterday", "Time"], ["に", "two", "Number"], ["じかん", "hours", "Duration suffix"], ["べんきょうしました", "studied", "Action (past)"]], "Number + じかん gives a duration, without に. Here に means the number two, not a particle."],
     ichijikan: [[["まいにち", "every day", "Time"], ["いちじかん", "one hour", "Duration"], ["ほん", "book", "Object"], ["を", "—", "Object particle", "particle"], ["よみます", "read", "Action"]], "いちじかん gives how long the reading lasts; durations usually need no particle."],
-    senshuu: [[["せんしゅう", "last week", "Time"], ["ともだち", "friend", "Companion"], ["と", "with", "Companion particle", "particle"], ["えいが", "movie", "Object"], ["を", "—", "Object particle", "particle"], ["みました", "watched", "Action (past)"]], "せんしゅう needs no に; みました is the polite past of みます."],
+    senshuu: [[["せんしゅう", "last week", "Time"], ["ともだち", "friend", "Companion"], ["と", "with", "Companion particle", "particle"], ["えいが", "movie", "Object"], ["を", "—", "Object particle", "particle"], ["みました", "watched", "Action (past)"]], "せんしゅう needs no に; と marks the companion and を marks the movie watched."],
     toki: [[["ひま", "free / not busy", "Description"], ["な", "—", "Adjective-linking ending"], ["とき", "when / time", "Time noun"], ["ほん", "books", "Object"], ["を", "—", "Object particle", "particle"], ["よみます", "read", "Action"]], "A な-adjective uses な before とき: ひまなとき means “when I have free time.”"],
     getsuyoubi: [[["げつようび", "Monday", "Time"], ["に", "on", "Time particle", "particle"], ["にほんご", "Japanese", "Noun modifier"], ["の", "—", "Noun-linking particle", "particle"], ["クラス", "class", "Subject"], ["が", "—", "Existence subject particle", "particle"], ["あります", "there is / have", "State"]], "Day に + event が + あります describes an event scheduled for that day."],
     kayoubi: [[["かようび", "Tuesday", "Time"], ["に", "on", "Time particle", "particle"], ["アルバイト", "part-time job", "Subject"], ["が", "—", "Existence subject particle", "particle"], ["あります", "there is / have", "State"]], "に marks the day; アルバイトがあります describes having work scheduled."],
     suiyoubi: [[["すいようび", "Wednesday", "Time"], ["に", "on", "Time particle", "particle"], ["ともだち", "friend", "Companion"], ["と", "with", "Companion particle", "particle"], ["あいます", "meet", "Action"]], "Day に marks when; と marks the person you meet with."],
     mokuyoubi: [[["もくようび", "Thursday", "Time"], ["に", "on", "Time particle", "particle"], ["レポート", "report", "Object"], ["を", "—", "Object particle", "particle"], ["かきます", "write", "Action"]], "Time に + object を + action describes what is planned for Thursday."],
     kinyoubi: [[["きんようび", "Friday", "Time"], ["に", "on", "Time particle", "particle"], ["レストラン", "restaurant", "Destination"], ["へ", "to", "Direction particle", "particle"], ["いきます", "go", "Movement"]], "に marks the day; へ marks the direction and is pronounced e."],
-    au: [[["あした", "tomorrow", "Time"], ["えき", "station", "Place"], ["で", "at", "Action-place particle", "particle"], ["ともだち", "friend", "Person met"], ["に", "—", "Meeting particle", "particle"], ["あう", "meet", "Action (plain form)"]], "あう is the plain form of あいます. に marks the person met, while で marks the meeting place."],
-    aru: [[["つくえ", "desk", "Reference object"], ["の", "—", "Noun-linking particle", "particle"], ["うえ", "on / above", "Location"], ["に", "at", "Existence-location particle", "particle"], ["ほん", "book", "Subject"], ["が", "—", "Existence subject particle", "particle"], ["ある", "there is", "State (plain form)"]], "ある is the plain form of あります, used for things and plants."],
-    kau: [[["スーパー", "supermarket", "Place"], ["で", "at", "Action-place particle", "particle"], ["パン", "bread", "Object"], ["を", "—", "Object particle", "particle"], ["かう", "buy", "Action (plain form)"]], "かう is the plain form of かいます; を marks what is bought."],
-    kaku: [[["ノート", "notebook", "Writing surface"], ["に", "in", "Writing-target particle", "particle"], ["なまえ", "name", "Object"], ["を", "—", "Object particle", "particle"], ["かく", "write", "Action (plain form)"]], "に marks the surface written on; を marks what is written. かく is the plain form."],
-    toru: [[["こうえん", "park", "Place"], ["で", "in", "Action-place particle", "particle"], ["しゃしん", "picture", "Object"], ["を", "—", "Object particle", "particle"], ["とる", "take", "Action (plain form)"]], "しゃしんをとる means “take a picture”; とる is the plain form of とります."],
-    matsu: [[["バスてい", "bus stop", "Place"], ["で", "at", "Action-place particle", "particle"], ["バス", "bus", "Object"], ["を", "—", "Object particle", "particle"], ["まつ", "wait for", "Action (plain form)"]], "まつ is the plain form of まちます; を marks what you wait for."],
-    iru: [[["こうえん", "park", "Location"], ["に", "in", "Existence-location particle", "particle"], ["こども", "child", "Subject"], ["が", "—", "Existence subject particle", "particle"], ["いる", "there is", "State (plain form)"]], "いる is the plain form of います, used for people and animals."],
-    wakaru: [[["この", "this", "Noun determiner"], ["もんだい", "question / problem", "Topic"], ["は", "as for", "Topic particle", "particle"], ["よく", "well", "Degree adverb"], ["わかる", "understand", "State (plain form)"]], "よく here means “well,” not “often”; わかる is the plain form of わかります."],
+    au: [[["あした", "tomorrow", "Time"], ["えき", "station", "Place"], ["で", "at", "Action-place particle", "particle"], ["ともだち", "friend", "Person met"], ["に", "—", "Meeting particle", "particle"], ["あいます", "meet", "Action"]], "に marks the person met; で marks the meeting place."],
+    aru: [[["つくえ", "desk", "Reference object"], ["の", "—", "Noun-linking particle", "particle"], ["うえ", "on / above", "Location"], ["に", "at", "Existence-location particle", "particle"], ["ほん", "book", "Subject"], ["が", "—", "Existence subject particle", "particle"], ["あります", "there is", "State"]], "Location に + thing が + あります. Use あります for things and plants."],
+    kau: [[["スーパー", "supermarket", "Place"], ["で", "at", "Action-place particle", "particle"], ["パン", "bread", "Object"], ["を", "—", "Object particle", "particle"], ["かいます", "buy", "Action"]], "Place で + object を + action. を marks what is bought."],
+    kaku: [[["ノート", "notebook", "Writing surface"], ["に", "in", "Writing-target particle", "particle"], ["なまえ", "name", "Object"], ["を", "—", "Object particle", "particle"], ["かきます", "write", "Action"]], "に marks the surface written on; を marks what is written."],
+    toru: [[["こうえん", "park", "Place"], ["で", "in", "Action-place particle", "particle"], ["しゃしん", "picture", "Object"], ["を", "—", "Object particle", "particle"], ["とります", "take", "Action"]], "しゃしんをとります means “take a picture”; で marks the place."],
+    matsu: [[["バスてい", "bus stop", "Place"], ["で", "at", "Action-place particle", "particle"], ["バス", "bus", "Object"], ["を", "—", "Object particle", "particle"], ["まちます", "wait for", "Action"]], "を marks what you wait for; で marks where you wait."],
+    iru: [[["こうえん", "park", "Location"], ["に", "in", "Existence-location particle", "particle"], ["こども", "child", "Subject"], ["が", "—", "Existence subject particle", "particle"], ["います", "there is", "State"]], "Location に + person or animal が + います."],
+    wakaru: [[["この", "this", "Noun determiner"], ["もんだい", "question / problem", "Topic"], ["は", "as for", "Topic particle", "particle"], ["よく", "well", "Degree adverb"], ["わかります", "understand", "State"]], "よく here means “well,” not “often”; は marks the topic."],
     "suffix-gurai": [[["えき", "station", "Endpoint"], ["まで", "to / as far as", "Endpoint particle", "particle"], ["じゅっぷん", "ten minutes", "Duration"], ["ぐらい", "about", "Approximation suffix"], ["です", "is", "Polite ending"]], "Duration + ぐらい means “about that long”; まで marks the endpoint of the trip."],
     sorekara: [[["あさごはん", "breakfast", "Object"], ["を", "—", "Object particle", "particle"], ["たべます", "eat", "Action"], ["それから", "and then", "Sentence connector", "connector"], ["がっこう", "school", "Destination"], ["へ", "to", "Direction particle", "particle"], ["いきます", "go", "Movement"]], "それから connects events in order: first breakfast, then going to school."],
     dakara: [[["あした", "tomorrow", "Topic / time"], ["は", "as for", "Topic particle", "particle"], ["テスト", "test", "Event"], ["です", "is", "Polite ending"], ["だから", "so / therefore", "Sentence connector", "connector"], ["べんきょうします", "study", "Action"]], "だから introduces a result or decision based on the preceding sentence."],
     "suffix-to": [[["ともだち", "friend", "Companion"], ["と", "with", "Companion particle", "particle"], ["えいが", "movie", "Object"], ["を", "—", "Object particle", "particle"], ["みます", "watch", "Action"]], "と marks the companion; を marks what is watched."],
     doushite: [[["どうして", "why", "Question word"], ["きょう", "today", "Topic / time"], ["は", "as for", "Topic particle", "particle"], ["やすみ", "day off", "State noun"], ["です", "is", "Polite ending"], ["か", "?", "Question particle", "particle"]], "どうして asks for a reason; か makes the polite sentence a question."],
-    hitoride: [[["ひとりで", "alone / by oneself", "Manner expression"], ["カフェ", "cafe", "Destination"], ["へ", "to", "Direction particle", "particle"], ["いきました", "went", "Movement (past)"]], "ひとりで is a set expression meaning “alone”; いきました is the polite past of いきます."],
+    hitoride: [[["ひとりで", "alone / by oneself", "Manner expression"], ["カフェ", "cafe", "Destination"], ["へ", "to", "Direction particle", "particle"], ["いきました", "went", "Movement (past)"]], "ひとりで means “alone”; へ marks the cafe as the destination."],
     moshimoshi: [[["もしもし", "hello (on the phone)", "Phone greeting"], ["たなか", "Tanaka", "Name"], ["さん", "polite name suffix", "Honorific"], ["です", "is", "Polite ending"], ["か", "?", "Question particle", "particle"]], "もしもし opens a phone conversation; さん politely follows the person’s name."],
     ushiro: [[["ねこ", "cat", "Topic"], ["は", "as for", "Topic particle", "particle"], ["いす", "chair", "Reference object"], ["の", "—", "Noun-linking particle", "particle"], ["うしろ", "behind", "Location"], ["です", "is", "Polite ending"]], "いすのうしろ means “behind the chair”; は introduces the cat being located."],
     naka: [[["かばん", "bag", "Reference object"], ["の", "—", "Noun-linking particle", "particle"], ["なか", "inside", "Location"], ["に", "at", "Existence-location particle", "particle"], ["ほん", "book", "Subject"], ["が", "—", "Existence subject particle", "particle"], ["あります", "there is", "State"]], "かばんのなか means “inside the bag”; に marks that location."],
@@ -500,7 +500,7 @@
     aida: [[["ホテル", "hotel", "Topic"], ["は", "as for", "Topic particle", "particle"], ["えき", "station", "First landmark"], ["と", "and", "Listing particle", "particle"], ["こうえん", "park", "Second landmark"], ["の", "—", "Noun-linking particle", "particle"], ["あいだ", "between", "Location"], ["です", "is", "Polite ending"]], "A と B のあいだ means “between A and B.” Here と joins two landmarks, not companions."],
     hito: [[["あの", "that", "Noun determiner"], ["ひと", "person", "Topic"], ["は", "as for", "Topic particle", "particle"], ["だれ", "who", "Question word"], ["です", "is", "Polite ending"], ["か", "?", "Question particle", "particle"]], "あの precedes a noun; だれ asks who the person is."],
     gohan: [[["かぞく", "family", "Companion"], ["と", "with", "Companion particle", "particle"], ["ごはん", "meal", "Object"], ["を", "—", "Object particle", "particle"], ["たべます", "eat", "Action"]], "ごはん can mean cooked rice or a meal; here ごはんをたべます means “eat a meal.”"],
-    kinou: [[["きのう", "yesterday", "Time"], ["えいが", "movie", "Object"], ["を", "—", "Object particle", "particle"], ["みました", "watched", "Action (past)"]], "きのう needs no に. みました is the polite past of みます."],
+    kinou: [[["きのう", "yesterday", "Time"], ["えいが", "movie", "Object"], ["を", "—", "Object particle", "particle"], ["みました", "watched", "Action (past)"]], "きのう needs no に; を marks the movie watched."],
     "gomen-nasai": [[["おそく", "late", "Adverbial adjective form"], ["なって", "becoming / being", "Linking verb form"], ["ごめんなさい", "I’m sorry", "Apology"]], "おそくなって gives the reason for the apology: “sorry for being late.”"],
     migi: [[["つぎ", "next", "Noun modifier"], ["の", "—", "Noun-linking particle", "particle"], ["かど", "corner", "Turning point"], ["を", "at / around", "Route particle", "particle"], ["みぎ", "right", "Direction"], ["に", "to", "Turning-direction particle", "particle"], ["まがってください", "please turn", "Request"]], "を marks the corner passed around, not a direct object; に marks the turn’s direction."],
     hidari: [[["ぎんこう", "bank", "Topic"], ["は", "as for", "Topic particle", "particle"], ["えき", "station", "Reference object"], ["の", "—", "Noun-linking particle", "particle"], ["ひだり", "left", "Location"], ["です", "is", "Polite ending"]], "えきのひだり means “to the left of the station.”"]
@@ -509,6 +509,33 @@
   breakdowns.takusan = breakdowns.kodomo;
   breakdowns.mae = breakdowns.hoteru;
   breakdowns.shita = breakdowns.neko;
+
+  // Authored forms only: do not guess a dictionary form from a verb ending.
+  const verbFormNotes = {};
+  const politeNonpast = [
+    ["みます", "みる"], ["ききます", "きく"], ["よみます", "よむ"],
+    ["します", "する"], ["たべます", "たべる"], ["のみます", "のむ"],
+    ["べんきょうします", "べんきょうする"], ["いきます", "いく"],
+    ["ねます", "ねる"], ["あいます", "あう"], ["やすみます", "やすむ"],
+    ["はなします", "はなす"], ["おきます", "おきる"], ["かえります", "かえる"],
+    ["きます", "くる"], ["わかります", "わかる"], ["あります", "ある"],
+    ["います", "いる"], ["とります", "とる"], ["かきます", "かく"],
+    ["あそびます", "あそぶ"], ["かいます", "かう"], ["まちます", "まつ"]
+  ];
+  for (const [form, base] of politeNonpast) verbFormNotes[form] = `Polite nonpast of ${base}.`;
+  for (const [form, base] of [["かいました", "かう"], ["べんきょうしました", "べんきょうする"], ["みました", "みる"], ["いきました", "いく"]]) {
+    verbFormNotes[form] = `Polite past of ${base}.`;
+  }
+  for (const [form, base] of [["のみません", "のむ"], ["みません", "みる"]]) {
+    verbFormNotes[form] = `Polite negative nonpast of ${base}.`;
+  }
+  verbFormNotes["みませんか"] = "Polite invitation from みる.";
+  verbFormNotes["のみませんか"] = "Polite invitation from のむ.";
+  verbFormNotes["あいましょう"] = "Polite suggestion from あう: let’s meet.";
+  verbFormNotes["まがってください"] = "Polite request from まがる.";
+  for (const [parts] of Object.values(breakdowns)) {
+    for (const part of parts) if (verbFormNotes[part[0]]) part[4] = verbFormNotes[part[0]];
+  }
 
   globalThis.KANA_SPRINT_VOCABULARY_EXAMPLES = Object.freeze(examples);
   globalThis.KANA_SPRINT_VOCABULARY_BREAKDOWNS = Object.freeze(breakdowns);
