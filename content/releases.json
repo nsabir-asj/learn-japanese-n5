@@ -830,6 +830,12 @@
       "publishedAt": "2026-11-01",
       "title": "Practice that moves you forward",
       "changes": [{"pages": ["guided"], "text": "Sentence and particle practice now progress from individual patterns to contrasts and mixed application. Choose Gradual, Balanced, or Brisk learning pace in Session settings. Existing successes are recognised, mistakes receive spaced targeted checks, and later reviews stay limited. Supported and independent evidence remain distinct, with clear suggestions when the selected material is established."}]
+    },
+    {
+      "id": "2026-11-01.2",
+      "publishedAt": "2026-11-01",
+      "title": "Combine topics across lessons",
+      "changes": [{"pages": ["guided"], "text": "Sentence building and particle practice include 64 additional checked sentences combining selected topics, including across lessons. Auto introduces two-topic combinations before longer ones as your skills develop; Challenge offers direct practice. Every required topic must be selected, vocabulary filters still apply, and hints explain all the patterns in each mixed sentence."}]
     }
   ]
 }

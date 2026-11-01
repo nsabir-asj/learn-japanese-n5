@@ -263,12 +263,88 @@
     const orders=chunks.length===3 && chunks[0].at(-1)?.role!=="topic" ? [[0,1,2],[1,0,2]] : chunks.length===4 ? [[0,1,2,3],[0,2,1,3],[1,0,2,3],[1,2,0,3],[2,0,1,3],[2,1,0,3]] : undefined;
     add(id,topic,en,chunks,{expanded:true,...(orders ? {orders}:{}),...options});
   });
+  // Authored combinations are additional material, not replacements for the
+  // single-topic collection. Every main concept must be selected together.
+  const mixedSentences = [];
+  const mix = (id, requiredTopics, meaning, chunks, options = {}) => {
+    const order = chunks.map((_,i)=>i);
+    const adjuncts = order.slice(0,-1);
+    const permutations = xs => xs.length ? xs.flatMap((x,i)=>permutations(xs.filter((_,j)=>i!==j)).map(rest=>[x,...rest])) : [[]];
+    mixedSentences.push({id:`mix-${id}`,topic:requiredTopics[0],requiredTopics,meaning,chunks,
+      orders:permutations(adjuncts).map(xs=>[...xs,order.at(-1)]),...options});
+  };
+  [
+    ["whose-book",["possession","questions"],"Is it your friend’s book?",[[word("tomodachi"),p("possession"),word("hon")],[{text:"です"},p("question")]]],
+    ["whose-bag",["possession","questions"],"Is it the teacher’s bag?",[[word("sensei"),p("possession"),word("kaban")],[{text:"です"},p("question")]]],
+    ["this-friend-book",["pointing","possession"],"This is my friend’s book.",[phrase("kore","topic"),[word("tomodachi"),p("possession"),word("hon"),{text:"です"}]],{orders:[[0,1]]}],
+    ["that-teacher-umbrella",["pointing","possession"],"That near you is the teacher’s umbrella.",[phrase("sore","topic"),[word("sensei"),p("possession"),word("kasa"),{text:"です"}]],{orders:[[0,1]]}],
+    ["this-umbrella-question",["pointing","questions"],"Is this an umbrella?",[phrase("kore","topic"),[word("kasa"),{text:"です"},p("question")]]],
+    ["that-book-question",["pointing","questions"],"Is that over there a book?",[phrase("are","topic"),[word("hon"),{text:"です"},p("question")]]],
+    ["also-teacher-book",["also","possession","pointing"],"This is the teacher’s book too.",[phrase("kore","also"),[word("sensei"),p("possession"),word("hon"),{text:"です"}]],{context:"You have just identified one book as the teacher’s. Add that this book is also the teacher’s.",orders:[[0,1]]}],
+    ["also-friend-bag",["also","possession","pointing"],"That near you is my friend’s bag too.",[phrase("sore","also"),[word("tomodachi"),p("possession"),word("kaban"),{text:"です"}]],{context:"You have just identified one bag as your friend’s. Add that the bag near the other person is your friend’s too.",orders:[[0,1]]}],
+    ["friend-music",["possession","objects"],"I listen to my friend’s music.",[[word("tomodachi"),p("possession"),word("ongaku"),p("object")],v("kiku")]],
+    ["teacher-book-read",["possession","objects"],"I read the teacher’s book.",[[word("sensei"),p("possession"),word("hon"),p("object")],v("yomu")]],
+    ["teacher-home-go",["possession","destination"],"I go to the teacher’s home.",[[word("sensei"),p("possession"),word("uchi"),p("destination")],v("iku")]],
+    ["friend-home-return",["possession","destination"],"I return to my friend’s home.",[[word("tomodachi"),p("possession"),word("uchi"),p("destination")],v("kaeru")]],
+    ["friend-home-study",["possession","action-place"],"I study at my friend’s home.",[[word("tomodachi"),p("possession"),word("uchi"),p("place")],v("benkyousuru")]],
+    ["teacher-home-study",["possession","action-place"],"I study at the teacher’s home.",[[word("sensei"),p("possession"),word("uchi"),p("place")],v("benkyousuru")]],
+    ["friend-teacher-study",["possession","companion"],"I study with my friend’s teacher.",[[word("tomodachi"),p("possession"),word("sensei"),p("companion")],v("benkyousuru")]],
+    ["teacher-friend-study",["possession","companion"],"I study with the teacher’s friend.",[[word("sensei"),p("possession"),word("tomodachi"),p("companion")],v("benkyousuru")]],
+    ["seven-library",["time","destination"],"I go to the library at seven.",[phrase("shichiji","time"),phrase("toshokan","destination"),v("iku")]],
+    ["nine-university",["time","destination"],"I go to university at nine.",[phrase("kuji","time"),phrase("daigaku","destination"),v("iku")]],
+    ["seven-friend-study",["time","companion"],"I study with a friend at seven.",[phrase("shichiji","time"),phrase("tomodachi","companion"),v("benkyousuru")]],
+    ["nine-teacher-study",["time","companion"],"I study with the teacher at nine.",[phrase("kuji","time"),phrase("sensei","companion"),v("benkyousuru")]],
+    ["seven-home-study",["time","action-place"],"I study at home at seven.",[phrase("shichiji","time"),phrase("uchi","place"),v("benkyousuru")]],
+    ["nine-library-study",["time","action-place"],"I study at the library at nine.",[phrase("kuji","time"),phrase("toshokan","place"),v("benkyousuru")]],
+    ["friend-temple",["companion","destination"],"I go to the temple with a friend.",[phrase("tomodachi","companion"),phrase("otera","destination"),v("iku")]],
+    ["teacher-library",["companion","destination"],"I go to the library with the teacher.",[phrase("sensei","companion"),phrase("toshokan","destination"),v("iku")]],
+    ["teacher-library-study",["companion","action-place"],"I study with the teacher at the library.",[phrase("sensei","companion"),phrase("toshokan","place"),v("benkyousuru")]],
+    ["friend-university-study",["companion","action-place"],"I study with a friend at university.",[phrase("tomodachi","companion"),phrase("daigaku","place"),v("benkyousuru")]],
+    ["no-temple",["negative","destination"],"I do not go to the temple.",[phrase("otera","destination"),v("iku",true)]],
+    ["no-bookstore",["negative","destination"],"I do not go to the bookstore.",[phrase("honya","destination"),v("iku",true)]],
+    ["no-teacher-study",["negative","companion"],"I do not study with the teacher.",[phrase("sensei","companion"),v("benkyousuru",true)]],
+    ["no-friend-study",["negative","companion"],"I do not study with a friend.",[phrase("tomodachi","companion"),v("benkyousuru",true)]],
+    ["no-park-study",["negative","action-place"],"I do not study in the park.",[phrase("kouen","place"),v("benkyousuru",true)]],
+    ["no-library-study",["negative","action-place"],"I do not study at the library.",[phrase("toshokan","place"),v("benkyousuru",true)]],
+    ["past-temple",["past-actions","destination"],"I went to the temple yesterday.",[phrase("kinou","bareTime"),phrase("otera","destination"),past("iku")]],
+    ["past-hospital",["past-actions","destination"],"I went to the hospital last week.",[phrase("senshuu","bareTime"),phrase("byouin","destination"),past("iku")]],
+    ["past-teacher-study",["past-actions","companion"],"I studied with the teacher yesterday.",[phrase("kinou","bareTime"),phrase("sensei","companion"),past("benkyousuru")]],
+    ["past-friend-study",["past-actions","companion"],"I studied with a friend last week.",[phrase("senshuu","bareTime"),phrase("tomodachi","companion"),past("benkyousuru")]],
+    ["past-park-study",["past-actions","action-place"],"I studied in the park yesterday.",[phrase("kinou","bareTime"),phrase("kouen","place"),past("benkyousuru")]],
+    ["past-library-study",["past-actions","action-place"],"I studied at the library last week.",[phrase("senshuu","bareTime"),phrase("toshokan","place"),past("benkyousuru")]],
+    ["duration-teacher",["duration","companion"],"I study with the teacher for one hour.",[phrase("ichijikan","duration"),phrase("sensei","companion"),v("benkyousuru")]],
+    ["duration-friend",["duration","companion"],"I study with a friend for about one hour.",[[word("ichijikan"),word("suffix-gurai"),p("duration")],phrase("tomodachi","companion"),v("benkyousuru")]],
+    ["duration-park",["duration","action-place"],"I study in the park for one hour.",[phrase("ichijikan","duration"),phrase("kouen","place"),v("benkyousuru")]],
+    ["duration-home",["duration","action-place"],"I study at home for about one hour.",[[word("ichijikan"),word("suffix-gurai"),p("duration")],phrase("uchi","place"),v("benkyousuru")]],
+    ["list-home-things",["listing-nouns","existence"],"There are a bag and an umbrella at home.",[phrase("uchi","existencePlace"),[word("kaban"),p("list"),word("kasa"),p("subject")],v("aru")]],
+    ["list-park-people",["listing-nouns","existence"],"There are a teacher and a child in the park.",[phrase("kouen","existencePlace"),[word("sensei"),p("list"),word("kodomo"),p("subject")],v("iru")]],
+    ["friend-bag-exists",["possession","existence"],"There is a bag belonging to my friend in the library.",[phrase("toshokan","existencePlace"),[word("tomodachi"),p("possession"),word("kaban"),p("subject")],v("aru")]],
+    ["teacher-book-exists",["possession","existence"],"There is a book belonging to the teacher at home.",[phrase("uchi","existencePlace"),[word("sensei"),p("possession"),word("hon"),p("subject")],v("aru")]],
+    ["cat-behind-desk",["relative-location","existence"],"There is a cat behind the desk.",[position("tsukue","ushiro","existencePlace"),phrase("neko","subject"),v("iru")]],
+    ["bag-under-chair",["relative-location","existence"],"There is a bag under the chair.",[position("isu","shita","existencePlace"),phrase("kaban","subject"),v("aru")]],
+    ["past-friend-umbrella",["possession","past-nouns"],"It was my friend’s umbrella.",[[word("tomodachi"),p("possession"),word("kasa")],ending("でした")]],
+    ["past-teacher-book",["possession","past-nouns"],"It was not the teacher’s book.",[[word("sensei"),p("possession"),word("hon")],ending("じゃなかったです")]],
+    ["list-drinks",["listing-nouns","objects"],"I drink water and coffee.",[[word("mizu"),p("list"),word("koohii"),p("object")],v("nomu")]],
+    ["list-reading",["listing-nouns","objects"],"I read a book and a report.",[[word("hon"),p("list"),word("repooto"),p("object")],v("yomu")]],
+    ["friend-book-home",["possession","action-place","objects"],"I read my friend’s book at home.",[phrase("uchi","place"),[word("tomodachi"),p("possession"),word("hon"),p("object")],v("yomu")]],
+    ["teacher-book-library",["possession","action-place","objects"],"I read the teacher’s book at the library.",[phrase("toshokan","place"),[word("sensei"),p("possession"),word("hon"),p("object")],v("yomu")]],
+    ["seven-friend-library",["time","companion","destination"],"I go to the library with a friend at seven.",[phrase("shichiji","time"),phrase("tomodachi","companion"),phrase("toshokan","destination"),v("iku")]],
+    ["nine-teacher-university",["time","companion","destination"],"I go to university with the teacher at nine.",[phrase("kuji","time"),phrase("sensei","companion"),phrase("daigaku","destination"),v("iku")]],
+    ["past-friend-book",["past-actions","possession","objects"],"I read my friend’s book yesterday.",[phrase("kinou","bareTime"),[word("tomodachi"),p("possession"),word("hon"),p("object")],past("yomu")]],
+    ["past-teacher-book-read",["past-actions","possession","objects"],"I read the teacher’s book last week.",[phrase("senshuu","bareTime"),[word("sensei"),p("possession"),word("hon"),p("object")],past("yomu")]],
+    ["past-duration-park",["duration","action-place","past-actions"],"I studied in the park for one hour yesterday.",[phrase("kinou","bareTime"),phrase("kouen","place"),phrase("ichijikan","duration"),past("benkyousuru")]],
+    ["past-duration-library",["duration","action-place","past-actions"],"I studied at the library for about one hour last week.",[phrase("senshuu","bareTime"),phrase("toshokan","place"),[word("ichijikan"),word("suffix-gurai"),p("duration")],past("benkyousuru")]],
+    ["past-list-drinks",["listing-nouns","objects","past-actions"],"I drank water and coffee yesterday.",[phrase("kinou","bareTime"),[word("mizu"),p("list"),word("koohii"),p("object")],past("nomu")]],
+    ["past-list-reading",["listing-nouns","objects","past-actions"],"I read a book and a report last week.",[phrase("senshuu","bareTime"),[word("hon"),p("list"),word("repooto"),p("object")],past("yomu")]],
+    ["past-friend-library-book",["past-actions","possession","action-place","objects"],"I read my friend’s book at the library yesterday.",[phrase("kinou","bareTime"),phrase("toshokan","place"),[word("tomodachi"),p("possession"),word("hon"),p("object")],past("yomu")]],
+    ["past-teacher-home-book",["past-actions","possession","action-place","objects"],"I read the teacher’s book at home last week.",[phrase("senshuu","bareTime"),phrase("uchi","place"),[word("sensei"),p("possession"),word("hon"),p("object")],past("yomu")]]
+  ].forEach(row=>mix(...row));
   // These alternatives preserve the prompt's meaning. Keep them explicit rather
   // than accepting arbitrary particles, omissions, or word permutations.
   roles.relativeTime = { title: "Time expression", note: "Relative or repeated time can stand alone, or take は to make it the topic. It does not take に here.", choices: ["", "は"] };
   roles.weekday = { title: "Day of the week", note: "A day of the week can take に or stand without it in this sentence.", choices: ["に", ""] };
   roles.meeting = { title: "Person you meet", note: "With あう, に marks the person you meet; と presents the meeting as a shared action. Both fit this prompt.", choices: ["と", "に"] };
-  for (const sentence of sentences) {
+  for (const sentence of [...sentences,...mixedSentences]) {
     if (sentence.meaning.startsWith("I ")) {
       if (sentence.chunks[0]?.[0]?.wordId === "watashi" && sentence.chunks[0]?.[1]?.role === "topic") sentence.optionalTopic = "omit";
       else if (!sentence.chunks.flat().some(piece => piece.wordId === "watashi")) sentence.optionalTopic = "add";
@@ -276,7 +352,7 @@
     sentence.chunks = sentence.chunks.map(chunk => chunk.map(piece => piece.role === "bareTime" ? {...piece,role:"relativeTime"} : piece));
     if (sentence.id === "time-sunday") sentence.chunks[0][1].role = "weekday";
     if (sentence.id === "past-meet") sentence.chunks[1][1].role = "meeting";
-    if (sentence.chunks.some(chunk => chunk.some(piece => piece.role === "existencePlace"))) sentence.orders = [[0,1,2],[1,0,2]];
+    if (!sentence.requiredTopics && sentence.chunks.some(chunk => chunk.some(piece => piece.role === "existencePlace"))) sentence.orders = [[0,1,2],[1,0,2]];
     if (sentence.chunks.some(chunk=>chunk.some(piece=>piece.role==="list"))) {
       const alternate = sentence.chunks.map(chunk => chunk.map(piece => ({...piece})));
       const list = alternate.find(chunk => chunk.some(piece => piece.role === "list"));
@@ -287,11 +363,11 @@
   }
   // Reviewed difficulty describes grammar combinations, independently of lesson,
   // vocabulary familiarity, support mode, and answer format.
-  for (const sentence of sentences) {
+  for (const sentence of [...sentences,...mixedSentences]) {
     const markers=sentence.chunks.flat().filter(piece=>piece.role);
     const possessions=markers.filter(piece=>piece.role==="possession").length;
     const combinedNouns=possessions>=2 || possessions>0 && !["possession","relative-location"].includes(sentence.topic);
-    sentence.difficulty=markers.length>=3 || combinedNouns ? "challenge" : "focused";
+    sentence.difficulty=sentence.requiredTopics || markers.length>=3 || combinedNouns ? "challenge" : "focused";
     sentence.difficultyReason=sentence.difficulty==="challenge" ? "Combines familiar patterns or several particle roles." : "Centres on one main sentence pattern.";
   }
   const wordGroups = [
@@ -305,7 +381,7 @@
     ["yomu", "miru", "kiku", "hanasu"], ["taberu", "nomu"], ["iku", "kaeru", "kuru"],
     ["okiru", "neru"], ["suru", "benkyousuru"]
   ];
-  globalThis.SENTENCE_COURSE = { topics, words, verbs, roles, sentences, wordGroups, lessons: [
+  globalThis.SENTENCE_COURSE = { topics, words, verbs, roles, sentences, mixedSentences, wordGroups, lessons: [
     { id: 1, title: "First conversations", description: "Introduce yourself, connect nouns, and ask questions." },
     { id: 2, title: "Things around you", description: "Point out objects and add ‘also’." },
     { id: 3, title: "Everyday actions", description: "Objects, places, time, companions, and polite verbs." },

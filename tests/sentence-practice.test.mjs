@@ -140,7 +140,7 @@ test('all activities start unaided without automatic rule or vocabulary introduc
 test('opening a hint before answering marks assistance, while post-answer explanations do not',()=>{
   const source=readFileSync(new URL('../features/sentences/practice.js',import.meta.url),'utf8');
   const body=source.match(/function showRule\(hint = false\) \{([\s\S]*?)\n  \}/)[1];
-  const harness=vm.createContext({current:{topic:'new'},answered:false,teaching:false,assisted:false,assistanceReason:'',C:{topics:[{id:'new',title:'Rule'}]},ruleMarkup:()=>'',wordGlossary:()=>'',esc:x=>x,$:()=>({showModal(){}})});
+  const harness=vm.createContext({current:{topic:'new'},E:{requirements:ex=>ex.requiredTopics||[ex.topic]},answered:false,teaching:false,assisted:false,assistanceReason:'',C:{topics:[{id:'new',title:'Rule'}]},ruleMarkup:()=>'',wordGlossary:()=>'',esc:x=>x,$:()=>({showModal(){}})});
   vm.runInContext(`function showRule(hint=false){${body}};showRule(true)`,harness);
   assert.equal(harness.assisted,true);
   assert.equal(harness.assistanceReason,'hint');
@@ -170,7 +170,8 @@ test('Lesson 4 is selectable in every activity with eight new verbs and past for
   assert.ok(C.lessons.some(l=>l.id===4));
   for(const activity of ['build','particles']){
     const pool=E.pool({...config,activity,topics});
-    assert.equal(pool.length,60);
+    assert.equal(pool.filter(x=>!x.requiredTopics).length,60);
+    assert.equal(pool.length,64);
     assert.equal(new Set(pool.map(s=>s.topic)).size,6);
     assert.ok(pool.every(s=>E.slots(s).length>0));
   }

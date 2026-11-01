@@ -67,7 +67,7 @@
   }
   function tileBank(exercise, supported, random = Math.random, options = {}) {
     const config = options.settings || {}, vocabulary = options.vocabulary || {};
-    const lesson = C.topics.find(t => t.id === exercise.topic).lesson;
+    const lesson = Math.max(...lessonIds(exercise));
     const units = supported ? exercise.chunks : pieces(exercise).filter(x => !x.role).map(x => [x]);
     const describe = unit => unit.map(piece => {
       const verb = C.verbs.find(v => v.id === piece.wordId);
@@ -106,7 +106,7 @@
       });
     }
     // Fill from authored phrases at the same level when close contrasts are scarce.
-    for (const sentence of C.sentences.filter(s => C.topics.find(t => t.id === s.topic).lesson <= lesson)) {
+    for (const sentence of C.sentences.filter(s => C.topics.find(t => t.id === s.topic).lesson <= lesson && (!exercise.requiredTopics || (config.topics || exercise.requiredTopics).includes(s.topic)))) {
       const alternatives = supported ? sentence.chunks : pieces(sentence).filter(x => !x.role).map(x => [x]);
       alternatives.forEach(unit => {
         const verbForm = unit.some(piece => C.verbs.some(verb => verb.id === piece.wordId));
@@ -150,10 +150,17 @@
     return Boolean(item?.introduced && (!mastered || (item.seen > 0 && item.mastery >= 72)));
   });
   function pool(settings, vocabulary = {}) {
-    const all = settings.activity === "verbs" ? verbs : C.sentences;
-    return all.filter(exercise => settings.topics.includes(exercise.topic) &&
+    const all = settings.activity === "verbs" ? verbs : sentenceExamples;
+    return all.filter(exercise => requirements(exercise).every(id=>settings.topics.includes(id)) &&
       (settings.activity === "verbs" || !["focused","challenge"].includes(settings.difficulty) || exercise.difficulty === settings.difficulty) &&
       (!["introduced","mastered"].includes(settings.vocabulary) || wordIds(exercise).every(id => familiar(id,vocabulary,settings.vocabulary === "mastered"))));
+  }
+  const sentenceExamples = [...C.sentences,...(C.mixedSentences || [])];
+  const requirements = exercise => exercise.requiredTopics || [exercise.topic];
+  const lessonIds = exercise => [...new Set(requirements(exercise).map(id=>C.topics.find(t=>t.id===id).lesson))].sort((a,b)=>a-b);
+  function roleTopic(exercise,role) {
+    const candidates={possession:["possession","relative-location"],question:["questions"],also:["also"],object:["objects"],destination:["destination"],place:["action-place"],time:["time"],relativeTime:["time","past-actions"],existencePlace:["existence"],subject:["existence"],list:["listing-nouns"],duration:["duration"],companion:["companion"],topic:["pointing","identity","past-nouns"]};
+    return exercise.requiredTopics ? candidates[role]?.find(id=>requirements(exercise).includes(id)) || exercise.topic : exercise.topic;
   }
   function recordKey(exercise, settings) { return `${settings.activity}:${settings.activity === "build" ? settings.support : settings.input}:${exercise.id}`; }
   function recordParticleEvidence(progress, exercise, settings, details, assisted, now=Date.now()) {
@@ -183,7 +190,7 @@
   function seedParticleEvidence(progress) {
     if(progress.particleEvidenceVersion===1)return false;
     progress.items ||= {};
-    for(const exercise of C.sentences){
+    for(const exercise of sentenceExamples){
       if(Object.keys(progress.items).some(key=>key.startsWith(`particleEvidence:${exercise.id}:`)))continue;
       const history=["build:independent","particles:choice","particles:typing"].flatMap(prefix=>progress.items[`${prefix}:${exercise.id}`]?.history || []).sort((a,b)=>a.at-b.at || a.question-b.question);
       const lastFailure=history.findLastIndex(event=>!event.correct && !event.assisted);
@@ -322,5 +329,5 @@
   }
   const playbackKey = activity => ({build:"autoAudio",verbs:"autoVerbAudio",particles:"autoParticleAudio"}[activity]);
   const playbackEnabled = settings => settings[playbackKey(settings.activity)] === true;
-  globalThis.SENTENCE_ENGINE = { normalize, shuffle, pieces, slots, model, acceptedSentences, particleAnswer, diagnose, unexpectedWords, tileBank, hiraganaPreview, particlePreview, verbs, wordIds, familiar, pool, recordKey, choose, record, verbChoiceCount, verbChoices, verbChoiceInfo, playbackKey, playbackEnabled, recordParticleEvidence, particlePriority, seedParticleEvidence };
+  globalThis.SENTENCE_ENGINE = { normalize, shuffle, pieces, slots, model, acceptedSentences, particleAnswer, diagnose, unexpectedWords, tileBank, hiraganaPreview, particlePreview, verbs, wordIds, familiar, pool, recordKey, choose, record, verbChoiceCount, verbChoices, verbChoiceInfo, playbackKey, playbackEnabled, recordParticleEvidence, particlePriority, seedParticleEvidence, sentenceExamples, requirements, lessonIds, roleTopic };
 })();
