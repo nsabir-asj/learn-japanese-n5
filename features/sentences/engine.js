@@ -170,6 +170,15 @@
       item.role=role;item.exerciseId=exercise.id;
       if(!correct)item.lastMistakeQuestion=progress.total;
     }
+    if(exercise.difficulty==="challenge" && details.length){
+      const key=`particleCombination:${exercise.id}`,previous=progress.items[key];
+      const correct=details.every(slot=>slot.correct);
+      if(!correct || !previous || progress.total-previous.lastQuestion>=3 || now-previous.lastSeen>=600000){
+        const item=record(progress,key,correct,false,now);
+        item.exerciseId=exercise.id;item.combination=true;
+      }
+    }
+
   }
   function seedParticleEvidence(progress) {
     if(progress.particleEvidenceVersion===1)return false;
@@ -210,7 +219,7 @@
     // Mixed prompts remain eligible if even one role is unfamiliar or weak.
     return roles.every(established) ? 1 : 0;
   }
-  function choose(pool, settings, progress, recent = [], vocabulary = {}, random = Math.random, now = Date.now()) {
+  function chooseRotation(pool, settings, progress, recent = [], vocabulary = {}, random = Math.random, now = Date.now()) {
     if (!pool.length) return null;
     const itemFor = exercise => progress.items?.[recordKey(exercise,settings)];
     const priorityCache=new Map();
@@ -251,6 +260,10 @@
     })[0];
   }
 
+  function choose(pool, settings, progress, recent=[], vocabulary={}, random=Math.random, now=Date.now()) {
+    const progression=globalThis.SENTENCE_PROGRESSION;
+    return progression?.enabled(settings) ? progression.choose(pool,settings,progress,recent,vocabulary,random,now) : chooseRotation(pool,settings,progress,recent,vocabulary,random,now);
+  }
   function record(progress, key, correct, assisted, now = Date.now(), evidence = {}) {
     const item = progress.items[key] || { seen:0, correct:0, wrong:0, assisted:0, run:0 };
     if(key.startsWith("verbs:choice:") || key.startsWith("verbs:typing:")) {

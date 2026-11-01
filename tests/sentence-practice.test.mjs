@@ -562,7 +562,7 @@ test('expanded examples remain fully subject to strict vocabulary filters',()=>{
 });
 
 
-test('Auto preserves the original pool and scheduling sequence as the default',()=>{
+test('Auto difficulty alone preserves the collection and underlying rotation',()=>{
   const legacy={...config},auto={...config,difficulty:'auto'};
   const legacyPool=E.pool(legacy),autoPool=E.pool(auto);
   assert.deepEqual(Array.from(autoPool,x=>x.id),Array.from(legacyPool,x=>x.id));

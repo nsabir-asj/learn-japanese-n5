@@ -150,3 +150,5 @@ body[data-activity="sentences"] .activity-stat>span { min-height:2.6em;line-heig
 .sp-difficulty>div { flex:none;display:flex;align-items:center;gap:13px; }
 .sp-difficulty p { color:#a9c1b7;font-size:.75rem;line-height:1.5;margin:0; }
 @media(max-width:700px) { .sp-difficulty { flex-direction:column;align-items:stretch;gap:10px; }.sp-difficulty>div { flex-wrap:wrap;justify-content:space-between;gap:10px; } }
+
+.sp-progression-note { color:#aec9ba;border-left:2px solid #59796b;padding:5px 12px;font-size:.76rem;line-height:1.6;margin:0 0 18px; }
