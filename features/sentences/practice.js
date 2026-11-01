@@ -146,7 +146,6 @@
       }
       if(s.support==="independent"){
         $("#builtAnswer").insertAdjacentHTML("afterend",`<div class="sp-composer" id="sentenceComposer"><label for="builderInput">Type words and particles in romaji</label><div class="sp-compose-entry"><input id="builderInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="tomodachi to eiga o mimasu"><button type="button" class="sp-secondary" data-action="add-typed">Add word</button></div><p id="builderPreview" lang="ja" role="status" aria-live="polite">—</p><small>Space adds a word. Enter checks the sentence, including text still in the field. Click a tile to edit; Backspace in an empty field edits the last tile.</small></div>`);
-        $("#exerciseBody").insertAdjacentHTML("beforeend",'<button type="button" class="sp-secondary" data-action="show-bank" id="showComposerBank">Use word tiles</button>');
       }
       renderTiles();
       if(s.support==="independent"){
@@ -173,7 +172,6 @@
     const typing=typingBuild();
     $("#sentenceComposer").hidden=!typing;
     $("#wordBank").hidden=typing;$("#particleBank").hidden=typing;
-    $("#showComposerBank").hidden=!typing;
     document.querySelectorAll("#exerciseBody .sp-bank-heading").forEach(x=>x.hidden=typing);
     document.querySelectorAll("[data-build-input]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.buildInput===state.settings.buildInput)));
     $("#composerRecordNote").textContent=typing && attemptUsedTiles ? "This answer will be recorded as tile practice because word tiles were available. Your accuracy and streak still count normally unless you use a hint." : "";
@@ -415,7 +413,6 @@
     if(button.dataset.buildInput){switchBuildInput(button.dataset.buildInput);return;}
     if (answered || !current) return;
     if(action==="add-typed"){commitComposer();$("#builderInput").focus({preventScroll:true});return;}
-    if(action==="show-bank"){switchBuildInput("tiles");return;}
     if(typingBuild() && button.dataset.remove!==undefined){editComposer(Number(button.dataset.remove));return;}
     if (button.dataset.word) {const tile=bank.find(x=>x.id === button.dataset.word);if (tile && !selected.some(x=>x.id===tile.id)) selected.push(tile);renderTiles();$("#builtAnswer button:last-child")?.focus();}
     if (button.dataset.particle) {selected.push({text:button.dataset.particle,particle:true});renderTiles();}

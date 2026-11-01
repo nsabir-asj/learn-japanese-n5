@@ -884,6 +884,12 @@
       "publishedAt": "2026-11-01",
       "title": "Choose typing or tiles without losing your answer",
       "changes": [{"pages": ["guided"], "text": "Switch between Type and Tiles on the same sentence while keeping your draft. Using word tiles counts as normal independent tile practice, with accuracy and streak credit; hints still count as support. Once tiles have been available, that attempt stays recorded as tile practice even if you return to typing."}]
+    },
+    {
+      "id": "2026-11-01.11",
+      "publishedAt": "2026-11-01",
+      "title": "Simpler sentence input controls",
+      "changes": [{"pages": ["guided"], "text": "Use the Tiles / Type selector to switch how you build a sentence. The duplicate Use word tiles button has been removed."}]
     }
   ]
 }
