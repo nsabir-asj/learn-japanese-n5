@@ -177,7 +177,7 @@
     const candidates={possession:["possession","relative-location"],question:["questions"],also:["also"],object:["objects"],destination:["destination"],place:["action-place"],time:["time"],relativeTime:["time","past-actions"],existencePlace:["existence"],subject:["existence"],list:["listing-nouns"],duration:["duration"],companion:["companion"],topic:["pointing","identity","past-nouns"]};
     return exercise.requiredTopics ? candidates[role]?.find(id=>requirements(exercise).includes(id)) || exercise.topic : exercise.topic;
   }
-  function recordKey(exercise, settings) { return `${settings.activity}:${settings.activity === "build" ? (settings.support==="independent" && settings.buildInput==="typing" ? "typing" : settings.support) : settings.input}:${exercise.id}`; }
+  function recordKey(exercise, settings) { return `${settings.activity}:${settings.activity === "build" ? (settings.support==="independent" && ["typing","voice"].includes(settings.buildInput) ? settings.buildInput : settings.support) : settings.input}:${exercise.id}`; }
   function recordParticleEvidence(progress, exercise, settings, details, assisted, now=Date.now()) {
     if(assisted || !(settings.activity==="particles" || settings.activity==="build" && settings.support==="independent"))return;
     const roles=[...new Set(details.map(slot=>slot.role))];
@@ -207,7 +207,7 @@
     progress.items ||= {};
     for(const exercise of sentenceExamples){
       if(Object.keys(progress.items).some(key=>key.startsWith(`particleEvidence:${exercise.id}:`)))continue;
-      const history=["build:independent","build:typing","particles:choice","particles:typing"].flatMap(prefix=>progress.items[`${prefix}:${exercise.id}`]?.history || []).sort((a,b)=>a.at-b.at || a.question-b.question);
+      const history=["build:independent","build:typing","build:voice","particles:choice","particles:typing"].flatMap(prefix=>progress.items[`${prefix}:${exercise.id}`]?.history || []).sort((a,b)=>a.at-b.at || a.question-b.question);
       const lastFailure=history.findLastIndex(event=>!event.correct && !event.assisted);
       // Old failed answers have no reliable per-particle breakdown. Import
       // only later, fully correct unaided answers; never assume partial skill.

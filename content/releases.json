@@ -890,6 +890,12 @@
       "publishedAt": "2026-11-01",
       "title": "Simpler sentence input controls",
       "changes": [{"pages": ["guided"], "text": "Use the Tiles / Type selector to switch how you build a sentence. The duplicate Use word tiles button has been removed."}]
+    },
+    {
+      "id": "2026-11-01.12",
+      "publishedAt": "2026-11-01",
+      "title": "Try voice input for sentence building",
+      "changes": [{"pages": ["guided"], "text": "Type view now offers an optional Speak button marked Beta. Review and edit the Japanese transcript before adding it to your sentence, then check when ready. Voice input keeps separate recall records, does not count as help, and supports familiar kanji spellings. Typing and tiles remain available when voice recognition is unavailable."}]
     }
   ]
 }

@@ -227,3 +227,13 @@ body[data-activity="sentences"] .activity-stat>span { min-height:2.6em;line-heig
 }
 
 .sp-compose-record-note { color:#adcdbb;font-size:.76rem;line-height:1.7;margin:16px 0 0; }
+
+.sp-voice { margin-top:18px; padding-top:16px; border-top:1px solid #33453f; }
+.sp-voice-button { display:inline-flex; align-items:center; gap:8px; }
+.sp-voice-button small { border:1px solid currentColor; border-radius:5px; padding:1px 5px; font-size:.65rem; line-height:1.4; }
+.sp-voice-button[aria-pressed="true"] { background:#284d40; box-shadow:0 0 0 2px #9cdcca; }
+.sp-voice p { color:#adcdbb; font-size:.76rem; line-height:1.7; margin:10px 0 0; }
+.sp-voice textarea { display:block; width:100%; box-sizing:border-box; resize:vertical; background:#101c1b; border:1px solid #58756a; border-radius:10px; color:#eef7f3; font:inherit; padding:12px; margin:8px 0 12px; }
+.sp-voice label { display:block; margin-top:12px; }
+.sp-voice small { display:block; margin-top:8px; }
+.sp-voice-button small { margin:0; }

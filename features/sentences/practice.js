@@ -17,12 +17,12 @@
   } catch { /* A broken saved snapshot should not stop practice. */ }
   let verbOptions = [];
   let composerInsertAt = null;
-  let attemptUsedTiles = false;
+  let attemptUsedTiles = false, attemptUsedVoice = false;
   let renderedAt = 0;
   let helpTab = "hint", guideScrollTop = 0;
   let current = null, selected = [], bank = [], answers = [], activeSlot = 0, answered = false, assisted = false, assistanceReason = "", recent = [], sessionTotal = 0, sessionCorrect = 0, sessionUnaided = 0;
   let draft = new Set(), scopeView = "lessons", scopeSearch = "";
-  const settings = () => globalThis.SENTENCE_COMPOSER.attemptSettings({...state.settings,topics:state.settings.scopes[state.settings.activity]},attemptUsedTiles);
+  const settings = () => globalThis.SENTENCE_COMPOSER.attemptSettings({...state.settings,topics:state.settings.scopes[state.settings.activity]},attemptUsedTiles,attemptUsedVoice);
   const typingBuild = () => state.settings.activity==="build" && state.settings.support==="independent" && state.settings.buildInput==="typing";
   const modeName = () => ({build:state.settings.support === "supported" ? "Supported building" : "Independent building",particles:state.settings.input === "choice" ? "Particle choices" : "Particle recall",verbs:state.settings.input === "choice" ? "Verb choices" : "Verb recall"}[state.settings.activity]);
   const availableTopics = () => C.topics.filter(t => state.settings.activity === "verbs" ? t.verbGroup : !t.verbGroup);
@@ -94,7 +94,7 @@
   }
   function renderProgress() {
     const s = settings();
-    $("#progressBody").innerHTML = `<p class="sp-muted">Supported building, independent building, choices, and typing have separate records. Independent building and particle practice share scheduling evidence for each particle role. Familiar sentences return less often; activity scores stay separate. Reading a rule or arranging a supported chunk does not establish independent particle recall.</p><div class="sp-progress-grid">${availableTopics().filter(t => s.topics.includes(t.id)).map(topic => {
+    $("#progressBody").innerHTML = `<p class="sp-muted">Supported building, independent building, choices, typing, and voice input have separate records. Independent building and particle practice share scheduling evidence for each particle role. Familiar sentences return less often; activity scores stay separate. Reading a rule or arranging a supported chunk does not establish independent particle recall.</p><div class="sp-progress-grid">${availableTopics().filter(t => s.topics.includes(t.id)).map(topic => {
       const exercises = E.pool({...s,topics:[topic.id],vocabulary:"any",difficulty:"auto"});
       const rows = exercises.map(x => state.items[E.recordKey(x,s)]).filter(Boolean);
       const correct = rows.reduce((a,x) => a + x.correct,0), attempts = rows.reduce((a,x) => a + x.correct + x.wrong,0);
@@ -111,6 +111,8 @@
     return `<p class="sp-rule-copy">${esc(topic.rule)}</p><div class="sp-models">${topic.examples.map(([jp,en]) => `<div><strong lang="ja">${esc(jp)}</strong><span>${esc(en)}</span></div>`).join("")}</div>`;
   }
   function next() {
+    globalThis.SENTENCE_VOICE?.cancel();
+    attemptUsedVoice=false;
     globalThis.SENTENCE_VIEWPORT?.cancel();
     window.KANA_SPRINT_SPEECH?.stop();
     composerInsertAt=null;
@@ -150,6 +152,7 @@
       renderTiles();
       if(s.support==="independent"){
         $("#exerciseBody").insertAdjacentHTML("beforeend",'<p id="composerRecordNote" class="sp-compose-record-note" role="status"></p>');
+        globalThis.SENTENCE_VOICE.mount($("#sentenceComposer"),tokens=>{commitComposer();insertComposer(tokens);attemptUsedVoice=true;renderTiles();renderChrome();},()=>answered);
         applyBuildInput();
       }
       $("#keyboardNote").textContent = typingBuild()?"Space adds words · Enter checks · wa → は, o / wo → を, e / he → へ":"Press Enter to check. Use Tab and Enter to select a focused tile.";
@@ -180,6 +183,7 @@
   }
   function switchBuildInput(mode) {
     if(answered || !current || !["tiles","typing"].includes(mode) || mode===state.settings.buildInput)return;
+    globalThis.SENTENCE_VOICE?.cancel();
     // Commit pending text (including an edited tile) before hiding the input.
     if(typingBuild())commitComposer();
     if(mode==="tiles")attemptUsedTiles=true;
@@ -259,6 +263,7 @@
   }
   function check(unknown = false) {
     if (answered || !current) return;
+    globalThis.SENTENCE_VOICE?.cancel();
     const s = settings();
     let correct = false, details = [], response = "";
     if (s.activity === "build") {

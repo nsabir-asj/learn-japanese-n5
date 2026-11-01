@@ -44,7 +44,7 @@
         addMixed(exercise,(item.history||[]).map(event=>({...event,exerciseId:exercise.id})));
         continue;
       }
-      const prefixes=supported ? ["build:supported:","build:independent:","build:typing:"] : settings.activity==="particles" ? ["build:independent:","build:typing:","particles:choice:","particles:typing:"] : settings.buildInput==="typing" ? ["build:typing:"] : ["build:independent:","build:typing:"];
+      const prefixes=supported ? ["build:supported:","build:independent:","build:typing:","build:voice:"] : settings.activity==="particles" ? ["build:independent:","build:typing:","build:voice:","particles:choice:","particles:typing:"] : settings.buildInput==="typing" ? ["build:typing:","build:voice:"] : ["build:independent:","build:typing:","build:voice:"];
       // Sentence assembly evidence is distinct from particle-only recognition.
       const prefix=prefixes.find(value=>key.startsWith(value));
       if(!prefix)continue;

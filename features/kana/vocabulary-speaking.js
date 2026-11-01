@@ -268,5 +268,5 @@
     }
     return { start, stop, cancel };
   }
-  globalThis.KANA_SPRINT_VOCABULARY_SPEAKING = { normalize, matches, matchesSpoken, sourceSpellingsFor, matchesRomaji, romajiToHiragana, interpretation, promptFor, createSession };
+  globalThis.KANA_SPRINT_VOCABULARY_SPEAKING = { normalize, writtenForms: word => [...word.jp.split(/[／/]/), ...(spellings[word.id] || "").split("|").filter(Boolean), ...(word.speechSpellings || [])], matches, matchesSpoken, sourceSpellingsFor, matchesRomaji, romajiToHiragana, interpretation, promptFor, createSession };
 })();
