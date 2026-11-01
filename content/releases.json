@@ -842,6 +842,12 @@
       "publishedAt": "2026-11-01",
       "title": "A particle reference beside your practice",
       "changes": [{"pages": ["guided"], "text": "Hint & guide opens a question hint and a beginner particle reference with 23 uses and 69 translated examples. After answering, the button opens only the particle guide. Jump between particles, compare common uses, and reopen the table at your previous position. Help before submission counts as support; browsing after answering leaves the result unchanged."}]
+    },
+    {
+      "id": "2026-11-01.4",
+      "publishedAt": "2026-11-01",
+      "title": "Keep questions and results in view",
+      "changes": [{"pages": ["guided"], "text": "Sentence, particle, and verb practice now position answered cards with comfortable spacing while keeping the result and model answer visible. Next brings the whole question card into view when it fits, or aligns its top for taller cards. Keyboard focus no longer causes a second jump, and scrolling respects reduced-motion preferences."}]
     }
   ]
 }

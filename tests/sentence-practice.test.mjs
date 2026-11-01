@@ -224,7 +224,7 @@ test('plain Enter checks sentence building and advances feedback while focused c
   const source=readFileSync(new URL('../features/sentences/practice.js',import.meta.url),'utf8');
   const body=source.match(/document\.addEventListener\("keydown",event => \{([\s\S]*?)\n  \}\);/)[1];
   let checks=0, advances=0;
-  const harness=vm.createContext({current:{},renderedAt:0,teaching:false,answered:false,$:()=>null,check:()=>checks++,next:()=>advances++});
+  const harness=vm.createContext({current:{},renderedAt:0,teaching:false,answered:false,$:()=>null,check:()=>checks++,advance:()=>advances++});
   const handler=vm.runInContext(`(event)=>{${body}}`,harness);
   const event=(extra={})=>({key:'Enter',repeat:false,isComposing:false,ctrlKey:false,target:{matches:()=>false},preventDefault(){},...extra});
   handler(event());assert.equal(checks,1);

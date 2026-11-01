@@ -108,6 +108,7 @@
     return `<p class="sp-rule-copy">${esc(topic.rule)}</p><div class="sp-models">${topic.examples.map(([jp,en]) => `<div><strong lang="ja">${esc(jp)}</strong><span>${esc(en)}</span></div>`).join("")}</div>`;
   }
   function next() {
+    globalThis.SENTENCE_VIEWPORT?.cancel();
     window.KANA_SPRINT_SPEECH?.stop();
     answered = false; assisted = false; assistanceReason = ""; selected = []; answers = []; activeSlot = 0;
     const config = settings(), vocab = vocabulary();
@@ -119,6 +120,10 @@
     }
     recent.push(current.id); recent = recent.slice(-8);
     renderExercise();
+  }
+  function advance() {
+    next();
+    globalThis.SENTENCE_VIEWPORT.position("question",$("#exercisePrompt"));
   }
   function renderExercise() {
     renderedAt=Date.now();
@@ -236,8 +241,8 @@
       document.querySelector(".sp-verb-prompt").insertAdjacentHTML("afterend",`<p class="sp-verb-meaning">${esc(current.verb.romaji)} · ${esc(current.verb.meaning)}</p>`);
     }
     $("#keyboardNote").hidden=true;
-    $("#nextExercise").focus();
     if(E.playbackEnabled(s) && !window.KANA_SPRINT_SPEECH?.speakJapanese(s.activity==="verbs" ? current.answer : E.model(current))) $("#audioNotice").textContent="No Japanese voice available. Choose a voice in Settings & Data.";
+    globalThis.SENTENCE_VIEWPORT.position("review",$("#nextExercise"));
   }
   function wordGlossary() { return `<div class="sp-word-intro">${E.wordIds(current).map(id => `<div><strong lang="ja">${esc(C.words[id].jp)}</strong><span>${esc(C.words[id].romaji)}</span><span>${esc(C.words[id].meaning)}</span></div>`).join("")}</div>`; }
   function rememberGuideScroll() {
@@ -321,7 +326,7 @@
       state.settings.typingScript=button.dataset.typingScript;save();updateTypingPreview();return;
     }
     if (button.dataset.scopeView) {scopeView=button.dataset.scopeView;renderScope();return;}
-    if (button.dataset.focus) {state.settings.activity="particles";state.settings.scopes.particles=[button.dataset.focus];state.settings.review="all";save();next();$("#questionCard").scrollIntoView({block:"start"});return;}
+    if (button.dataset.focus) {state.settings.activity="particles";state.settings.scopes.particles=[button.dataset.focus];state.settings.review="all";save();advance();return;}
     if (button.id === "openScope") return openScope();
     if (button.id === "closeScope") return $("#scopeDialog").close();
     if (button.id === "closeRule") {rememberGuideScroll();$("#ruleDialog").close();return;}
@@ -340,7 +345,7 @@
     if (action === "rule" || action === "hint") return showRule(action === "hint");
     if (action === "audio") { if (!window.KANA_SPRINT_SPEECH?.speakJapanese(state.settings.activity === "verbs" ? current.answer : E.model(current))) $("#audioNotice").textContent="No Japanese voice available. Choose a voice in Settings & Data."; return; }
     if (action === "next" && Date.now()-renderedAt<500) return;
-    if (action === "next") {next();$("#exercisePrompt")?.focus();return;}
+    if (action === "next") {advance();return;}
     if (action === "check" || action === "unknown") return check(action === "unknown");
     if (answered || !current) return;
     if (button.dataset.word) {const tile=bank.find(x=>x.id === button.dataset.word);if (tile && !selected.some(x=>x.id===tile.id)) selected.push(tile);renderTiles();$("#builtAnswer button:last-child")?.focus();}
@@ -367,7 +372,7 @@
     if ($("dialog[open]") || event.isComposing || event.repeat || !current) return;
     const typing = event.target.matches("input,select,textarea,summary");
     if (event.key === "Enter" && !event.target.matches("button,summary,select,a,textarea")) {
-      event.preventDefault();if(answered){if(Date.now()-renderedAt>=500)next();}else check();return;
+      event.preventDefault();if(answered){if(Date.now()-renderedAt>=500)advance();}else check();return;
     }
     if (typing || event.ctrlKey || event.altKey || event.metaKey || answered || event.repeat) return;
     const n = "1234567890-".indexOf(event.key);
