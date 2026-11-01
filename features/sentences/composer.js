@@ -1,7 +1,7 @@
 (() => {
   "use strict";
   const E=globalThis.SENTENCE_ENGINE,C=globalThis.SENTENCE_COURSE;
-  const aliases={wa:"は",ha:"は",o:"を",wo:"を",e:"へ",he:"へ",ga:"が",ni:"に",de:"で",no:"の",to:"と",mo:"も",ka:"か"};
+  const aliases={wa:"は",ha:"は",o:"を",wo:"を",e:"へ",he:"へ",ga:"が",ni:"に",de:"で",no:"の",to:"と",mo:"も",ka:"か",nimo:"にも",hemo:"へも",demo:"でも"};
   // This is a course-wide spelling dictionary, never the current answer or bank.
   const spellings=new Map();
   for(const word of Object.values(C.words))spellings.set(E.normalize(E.hiraganaPreview(word.romaji)),word.jp);

@@ -109,5 +109,16 @@
         example("|いちじかんぐらい| まちました。","I waited for about one hour."),
         example("としょかんで |いちじかん| ほんを よみました。","I read a book at the library for one hour.")])]}
   ];
+  const extend=(id,entry)=>groups.find(group=>group.id===id).uses.push(entry);
+  extend("ga",use("having-events-understanding","Have, schedule, or understand something","が also marks what you have, an event that takes place, or the language you understand with わかる. Its role depends on the whole pattern, not just an English word.","thing + が + あります / language + が + わかります","Use います when talking about having siblings or friends. With わかる, do not substitute the usual action-object を in these neutral examples.",[
+    example("じてんしゃ|が| あります。","I have a bicycle."),example("テスト|が| あります。","There is a test."),example("にほんご|が| わかります。","I understand Japanese.")]));
+  extend("wo",use("waiting","Say who you wait for","With まつ, put を after the person you wait for. This differs from the person に you meet with あう.","person + を + まちます","‘For’ in English does not automatically require に. The verb selects this pattern.",[
+    example("ともだち|を| まちます。","I wait for a friend."),example("としょかんのまえで せんせい|を| まちました。","I waited for the teacher in front of the library."),example("せんせい|を| いちじかん まちます。","I wait for the teacher for one hour.")]));
+  extend("ni",use("letter-recipient","Say who a letter is for","With かく, に can mark the person you write to. Keep を after the letter itself.","recipient + に + letter + を + かきます","Recipient に and object を can both occur in one sentence.",[
+    example("ともだち|に| てがみを かきます。","I write a letter to a friend."),example("せんせい|に| てがみを かきました。","I wrote a letter to the teacher."),example("ともだち|に| てがみを かきませんでした。","I did not write a letter to a friend.")]));
+  extend("de",use("event-venue","Locate an event","Use で for the venue where a class, test, or other event takes place, even with あります.","venue + で + event + が + あります","Compare としょかんにほんがあります (a book exists there) with としょかんでクラスがあります (a class takes place there).",[
+    example("だいがく|で| テストが あります。","There is a test at university."),example("としょかん|で| クラスが あります。","There is a class at the library."),example("だいがく|で| テストが ありました。","There was a test at university.")]));
+  extend("mo",use("combined-particles","Add another place or destination","Keep に or で before も when adding another destination or activity location. でも is at a place too; にも is to a place too in these movement examples.","activity place + でも / destination + にも・へも","This differs from replacing は, が, or を with も. Keep the context clear so ‘too’ adds the intended place or thing.",[
+    example("としょかん|でも| べんきょうします。","I study at the library too.","You have said you study at home."),example("こうえん|にも| いきます。","I go to the park too.","You have said you go to the supermarket."),example("うちに ねこ|も| います。","There is a cat at home too.","You have said there is a dog at home.")]));
   globalThis.SENTENCE_PARTICLE_GUIDE={groups};
 })();

@@ -19,7 +19,7 @@
   ];
   topics.push(
     { id: "existence", lesson: 4, title: "Say what is there", subtitle: "Place に + thing / person が", rule: "Use に for where something exists and が for what exists. Use あります for things and plants, and います for people and animals. Use で for an activity instead.", examples: [["こうえんに いぬが います。", "There is a dog in the park."], ["つくえのうえに ほんが あります。", "There is a book on the desk."]] },
-    { id: "relative-location", lesson: 4, title: "Locate people and things", subtitle: "Reference noun の + position", rule: "Connect a reference object to a position with の: つくえのした means under the desk. To locate something already being discussed, use topic は + location + です.", examples: [["ねこは つくえのしたです。", "The cat is under the desk."], ["ほんやは ホテルのとなりです。", "The bookstore is next to the hotel."]] },
+    { id: "relative-location", lesson: 4, title: "Locate people and things", subtitle: "Reference noun の + position", rule: "Connect a reference object to a position with の: つくえのした means under the desk. To locate something already being discussed, use topic は + location + です. For an activity at that location, follow the whole position phrase with で: としょかんのまえでまちます.", examples: [["ねこは つくえのしたです。", "The cat is under the desk."], ["ほんやは ホテルのとなりです。", "The bookstore is next to the hotel."]] },
     { id: "past-actions", lesson: 4, title: "Talk about past actions", subtitle: "ました / ませんでした", rule: "Add ました to the polite stem for a past action, or ませんでした for a past negative. きのう and せんしゅう usually need no に. Particles for objects, destinations, and activity places keep their roles.", examples: [["きのう ほんを よみました。", "I read a book yesterday."], ["きのう べんきょうしませんでした。", "I did not study yesterday."]] },
     { id: "past-nouns", lesson: 4, title: "Describe the past", subtitle: "でした / じゃなかったです", rule: "For a past noun sentence, change です to でした. A polite past negative is じゃなかったです. These noun endings differ from verb endings such as ました.", examples: [["きのうは にちようびでした。", "Yesterday was Sunday."], ["せんせいじゃなかったです。", "I was not a teacher."]] },
     { id: "duration", lesson: 4, title: "Say how long", subtitle: "Duration without に · ぐらい", rule: "A duration such as いちじかん (one hour) takes no に here. Add ぐらい for approximately. Compare a clock time such as しちじに (at seven).", examples: [["いちじかん べんきょうしました。", "I studied for one hour."], ["いちじかんぐらい まちました。", "I waited for about one hour."]] },
@@ -339,6 +339,137 @@
     ["past-friend-library-book",["past-actions","possession","action-place","objects"],"I read my friend’s book at the library yesterday.",[phrase("kinou","bareTime"),phrase("toshokan","place"),[word("tomodachi"),p("possession"),word("hon"),p("object")],past("yomu")]],
     ["past-teacher-home-book",["past-actions","possession","action-place","objects"],"I read the teacher’s book at home last week.",[phrase("senshuu","bareTime"),phrase("uchi","place"),[word("sensei"),p("possession"),word("hon"),p("object")],past("yomu")]]
   ].forEach(row=>mix(...row));
+  // Lesson 4 expansion: original prompts, grouped by the distinction being taught.
+  topics.push(
+    {id:"existence-uses",lesson:4,title:"Have things and describe events",subtitle:"Having / scheduled events · がある・いる",rule:"あります can mean have a thing or time, or that an event takes place. います can describe having siblings or friends. Use が for what you have or the event. A physical thing exists at a place に; an event happens at a venue で. Days can take に, while あした and きのう normally do not.",examples:[["じてんしゃが あります。","I have a bicycle."],["だいがくで テストが あります。","There is a test at university."]]},
+    {id:"also-actions",lesson:4,title:"Add ‘too’ to actions",subtitle:"も / にも / でも",rule:"も replaces は, が, or を when adding a person or thing. Keep location or destination particles: としょかんでも means at the library too; としょかんにも means to the library too. Context tells you which person, thing, or place is being added.",examples:[["おちゃも のみます。","I drink tea too."],["としょかんでも べんきょうします。","I study at the library too."]]},
+    {id:"verb-particles",lesson:4,title:"Match particles to the verb",subtitle:"会う に・と / 待つ を / わかる が / 書く に",rule:"Choose the particle with the verb: meet a person に (or と for meeting together), wait for a person を, understand a language が, and write a letter to a person に. English ‘to’, ‘with’, or ‘for’ does not decide the Japanese particle on its own.",examples:[["ともだちを まちます。","I wait for a friend."],["にほんごが わかります。","I understand Japanese."]]},
+    {id:"quantity-frequency",lesson:4,title:"Say how much or how often",subtitle:"たくさん / あまり / ぜんぜん / よく",rule:"たくさん means many or a lot. With an object it can come before the noun or after を. あまり with a negative means not much / not often; ぜんぜん with a negative means not at all. よく can mean often. These adverbs do not need a particle after them in these examples.",examples:[["しゃしんを たくさん とります。","I take many photographs."],["あまり コーヒーを のみません。","I do not drink coffee very often."]]},
+    {id:"question-words",lesson:4,title:"Ask where, when, who, and how long",subtitle:"どこ / いつ / だれ / なんじかん",rule:"Put a question word where the answer would go, keeping the particle for that role: どこで for an activity, どこに for a destination, だれと for a companion. いつ and なんじかん stand without に here. Finish polite questions with か.",examples:[["どこで べんきょうしますか。","Where do you study?"],["なんじかん べんきょうしましたか。","How many hours did you study?"]]}
+  );
+  [
+    ["ashita","あした","ashita","tomorrow"],["getsuyoubi","げつようび","getsuyoubi","Monday"],["mokuyoubi","もくようび","mokuyoubi","Thursday"],
+    ["kurasu","クラス","kurasu","class"],["tesuto","テスト","tesuto","test"],["jikan","じかん","jikan","time"],["jitensha","じてんしゃ","jitensha","bicycle"],
+    ["kyoudai","きょうだい","kyoudai","siblings"],["tegami","てがみ","tegami","letter"],["eigo","えいご","eigo","English"],
+    ["takusan","たくさん","takusan","many / a lot"],["amari","あまり","amari","not much / not often (with a negative)"],["zenzen","ぜんぜん","zenzen","not at all (with a negative)"],["yoku","よく","yoku","often"],
+    ["doko","どこ","doko","where"],["dare","だれ","dare","who"],["itsu","いつ","itsu","when"],
+    ["nijikan","にじかん","nijikan","two hours"],["sanjikan","さんじかん","sanjikan","three hours"],["ichijikanhan","いちじかんはん","ichijikanhan","one and a half hours"],["nanjikan","なんじかん","nanjikan","how many hours"]
+  ].forEach(row=>w(...row));
+  for(const [id,form] of Object.entries({getsuyoubi:"月曜日",mokuyoubi:"木曜日",jikan:"時間",kyoudai:"兄弟",tegami:"手紙",nijikan:"二時間",sanjikan:"三時間",ichijikanhan:"一時間半",nanjikan:"何時間"}))words[id].speechSpellings=[form];
+  words.kyoudai.vocabularyIds=["n5-0249"];words.tegami.vocabularyIds=["n5-0461"];
+  // Number phrases have no complete-word Vocabulary records; strict filters exclude them.
+  for(const id of ["nijikan","sanjikan","ichijikanhan","nanjikan"])words[id].foundation=true;
+  Object.assign(roles,{
+    ownedSubject:{title:"What you have",note:"が marks what you have. Use あります for things or time, and います for siblings or friends.",choices:["が"]},
+    eventSubject:{title:"Scheduled event",note:"が marks the class, test, or other event that takes place. あります can describe a scheduled event, not only an object.",choices:["が"]},
+    eventPlace:{title:"Event venue",note:"で marks the venue where this event takes place. Compare に for where a physical thing exists.",choices:["で"]},
+    alsoObject:{title:"Additional object",note:"も replaces を when adding another thing you read, drink, buy, or watch. Do not use をも here.",choices:["も"]},
+    alsoSubject:{title:"Additional thing that exists",note:"も replaces が when adding another person or thing whose existence you mention.",choices:["も"]},
+    alsoTopic:{title:"Additional person",note:"も replaces は when adding another person who does the same activity.",choices:["も"]},
+    alsoPlace:{title:"Additional activity location",note:"Keep で and add も: でも means at this place too. も alone would lose the activity-location marking.",choices:["でも"]},
+    alsoDestination:{title:"Additional destination",note:"Keep に (or へ) before も: にも / へも means to this place too.",choices:["にも","へも"]},
+    meeting:{title:"Person you meet",note:"With あう, に marks the person you meet; と presents the meeting as a shared action. Both fit this prompt.",choices:["と","に"]},
+    waiting:{title:"Person you wait for",note:"を marks the person you wait for with まつ. Do not choose に just because the person is the target in English.",choices:["を"]},
+    understood:{title:"What you understand",note:"With わかる, が marks the language or thing you understand in this neutral pattern. It is not the object を pattern used with reading or drinking.",choices:["が"]},
+    recipient:{title:"Person you write to",note:"に marks the recipient of the letter with かく. The letter itself takes を.",choices:["に"]},
+    adverb:{title:"Adverb without a particle",note:"たくさん, あまり, ぜんぜん, and よく need no particle after them in these sentences. Keep あまり and ぜんぜん with the negative ending.",choices:[""]},
+    questionTime:{title:"When",note:"いつ asks when. Use it without に in this neutral question, unlike a specific clock time.",choices:[""]},
+    weekTime:{title:"Day of the week",note:"A day of the week can take に or stand alone in this sentence. Relative days such as あした normally stand without に.",choices:["に",""]}
+  });
+  const day=id=>phrase(id,["getsuyoubi","mokuyoubi"].includes(id)?"weekTime":"bareTime");
+  const ad=id=>phrase(id,"adverb");
+  const qend=id=>[...v(id),p("question")];
+  const pqend=id=>[...past(id),p("question")];
+  const evt=(place,event,negative=false)=>[phrase(place,"eventPlace"),phrase(event,"eventSubject"),v("aru",negative)];
+  const pre=id=>[...phrase(id,"topic")];
+  const additions=[
+    ["have-bicycle","existence-uses","I have a bicycle.",[phrase("jitensha","ownedSubject"),v("aru")]],
+    ["have-no-time","existence-uses","I do not have time.",[phrase("jikan","ownedSubject"),v("aru",true)]],
+    ["have-siblings","existence-uses","I have siblings.",[phrase("kyoudai","ownedSubject"),v("iru")]],
+    ["have-no-bicycle","existence-uses","I do not have a bicycle.",[phrase("jitensha","ownedSubject"),v("aru",true)]],
+    ["event-university-test","existence-uses","There is a test at university.",evt("daigaku","tesuto")],
+    ["event-library-class","existence-uses","There is a class at the library.",evt("toshokan","kurasu")],
+    ["event-no-university-class","existence-uses","There is no class at university.",evt("daigaku","kurasu",true)],
+    ["event-no-library-test","existence-uses","There is no test at the library.",evt("toshokan","tesuto",true)],
+    ["also-drink-tea","also-actions","I drink tea too.",[phrase("ocha","alsoObject"),v("nomu")],{context:"You have said that you drink coffee. Add tea as another drink."}],
+    ["also-read-report","also-actions","I read reports too.",[phrase("repooto","alsoObject"),v("yomu")],{context:"You have said that you read books. Add reports as another thing you read."}],
+    ["also-teacher-study","also-actions","The teacher studies too.",[phrase("sensei","alsoTopic"),v("benkyousuru")],{context:"Your friend studies. Add the teacher as another person who studies."}],
+    ["also-friend-go","also-actions","My friend goes to the park too.",[phrase("tomodachi","alsoTopic"),phrase("kouen","destination"),v("iku")],{context:"You go to the park. Say that your friend goes there as well; you are adding a person, not a destination."}],
+    ["also-cat-home","also-actions","There is a cat at home too.",[phrase("uchi","existencePlace"),phrase("neko","alsoSubject"),v("iru")],{context:"You have said there is a dog at home. Add a cat as another animal at home."}],
+    ["also-bag-desk","also-actions","There is a bag on the desk too.",[position("tsukue","ue","existencePlace"),phrase("kaban","alsoSubject"),v("aru")],{context:"You have said there is a book on the desk. Add a bag as another item there."}],
+    ["also-study-library","also-actions","I study at the library too.",[phrase("toshokan","alsoPlace"),v("benkyousuru")],{context:"You have said you study at home. Add the library as another place you study."}],
+    ["also-read-home","also-actions","I read books at home too.",[phrase("uchi","alsoPlace"),phrase("hon","object"),v("yomu")],{context:"You read books at the library. Add home as another place you read them."}],
+    ["also-go-library","also-actions","I go to the library too.",[phrase("toshokan","alsoDestination"),v("iku")],{context:"You go to university. Add the library as another destination."}],
+    ["also-go-park","also-actions","I go to the park too.",[phrase("kouen","alsoDestination"),v("iku")],{context:"You go to the supermarket. Add the park as another destination."}],
+    ["meet-teacher","verb-particles","I meet the teacher.",[phrase("sensei","meeting"),v("au")]],
+    ["meet-friend","verb-particles","I meet a friend.",[phrase("tomodachi","meeting"),v("au")]],
+    ["wait-teacher","verb-particles","I wait for the teacher.",[phrase("sensei","waiting"),v("matsu")]],
+    ["wait-friend","verb-particles","I wait for a friend.",[phrase("tomodachi","waiting"),v("matsu")]],
+    ["understand-japanese","verb-particles","I understand Japanese.",[phrase("nihongo","understood"),v("wakaru")]],
+    ["not-understand-english","verb-particles","I do not understand English.",[phrase("eigo","understood"),v("wakaru",true)]],
+    ["write-friend-letter","verb-particles","I write a letter to a friend.",[phrase("tomodachi","recipient"),phrase("tegami","object"),v("kaku")]],
+    ["write-teacher-letter","verb-particles","I write a letter to the teacher.",[phrase("sensei","recipient"),phrase("tegami","object"),v("kaku")]],
+    ["many-photos","quantity-frequency","I take many photographs.",[phrase("shashin","object"),ad("takusan"),v("toru")]],
+    ["many-books","quantity-frequency","I read many books.",[phrase("hon","object"),ad("takusan"),v("yomu")]],
+    ["many-flowers","quantity-frequency","There are many flowers in the park.",[phrase("kouen","existencePlace"),phrase("hana-flower","subject"),ad("takusan"),v("aru")]],
+    ["not-often-coffee","quantity-frequency","I do not drink coffee very often.",[ad("amari"),phrase("koohii","object"),v("nomu",true)]],
+    ["not-often-tv","quantity-frequency","I do not watch TV very often.",[ad("amari"),phrase("terebi","object"),v("miru",true)]],
+    ["never-music","quantity-frequency","I do not listen to music at all.",[ad("zenzen"),phrase("ongaku","object"),v("kiku",true)]],
+    ["never-study","quantity-frequency","I do not study at all.",[ad("zenzen"),v("benkyousuru",true)]],
+    ["often-park","quantity-frequency","I often go to the park.",[ad("yoku"),phrase("kouen","destination"),v("iku")]],
+    ["often-japanese","quantity-frequency","I often study Japanese.",[ad("yoku"),phrase("nihongo","object"),v("benkyousuru")]],
+    ["not-much-water","quantity-frequency","I do not drink much water.",[ad("amari"),phrase("mizu","object"),v("nomu",true)]],
+    ["where-study","question-words","Where do you study?",[phrase("doko","place"),qend("benkyousuru")]],
+    ["where-go","question-words","Where will you go?",[phrase("doko","destination"),qend("iku")]],
+    ["where-book","question-words","Where is the book?",[pre("hon"),[word("doko"),{text:"です"},p("question")]]],
+    ["when-test","question-words","When is there a test?",[phrase("itsu","questionTime"),phrase("tesuto","eventSubject"),qend("aru")]],
+    ["who-companion-study","question-words","Who do you study with?",[phrase("dare","companion"),qend("benkyousuru")]],
+    ["who-wait","question-words","Who are you waiting for?",[phrase("dare","waiting"),qend("matsu")]],
+    ["hours-study","question-words","How many hours do you study?",[phrase("nanjikan","duration"),qend("benkyousuru")]],
+    ["when-return","question-words","When will you return home?",[phrase("itsu","questionTime"),phrase("uchi","destination"),qend("kaeru")]],
+    ["duration-two-read","duration","I read books for two hours.",[phrase("nijikan","duration"),phrase("hon","object"),v("yomu")]],
+    ["duration-three-study","duration","I studied for three hours.",[phrase("sanjikan","duration"),past("benkyousuru")]],
+    ["duration-half-sleep","duration","I slept for one and a half hours.",[phrase("ichijikanhan","duration"),past("neru")]],
+    ["duration-half-about-study","duration","I study for about one and a half hours.",[[word("ichijikanhan"),word("suffix-gurai"),p("duration")],v("benkyousuru")]]
+  ];
+  for(const [id,topic,meaning,chunks,options={}] of additions){
+    const adjuncts=chunks.slice(0,-1).map((_,i)=>i);
+    // Keep explicit noun topics at the front; other adjuncts may trade places.
+    const orders=adjuncts.length===2&&!chunks[0].some(x=>x.role==="topic")?[[0,1,2],[1,0,2]]:undefined;
+    add(`l4-${id}`,topic,meaning,chunks,{lesson4Expansion:true,...(orders?{orders}:{}),...options});
+  }
+  const loc=(place,positionId,role)=>position(place,positionId,role);
+  const expandedMix=[
+    ["monday-japanese-class",["existence-uses","time"],"There is a class on Monday.",[day("getsuyoubi"),phrase("kurasu","eventSubject"),v("aru")]],
+    ["thursday-no-test",["existence-uses","time"],"There is no test on Thursday.",[day("mokuyoubi"),phrase("tesuto","eventSubject"),v("aru",true)]],
+    ["yesterday-test",["existence-uses","past-actions"],"There was a test yesterday.",[day("kinou"),phrase("tesuto","eventSubject"),past("aru")]],
+    ["last-week-no-class",["existence-uses","past-actions"],"There was no class last week.",[day("senshuu"),phrase("kurasu","eventSubject"),past("aru",true)]],
+    ["library-front-wait",["relative-location","verb-particles"],"I wait for a friend in front of the library.",[loc("toshokan","mae","place"),phrase("tomodachi","waiting"),v("matsu")]],
+    ["park-near-meet",["relative-location","verb-particles"],"I meet the teacher near the park.",[loc("kouen","chikaku","place"),phrase("sensei","meeting"),v("au")]],
+    ["hour-wait-friend",["duration","verb-particles"],"I wait for a friend for one hour.",[phrase("ichijikan","duration"),phrase("tomodachi","waiting"),v("matsu")]],
+    ["two-hours-wait-teacher",["duration","verb-particles"],"I wait for the teacher for two hours.",[phrase("nijikan","duration"),phrase("sensei","waiting"),v("matsu")]],
+    ["past-tea-too",["also-actions","past-actions"],"I drank tea too.",[phrase("ocha","alsoObject"),past("nomu")],{context:"You have said that you drank water. Add tea as another drink you had."}],
+    ["past-report-too",["also-actions","past-actions"],"I read a report too.",[phrase("repooto","alsoObject"),past("yomu")],{context:"You have said that you read a book. Add a report as another thing you read."}],
+    ["also-buy-list",["also-actions","listing-nouns"],"I buy books and umbrellas too.",[[word("hon"),p("list"),word("kasa"),p("alsoObject")],v("kau")],{context:"You buy bags. Add books and umbrellas as other things you buy."}],
+    ["also-drink-list",["also-actions","listing-nouns"],"I drink water and tea too.",[[word("mizu"),p("list"),word("ocha"),p("alsoObject")],v("nomu")],{context:"You drink coffee. Add water and tea as other drinks you have."}],
+    ["past-many-photos",["quantity-frequency","past-actions"],"I took many photographs yesterday.",[day("kinou"),phrase("shashin","object"),ad("takusan"),past("toru")]],
+    ["past-not-much-study",["quantity-frequency","past-actions"],"I did not study much last week.",[day("senshuu"),ad("amari"),past("benkyousuru",true)]],
+    ["past-where-photos",["question-words","past-actions"],"Where did you take photographs?",[phrase("doko","place"),phrase("shashin","object"),pqend("toru")]],
+    ["past-who-study",["question-words","past-actions"],"Who did you study with?",[phrase("dare","companion"),pqend("benkyousuru")]],
+    ["often-two-hours-read",["duration","quantity-frequency"],"I often read books for two hours.",[ad("yoku"),phrase("nijikan","duration"),phrase("hon","object"),v("yomu")]],
+    ["often-hour-study",["duration","quantity-frequency"],"I often study for about one hour.",[ad("yoku"),[word("ichijikan"),word("suffix-gurai"),p("duration")],v("benkyousuru")]],
+    ["hour-library-front-wait",["duration","relative-location","verb-particles"],"I wait for a friend in front of the library for one hour.",[loc("toshokan","mae","place"),phrase("tomodachi","waiting"),phrase("ichijikan","duration"),v("matsu")]],
+    ["two-hours-park-near-wait",["duration","relative-location","verb-particles"],"I wait for the teacher near the park for two hours.",[loc("kouen","chikaku","place"),phrase("sensei","waiting"),phrase("nijikan","duration"),v("matsu")]],
+    ["past-many-photos-friend",["quantity-frequency","past-actions","companion"],"I took many photographs with a friend yesterday.",[day("kinou"),phrase("tomodachi","companion"),phrase("shashin","object"),ad("takusan"),past("toru")]],
+    ["past-no-study-friend",["quantity-frequency","past-actions","companion"],"I did not study with a friend at all last week.",[day("senshuu"),phrase("tomodachi","companion"),ad("zenzen"),past("benkyousuru",true)]],
+    ["past-library-too-study",["also-actions","past-actions","action-place"],"I studied at the library too.",[phrase("toshokan","alsoPlace"),past("benkyousuru")],{context:"You studied at home. Add the library as another place you studied."}],
+    ["past-park-too-photos",["also-actions","past-actions","action-place"],"I studied in the park too.",[phrase("kouen","alsoPlace"),past("benkyousuru")],{context:"You studied at university. Add the park as another place you studied."}],
+    ["past-hour-library-front-wait",["duration","relative-location","verb-particles","past-actions"],"Yesterday, I waited for a friend in front of the library for one hour.",[day("kinou"),loc("toshokan","mae","place"),phrase("tomodachi","waiting"),phrase("ichijikan","duration"),past("matsu")]],
+    ["past-two-hours-park-near-wait",["duration","relative-location","verb-particles","past-actions"],"Last week, I waited for the teacher near the park for two hours.",[day("senshuu"),loc("kouen","chikaku","place"),phrase("sensei","waiting"),phrase("nijikan","duration"),past("matsu")]],
+    ["past-friend-japanese-book",["past-nouns","possession"],"It was my friend's Japanese-language book.",[[word("tomodachi"),p("possession"),word("nihongo"),p("possession"),word("hon")],ending("でした")]],
+    ["past-not-teacher-report",["past-nouns","possession"],"It was not the teacher's report.",[[word("sensei"),p("possession"),word("repooto")],ending("じゃなかったです")]]
+  ];
+  for(const row of expandedMix){mix(...row);mixedSentences.at(-1).lesson4Expansion=true;}
   // These alternatives preserve the prompt's meaning. Keep them explicit rather
   // than accepting arbitrary particles, omissions, or word permutations.
   roles.relativeTime = { title: "Time expression", note: "Relative or repeated time can stand alone, or take は to make it the topic. It does not take に here.", choices: ["", "は"] };
@@ -349,10 +480,11 @@
       if (sentence.chunks[0]?.[0]?.wordId === "watashi" && sentence.chunks[0]?.[1]?.role === "topic") sentence.optionalTopic = "omit";
       else if (!sentence.chunks.flat().some(piece => piece.wordId === "watashi")) sentence.optionalTopic = "add";
     }
+    if(sentence.lesson4Expansion && !sentence.context && sentence.chunks.flat().some(p=>p.role==="eventSubject"))sentence.context="Talk about a scheduled class or test.";
     sentence.chunks = sentence.chunks.map(chunk => chunk.map(piece => piece.role === "bareTime" ? {...piece,role:"relativeTime"} : piece));
     if (sentence.id === "time-sunday") sentence.chunks[0][1].role = "weekday";
     if (sentence.id === "past-meet") sentence.chunks[1][1].role = "meeting";
-    if (!sentence.requiredTopics && sentence.chunks.some(chunk => chunk.some(piece => piece.role === "existencePlace"))) sentence.orders = [[0,1,2],[1,0,2]];
+    if (!sentence.requiredTopics && sentence.chunks.length===3 && sentence.chunks.some(chunk => chunk.some(piece => piece.role === "existencePlace"))) sentence.orders = [[0,1,2],[1,0,2]];
     if (sentence.chunks.some(chunk=>chunk.some(piece=>piece.role==="list"))) {
       const alternate = sentence.chunks.map(chunk => chunk.map(piece => ({...piece})));
       const list = alternate.find(chunk => chunk.some(piece => piece.role === "list"));
@@ -360,6 +492,16 @@
       [list[index-1],list[index+1]] = [list[index+1],list[index-1]];
       sentence.alternatives = [alternate];
     }
+  }
+  // Keep たくさん next to its intended noun or the verb, so it cannot
+  // accidentally describe a different noun (e.g. many friends vs many photos).
+  for(const sentence of [...sentences,...mixedSentences].filter(s=>s.lesson4Expansion)){
+    const quantity=sentence.chunks.findIndex(c=>c.some(p=>p.wordId==="takusan"));
+    if(quantity<0)continue;
+    const target=sentence.chunks.findIndex(c=>c.some(p=>["object","subject"].includes(p.role)));
+    const last=sentence.chunks.length-1,base=sentence.chunks.map((_,i)=>i);
+    const before=base.filter(i=>i!==quantity);before.splice(before.indexOf(target),0,quantity);
+    sentence.orders=[...new Map([...(sentence.orders||[base]),before].filter(order=>[target,last].includes(order[order.indexOf(quantity)+1])).map(order=>[order.join(","),order])).values()];
   }
   // Reviewed difficulty describes grammar combinations, independently of lesson,
   // vocabulary familiarity, support mode, and answer format.
@@ -371,6 +513,7 @@
     sentence.difficultyReason=sentence.difficulty==="challenge" ? "Combines familiar patterns or several particle roles." : "Centres on one main sentence pattern.";
   }
   const wordGroups = [
+    ["getsuyoubi","mokuyoubi","nichiyoubi"], ["kurasu","tesuto"], ["nihongo","eigo"], ["nijikan","sanjikan","ichijikanhan","ichijikan"],
     ["inu","neko","kodomo"], ["isu","tsukue","hon","kaban"], ["kouen","suupaa","hoteru","honya","otera","byouin"],
     ["ue","shita","naka","mae","ushiro","tonari","chikaku","migi","hidari","aida"], ["kinou","senshuu","kyou","mainichi"],
     ["aru","iru"], ["kau","kaku","toru","matsu","au"],

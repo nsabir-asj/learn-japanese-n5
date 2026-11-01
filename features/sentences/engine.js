@@ -34,10 +34,14 @@
     return new Set(answerForms(exercise).flatMap(formAnswers));
   }
   function particleAnswer(value, role) {
-    const aliases = { wa:"は", ha:"は", ga:"が", o:"を", wo:"を", ni:"に", e:"へ", he:"へ", de:"で", no:"の", to:"と", mo:"も", ka:"か", none:"", "なし":"", "—":"", "-":"" };
-    const raw = String(value).normalize("NFKC").trim().toLowerCase();
+    const aliases = { wa:"は", ha:"は", ga:"が", o:"を", wo:"を", ni:"に", e:"へ", he:"へ", de:"で", no:"の", to:"と", mo:"も", ka:"か", nimo:"にも", hemo:"へも", demo:"でも", none:"", "なし":"", "—":"", "-":"" };
+    const raw = String(value).normalize("NFKC").trim().toLowerCase().replace(/\s+/g,"");
     const answer = Object.hasOwn(aliases,raw) ? aliases[raw] : raw;
     return { answer, correct: C.roles[role].choices.includes(answer) };
+  }
+  function particleChoices(exercise) {
+    const combined=requirements(exercise).includes("also-actions") || slots(exercise).some(slot=>slot.choices.some(x=>x.length>1));
+    return ["は","が","を","に","へ","で","の","と","も","か","—",...(combined?["にも","へも","でも"]:[])];
   }
   function unexpectedWords(exercise, tokens) {
     const allowed = new Set();
@@ -50,14 +54,16 @@
   function diagnose(exercise, tokens) {
     // Match each marker to its own preceding word, even when phrases are reordered.
     const texts = tokens.map(x => typeof x === "string" ? x : x.text);
-    const markers = new Set(["は","が","を","に","へ","で","の","と","も","か"]);
+    const markers = new Set(["は","が","を","に","へ","で","の","と","も","か","にも","へも","でも"]);
     const response = normalize(texts.join(""));
     const forms = answerForms(exercise);
     const matching = forms.find(form => formAnswers(form).includes(response));
     const diagnoseForm = form => slots(form).map(slot => {
-      const at = texts.indexOf(slot.anchor);
+      const at = slot.role==="question" ? texts.length-2 : texts.indexOf(slot.anchor);
       const next = at >= 0 ? texts[at + 1] : undefined;
-      const answer = markers.has(next) ? next : "";
+      let end=at+1;
+      while(at>=0 && markers.has(texts[end]))end++;
+      const answer=at>=0 ? texts.slice(at+1,end).join("") : "";
       return { ...slot, answer, correct: at >= 0 && slot.choices.includes(answer) };
     });
     if (matching) return diagnoseForm(matching);
@@ -174,7 +180,7 @@
   const requirements = exercise => exercise.requiredTopics || [exercise.topic];
   const lessonIds = exercise => [...new Set(requirements(exercise).map(id=>C.topics.find(t=>t.id===id).lesson))].sort((a,b)=>a-b);
   function roleTopic(exercise,role) {
-    const candidates={possession:["possession","relative-location"],question:["questions"],also:["also"],object:["objects"],destination:["destination"],place:["action-place"],time:["time"],relativeTime:["time","past-actions"],existencePlace:["existence"],subject:["existence"],list:["listing-nouns"],duration:["duration"],companion:["companion"],topic:["pointing","identity","past-nouns"]};
+    const candidates={ownedSubject:["existence-uses"],eventSubject:["existence-uses","question-words"],eventPlace:["existence-uses"],alsoObject:["also-actions"],alsoSubject:["also-actions"],alsoPlace:["also-actions"],alsoDestination:["also-actions"],alsoTopic:["also-actions"],meeting:["verb-particles"],waiting:["verb-particles"],understood:["verb-particles"],recipient:["verb-particles"],adverb:["quantity-frequency"],questionTime:["question-words"],weekTime:["time","existence-uses"],possession:["possession","relative-location"],question:["questions"],also:["also"],object:["objects"],destination:["destination"],place:["action-place"],time:["time"],relativeTime:["time","past-actions"],existencePlace:["existence"],subject:["existence"],list:["listing-nouns"],duration:["duration"],companion:["companion"],topic:["pointing","identity","past-nouns"]};
     return exercise.requiredTopics ? candidates[role]?.find(id=>requirements(exercise).includes(id)) || exercise.topic : exercise.topic;
   }
   function recordKey(exercise, settings) { return `${settings.activity}:${settings.activity === "build" ? (settings.support==="independent" && ["typing","voice"].includes(settings.buildInput) ? settings.buildInput : settings.support) : settings.input}:${exercise.id}`; }
@@ -344,5 +350,5 @@
   }
   const playbackKey = activity => ({build:"autoAudio",verbs:"autoVerbAudio",particles:"autoParticleAudio"}[activity]);
   const playbackEnabled = settings => settings[playbackKey(settings.activity)] === true;
-  globalThis.SENTENCE_ENGINE = { normalize, shuffle, pieces, slots, model, acceptedSentences, particleAnswer, diagnose, unexpectedWords, tileBank, hiraganaPreview, particlePreview, verbs, wordIds, familiar, pool, recordKey, choose, record, verbChoiceCount, verbChoices, verbChoiceInfo, playbackKey, playbackEnabled, recordParticleEvidence, particlePriority, seedParticleEvidence, sentenceExamples, requirements, lessonIds, roleTopic };
+  globalThis.SENTENCE_ENGINE = { normalize, shuffle, pieces, slots, model, acceptedSentences, particleAnswer, diagnose, unexpectedWords, tileBank, hiraganaPreview, particlePreview, verbs, wordIds, familiar, pool, recordKey, choose, record, verbChoiceCount, verbChoices, verbChoiceInfo, playbackKey, playbackEnabled, recordParticleEvidence, particlePriority, seedParticleEvidence, sentenceExamples, requirements, lessonIds, roleTopic, particleChoices };
 })();

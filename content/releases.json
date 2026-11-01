@@ -896,6 +896,18 @@
       "publishedAt": "2026-11-01",
       "title": "Try voice input for sentence building",
       "changes": [{"pages": ["guided"], "text": "Type view now offers an optional Speak button marked Beta. Review and edit the Japanese transcript before adding it to your sentence, then check when ready. Voice input keeps separate recall records, does not count as help, and supports familiar kanji spellings. Typing and tiles remain available when voice recognition is unavailable."}]
+    },
+    {
+      "id": "2026-11-01.13",
+      "publishedAt": "2026-11-01",
+      "title": "Update notices match your practice page",
+      "changes": [{"pages": ["all"], "text": "Update notifications and changelogs now follow the page’s colors, including teal buttons and accents on Sentence Practice, with matching borders, badges, and keyboard focus."}]
+    },
+    {
+      "id": "2026-11-01.14",
+      "publishedAt": "2026-11-01",
+      "title": "More ways to practise Lesson 4",
+      "changes": [{"pages": ["guided"], "text": "Explore five new Lesson 4 topics: having things and scheduled events, adding ‘too’ to actions, verb-specific particles, quantity and frequency, and question words. New sentence combinations and varied durations build on earlier lessons. Practise にも and でも with matching explanations and partial feedback; vocabulary and topic filters still apply. Voice input no longer reports a stopped recording when checking a typed answer without using the microphone."}]
     }
   ]
 }

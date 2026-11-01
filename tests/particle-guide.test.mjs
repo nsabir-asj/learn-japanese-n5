@@ -21,7 +21,7 @@ test('beginner reference covers every practice particle and no-particle uses wit
         assert.equal(example.jp.split('|').length%2,1,'highlight delimiters must be balanced');
         const highlights=example.jp.split('|').filter((_,i)=>i%2);
         assert.ok(highlights.length&&highlights.every(x=>x.length>0));
-        if(group.id!=='none')assert.ok(highlights.every(x=>x===group.particle),`${group.id}/${use.id}`);
+        if(group.id!=='none')assert.ok(highlights.every(x=>group.id==='mo'&&use.id==='combined-particles'?['も','にも','でも'].includes(x):x===group.particle),`${group.id}/${use.id}`);
         assert.ok(example.jp.endsWith('。')&&example.meaning);
         const key=example.jp.replaceAll('|','');
         assert.ok(!sentences.has(example.jp),`vary examples with the same teaching focus: ${key}`);sentences.add(example.jp);
@@ -29,7 +29,7 @@ test('beginner reference covers every practice particle and no-particle uses wit
       }
     }
   }
-  assert.equal(uses,23);assert.equal(examples,69);
+  assert.equal(uses,28);assert.equal(examples,84);
   const additions=G.groups.find(x=>x.id==='mo').uses.flatMap(x=>x.examples);
   assert.ok(additions.every(x=>x.context),'also needs an explicit situation');
   assert.ok(G.groups.find(x=>x.id==='ga').uses.find(x=>x.id==='identify').examples.every(x=>x.context),'subject identification needs context');
@@ -52,9 +52,9 @@ test('reference renders one semantic three-column table with translated examples
   const html=H.guideMarkup();
   assert.equal((html.match(/<table /g)||[]).length,1);
   assert.equal((html.match(/scope="col"/g)||[]).length,3);
-  assert.equal((html.match(/scope="row"/g)||[]).length,23);
-  assert.equal((html.match(/class="sp-guide-example"/g)||[]).length,69);
-  assert.equal((html.match(/class="sp-guide-meaning"/g)||[]).length,69);
+  assert.equal((html.match(/scope="row"/g)||[]).length,28);
+  assert.equal((html.match(/class="sp-guide-example"/g)||[]).length,84);
+  assert.equal((html.match(/class="sp-guide-meaning"/g)||[]).length,84);
   for(const group of G.groups){assert.ok(html.includes(`data-guide-jump="${group.id}"`));assert.ok(html.includes(`id="guide-${group.id}"`));}
   assert.ok(!html.includes('|'),'authoring delimiters must never be visible');
   assert.match(html,/lang="ja"/);assert.match(html,/<caption/);

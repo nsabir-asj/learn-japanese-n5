@@ -4,7 +4,7 @@
   const PACES={gradual:{successes:4,examples:3,active:1,combine:1},balanced:{successes:3,examples:2,active:2,combine:2},brisk:{successes:2,examples:2,active:2,combine:2}};
   const enabled=s=>Boolean(PACES[s.learningPace]) && ["build","particles"].includes(s.activity) && s.review!=="trouble";
   const roles=exercise=>[...new Set(E.slots(exercise).map(slot=>slot.role))];
-  const primaryRoles={identity:["topic"],possession:["possession"],questions:["question"],pointing:["topic"],also:["also"],objects:["object"],destination:["destination"],"action-place":["place"],time:["time","relativeTime"],companion:["companion"],negative:["object"],existence:["existencePlace","subject"],"relative-location":["possession","topic"],"past-actions":["object"],"past-nouns":["topic"],duration:["duration"],"listing-nouns":["list"]};
+  const primaryRoles={"existence-uses":["ownedSubject","eventSubject","eventPlace"],"also-actions":["alsoTopic","alsoObject","alsoSubject","alsoPlace","alsoDestination"],"verb-particles":["meeting","waiting","understood","recipient"],"quantity-frequency":["adverb"],"question-words":["question"],identity:["topic"],possession:["possession"],questions:["question"],pointing:["topic"],also:["also"],objects:["object"],destination:["destination"],"action-place":["place"],time:["time","relativeTime"],companion:["companion"],negative:["object"],existence:["existencePlace","subject"],"relative-location":["possession","topic"],"past-actions":["object"],"past-nouns":["topic"],duration:["duration"],"listing-nouns":["list"]};
   const isMixed=exercise=>exercise.difficulty==="challenge";
   const combinationKey=exercise=>[...E.requirements(exercise)].sort().join("+");
   function readiness(observations, pace="balanced", availableExamples=Infinity) {

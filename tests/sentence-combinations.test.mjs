@@ -10,7 +10,7 @@ const mixed=Array.from(C.mixedSentences),plain=x=>JSON.parse(JSON.stringify(x));
 
 test('mixed content has unique models, explicit valid requirements, and checked level metadata',()=>{
   assert.ok(mixed.length>=60);
-  assert.equal(C.sentences.length,160,'preserve the original collection and its IDs');
+  assert.equal(C.sentences.filter(s=>!s.lesson4Expansion).length,160,'preserve the original collection and its IDs');
   const ids=new Set(),models=new Set();
   for(const exercise of E.sentenceExamples){
     assert.ok(!ids.has(exercise.id),exercise.id);ids.add(exercise.id);
@@ -48,11 +48,11 @@ test('every topic subset of each combination uses all-of selection; deselection 
 });
 
 test('mixed grammar requirements cover all tested particle roles and past or negative endings',()=>{
-  const topicForRole={possession:['possession','relative-location'],question:['questions'],also:['also'],object:['objects'],destination:['destination'],place:['action-place'],time:['time'],existencePlace:['existence'],subject:['existence'],list:['listing-nouns'],duration:['duration'],companion:['companion']};
+  const topicForRole={possession:['possession','relative-location'],question:['questions','question-words'],also:['also'],object:['objects','question-words','verb-particles','quantity-frequency'],destination:['destination','question-words','quantity-frequency'],place:['action-place','relative-location','question-words'],time:['time'],existencePlace:['existence','quantity-frequency','also-actions'],subject:['existence','quantity-frequency'],list:['listing-nouns'],duration:['duration','question-words'],companion:['companion','question-words']};
   for(const ex of mixed){
     for(const slot of E.slots(ex))if(topicForRole[slot.role])assert.ok(topicForRole[slot.role].some(id=>ex.requiredTopics.includes(id)),`${ex.id}: ${slot.role}`);
     for(const piece of E.pieces(ex)){
-      if(/ません|ました/.test(piece.text))assert.ok(ex.requiredTopics.includes(/でした|ました/.test(piece.text)?'past-actions':'negative'),`${ex.id}: ${piece.text}`);
+      if(/ません|ました/.test(piece.text))assert.ok((/でした|ました/.test(piece.text) ? ex.requiredTopics.includes('past-actions') : ['negative','existence-uses','quantity-frequency'].some(id=>ex.requiredTopics.includes(id))),`${ex.id}: ${piece.text}`);
       if(/でした|じゃなかったです/.test(piece.text)&&!piece.wordId)assert.ok(ex.requiredTopics.includes('past-nouns'),ex.id);
       if(['kore','sore','are','kono'].includes(piece.wordId))assert.ok(ex.requiredTopics.includes('pointing'),ex.id);
     }

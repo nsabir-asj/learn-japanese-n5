@@ -38,3 +38,9 @@ test('speech requires review and explicit add, preserves edited drafts on errors
 test('unsupported browsers retain the typing fallback without starting recording',()=>{
   const {node}=setup(false);assert.equal(node('sentenceMic').disabled,true);assert.match(node('sentenceVoiceStatus').textContent,/unavailable/);
 });
+
+test('cancelling an idle voice control does not claim a recording was stopped',()=>{
+  const {c,node}=setup();const original=node('sentenceVoiceStatus').textContent;
+  c.SENTENCE_VOICE.cancel();assert.equal(node('sentenceVoiceStatus').textContent,original);
+  node('sentenceMic').events.click();c.SENTENCE_VOICE.cancel();assert.match(node('sentenceVoiceStatus').textContent,/Recording stopped/);
+});

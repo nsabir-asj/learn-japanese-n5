@@ -32,7 +32,7 @@
     mic.disabled=!Recognition;
     status.textContent=Recognition ? "Speak Japanese, review the draft, then check your answer. Your browser’s speech service may process the audio." : "Voice input is unavailable in this browser. You can still type or use tiles.";
     let busy=false,local=null;
-    stopUI=()=>{busy=false;mic.setAttribute('aria-pressed','false');q('sentenceMicLabel').textContent='Speak';mic.disabled=!Recognition;draft.disabled=false;q("sentenceVoiceAdd").disabled=false;if(!isAnswered())status.textContent='Recording stopped. Your draft is kept.';};
+    stopUI=()=>{const wasBusy=busy;busy=false;mic.setAttribute('aria-pressed','false');q('sentenceMicLabel').textContent='Speak';mic.disabled=!Recognition;draft.disabled=false;q("sentenceVoiceAdd").disabled=false;if(wasBusy&&!isAnswered())status.textContent='Recording stopped. Your draft is kept.';};
     mic.addEventListener('click',()=>{
       if(isAnswered())return;
       if(busy){local?.stop();return;}

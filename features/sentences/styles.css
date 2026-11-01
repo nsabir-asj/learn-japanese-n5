@@ -1,5 +1,5 @@
 /* Sentence practice shares the trainer palette, with a quiet teal accent. */
-body[data-activity="sentences"] { --sp-accent:#8ee0cf; --sp-accent-bg:rgba(86,190,166,.11); }
+body[data-activity="sentences"] { --sp-accent:#8ee0cf; --sp-accent-bg:rgba(86,190,166,.11); --app-update-surface:#141d25; --app-update-border:#4b6067; --app-update-button-text:#102c27; --app-update-backdrop:#070d14c9; }
 #sentencePractice { margin-top:24px; }
 #sentencePractice button, .sp-dialog button { font:inherit; }
 #sentencePractice button:focus-visible, .sp-dialog button:focus-visible, #sentencePractice input:focus-visible, .sp-dialog input:focus-visible, #sentencePractice select:focus-visible, #sentencePractice summary:focus-visible { outline:2px solid var(--sp-accent,#8ee0cf); outline-offset:4px; }
