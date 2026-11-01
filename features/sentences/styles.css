@@ -153,3 +153,63 @@ body[data-activity="sentences"] .activity-stat>span { min-height:2.6em;line-heig
 
 .sp-progression-note { color:#aec9ba;border-left:2px solid #59796b;padding:5px 12px;font-size:.76rem;line-height:1.6;margin:0 0 18px; }
 .sp-mixed-concepts { color:#aec9ba;font-size:.76rem;line-height:1.6;margin:12px 0 20px;overflow-wrap:anywhere; }
+
+/* One help surface: a question hint before submission, a full reference after. */
+.sp-particle-help { min-width:156px; }
+#ruleDialog [hidden] { display:none!important; }
+.sp-help-dialog { width:min(1120px,calc(100% - 40px));height:min(820px,calc(100dvh - 48px));overflow:hidden; }
+.sp-help-dialog .sp-dialog-shell { height:100%;max-height:100%;min-height:0; }
+#ruleDialog header>div { min-width:0;flex:1; }
+.sp-help-dialog .sp-rule-body { flex:1;min-height:0;padding-top:20px; }
+.sp-help-dialog .sp-rule-body>h3 { margin:0 0 12px;font-size:1rem;color:#d7f1e6; }
+.sp-help-dialog .sp-rule-body>h3:not(:first-child) { margin-top:28px; }
+.sp-help-tabs { display:flex;gap:6px;padding:0 24px 14px;border-bottom:1px solid #354b47;flex:none; }
+.sp-help-tabs button { background:transparent;color:#a9bfb6;border:1px solid transparent;border-radius:8px;padding:10px 16px;font:inherit;font-size:.83rem;font-weight:600;cursor:pointer; }
+.sp-help-tabs button[aria-selected="true"] { color:#d4f8e9;background:#264337;border-color:#567d6c; }
+.sp-help-tabs button:focus-visible,.sp-guide-index button:focus-visible,.sp-guide-scroll:focus-visible { outline:2px solid #9ddfcd;outline-offset:2px; }
+.sp-guide-panel { display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden; }
+.sp-guide-index { display:flex;gap:7px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid #354b47;flex:none;background:#15241f; }
+.sp-guide-index button { display:grid;place-items:center;min-width:42px;min-height:40px;border:1px solid #436154;border-radius:8px;background:#1d3029;color:#bfe9d7;font:inherit;font-size:1.04rem;cursor:pointer; }
+.sp-guide-index button:hover { background:#2c493a;border-color:#9ddfcd; }
+.sp-guide-scroll { overflow:auto;overscroll-behavior:contain;flex:1;min-height:0;padding:0 24px 24px;scrollbar-gutter:stable; }
+.sp-guide-intro { color:#adc1b7;font-size:.8rem;line-height:1.7;margin:18px 0; }
+.sp-guide-table { width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;font-size:.85rem;line-height:1.75; }
+.sp-guide-particle-col { width:92px; }.sp-guide-rule-col { width:46%; }
+.sp-guide-table thead { position:sticky;top:0;z-index:1; }
+.sp-guide-table thead th { background:#20362d;color:#c6e4d5;border-block:1px solid #4a6b5b;font-size:.75rem;font-weight:650;padding:13px 16px;text-align:left; }
+.sp-guide-table thead th:first-child { border-radius:8px 0 0 0; }.sp-guide-table thead th:last-child { border-radius:0 8px 0 0; }
+.sp-guide-table tbody { scroll-margin-top:52px; }
+.sp-guide-table td,.sp-guide-table tbody th { vertical-align:top;text-align:left;padding:24px 16px;border-bottom:1px solid #35483e;background:#15221c;overflow-wrap:anywhere; }
+.sp-guide-table tbody:nth-of-type(even) td,.sp-guide-table tbody:nth-of-type(even) th { background:#192720; }
+.sp-guide-table .sp-guide-group-start>td,.sp-guide-table .sp-guide-group-start>th { border-top:9px solid #141d25; }
+.sp-guide-symbol { display:block;color:#a8e9cd;font-size:1.65rem;font-weight:650;line-height:1.4; }
+.sp-guide-reading { display:block;color:#9db7a8;font-size:.73rem;font-weight:400;margin-top:5px; }
+.sp-guide-table h3 { color:#e0f2e7;font-size:.94rem;line-height:1.55;margin:0 0 9px; }
+.sp-guide-table td>p { margin:0 0 14px;color:#c4d3c9; }
+.sp-guide-table .sp-guide-pattern { border-left:2px solid #66947b;padding:7px 10px;background:#24392c;color:#d1eadb;font-size:.8rem;line-height:1.7; }
+.sp-guide-pattern>span { display:block;text-transform:uppercase;letter-spacing:.08em;font-size:.63rem;color:#9fc2ac;margin-bottom:4px; }
+.sp-guide-table .sp-guide-note { color:#a4bcae;font-size:.78rem;margin-bottom:0; }
+.sp-guide-example+.sp-guide-example { margin-top:18px;padding-top:16px;border-top:1px solid #34473c; }
+.sp-guide-example p { margin:0; }.sp-guide-example p[lang="ja"] { color:#edf6f0;font-size:1.02rem;line-height:1.9; }
+.sp-guide-example mark { background:#36553e;color:#d4ffdf;border-radius:4px;padding:1px 4px;margin:0 1px; }
+.sp-guide-example .sp-guide-meaning { color:#b9cbbf;font-size:.79rem;line-height:1.6;margin-top:6px; }
+.sp-guide-context { display:block;color:#a5c0b0;font-size:.72rem;line-height:1.6;margin-bottom:7px; }
+.sp-guide-references { font-size:.73rem;line-height:1.8;color:#95ae9f;margin:22px 0 0; }.sp-guide-references a { color:#b0dfc8;text-decoration:underline;text-underline-offset:3px; }
+.sp-sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+@media(max-width:700px) {
+  .sp-help-dialog { width:100%;max-width:100%;height:100dvh;max-height:100dvh;margin:0;border:0;border-radius:0; }
+  .sp-help-dialog .sp-dialog-shell { max-height:100dvh; }.sp-help-dialog header { padding:18px 16px 14px; }.sp-help-dialog header h2 { font-size:1.2rem; }
+  .sp-help-tabs { padding:0 16px 12px; }.sp-help-tabs button { flex:1;padding:10px 8px;font-size:.8rem; }
+  .sp-guide-index { padding:12px 16px;gap:6px; }.sp-guide-index button { min-width:40px;min-height:40px; }
+  .sp-guide-scroll { padding:0 16px 20px;scrollbar-gutter:auto; }.sp-guide-intro { font-size:.75rem; }
+  .sp-guide-table,.sp-guide-table tbody { display:block; }.sp-guide-table colgroup { display:none; }
+  .sp-guide-table thead { position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0); }
+  .sp-guide-table tr { display:grid;grid-template-columns:48px minmax(0,1fr);border-bottom:1px solid #35483e;background:#15221c; }
+  .sp-guide-table tbody:nth-of-type(even) tr { background:#192720; }
+  .sp-guide-table tbody th { grid-column:1;grid-row:1/span 2;padding:20px 5px 20px 10px; }
+  .sp-guide-table td { grid-column:2;padding:20px 12px; }
+  .sp-guide-table td:last-child { padding-top:0; }
+  .sp-guide-table tbody th,.sp-guide-table tbody td { background:transparent!important;border:0!important; }
+  .sp-guide-table .sp-guide-group-start { border-top:8px solid #141d25; }.sp-guide-table tbody { scroll-margin-top:0; }
+  .sp-guide-symbol { font-size:1.4rem; }.sp-guide-reading { font-size:.65rem; }.sp-guide-table h3 { font-size:.88rem; }
+}

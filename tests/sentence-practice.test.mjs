@@ -140,7 +140,7 @@ test('all activities start unaided without automatic rule or vocabulary introduc
 test('opening a hint before answering marks assistance, while post-answer explanations do not',()=>{
   const source=readFileSync(new URL('../features/sentences/practice.js',import.meta.url),'utf8');
   const body=source.match(/function showRule\(hint = false\) \{([\s\S]*?)\n  \}/)[1];
-  const harness=vm.createContext({current:{topic:'new'},E:{requirements:ex=>ex.requiredTopics||[ex.topic]},answered:false,teaching:false,assisted:false,assistanceReason:'',C:{topics:[{id:'new',title:'Rule'}]},ruleMarkup:()=>'',wordGlossary:()=>'',esc:x=>x,$:()=>({showModal(){}})});
+  const harness=vm.createContext({current:{topic:'new'},state:{settings:{activity:'build'}},SENTENCE_HELP:{presentation:(_,done)=>({guide:true,hint:!done,tabs:!done,initial:done?'guide':'hint'})},switchHelpTab(){},E:{requirements:ex=>ex.requiredTopics||[ex.topic]},answered:false,teaching:false,assisted:false,assistanceReason:'',C:{topics:[{id:'new',title:'Rule'}]},ruleMarkup:()=>'',wordGlossary:()=>'',esc:x=>x,$:()=>({showModal(){},setAttribute(){},classList:{toggle(){}}})});
   vm.runInContext(`function showRule(hint=false){${body}};showRule(true)`,harness);
   assert.equal(harness.assisted,true);
   assert.equal(harness.assistanceReason,'hint');

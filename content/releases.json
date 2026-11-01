@@ -836,6 +836,12 @@
       "publishedAt": "2026-11-01",
       "title": "Combine topics across lessons",
       "changes": [{"pages": ["guided"], "text": "Sentence building and particle practice include 64 additional checked sentences combining selected topics, including across lessons. Auto introduces two-topic combinations before longer ones as your skills develop; Challenge offers direct practice. Every required topic must be selected, vocabulary filters still apply, and hints explain all the patterns in each mixed sentence."}]
+    },
+    {
+      "id": "2026-11-01.3",
+      "publishedAt": "2026-11-01",
+      "title": "A particle reference beside your practice",
+      "changes": [{"pages": ["guided"], "text": "Hint & guide opens a question hint and a beginner particle reference with 23 uses and 69 translated examples. After answering, the button opens only the particle guide. Jump between particles, compare common uses, and reopen the table at your previous position. Help before submission counts as support; browsing after answering leaves the result unchanged."}]
     }
   ]
 }
