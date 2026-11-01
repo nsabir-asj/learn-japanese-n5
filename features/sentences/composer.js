@@ -17,5 +17,6 @@
     const pending=flush||/\s$/u.test(value)?"":parts.pop()||"";
     return {tokens:parts.map(convert),pending};
   }
-  globalThis.SENTENCE_COMPOSER={convert,split};
+  const attemptSettings=(settings,usedTiles)=>({...settings,buildInput:settings.activity==="build" && settings.support==="independent" && usedTiles?"tiles":settings.buildInput});
+  globalThis.SENTENCE_COMPOSER={convert,split,attemptSettings};
 })();

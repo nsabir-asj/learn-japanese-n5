@@ -878,6 +878,12 @@
       "publishedAt": "2026-11-01",
       "title": "Challenge practice keeps moving",
       "changes": [{"pages": ["guided"], "text": "Successful Challenge practice now advances using evidence available at that difficulty, avoiding loops through a few familiar sentences. Other eligible selected topics stay in rotation, established examples receive varied maintenance, and progress explains when filters leave too few distinct examples. Vocabulary filters and separate assisted and typed records remain respected."}]
+    },
+    {
+      "id": "2026-11-01.10",
+      "publishedAt": "2026-11-01",
+      "title": "Choose typing or tiles without losing your answer",
+      "changes": [{"pages": ["guided"], "text": "Switch between Type and Tiles on the same sentence while keeping your draft. Using word tiles counts as normal independent tile practice, with accuracy and streak credit; hints still count as support. Once tiles have been available, that attempt stays recorded as tile practice even if you return to typing."}]
     }
   ]
 }

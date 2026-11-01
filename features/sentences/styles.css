@@ -225,3 +225,5 @@ body[data-activity="sentences"] .activity-stat>span { min-height:2.6em;line-heig
   .sp-guide-table .sp-guide-group-start { border-top:8px solid #141d25; }.sp-guide-table tbody { scroll-margin-top:0; }
   .sp-guide-symbol { font-size:1.4rem; }.sp-guide-reading { font-size:.65rem; }.sp-guide-table h3 { font-size:.88rem; }
 }
+
+.sp-compose-record-note { color:#adcdbb;font-size:.76rem;line-height:1.7;margin:16px 0 0; }

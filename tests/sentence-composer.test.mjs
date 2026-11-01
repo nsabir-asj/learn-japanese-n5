@@ -39,3 +39,28 @@ test('editing a middle tile restores the replacement in place and preserves pend
   input.value='hon';vm.runInContext('editComposer(0)',h);
   assert.equal(input.value,'uchi');assert.equal(h.selected.at(-1).text,'ほん');
 });
+test('revealing tiles changes the answer format without assistance, resetting the question, or losing pending edits',()=>{
+  const source=readFileSync(new URL('../features/sentences/practice.js',import.meta.url),'utf8');
+  const input={value:'hon',focus(){}},preview={textContent:''};
+  const question={id:'object-hon'},selected=T.split('watashi wa',true).tokens;
+  const h=vm.createContext({current:question,answered:false,assisted:false,assistanceReason:'',state:{settings:{activity:'build',support:'independent',buildInput:'typing'}},attemptUsedTiles:false,composerInsertAt:null,selected,SENTENCE_COMPOSER:T,typingBuild:()=>h.state.settings.buildInput==='typing',renderTiles(){},applyBuildInput(){},save(){},renderChrome(){},$:id=>id==='#builderInput'?input:preview});
+  for(const name of ['insertComposer','commitComposer','switchBuildInput'])vm.runInContext(source.match(new RegExp(`  function ${name}\\([^]*?\\n  \\}`))[0],h);
+  vm.runInContext('switchBuildInput("tiles")',h);
+  assert.equal(h.current,question);assert.equal(h.selected,selected);
+  assert.equal(Array.from(h.selected,x=>x.text).join(''),'わたしはほん');
+  assert.equal(h.assisted,false);assert.equal(h.assistanceReason,'');assert.equal(h.attemptUsedTiles,true);
+  vm.runInContext('switchBuildInput("typing")',h);
+  const settings=T.attemptSettings(h.state.settings,h.attemptUsedTiles);
+  assert.equal(E.recordKey(question,settings),'build:independent:object-hon');
+  const progress={items:{},total:1};E.record(progress,E.recordKey(question,settings),true,h.assisted,1000);
+  assert.equal(progress.items['build:independent:object-hon'].correct,1);
+  assert.equal(progress.items['build:typing:object-hon'],undefined);
+  h.assisted=true;h.assistanceReason='hint';vm.runInContext('switchBuildInput("tiles")',h);
+  assert.equal(h.assisted,true);assert.equal(h.assistanceReason,'hint');
+});
+test('a fresh typed attempt keeps typed credit and other activities keep their own formats',()=>{
+  const s={activity:'build',support:'independent',buildInput:'typing'},ex=C.sentences.find(x=>x.id==='object-hon');
+  assert.equal(E.recordKey(ex,T.attemptSettings(s,false)),'build:typing:object-hon');
+  assert.equal(T.attemptSettings({...s,support:'supported'},true).buildInput,'typing');
+  assert.equal(T.attemptSettings({...s,activity:'verbs'},true).buildInput,'typing');
+});

@@ -17,11 +17,12 @@
   } catch { /* A broken saved snapshot should not stop practice. */ }
   let verbOptions = [];
   let composerInsertAt = null;
+  let attemptUsedTiles = false;
   let renderedAt = 0;
   let helpTab = "hint", guideScrollTop = 0;
   let current = null, selected = [], bank = [], answers = [], activeSlot = 0, answered = false, assisted = false, assistanceReason = "", recent = [], sessionTotal = 0, sessionCorrect = 0, sessionUnaided = 0;
   let draft = new Set(), scopeView = "lessons", scopeSearch = "";
-  const settings = () => ({...state.settings,topics:state.settings.scopes[state.settings.activity]});
+  const settings = () => globalThis.SENTENCE_COMPOSER.attemptSettings({...state.settings,topics:state.settings.scopes[state.settings.activity]},attemptUsedTiles);
   const typingBuild = () => state.settings.activity==="build" && state.settings.support==="independent" && state.settings.buildInput==="typing";
   const modeName = () => ({build:state.settings.support === "supported" ? "Supported building" : "Independent building",particles:state.settings.input === "choice" ? "Particle choices" : "Particle recall",verbs:state.settings.input === "choice" ? "Verb choices" : "Verb recall"}[state.settings.activity]);
   const availableTopics = () => C.topics.filter(t => state.settings.activity === "verbs" ? t.verbGroup : !t.verbGroup);
@@ -63,7 +64,7 @@
     const topicCount = settings().topics.filter(id => availableTopics().some(t => t.id === id)).length;
     $("#scopeCount").textContent = `${topicCount} ${topicCount === 1 ? "topic" : "topics"} · ${pool().length} exercises`;
     $("#modeControls").innerHTML = s.activity === "build" ? ["supported","independent"].map(id => `<button type="button" data-support="${id}" aria-pressed="${s.support === id}">${id === "supported" ? "Supported" : "Independent"}</button>`).join("") : ["choice","typing"].map(id => `<button type="button" data-input="${id}" aria-pressed="${s.input === id}">${id === "choice" ? "Choose" : "Type"}</button>`).join("");
-    $("#modeDescription").textContent = s.activity === "build" ? s.support === "supported" ? "Start with useful chunks. Particles stay attached to their words." : typingBuild() ? "Recall words and particles in romaji. Space places each word; the optional word bank counts as help." : "Choose words and particles separately. Extra particles can remain unused." : s.activity === "particles" ? "The words are in place. Choose what connects them; sometimes no particle is needed." : "Start from the dictionary form. Practise polite affirmative, negative, and past forms.";
+    $("#modeDescription").textContent = s.activity === "build" ? s.support === "supported" ? "Start with useful chunks. Particles stay attached to their words." : typingBuild() ? "Recall words and particles in romaji. Space places each word; switch to word tiles whenever that is easier." : "Choose words and particles separately. Extra particles can remain unused." : s.activity === "particles" ? "The words are in place. Choose what connects them; sometimes no particle is needed." : "Start from the dictionary form. Practise polite affirmative, negative, and past forms.";
     $("#difficultyControl").hidden=s.activity==="verbs";
     document.querySelectorAll("[data-difficulty]").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.difficulty===s.difficulty)));
     $("#difficultyDescription").textContent=({auto:"Learning pace guides progression from individual patterns to selected topic combinations, then review.",focused:"Shorter examples centred on one main pattern. Keeps your selected lessons and vocabulary filter.",challenge:"Checked sentences combine your selected topics, including across lessons. Vocabulary filters still apply."})[s.difficulty];
@@ -113,6 +114,7 @@
     globalThis.SENTENCE_VIEWPORT?.cancel();
     window.KANA_SPRINT_SPEECH?.stop();
     composerInsertAt=null;
+    attemptUsedTiles=state.settings?.activity==="build" && state.settings?.support==="independent" && state.settings?.buildInput==="tiles";
     answered = false; assisted = false; assistanceReason = ""; selected = []; answers = []; activeSlot = 0;
     const config = settings(), vocab = vocabulary();
     current = E.choose(pool(),config,state,recent,vocab);
@@ -142,13 +144,15 @@
       if(s.support==="independent"){
         $("#exerciseBody").insertAdjacentHTML("afterbegin",`<div class="sp-compose-controls"><span>Build with</span><div class="sp-segments" role="group" aria-label="Sentence input"><button type="button" data-build-input="tiles" aria-pressed="${!typingBuild()}">Tiles</button><button type="button" data-build-input="typing" aria-pressed="${typingBuild()}">Type</button></div></div>`);
       }
-      if(typingBuild()){
-        $("#builtAnswer").insertAdjacentHTML("afterend",`<div class="sp-composer"><label for="builderInput">Type words and particles in romaji</label><div class="sp-compose-entry"><input id="builderInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="tomodachi to eiga o mimasu"><button type="button" class="sp-secondary" data-action="add-typed">Add word</button></div><p id="builderPreview" lang="ja" role="status" aria-live="polite">—</p><small>Space adds a word. Enter checks the sentence, including text still in the field. Click a tile to edit; Backspace in an empty field edits the last tile.</small></div>`);
-        $("#wordBank").hidden=true;$("#particleBank").hidden=true;
-        document.querySelectorAll("#exerciseBody .sp-bank-heading").forEach(x=>x.hidden=true);
-        $("#exerciseBody").insertAdjacentHTML("beforeend",'<button type="button" class="sp-secondary" data-action="show-bank" id="showComposerBank">Show word bank · counts as help</button>');
+      if(s.support==="independent"){
+        $("#builtAnswer").insertAdjacentHTML("afterend",`<div class="sp-composer" id="sentenceComposer"><label for="builderInput">Type words and particles in romaji</label><div class="sp-compose-entry"><input id="builderInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="tomodachi to eiga o mimasu"><button type="button" class="sp-secondary" data-action="add-typed">Add word</button></div><p id="builderPreview" lang="ja" role="status" aria-live="polite">—</p><small>Space adds a word. Enter checks the sentence, including text still in the field. Click a tile to edit; Backspace in an empty field edits the last tile.</small></div>`);
+        $("#exerciseBody").insertAdjacentHTML("beforeend",'<button type="button" class="sp-secondary" data-action="show-bank" id="showComposerBank">Use word tiles</button>');
       }
       renderTiles();
+      if(s.support==="independent"){
+        $("#exerciseBody").insertAdjacentHTML("beforeend",'<p id="composerRecordNote" class="sp-compose-record-note" role="status"></p>');
+        applyBuildInput();
+      }
       $("#keyboardNote").textContent = typingBuild()?"Space adds words · Enter checks · wa → は, o / wo → を, e / he → へ":"Press Enter to check. Use Tab and Enter to select a focused tile.";
     } else if (s.activity === "particles") {
       answers = E.slots(current).map(() => null);
@@ -164,6 +168,26 @@
       $("#keyboardNote").textContent = s.input === "typing" ? "Type the whole form, then press Enter." : `Choose an answer · Keys 1–${options.length} · Checks immediately`;
     }
     if (s.input === "typing" && s.activity !== "build") updateTypingPreview();
+  }
+  function applyBuildInput() {
+    const typing=typingBuild();
+    $("#sentenceComposer").hidden=!typing;
+    $("#wordBank").hidden=typing;$("#particleBank").hidden=typing;
+    $("#showComposerBank").hidden=!typing;
+    document.querySelectorAll("#exerciseBody .sp-bank-heading").forEach(x=>x.hidden=typing);
+    document.querySelectorAll("[data-build-input]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.buildInput===state.settings.buildInput)));
+    $("#composerRecordNote").textContent=typing && attemptUsedTiles ? "This answer will be recorded as tile practice because word tiles were available. Your accuracy and streak still count normally unless you use a hint." : "";
+    $("#composerRecordNote").hidden=!(typing && attemptUsedTiles);
+    $("#keyboardNote").textContent=typing?"Space adds words · Enter checks · wa → は, o / wo → を, e / he → へ":"Press Enter to check. Use Tab and Enter to select a focused tile.";
+  }
+  function switchBuildInput(mode) {
+    if(answered || !current || !["tiles","typing"].includes(mode) || mode===state.settings.buildInput)return;
+    // Commit pending text (including an edited tile) before hiding the input.
+    if(typingBuild())commitComposer();
+    if(mode==="tiles")attemptUsedTiles=true;
+    state.settings.buildInput=mode;
+    applyBuildInput();save();renderChrome();
+    if(mode==="typing")$("#builderInput").focus({preventScroll:true});
   }
   function insertComposer(tokens) {
     if(!tokens.length)return;
@@ -388,15 +412,10 @@
     if (action === "next" && Date.now()-renderedAt<500) return;
     if (action === "next") {advance();return;}
     if (action === "check" || action === "unknown") return check(action === "unknown");
-    if(button.dataset.buildInput){state.settings.buildInput=button.dataset.buildInput;save();recent=[];next();return;}
+    if(button.dataset.buildInput){switchBuildInput(button.dataset.buildInput);return;}
     if (answered || !current) return;
     if(action==="add-typed"){commitComposer();$("#builderInput").focus({preventScroll:true});return;}
-    if(action==="show-bank"){
-      assisted=true;assistanceReason="word bank";
-      $("#wordBank").hidden=false;$("#particleBank").hidden=false;
-      document.querySelectorAll("#exerciseBody .sp-bank-heading").forEach(x=>x.hidden=false);
-      button.hidden=true;return;
-    }
+    if(action==="show-bank"){switchBuildInput("tiles");return;}
     if(typingBuild() && button.dataset.remove!==undefined){editComposer(Number(button.dataset.remove));return;}
     if (button.dataset.word) {const tile=bank.find(x=>x.id === button.dataset.word);if (tile && !selected.some(x=>x.id===tile.id)) selected.push(tile);renderTiles();$("#builtAnswer button:last-child")?.focus();}
     if (button.dataset.particle) {selected.push({text:button.dataset.particle,particle:true});renderTiles();}
