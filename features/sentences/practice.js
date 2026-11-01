@@ -4,23 +4,25 @@
   const KEY = "kanaSprintSentencesV1";
   const $ = selector => document.querySelector(selector);
   const esc = value => String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
-  const defaults = () => ({ version:1, total:0, correct:0, streak:0, bestStreak:0, items:{}, skills:{}, introduced:{}, wordsSeen:{}, settings:{ activity:"build", support:"supported", input:"choice", typingScript:"romaji", learningPace:"balanced",difficulty:"auto", bankSize:"auto", verbChoices:"auto", autoAudio:false, autoVerbAudio:false, autoParticleAudio:false, vocabulary:"prefer", review:"all", scopes:{build:["identity","possession","questions"],particles:["identity","possession","questions"],verbs:["verbs-u","verbs-ru","verbs-irregular"]} } });
+  const defaults = () => ({ version:1, total:0, correct:0, streak:0, bestStreak:0, items:{}, skills:{}, introduced:{}, wordsSeen:{}, settings:{ activity:"build", support:"supported", input:"choice", buildInput:"tiles", typingScript:"romaji", learningPace:"balanced",difficulty:"auto", bankSize:"auto", verbChoices:"auto", autoAudio:false, autoVerbAudio:false, autoParticleAudio:false, vocabulary:"prefer", review:"all", scopes:{build:["identity","possession","questions"],particles:["identity","possession","questions"],verbs:["verbs-u","verbs-ru","verbs-irregular"]} } });
   let state = defaults();
   try {
     const saved = JSON.parse(localStorage.getItem(KEY));
     if (saved?.version === 1) {
       state = { ...state, ...saved, settings:{...state.settings,...saved.settings,scopes:{...state.settings.scopes,...saved.settings?.scopes}} };
       for (const field of ["items","skills","introduced","wordsSeen"]) if (!state[field] || typeof state[field] !== "object" || Array.isArray(state[field])) state[field] = {};
-      for (const [key, options] of Object.entries({activity:["build","particles","verbs"],support:["supported","independent"],input:["choice","typing"],typingScript:["romaji","japanese"],learningPace:["gradual","balanced","brisk"],difficulty:["auto","focused","challenge"],bankSize:["auto","8","12"],verbChoices:["auto","4","6"],vocabulary:["prefer","introduced","mastered","any"],review:["all","trouble"]})) if (!options.includes(state.settings[key])) state.settings[key] = defaults().settings[key];
+      for (const [key, options] of Object.entries({activity:["build","particles","verbs"],support:["supported","independent"],input:["choice","typing"],buildInput:["tiles","typing"],typingScript:["romaji","japanese"],learningPace:["gradual","balanced","brisk"],difficulty:["auto","focused","challenge"],bankSize:["auto","8","12"],verbChoices:["auto","4","6"],vocabulary:["prefer","introduced","mastered","any"],review:["all","trouble"]})) if (!options.includes(state.settings[key])) state.settings[key] = defaults().settings[key];
       for (const activity of ["build","particles","verbs"]) state.settings.scopes[activity] = Array.isArray(state.settings.scopes[activity]) ? state.settings.scopes[activity].filter(id => C.topics.some(t => t.id === id)) : defaults().settings.scopes[activity];
     }
   } catch { /* A broken saved snapshot should not stop practice. */ }
   let verbOptions = [];
+  let composerInsertAt = null;
   let renderedAt = 0;
   let helpTab = "hint", guideScrollTop = 0;
   let current = null, selected = [], bank = [], answers = [], activeSlot = 0, answered = false, assisted = false, assistanceReason = "", recent = [], sessionTotal = 0, sessionCorrect = 0, sessionUnaided = 0;
   let draft = new Set(), scopeView = "lessons", scopeSearch = "";
   const settings = () => ({...state.settings,topics:state.settings.scopes[state.settings.activity]});
+  const typingBuild = () => state.settings.activity==="build" && state.settings.support==="independent" && state.settings.buildInput==="typing";
   const modeName = () => ({build:state.settings.support === "supported" ? "Supported building" : "Independent building",particles:state.settings.input === "choice" ? "Particle choices" : "Particle recall",verbs:state.settings.input === "choice" ? "Verb choices" : "Verb recall"}[state.settings.activity]);
   const availableTopics = () => C.topics.filter(t => state.settings.activity === "verbs" ? t.verbGroup : !t.verbGroup);
   function vocabulary() { try { return JSON.parse(localStorage.getItem("kanaSprintVocabularyV1")) || {}; } catch { return {}; } }
@@ -47,11 +49,11 @@
     <div class="sp-context"><div class="sp-collection" aria-label="Practice collection"><span class="sp-eyebrow">Practice collection</span><div class="sp-collection-row"><div class="sp-collection-copy"><strong id="scopeName"></strong><span id="scopeCount"></span></div><button class="sp-change" id="openScope" type="button" aria-haspopup="dialog" aria-controls="scopeDialog" aria-label="Change practice collection">Change</button></div></div><div class="sp-segments" id="modeControls" role="group" aria-label="Practice support"></div></div>
     <p id="modeDescription" class="sp-mode-description"></p><div class="sp-difficulty" id="difficultyControl"><div><span class="sp-eyebrow">Difficulty</span><div class="sp-segments" role="group" aria-label="Sentence difficulty">${["auto","focused","challenge"].map(id=>`<button type="button" data-difficulty="${id}">${id==="auto" ? "Auto" : id==="focused" ? "Focused" : "Challenge"}</button>`).join("")}</div></div><p id="difficultyDescription"></p></div><p id="availabilityNote" class="sp-muted" hidden></p><p id="progressionNote" class="sp-progression-note" aria-live="polite" hidden></p>
     <section class="sp-workspace" aria-label="Practice exercise"><div class="sp-question-card" id="questionCard"></div></section>
-    <details class="sp-settings" id="sessionSettings"><summary><span><strong>Session settings</strong><small id="settingsSummary"></small></span></summary><div class="sp-settings-grid"><label>Vocabulary<select id="vocabularyFilter"><option value="prefer">Prefer familiar words</option><option value="introduced">Only introduced words</option><option value="mastered">Only mastered words</option><option value="any">Any words in this collection</option></select><small>Uses progress from Vocabulary. Strict filters include every content word; clock phrases without Vocabulary records are excluded.</small></label><label>Practice mix<select id="reviewFilter"><option value="all">New material + review</option><option value="trouble">Trouble exercises only</option></select><small>Trouble practice uses mistakes in the current activity and answer format.</small></label><label id="learningPaceSetting">Learning pace<select id="learningPace"><option value="gradual">Gradual</option><option value="balanced">Balanced</option><option value="brisk">Brisk</option></select><small>Controls how quickly new concepts and mixed practice appear. Reviews still target mistakes.</small></label><label id="bankSizeSetting">Word bank size<select id="bankSize"><option value="auto">Auto · 6 chunks / 8 words</option><option value="8">8 choices</option><option value="12">12 choices</option></select><small>Related extra words and contrasting verb forms make you choose from meaning. Strict vocabulary filters may limit the available choices.</small></label><label id="verbChoicesSetting">Verb choices<select id="verbChoices"><option value="auto">Auto · 4 or 6 choices</option><option value="4">4 choices</option><option value="6">6 choices</option></select><small>Auto increases each form after three spaced unaided successes including a later review. A mistake reduces choices; two unaided successes restore six.</small></label><label id="autoAudioSetting" class="sp-audio-setting"><input type="checkbox" id="autoSentenceAudio"><span><span id="autoAudioLabel">Automatically play the model sentence after answering</span><small id="autoAudioNote">Hear the correct sentence after either result. Your preference is saved.</small></span></label><p class="sp-settings-note">Grammar is available immediately. Lesson numbers organize the collections; guided-lesson completion is never required. Vocabulary hints and rules count as support when used before answering.</p></div></details>
+    <details class="sp-settings" id="sessionSettings"><summary><span><strong>Session settings</strong><small id="settingsSummary"></small></span></summary><div class="sp-settings-grid"><label>Vocabulary<select id="vocabularyFilter"><option value="prefer">Prefer familiar words</option><option value="introduced">Only introduced words</option><option value="mastered">Only mastered words</option><option value="any">Any words in this collection</option></select><small>Uses progress from Vocabulary. Strict filters include every content word; clock phrases without Vocabulary records are excluded.</small></label><label>Practice mix<select id="reviewFilter"><option value="all">New material + review</option><option value="trouble">Trouble exercises only</option></select><small>Trouble practice uses mistakes in the current activity and answer format.</small></label><label id="learningPaceSetting">Learning pace<select id="learningPace"><option value="gradual">Gradual</option><option value="balanced">Balanced</option><option value="brisk">Brisk</option></select><small>Controls how quickly new concepts and mixed practice appear. Reviews still target mistakes.</small></label><label id="bankSizeSetting">Word bank size<select id="bankSize"><option value="auto">Auto · follows difficulty</option><option value="8">8 choices</option><option value="12">12 choices</option></select><small>Auto targets 6 chunks / 8 words normally, or 8 chunks / 12 words in Challenge, with extra room for longer sentences. Close particle and verb contrasts add difficulty. Strict vocabulary filters may limit choices.</small></label><label id="verbChoicesSetting">Verb choices<select id="verbChoices"><option value="auto">Auto · 4 or 6 choices</option><option value="4">4 choices</option><option value="6">6 choices</option></select><small>Auto increases each form after three spaced unaided successes including a later review. A mistake reduces choices; two unaided successes restore six.</small></label><label id="autoAudioSetting" class="sp-audio-setting"><input type="checkbox" id="autoSentenceAudio"><span><span id="autoAudioLabel">Automatically play the model sentence after answering</span><small id="autoAudioNote">Hear the correct sentence after either result. Your preference is saved.</small></span></label><p class="sp-settings-note">Grammar is available immediately. Lesson numbers organize the collections; guided-lesson completion is never required. Vocabulary hints and rules count as support when used before answering.</p></div></details>
     <details class="sp-progress" id="practiceProgress"><summary><span><strong>Progress &amp; trouble spots</strong><small>See what you can do with and without support</small></span></summary><div id="progressBody"></div></details>
     <p class="sp-save-notice" id="saveNotice" role="status"></p>
   </main>
-  <dialog class="sp-dialog" id="scopeDialog" aria-labelledby="scopeTitle"><div class="sp-dialog-shell"><header><div><p class="sp-eyebrow">Make it your own</p><h2 id="scopeTitle">Choose your practice</h2><p>Combine lessons or pick individual topics. Everything is open.</p></div><button class="sp-icon-button" id="closeScope" type="button" aria-label="Close collection picker">×</button></header><div class="sp-dialog-controls"><div class="sp-segments" role="group" aria-label="Browse collections"><button type="button" data-scope-view="lessons">By lesson</button><button type="button" data-scope-view="topics">By topic</button></div><input id="scopeSearch" type="search" aria-label="Search topics" placeholder="Find a topic or particle…"><div class="sp-select-tools"><button type="button" id="selectAll">Select all</button><button type="button" id="clearAll">Clear</button></div></div><div id="scopeOptions" class="sp-scope-options"></div><footer><div><strong id="selectionCount"></strong><small id="selectionHint"></small></div><button class="sp-primary" id="applyScope" type="button">Apply selection</button></footer></div></dialog>
+  <dialog class="sp-dialog" id="scopeDialog" aria-labelledby="scopeTitle"><div class="sp-dialog-shell"><header><div><p class="sp-eyebrow">Make it your own</p><h2 id="scopeTitle">Choose your practice</h2><p>Combine lessons or pick individual topics. Everything is open.</p></div><button class="sp-icon-button" id="closeScope" type="button" aria-label="Close collection picker">×</button></header><div class="sp-dialog-controls"><div class="sp-segments" role="group" aria-label="Browse collections"><button type="button" data-scope-view="lessons">By lesson</button><button type="button" data-scope-view="topics">By topic</button></div><input id="scopeSearch" type="search" aria-label="Search topics" placeholder="Find a topic or particle…"><div class="sp-select-tools"><button type="button" id="selectAll">Select all</button><button type="button" id="clearAll">Clear</button></div></div><div id="scopeOptions" class="sp-scope-options"></div><footer><div><strong id="selectionCount"></strong><small id="selectionFilters"></small><small id="selectionHint"></small></div><button class="sp-primary" id="applyScope" type="button">Apply selection</button></footer></div></dialog>
   <dialog class="sp-dialog sp-rule-dialog" id="ruleDialog" aria-labelledby="ruleTitle"><div class="sp-dialog-shell"><header><div><p class="sp-eyebrow" id="helpEyebrow">Practice help</p><h2 id="ruleTitle"></h2><p id="helpDescription"></p></div><button class="sp-icon-button" id="closeRule" type="button" aria-label="Close help">×</button></header><div class="sp-help-tabs" role="tablist" aria-label="Practice help" id="helpTabs"><button type="button" role="tab" id="questionHintTab" aria-controls="ruleBody" aria-selected="true" data-help-tab="hint">Question hint</button><button type="button" role="tab" id="particleGuideTab" aria-controls="particleGuidePanel" aria-selected="false" tabindex="-1" data-help-tab="guide">Particle guide</button></div><div id="ruleBody" class="sp-rule-body" role="tabpanel" aria-labelledby="questionHintTab" tabindex="0"></div><div id="particleGuidePanel" class="sp-guide-panel" role="tabpanel" aria-labelledby="particleGuideTab" hidden></div></div></dialog>`);
 
   function renderChrome() {
@@ -61,7 +63,7 @@
     const topicCount = settings().topics.filter(id => availableTopics().some(t => t.id === id)).length;
     $("#scopeCount").textContent = `${topicCount} ${topicCount === 1 ? "topic" : "topics"} · ${pool().length} exercises`;
     $("#modeControls").innerHTML = s.activity === "build" ? ["supported","independent"].map(id => `<button type="button" data-support="${id}" aria-pressed="${s.support === id}">${id === "supported" ? "Supported" : "Independent"}</button>`).join("") : ["choice","typing"].map(id => `<button type="button" data-input="${id}" aria-pressed="${s.input === id}">${id === "choice" ? "Choose" : "Type"}</button>`).join("");
-    $("#modeDescription").textContent = s.activity === "build" ? s.support === "supported" ? "Start with useful chunks. Particles stay attached to their words." : "Choose words and particles separately. Extra particles can remain unused." : s.activity === "particles" ? "The words are in place. Choose what connects them; sometimes no particle is needed." : "Start from the dictionary form. Practise polite affirmative, negative, and past forms.";
+    $("#modeDescription").textContent = s.activity === "build" ? s.support === "supported" ? "Start with useful chunks. Particles stay attached to their words." : typingBuild() ? "Recall words and particles in romaji. Space places each word; the optional word bank counts as help." : "Choose words and particles separately. Extra particles can remain unused." : s.activity === "particles" ? "The words are in place. Choose what connects them; sometimes no particle is needed." : "Start from the dictionary form. Practise polite affirmative, negative, and past forms.";
     $("#difficultyControl").hidden=s.activity==="verbs";
     document.querySelectorAll("[data-difficulty]").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.difficulty===s.difficulty)));
     $("#difficultyDescription").textContent=({auto:"Learning pace guides progression from individual patterns to selected topic combinations, then review.",focused:"Shorter examples centred on one main pattern. Keeps your selected lessons and vocabulary filter.",challenge:"Checked sentences combine your selected topics, including across lessons. Vocabulary filters still apply."})[s.difficulty];
@@ -110,6 +112,7 @@
   function next() {
     globalThis.SENTENCE_VIEWPORT?.cancel();
     window.KANA_SPRINT_SPEECH?.stop();
+    composerInsertAt=null;
     answered = false; assisted = false; assistanceReason = ""; selected = []; answers = []; activeSlot = 0;
     const config = settings(), vocab = vocabulary();
     current = E.choose(pool(),config,state,recent,vocab);
@@ -136,8 +139,17 @@
     if (s.activity === "build") {
       bank = E.tileBank(current,s.support === "supported",Math.random,{settings:s,vocabulary:vocabulary()});
       $("#exerciseBody").innerHTML = `<div class="sp-answer-zone"><div class="sp-zone-heading"><span>Your sentence</span><button class="sp-text-button" type="button" data-action="clear">Clear</button></div><div id="builtAnswer" class="sp-built-answer" aria-label="Your sentence"></div></div><div class="sp-bank-heading"><span>${s.support === "supported" ? "Sentence chunks" : "Words"} · ${bank.length} choices</span><small>Extra choices can remain. Click an answer tile to remove it.</small></div><div id="wordBank" class="sp-tile-bank"></div>${s.support === "independent" ? `<div class="sp-bank-heading"><span>Particles</span><small>Reusable · extra choices may remain</small></div><div id="particleBank" class="sp-tile-bank sp-particle-bank">${["は","が","を","に","へ","で","の","と","も","か"].map(text => `<button class="sp-tile sp-particle" type="button" data-particle="${text}" lang="ja">${text}</button>`).join("")}</div>` : ""}`;
+      if(s.support==="independent"){
+        $("#exerciseBody").insertAdjacentHTML("afterbegin",`<div class="sp-compose-controls"><span>Build with</span><div class="sp-segments" role="group" aria-label="Sentence input"><button type="button" data-build-input="tiles" aria-pressed="${!typingBuild()}">Tiles</button><button type="button" data-build-input="typing" aria-pressed="${typingBuild()}">Type</button></div></div>`);
+      }
+      if(typingBuild()){
+        $("#builtAnswer").insertAdjacentHTML("afterend",`<div class="sp-composer"><label for="builderInput">Type words and particles in romaji</label><div class="sp-compose-entry"><input id="builderInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="tomodachi to eiga o mimasu"><button type="button" class="sp-secondary" data-action="add-typed">Add word</button></div><p id="builderPreview" lang="ja" role="status" aria-live="polite">—</p><small>Space adds a word. Enter checks the sentence, including text still in the field. Click a tile to edit; Backspace in an empty field edits the last tile.</small></div>`);
+        $("#wordBank").hidden=true;$("#particleBank").hidden=true;
+        document.querySelectorAll("#exerciseBody .sp-bank-heading").forEach(x=>x.hidden=true);
+        $("#exerciseBody").insertAdjacentHTML("beforeend",'<button type="button" class="sp-secondary" data-action="show-bank" id="showComposerBank">Show word bank · counts as help</button>');
+      }
       renderTiles();
-      $("#keyboardNote").textContent = "Press Enter to check. Use Tab and Enter to select a focused tile.";
+      $("#keyboardNote").textContent = typingBuild()?"Space adds words · Enter checks · wa → は, o / wo → を, e / he → へ":"Press Enter to check. Use Tab and Enter to select a focused tile.";
     } else if (s.activity === "particles") {
       answers = E.slots(current).map(() => null);
       $("#exerciseBody").innerHTML = `${s.input === "typing" ? typingControls() : ""}<p class="sp-task-help">${s.input === "typing" ? "Type your particle in each gap. Type ‘none’ or なし when no particle is needed." : "Select a gap, then choose a particle. Use — when no particle is needed."}</p><div class="sp-gap-sentence" id="gapSentence" lang="ja"></div>${s.input === "choice" ? `<div class="sp-tile-bank sp-particle-bank">${["は","が","を","に","へ","で","の","と","も","か","—"].map((text,i) => `<button class="sp-tile sp-particle" type="button" data-gap-choice="${text}"><kbd>${i < 9 ? i+1 : i === 9 ? 0 : "−"}</kbd><span lang="ja">${text}</span></button>`).join("")}</div>` : kanaPreviewMarkup()}`;
@@ -152,6 +164,32 @@
       $("#keyboardNote").textContent = s.input === "typing" ? "Type the whole form, then press Enter." : `Choose an answer · Keys 1–${options.length} · Checks immediately`;
     }
     if (s.input === "typing" && s.activity !== "build") updateTypingPreview();
+  }
+  function insertComposer(tokens) {
+    if(!tokens.length)return;
+    if(composerInsertAt===null)selected.push(...tokens);else selected.splice(composerInsertAt,0,...tokens);
+    composerInsertAt=null;
+  }
+  function updateComposer() {
+    const input=$("#builderInput");if(!input || answered)return;
+    const result=globalThis.SENTENCE_COMPOSER.split(input.value);
+    insertComposer(result.tokens);input.value=result.pending;
+    if(result.tokens.length)renderTiles();
+    $("#builderPreview").textContent=input.value?globalThis.SENTENCE_COMPOSER.convert(input.value).text:"—";
+  }
+  function commitComposer() {
+    const input=$("#builderInput");if(!input)return;
+    insertComposer(globalThis.SENTENCE_COMPOSER.split(input.value,true).tokens);
+    composerInsertAt=null;
+    input.value="";$("#builderPreview").textContent="—";renderTiles();
+  }
+  function editComposer(index) {
+    const token=selected[index];
+    commitComposer();
+    index=selected.indexOf(token);
+    selected.splice(index,1);composerInsertAt=index;renderTiles();
+    $("#builderInput").value=token?.raw||token?.text||"";
+    updateComposer();$("#builderInput").focus({preventScroll:true});
   }
   function verbChoicesMarkup() {
     return `<div class="sp-verb-choices ${answered ? "is-answered" : ""}">${verbOptions.map((text,i)=>{
@@ -202,9 +240,10 @@
     const s = settings();
     let correct = false, details = [], response = "";
     if (s.activity === "build") {
+      if(typingBuild() && !unknown)commitComposer();
       if (!unknown && !selected.length) { $("#answerFeedback").textContent = "Add some tiles before checking, or choose I don’t know."; return; }
       response = selected.map(x => x.text).join(""); correct = !unknown && E.acceptedSentences(current).has(E.normalize(response));
-      if (s.support === "independent") details = E.diagnose(current,selected);
+      if (s.support === "independent") {details = E.diagnose(current,selected);if(typingBuild()&&correct)details=details.map(x=>({...x,correct:true}));}
     } else if (s.activity === "particles") {
       if (s.input === "typing") document.querySelectorAll("[data-gap-input]").forEach(input => { answers[Number(input.dataset.gapInput)] = input.value; });
       if (!unknown && answers.some(x => x === null || (s.input === "typing" && !x.trim()))) { $("#answerFeedback").textContent = "Fill every gap. Type ‘none’ or choose — for no particle."; return; }
@@ -289,7 +328,8 @@
   function renderScope() {
     document.querySelectorAll("[data-scope-view]").forEach(x => x.setAttribute("aria-pressed",String(x.dataset.scopeView === scopeView)));
     const list = availableTopics().filter(t => E.normalize(`${t.title} ${t.subtitle} Lesson ${t.lesson}`).includes(E.normalize(scopeSearch)));
-    const topicRow = t => `<label class="sp-topic-option"><input type="checkbox" data-topic="${t.id}" ${draft.has(t.id) ? "checked" : ""}><span><strong>${esc(t.title)}</strong><small>${scopeView === "topics" ? `Lesson ${t.lesson} · ` : ""}${esc(t.subtitle)}</small></span><span class="sp-topic-count">${E.pool({...settings(),topics:[t.id],vocabulary:"any"}).length}</span></label>`;
+    const summary=globalThis.SENTENCE_SCOPE.describe([...draft],availableTopics().map(t=>t.id),ids=>pool({...settings(),topics:ids}),state.settings.activity==="verbs");
+    const topicRow = t => `<label class="sp-topic-option"><input type="checkbox" data-topic="${t.id}" ${draft.has(t.id) ? "checked" : ""}><span><strong>${esc(t.title)}</strong><small>${scopeView === "topics" ? `Lesson ${t.lesson} · ` : ""}${esc(t.subtitle)}</small></span><span class="sp-topic-count" title="${esc(summary.rows.get(t.id).detail)}">${esc(summary.rows.get(t.id).label)}</span></label>`;
     $("#scopeOptions").innerHTML = list.length ? scopeView === "topics" ? list.map(topicRow).join("") : C.lessons.map(lesson => {
       const rows = list.filter(t => t.lesson === lesson.id);
       if (!rows.length) return "";
@@ -299,9 +339,10 @@
       const rows = list.filter(t => t.lesson === Number(input.dataset.lesson));
       input.indeterminate = rows.some(t => draft.has(t.id)) && !rows.every(t => draft.has(t.id));
     });
-    const count = pool({...settings(),topics:[...draft]}).length;
+    const count = summary.total;
     $("#selectionCount").textContent = `${draft.size} topics · ${count} matching exercises`;
-    $("#selectionHint").textContent = state.settings.activity === "verbs" ? "Lesson 3 and 4 verbs, including past forms in Lesson 4." : "Topic counts show individual practice. Compatible selections also add mixed sentences; all their topics must stay selected. Difficulty and vocabulary filters apply.";
+    $("#selectionFilters").textContent = `${state.settings.activity==="verbs" ? "Verb practice" : ({auto:"Auto difficulty",focused:"Focused",challenge:"Challenge"})[state.settings.difficulty]} · ${({any:"Any collection words",prefer:"Prefer familiar words",introduced:"Only introduced words",mastered:"Only mastered words"})[state.settings.vocabulary]} · ${state.settings.review==="trouble" ? "Trouble only" : "New + review"}`;
+    $("#selectionHint").textContent = state.settings.activity === "verbs" ? "Lesson 3 and 4 verbs, including past forms in Lesson 4." : `${summary.standalone} standalone + ${summary.mixed} mixed exercises. Row counts reflect this selection if checked; mixed exercises can involve several topics but are counted once in the total.`;
     $("#applyScope").disabled = !draft.size;
   }
   document.addEventListener("click",event => {
@@ -347,13 +388,23 @@
     if (action === "next" && Date.now()-renderedAt<500) return;
     if (action === "next") {advance();return;}
     if (action === "check" || action === "unknown") return check(action === "unknown");
+    if(button.dataset.buildInput){state.settings.buildInput=button.dataset.buildInput;save();recent=[];next();return;}
     if (answered || !current) return;
+    if(action==="add-typed"){commitComposer();$("#builderInput").focus({preventScroll:true});return;}
+    if(action==="show-bank"){
+      assisted=true;assistanceReason="word bank";
+      $("#wordBank").hidden=false;$("#particleBank").hidden=false;
+      document.querySelectorAll("#exerciseBody .sp-bank-heading").forEach(x=>x.hidden=false);
+      button.hidden=true;return;
+    }
+    if(typingBuild() && button.dataset.remove!==undefined){editComposer(Number(button.dataset.remove));return;}
     if (button.dataset.word) {const tile=bank.find(x=>x.id === button.dataset.word);if (tile && !selected.some(x=>x.id===tile.id)) selected.push(tile);renderTiles();$("#builtAnswer button:last-child")?.focus();}
     if (button.dataset.particle) {selected.push({text:button.dataset.particle,particle:true});renderTiles();}
     if (button.dataset.remove !== undefined) {const removed=selected.splice(Number(button.dataset.remove),1)[0];renderTiles();if(removed?.id) $("#wordBank").querySelector(`[data-word="${removed.id}"]`)?.focus();else $("#particleBank")?.querySelector("button")?.focus();}
-    if (action === "clear") {selected=[];renderTiles();}
+    if (action === "clear") {composerInsertAt=null;selected=[];renderTiles();if(typingBuild()){$("#builderInput").value="";updateComposer();}}
     if (button.dataset.slot !== undefined) {activeSlot=Number(button.dataset.slot);renderGaps();$("#gapSentence").querySelector(`[data-slot="${activeSlot}"]`)?.focus();}
     if (button.dataset.gapChoice !== undefined) {answers[activeSlot]=button.dataset.gapChoice === "—" ? "" : button.dataset.gapChoice;const unfilled=answers.findIndex(x=>x===null);if(unfilled>=0)activeSlot=unfilled;renderGaps();}
+    if(typingBuild() && (button.dataset.word || button.dataset.particle)){$("#builderInput").focus({preventScroll:true});return;}
     if (event.detail > 0 && (button.dataset.word || button.dataset.particle || button.dataset.remove !== undefined)) $("#checkAnswer")?.focus();
     if (button.dataset.verbChoice) {answers[0]=button.dataset.verbChoice;document.querySelectorAll("[data-verb-choice]").forEach(x=>x.setAttribute("aria-pressed",String(x===button)));check();}
   });
@@ -366,10 +417,11 @@
   });
   for (const [id,key] of [["vocabularyFilter","vocabulary"],["reviewFilter","review"],["bankSize","bankSize"],["verbChoices","verbChoices"],["learningPace","learningPace"]]) $("#"+id).addEventListener("change",event => {state.settings[key]=event.target.value;save();recent=[];next();});
   $("#autoSentenceAudio").addEventListener("change",event=>{state.settings[E.playbackKey(state.settings.activity)]=event.target.checked;save();});
-  document.addEventListener("input",event => {if (!event.isComposing && event.target.matches("#verbInput,[data-gap-input]")) updateTypingPreview();});
-  document.addEventListener("compositionend",event => {if(event.target.matches("#verbInput,[data-gap-input]")) updateTypingPreview();});
+  document.addEventListener("input",event => {if(event.target.id==="builderInput"&&!event.isComposing){updateComposer();return;}if (!event.isComposing && event.target.matches("#verbInput,[data-gap-input]")) updateTypingPreview();});
+  document.addEventListener("compositionend",event => {if(event.target.id==="builderInput"){updateComposer();return;}if(event.target.matches("#verbInput,[data-gap-input]")) updateTypingPreview();});
   document.addEventListener("keydown",event => {
     if ($("dialog[open]") || event.isComposing || event.repeat || !current) return;
+    if(!answered && event.target.id==="builderInput" && typingBuild() && event.key==="Backspace" && !event.target.value && selected.length){event.preventDefault();editComposer(selected.length-1);return;}
     const typing = event.target.matches("input,select,textarea,summary");
     if (event.key === "Enter" && !event.target.matches("button,summary,select,a,textarea")) {
       event.preventDefault();if(answered){if(Date.now()-renderedAt>=500)advance();}else check();return;

@@ -848,6 +848,36 @@
       "publishedAt": "2026-11-01",
       "title": "Keep questions and results in view",
       "changes": [{"pages": ["guided"], "text": "Sentence, particle, and verb practice now position answered cards with comfortable spacing while keeping the result and model answer visible. Next brings the whole question card into view when it fits, or aligns its top for taller cards. Keyboard focus no longer causes a second jump, and scrolling respects reduced-motion preferences."}]
+    },
+    {
+      "id": "2026-11-01.5",
+      "publishedAt": "2026-11-01",
+      "title": "Clearer practice collection counts",
+      "changes": [{"pages": ["guided"], "text": "The topic picker explains standalone and mixed exercises instead of showing unexplained zeros. Topics identify when compatible selections are needed or current filters leave no matches. The selection summary separates standalone and mixed totals, using the actual difficulty, vocabulary, and review filters."}]
+    },
+    {
+      "id": "2026-11-01.6",
+      "publishedAt": "2026-11-01",
+      "title": "More challenging sentence choices",
+      "changes": [{"pages": ["guided"], "text": "Challenge sentence building uses larger automatic word banks with closer verb, vocabulary, and supported particle contrasts. Manual bank sizes remain available, and strict vocabulary filters can limit extras without changing accepted answers."}]
+    },
+    {
+      "id": "2026-11-01.7",
+      "publishedAt": "2026-11-01",
+      "title": "Center shorter practice cards",
+      "changes": [{"pages": ["guided"], "text": "Question and review cards that fit in the viewport now center vertically, while taller cards keep their existing positioning. Small movements are avoided when a card is already near the center, and page boundaries are respected."}]
+    },
+    {
+      "id": "2026-11-01.8",
+      "publishedAt": "2026-11-01",
+      "title": "Build sentences from romaji",
+      "changes": [{"pages": ["guided"], "text": "Independent building now offers Type: turn spaced romaji words and particles into editable Japanese tiles, with live kana preview. Reveal the word bank as assisted help, or recall the sentence unaided. Typed recall keeps separate scores, and existing valid sentence alternatives remain accepted."}]
+    },
+    {
+      "id": "2026-11-01.9",
+      "publishedAt": "2026-11-01",
+      "title": "Challenge practice keeps moving",
+      "changes": [{"pages": ["guided"], "text": "Successful Challenge practice now advances using evidence available at that difficulty, avoiding loops through a few familiar sentences. Other eligible selected topics stay in rotation, established examples receive varied maintenance, and progress explains when filters leave too few distinct examples. Vocabulary filters and separate assisted and typed records remain respected."}]
     }
   ]
 }

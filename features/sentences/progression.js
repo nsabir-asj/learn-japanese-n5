@@ -44,7 +44,7 @@
         addMixed(exercise,(item.history||[]).map(event=>({...event,exerciseId:exercise.id})));
         continue;
       }
-      const prefixes=supported ? ["build:supported:","build:independent:"] : settings.activity==="particles" ? ["build:independent:","particles:choice:","particles:typing:"] : ["build:independent:"];
+      const prefixes=supported ? ["build:supported:","build:independent:","build:typing:"] : settings.activity==="particles" ? ["build:independent:","build:typing:","particles:choice:","particles:typing:"] : settings.buildInput==="typing" ? ["build:typing:"] : ["build:independent:","build:typing:"];
       // Sentence assembly evidence is distinct from particle-only recognition.
       const prefix=prefixes.find(value=>key.startsWith(value));
       if(!prefix)continue;
@@ -55,7 +55,12 @@
       if(settings.activity==="particles" && isMixed(exercise) && progress.items[`particleCombination:${exercise.id}`]?.history?.length)continue;
       if(item.seen && !exercise.requiredTopics)seenTopics.add(exercise.topic);
       const events=(item.history || []).map(event=>({...event,exerciseId:exercise.id}));
-      if(isMixed(exercise))addMixed(exercise,events);
+      if(isMixed(exercise)){
+        addMixed(exercise,events);
+        // A single-topic Challenge sentence still demonstrates its main
+        // structure. Keep cross-topic application evidence separate.
+        if(!exercise.requiredTopics)add(topicEvents,exercise.topic,events);
+      }
       else add(topicEvents,exercise.topic,events);
     }
     const skill=role=>readiness(roleEvents.get(role)||[],settings.learningPace);
@@ -108,6 +113,10 @@
       const diverse=choices.filter(x=>x.topic!==last?.topic && recent.slice(-4).filter(id=>pool.find(y=>y.id===id)?.topic===x.topic).length<2);
       if(diverse.length)choices=diverse;
       const selected=E.shuffle(choices,random).sort((a,b)=>{
+        if(settings.difficulty==="challenge" && reason==="review"){
+          const coverage=(own(a)?.lastQuestion??-1)-(own(b)?.lastQuestion??-1);
+          if(coverage)return coverage;
+        }
         const shared=E.particlePriority(a,settings,progress,now)-E.particlePriority(b,settings,progress,now);
         if(shared)return shared;
         const turn=(own(a)?.lastQuestion??-1)-(own(b)?.lastQuestion??-1);
@@ -145,6 +154,13 @@
       progress.lastRetentionQuestion=progress.total;
       return pick(due.slice(0,3),"retention","A later check of familiar material");
     }
+    if(settings.difficulty==="challenge"){
+      // Challenge has no focused exercises. Its progression must use the
+      // evidence obtainable here, not wait for an unavailable core exercise.
+      const unfinished=pool.filter(x=>x.requiredTopics ? !plan.combinations.get(combinationKey(x))?.ready : !topic(x.topic)?.mixed.ready).filter(x=>!recent.slice(-2).includes(x.id) && !readiness((own(x)?.history||[]).map(event=>({...event,exerciseId:x.id})),settings.learningPace,1).ready);
+      if(unfinished.length)return pick(unfinished,"combine","Apply a selected Challenge pattern across varied examples");
+      return pick(pool,"review","Selected Challenge patterns established — varied maintenance across your selection");
+    }
     const core=pool.filter(x=>!isMixed(x) && plan.active.includes(x.topic));
     const mixed=pool.filter(x=>isMixed(x) && available(x) && (x.requiredTopics ? !plan.combinations.get(combinationKey(x))?.ready : topic(x.topic)?.stable && !topic(x.topic).mixed.ready) && (settings.difficulty==="challenge" || plan.supported || roles(x).filter(role=>!plan.skill(role).ready).length<=1));
     const combineTurn=progress.total%4<rules.combine;
@@ -171,6 +187,13 @@
     if(!enabled(settings) || !pool.length)return "";
     const plan=profile(pool,settings,progress);
     const stable=plan.topics.filter(t=>t.stable).length;
+    if(settings.difficulty==="challenge"){
+      const patterns=[...plan.topics.filter(t=>t.hasMixed).map(t=>t.mixed),...plan.combinations.values()];
+      const established=patterns.filter(x=>x.ready).length;
+      const examplesDemonstrated=pool.every(x=>readiness((progress.items?.[E.recordKey(x,settings)]?.history||[]).map(event=>({...event,exerciseId:x.id})),settings.learningPace,1).ready);
+      if(established<patterns.length && examplesDemonstrated)return "The available Challenge examples are demonstrated. More distinct examples are needed to establish every pattern; broader topic or vocabulary selections can help. Varied reviews continue.";
+      return established===patterns.length ? "The available Challenge patterns are established. Practice now rotates through varied maintenance; add topics for new material." : `${established} of ${patterns.length} selected Challenge patterns established. ${plan.supported ? "Supported arrangements have their own evidence." : "Progress uses spaced unaided answers."} Other eligible selected patterns remain in rotation.`;
+    }
     const needsHelp=plan.topics.some(t=>plan.active.includes(t.id) && (t.structure.repeated || t.required.some(role=>plan.skill(role).repeated)));
     if(needsHelp)return "A selected skill needs reinforcement. Try Hint or Supported building if useful; targeted checks are spaced between other questions.";
     const pendingMixed=plan.topics.some(t=>t.hasMixed && !t.mixed.ready) || [...plan.combinations.values()].some(x=>!x.ready);

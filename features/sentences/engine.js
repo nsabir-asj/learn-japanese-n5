@@ -67,6 +67,7 @@
   }
   function tileBank(exercise, supported, random = Math.random, options = {}) {
     const config = options.settings || {}, vocabulary = options.vocabulary || {};
+    const challenge=config.difficulty==="challenge";
     const lesson = Math.max(...lessonIds(exercise));
     const units = supported ? exercise.chunks : pieces(exercise).filter(x => !x.role).map(x => [x]);
     const describe = unit => unit.map(piece => {
@@ -84,9 +85,15 @@
       if (!key || seen.has(key) || !allowed(unit)) return;
       seen.add(key);
       const known = candidate.wordIds.length ? candidate.wordIds.filter(id => familiar(id,vocabulary)).length / candidate.wordIds.length : 0;
-      candidates.push({...candidate,priority:priority + (config.vocabulary === "prefer" ? known * 50 : 0)});
+      candidates.push({...candidate,priority:priority + (config.vocabulary === "prefer" ? known * (challenge?10:50) : 0)});
     }
     for (const unit of units) {
+      if(challenge && supported){
+        const contrasts={destination:["で"],place:["に","へ"],object:["が","に"],possession:["と"],companion:["に","で"],existencePlace:["で"],subject:["を"],list:["の"],time:["で"],relativeTime:["に"],duration:["に"]};
+        unit.forEach((piece,index)=>{
+          for(const text of contrasts[piece.role] || [])add(unit.map((x,i)=>i===index?{...x,text}:x),50);
+        });
+      }
       unit.forEach((piece,index) => {
         if (!piece.wordId) return;
         const related = [...new Set(C.wordGroups.filter(group => group.includes(piece.wordId)).flat())].filter(id => id !== piece.wordId);
@@ -96,7 +103,12 @@
           const negative = piece.text.includes("ません");
           const past = piece.text.endsWith("ました") || piece.text.endsWith("でした");
           const suffix = past ? (negative ? "ませんでした" : "ました") : (negative ? "ません" : "ます");
-          replace(verb.stem + (past ? (negative ? "ました" : "ませんでした") : (negative ? "ます" : "ません")),verb.id,45);
+          replace(verb.stem + (past ? (negative ? "ました" : "ませんでした") : (negative ? "ます" : "ません")),verb.id,challenge?60:45);
+          if(challenge && lesson>=4){
+            for(const ending of ["ます","ません","ました","ませんでした"]){
+              if(verb.stem+ending!==piece.text)replace(verb.stem+ending,verb.id,55);
+            }
+          }
           related.forEach(id => { const other=C.verbs.find(v=>v.id===id); if(other && (other.lesson || 3) <= lesson)replace(other.stem+suffix,id,35); });
         } else related.forEach(id => {
           // An extra choice may use earlier material, but never a later lesson's word.
@@ -106,6 +118,7 @@
       });
     }
     // Fill from authored phrases at the same level when close contrasts are scarce.
+    const relatedIds=new Set(units.flatMap(unit=>unit.flatMap(piece=>piece.wordId?[piece.wordId,...C.wordGroups.filter(group=>group.includes(piece.wordId)).flat()]:[])));
     for (const sentence of C.sentences.filter(s => C.topics.find(t => t.id === s.topic).lesson <= lesson && (!exercise.requiredTopics || (config.topics || exercise.requiredTopics).includes(s.topic)))) {
       const alternatives = supported ? sentence.chunks : pieces(sentence).filter(x => !x.role).map(x => [x]);
       alternatives.forEach(unit => {
@@ -113,10 +126,12 @@
         // Keep spare endings comparable to the target instead of padding an action
         // sentence with visibly unrelated noun-sentence endings or demonstratives.
         if (hasVerb && !unit.some(piece => piece.wordId)) return;
+        if(challenge && !unit.some(piece=>relatedIds.has(piece.wordId)))return;
         add(unit,hasVerb && verbForm ? 20 : 5);
       });
     }
-    const target = Math.max(source.length + 2, Number(config.bankSize) || (supported ? 6 : 8));
+    const automatic=challenge?Math.max(source.length+4,supported?8:12):(supported?6:8);
+    const target = Math.max(source.length + 2, Number(config.bankSize) || automatic);
     const extras = shuffle(candidates,random).sort((a,b) => b.priority - a.priority).slice(0,target-source.length);
     return shuffle([...source,...extras].map((x,index) => ({...x,id:`word-${index}`})),random);
   }
@@ -162,7 +177,7 @@
     const candidates={possession:["possession","relative-location"],question:["questions"],also:["also"],object:["objects"],destination:["destination"],place:["action-place"],time:["time"],relativeTime:["time","past-actions"],existencePlace:["existence"],subject:["existence"],list:["listing-nouns"],duration:["duration"],companion:["companion"],topic:["pointing","identity","past-nouns"]};
     return exercise.requiredTopics ? candidates[role]?.find(id=>requirements(exercise).includes(id)) || exercise.topic : exercise.topic;
   }
-  function recordKey(exercise, settings) { return `${settings.activity}:${settings.activity === "build" ? settings.support : settings.input}:${exercise.id}`; }
+  function recordKey(exercise, settings) { return `${settings.activity}:${settings.activity === "build" ? (settings.support==="independent" && settings.buildInput==="typing" ? "typing" : settings.support) : settings.input}:${exercise.id}`; }
   function recordParticleEvidence(progress, exercise, settings, details, assisted, now=Date.now()) {
     if(assisted || !(settings.activity==="particles" || settings.activity==="build" && settings.support==="independent"))return;
     const roles=[...new Set(details.map(slot=>slot.role))];
@@ -192,7 +207,7 @@
     progress.items ||= {};
     for(const exercise of sentenceExamples){
       if(Object.keys(progress.items).some(key=>key.startsWith(`particleEvidence:${exercise.id}:`)))continue;
-      const history=["build:independent","particles:choice","particles:typing"].flatMap(prefix=>progress.items[`${prefix}:${exercise.id}`]?.history || []).sort((a,b)=>a.at-b.at || a.question-b.question);
+      const history=["build:independent","build:typing","particles:choice","particles:typing"].flatMap(prefix=>progress.items[`${prefix}:${exercise.id}`]?.history || []).sort((a,b)=>a.at-b.at || a.question-b.question);
       const lastFailure=history.findLastIndex(event=>!event.correct && !event.assisted);
       // Old failed answers have no reliable per-particle breakdown. Import
       // only later, fully correct unaided answers; never assume partial skill.

@@ -7,8 +7,11 @@
     const room=height-padding*2;
     let top=scrollTop;
     if(card.bottom-card.top<=room){
-      // The entire card fits: move only enough to reveal it with padding.
-      top=clamp(top,card.bottom-height+padding,card.top-padding);
+      // Balance the space above and below a fully fitting card. Avoid tiny
+      // adjustments only when the current position also preserves the padding.
+      const center=(card.top+card.bottom-height)/2;
+      const padded=card.top-scrollTop>=padding && card.bottom-scrollTop<=height-padding;
+      top=padded && Math.abs(center-scrollTop)<=8?scrollTop:center;
     } else if(phase==="question") {
       top=card.top-padding;
     } else {

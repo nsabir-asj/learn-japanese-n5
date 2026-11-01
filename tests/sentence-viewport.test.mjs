@@ -7,12 +7,14 @@ const context=vm.createContext({});vm.runInContext(source,context);
 const {target}=context.SENTENCE_VIEWPORT;
 const base={scrollTop:500,height:800,documentHeight:4000};
 
-test('short cards are fully revealed with padding and minimal scrolling',()=>{
+test('short cards center in both phases regardless of their previous position',()=>{
   const card={top:600,bottom:1100};
-  assert.equal(target({...base,phase:'question',card}),500,'already visible');
-  assert.equal(target({...base,phase:'review',card}),500,'review stays put too');
-  assert.equal(target({...base,phase:'question',card,scrollTop:900}),576,'reveal the top');
-  assert.equal(target({...base,phase:'review',card,scrollTop:0}),324,'reveal the bottom');
+  assert.equal(target({...base,phase:'question',card}),450);
+  assert.equal(target({...base,phase:'review',card}),450);
+  assert.equal(target({...base,phase:'question',card,scrollTop:900}),450);
+  assert.equal(target({...base,phase:'review',card,scrollTop:0}),450);
+  assert.equal(target({...base,phase:'question',card,scrollTop:454}),454,'already close to center');
+  assert.equal(target({...base,phase:'review',card:{top:3500,bottom:3900}}),3200,'center as far as the document allows');
 });
 
 test('tall new cards align the top; review aligns the bottom when the result and model remain visible',()=>{
@@ -32,6 +34,7 @@ test('document bounds, exact-fit cards, narrow screens, and missing feedback rem
   assert.equal(target({...base,phase:'question',card:{top:5,bottom:1000}}),0);
   assert.equal(target({...base,phase:'review',card:{top:600,bottom:4000}}),3200);
   assert.equal(target({...base,phase:'question',card:{top:600,bottom:1352}}),576,'fits exactly between the padding');
+  assert.equal(target({...base,phase:'question',card:{top:600,bottom:1352},scrollTop:580}),576,'near-center tolerance cannot consume the padding');
   assert.equal(target({...base,phase:'question',height:500,card:{top:600,bottom:1100}}),576);
   assert.equal(target({...base,phase:'review',documentHeight:500,card:{top:0,bottom:450}}),0);
 });

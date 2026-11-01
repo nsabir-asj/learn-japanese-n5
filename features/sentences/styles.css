@@ -153,6 +153,18 @@ body[data-activity="sentences"] .activity-stat>span { min-height:2.6em;line-heig
 
 .sp-progression-note { color:#aec9ba;border-left:2px solid #59796b;padding:5px 12px;font-size:.76rem;line-height:1.6;margin:0 0 18px; }
 .sp-mixed-concepts { color:#aec9ba;font-size:.76rem;line-height:1.6;margin:12px 0 20px;overflow-wrap:anywhere; }
+.sp-compose-controls { display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;color:#adc6b8;font-size:.8rem; }
+.sp-composer { margin-top:18px;border-top:1px solid #39564a;padding-top:18px; }
+.sp-composer label { display:block;color:#bedbcc;font-size:.82rem;margin-bottom:10px; }
+.sp-compose-entry { display:flex;gap:10px;flex-wrap:wrap; }
+.sp-compose-entry input { flex:1;min-width:150px;background:#101e18;color:#ecfff3;border:1px solid #557e69;border-radius:9px;padding:12px;font:inherit;font-size:1rem; }
+.sp-compose-entry input:focus-visible { outline:2px solid #9ddfcd;outline-offset:2px; }
+#builderPreview { color:#bfe9cd;font-size:1.1rem;min-height:1.7em;overflow-wrap:anywhere;margin:12px 0 6px; }
+.sp-composer small { display:block;color:#a5bcb0;font-size:.75rem;line-height:1.7; }
+#showComposerBank { margin-top:20px; }
+.sp-topic-count { max-width:155px;flex:none;padding:5px 8px;line-height:1.5;color:#abc7b9; }
+.sp-topic-option span:not(.sp-topic-count) { min-width:0; }
+@media(max-width:480px) { .sp-topic-option { flex-wrap:wrap;gap:8px 10px; }.sp-topic-count { margin-left:26px;max-width:calc(100% - 26px); }.sp-topic-option span:not(.sp-topic-count) { flex-basis:calc(100% - 26px); } }
 
 /* One help surface: a question hint before submission, a full reference after. */
 .sp-particle-help { min-width:156px; }
