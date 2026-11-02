@@ -27,7 +27,7 @@
   }
   function formAnswers(form) {
     let variants = [""];
-    for (const piece of pieces(form)) variants = variants.flatMap(prefix => (piece.role ? C.roles[piece.role].choices : [piece.text]).map(text => prefix + text));
+    for (const piece of pieces(form)) variants = variants.flatMap(prefix => (piece.role ? C.roles[piece.role].choices : (piece.acceptedTexts||[piece.text])).map(text => prefix + text));
     return variants.map(normalize);
   }
   function acceptedSentences(exercise) {
@@ -170,9 +170,11 @@
     const item = vocabulary.items?.[key];
     return Boolean(item?.introduced && (!mastered || (item.seen > 0 && item.mastery >= 72)));
   });
+  const normalizeTopics=ids=>[...new Set(ids.map(id=>C.topicAliases?.[id]||id))];
   function pool(settings, vocabulary = {}) {
+    const selected=normalizeTopics(settings.topics);
     const all = settings.activity === "verbs" ? verbs : sentenceExamples;
-    return all.filter(exercise => requirements(exercise).every(id=>settings.topics.includes(id)) &&
+    return all.filter(exercise => requirements(exercise).every(id=>selected.includes(id)) &&
       (settings.activity === "verbs" || !["focused","challenge"].includes(settings.difficulty) || exercise.difficulty === settings.difficulty) &&
       (!["introduced","mastered"].includes(settings.vocabulary) || wordIds(exercise).every(id => familiar(id,vocabulary,settings.vocabulary === "mastered"))));
   }
@@ -180,7 +182,7 @@
   const requirements = exercise => exercise.requiredTopics || [exercise.topic];
   const lessonIds = exercise => [...new Set(requirements(exercise).map(id=>C.topics.find(t=>t.id===id).lesson))].sort((a,b)=>a-b);
   function roleTopic(exercise,role) {
-    const candidates={ownedSubject:["existence-uses"],eventSubject:["existence-uses","question-words"],eventPlace:["existence-uses"],alsoObject:["also-actions"],alsoSubject:["also-actions"],alsoPlace:["also-actions"],alsoDestination:["also-actions"],alsoTopic:["also-actions"],meeting:["verb-particles"],waiting:["verb-particles"],understood:["verb-particles"],recipient:["verb-particles"],adverb:["quantity-frequency"],questionTime:["question-words"],weekTime:["time","existence-uses"],possession:["possession","relative-location"],question:["questions"],also:["also"],object:["objects"],destination:["destination"],place:["action-place"],time:["time"],relativeTime:["time","past-actions"],existencePlace:["existence"],subject:["existence"],list:["listing-nouns"],duration:["duration"],companion:["companion"],topic:["pointing","identity","past-nouns"]};
+    const candidates={ownedSubject:["existence"],eventSubject:["existence","question-words"],eventPlace:["existence"],knownPlace:["existence","relative-location"],pastPeriod:["past-actions"],alsoDay:["also-actions"],alsoObject:["also-actions"],alsoSubject:["also-actions"],alsoPlace:["also-actions"],alsoDestination:["also-actions"],alsoTopic:["also-actions"],meeting:["verb-particles"],waiting:["verb-particles"],understood:["verb-particles"],recipient:["verb-particles"],adverb:["quantity-frequency"],questionTime:["question-words"],weekTime:["time","existence-uses"],possession:["possession","relative-location"],question:["questions"],also:["also"],object:["objects"],destination:["destination"],place:["action-place"],time:["time"],relativeTime:["time","past-actions"],existencePlace:["existence"],subject:["existence"],list:["listing-nouns"],duration:["duration"],companion:["companion"],topic:["pointing","identity","past-nouns"]};
     return exercise.requiredTopics ? candidates[role]?.find(id=>requirements(exercise).includes(id)) || exercise.topic : exercise.topic;
   }
   function recordKey(exercise, settings) { return `${settings.activity}:${settings.activity === "build" ? (settings.support==="independent" && ["typing","voice"].includes(settings.buildInput) ? settings.buildInput : settings.support) : settings.input}:${exercise.id}`; }
@@ -350,5 +352,5 @@
   }
   const playbackKey = activity => ({build:"autoAudio",verbs:"autoVerbAudio",particles:"autoParticleAudio"}[activity]);
   const playbackEnabled = settings => settings[playbackKey(settings.activity)] === true;
-  globalThis.SENTENCE_ENGINE = { normalize, shuffle, pieces, slots, model, acceptedSentences, particleAnswer, diagnose, unexpectedWords, tileBank, hiraganaPreview, particlePreview, verbs, wordIds, familiar, pool, recordKey, choose, record, verbChoiceCount, verbChoices, verbChoiceInfo, playbackKey, playbackEnabled, recordParticleEvidence, particlePriority, seedParticleEvidence, sentenceExamples, requirements, lessonIds, roleTopic, particleChoices };
+  globalThis.SENTENCE_ENGINE = { normalize, shuffle, pieces, slots, model, acceptedSentences, particleAnswer, diagnose, unexpectedWords, tileBank, hiraganaPreview, particlePreview, verbs, wordIds, familiar, pool, recordKey, choose, record, verbChoiceCount, verbChoices, verbChoiceInfo, playbackKey, playbackEnabled, recordParticleEvidence, particlePriority, seedParticleEvidence, sentenceExamples, requirements, lessonIds, roleTopic, particleChoices, normalizeTopics };
 })();

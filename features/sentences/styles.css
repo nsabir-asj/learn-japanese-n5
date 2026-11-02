@@ -237,3 +237,5 @@ body[data-activity="sentences"] .activity-stat>span { min-height:2.6em;line-heig
 .sp-voice label { display:block; margin-top:12px; }
 .sp-voice small { display:block; margin-top:8px; }
 .sp-voice-button small { margin:0; }
+
+.sp-topic-option .sp-topic-skills { font-size:.68rem;line-height:1.65;color:#a9c6bb; }

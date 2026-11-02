@@ -4,7 +4,7 @@
   const PACES={gradual:{successes:4,examples:3,active:1,combine:1},balanced:{successes:3,examples:2,active:2,combine:2},brisk:{successes:2,examples:2,active:2,combine:2}};
   const enabled=s=>Boolean(PACES[s.learningPace]) && ["build","particles"].includes(s.activity) && s.review!=="trouble";
   const roles=exercise=>[...new Set(E.slots(exercise).map(slot=>slot.role))];
-  const primaryRoles={"existence-uses":["ownedSubject","eventSubject","eventPlace"],"also-actions":["alsoTopic","alsoObject","alsoSubject","alsoPlace","alsoDestination"],"verb-particles":["meeting","waiting","understood","recipient"],"quantity-frequency":["adverb"],"question-words":["question"],identity:["topic"],possession:["possession"],questions:["question"],pointing:["topic"],also:["also"],objects:["object"],destination:["destination"],"action-place":["place"],time:["time","relativeTime"],companion:["companion"],negative:["object"],existence:["existencePlace","subject"],"relative-location":["possession","topic"],"past-actions":["object"],"past-nouns":["topic"],duration:["duration"],"listing-nouns":["list"]};
+  const primaryRoles={"also-actions":["alsoTopic","alsoObject","alsoSubject","alsoPlace","alsoDestination"],"verb-particles":["meeting","waiting","understood","recipient"],"quantity-frequency":["adverb"],"question-words":["question"],identity:["topic"],possession:["possession"],questions:["question"],pointing:["topic"],also:["also"],objects:["object"],destination:["destination"],"action-place":["place"],time:["time","relativeTime"],companion:["companion"],negative:["object"],existence:["existencePlace","subject","ownedSubject","eventSubject","eventPlace","knownPlace"],"relative-location":["possession","topic"],"past-actions":["object"],"past-nouns":["topic"],duration:["duration"],"listing-nouns":["list"]};
   const isMixed=exercise=>exercise.difficulty==="challenge";
   const combinationKey=exercise=>[...E.requirements(exercise)].sort().join("+");
   function readiness(observations, pace="balanced", availableExamples=Infinity) {
@@ -41,7 +41,9 @@
       }
       if(settings.activity==="particles" && item.combination && selected.has(item.exerciseId)){
         const exercise=selected.get(item.exerciseId);
-        addMixed(exercise,(item.history||[]).map(event=>({...event,exerciseId:exercise.id})));
+        const events=(item.history||[]).map(event=>({...event,exerciseId:exercise.id}));
+        addMixed(exercise,events);
+        if(!exercise.requiredTopics)add(topicEvents,exercise.topic,events);
         continue;
       }
       const prefixes=supported ? ["build:supported:","build:independent:","build:typing:","build:voice:"] : settings.activity==="particles" ? ["build:independent:","build:typing:","build:voice:","particles:choice:","particles:typing:"] : settings.buildInput==="typing" ? ["build:typing:","build:voice:"] : ["build:independent:","build:typing:","build:voice:"];
@@ -71,8 +73,13 @@
       const availableRoles=[...new Set((core.length ? core : examples).flatMap(roles))];
       const required=(primaryRoles[id]||availableRoles).filter(role=>availableRoles.includes(role));
       const structure=readiness(topicEvents.get(id)||[],settings.learningPace);
-      const stable=settings.activity==="particles" ? required.every(role=>skill(role).ready) : structure.ready && (supported || required.every(role=>skill(role).ready));
-      return {id,stable,seen:seenTopics.has(id),required,structure,mixed:readiness(mixedEvents.get(id)||[],settings.learningPace,examples.filter(isMixed).length),hasMixed:pool.some(x=>!x.requiredTopics && x.topic===id && isMixed(x))};
+      const availableSkillIds=[...new Set(pool.filter(x=>!x.requiredTopics&&x.topic===id&&x.skill).map(x=>x.skill))];
+      const checked=new Set((topicEvents.get(id)||[]).filter(event=>event.correct&&!event.assisted).map(event=>selected.get(event.exerciseId)?.skill));
+      const checkedSkills=availableSkillIds.filter(skill=>checked.has(skill)).length;
+      const coverageReady=checkedSkills===availableSkillIds.length;
+      const foundationReady=(settings.activity==="particles" ? required.every(role=>skill(role).ready) : structure.ready && (supported || required.every(role=>skill(role).ready)));
+      const stable=coverageReady&&foundationReady;
+      return {id,stable,foundationReady,coverageReady,checkedSkills,availableSkills:availableSkillIds.length,seen:seenTopics.has(id),required,structure,mixed:readiness(mixedEvents.get(id)||[],settings.learningPace,examples.filter(isMixed).length),hasMixed:pool.some(x=>!x.requiredTopics && x.topic===id && isMixed(x))};
     });
     const unsettled=topics.filter(t=>!t.stable);
     // Resume current concepts before introducing others, in curriculum order.
@@ -109,6 +116,15 @@
           return evidence && evidence.examples<evidence.requiredExamples && !evidence.exampleIds.includes(x.id);
         });
         if(breadth.length)choices=breadth;
+      }
+      // Interleave learning distinctions without repeating a seen sentence in
+      // preference to an unpractised one. Mistake retries retain their own path.
+      if(reason!=="retry"){
+        const unseen=choices.filter(x=>!own(x)?.seen);
+        if(unseen.length)choices=unseen;
+        const keys=new Set(recent.slice(-3).map(id=>pool.find(x=>x.id===id)).filter(Boolean).map(x=>x.skill?`${x.topic}:${x.skill}`:null).filter(Boolean));
+        const varied=choices.filter(x=>!x.skill||!keys.has(`${x.topic}:${x.skill}`));
+        if(varied.length)choices=varied;
       }
       const diverse=choices.filter(x=>x.topic!==last?.topic && recent.slice(-4).filter(id=>pool.find(y=>y.id===id)?.topic===x.topic).length<2);
       if(diverse.length)choices=diverse;
@@ -157,12 +173,12 @@
     if(settings.difficulty==="challenge"){
       // Challenge has no focused exercises. Its progression must use the
       // evidence obtainable here, not wait for an unavailable core exercise.
-      const unfinished=pool.filter(x=>x.requiredTopics ? !plan.combinations.get(combinationKey(x))?.ready : !topic(x.topic)?.mixed.ready).filter(x=>!recent.slice(-2).includes(x.id) && !readiness((own(x)?.history||[]).map(event=>({...event,exerciseId:x.id})),settings.learningPace,1).ready);
+      const unfinished=pool.filter(x=>x.requiredTopics ? !plan.combinations.get(combinationKey(x))?.ready : (!topic(x.topic)?.mixed.ready || !topic(x.topic)?.coverageReady)).filter(x=>!recent.slice(-2).includes(x.id) && !readiness((own(x)?.history||[]).map(event=>({...event,exerciseId:x.id})),settings.learningPace,1).ready);
       if(unfinished.length)return pick(unfinished,"combine","Apply a selected Challenge pattern across varied examples");
       return pick(pool,"review","Selected Challenge patterns established — varied maintenance across your selection");
     }
     const core=pool.filter(x=>!isMixed(x) && plan.active.includes(x.topic));
-    const mixed=pool.filter(x=>isMixed(x) && available(x) && (x.requiredTopics ? !plan.combinations.get(combinationKey(x))?.ready : topic(x.topic)?.stable && !topic(x.topic).mixed.ready) && (settings.difficulty==="challenge" || plan.supported || roles(x).filter(role=>!plan.skill(role).ready).length<=1));
+    const mixed=pool.filter(x=>isMixed(x) && available(x) && (x.requiredTopics ? !plan.combinations.get(combinationKey(x))?.ready : topic(x.topic)?.foundationReady && (!topic(x.topic).mixed.ready || !topic(x.topic).coverageReady)) && (settings.difficulty==="challenge" || plan.supported || !x.requiredTopics&&Boolean(C.topics.find(t=>t.id===x.topic)?.skills) || roles(x).filter(role=>!plan.skill(role).ready).length<=1));
     const combineTurn=progress.total%4<rules.combine;
     if(mixed.length && (combineTurn || !core.length))return pick(mixed,"combine","Combine and transfer familiar patterns");
     if(core.length){

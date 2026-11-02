@@ -908,6 +908,12 @@
       "publishedAt": "2026-11-01",
       "title": "More ways to practise Lesson 4",
       "changes": [{"pages": ["guided"], "text": "Explore five new Lesson 4 topics: having things and scheduled events, adding ‘too’ to actions, verb-specific particles, quantity and frequency, and question words. New sentence combinations and varied durations build on earlier lessons. Practise にも and でも with matching explanations and partial feedback; vocabulary and topic filters still apply. Voice input no longer reports a stopped recording when checking a typed answer without using the microphone."}]
+    },
+    {
+      "id": "2026-11-02.1",
+      "publishedAt": "2026-11-02",
+      "title": "Deeper Lesson 4 topic families",
+      "changes": [{"pages": ["guided"], "text": "Existence now includes having and events in one family. Lesson 4 can use earlier grammar without selecting earlier topics, while other Lesson 4 focuses remain optional. Explore distinct skills within each family, including shorter Challenge contrasts, reference points, location questions, past habits, prices, and noun lists. Progress checks skill coverage, and saved exercise records are retained."}]
     }
   ]
 }

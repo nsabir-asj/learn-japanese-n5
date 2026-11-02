@@ -6,11 +6,11 @@ const context=vm.createContext({});
 for(const path of ['content/sentences/course.js','features/sentences/engine.js','features/sentences/progression.js'])vm.runInContext(readFileSync(new URL(`../${path}`,import.meta.url),'utf8'),context);
 const C=context.SENTENCE_COURSE,E=context.SENTENCE_ENGINE,P=context.SENTENCE_PROGRESSION;
 const settings={activity:'build',support:'independent',input:'choice',difficulty:'auto',learningPace:'balanced',review:'all',vocabulary:'any',topics:Array.from(C.topics.filter(t=>!t.verbGroup),t=>t.id)};
-const mixed=Array.from(C.mixedSentences),plain=x=>JSON.parse(JSON.stringify(x));
+const mixed=Array.from(E.sentenceExamples.filter(x=>x.requiredTopics)),plain=x=>JSON.parse(JSON.stringify(x));
 
 test('mixed content has unique models, explicit valid requirements, and checked level metadata',()=>{
   assert.ok(mixed.length>=60);
-  assert.equal(C.sentences.filter(s=>!s.lesson4Expansion).length,160,'preserve the original collection and its IDs');
+  assert.equal(C.sentences.filter(s=>!s.lesson4Expansion&&!s.familyExpansion).length,160,'preserve the original collection and its IDs');
   const ids=new Set(),models=new Set();
   for(const exercise of E.sentenceExamples){
     assert.ok(!ids.has(exercise.id),exercise.id);ids.add(exercise.id);
@@ -48,13 +48,13 @@ test('every topic subset of each combination uses all-of selection; deselection 
 });
 
 test('mixed grammar requirements cover all tested particle roles and past or negative endings',()=>{
-  const topicForRole={possession:['possession','relative-location'],question:['questions','question-words'],also:['also'],object:['objects','question-words','verb-particles','quantity-frequency'],destination:['destination','question-words','quantity-frequency'],place:['action-place','relative-location','question-words'],time:['time'],existencePlace:['existence','quantity-frequency','also-actions'],subject:['existence','quantity-frequency'],list:['listing-nouns'],duration:['duration','question-words'],companion:['companion','question-words']};
+  const topicForRole={possession:['possession','relative-location'],question:['questions','question-words'],also:['also'],object:['objects','question-words','verb-particles','quantity-frequency'],destination:['destination','question-words','quantity-frequency'],place:['action-place','relative-location','question-words'],time:['time'],existencePlace:['existence','quantity-frequency','also-actions'],subject:['existence','quantity-frequency'],list:['listing-nouns','relative-location'],duration:['duration','question-words'],companion:['companion','question-words']};
   for(const ex of mixed){
-    for(const slot of E.slots(ex))if(topicForRole[slot.role])assert.ok(topicForRole[slot.role].some(id=>ex.requiredTopics.includes(id)),`${ex.id}: ${slot.role}`);
+    for(const slot of E.slots(ex))if(topicForRole[slot.role])assert.ok(topicForRole[slot.role].some(id=>[...ex.requiredTopics,...(ex.backgroundTopics||[])].includes(id)),`${ex.id}: ${slot.role}`);
     for(const piece of E.pieces(ex)){
-      if(/ません|ました/.test(piece.text))assert.ok((/でした|ました/.test(piece.text) ? ex.requiredTopics.includes('past-actions') : ['negative','existence-uses','quantity-frequency'].some(id=>ex.requiredTopics.includes(id))),`${ex.id}: ${piece.text}`);
+      if(/ません|ました/.test(piece.text))assert.ok((/でした|ました/.test(piece.text) ? ex.requiredTopics.includes('past-actions') : ['negative','existence','quantity-frequency'].some(id=>ex.requiredTopics.includes(id))),`${ex.id}: ${piece.text}`);
       if(/でした|じゃなかったです/.test(piece.text)&&!piece.wordId)assert.ok(ex.requiredTopics.includes('past-nouns'),ex.id);
-      if(['kore','sore','are','kono'].includes(piece.wordId))assert.ok(ex.requiredTopics.includes('pointing'),ex.id);
+      if(['kore','sore','are','kono'].includes(piece.wordId))assert.ok([...ex.requiredTopics,...(ex.backgroundTopics||[])].includes('pointing'),ex.id);
     }
   }
 });
@@ -141,7 +141,7 @@ function run(s,rounds=220,progress={total:0,items:{}},outcome=()=>({correct:true
 }
 
 test('successful Auto practice reaches two, three and four concepts, with spaced rotation in both activities',()=>{
-  const topics=['possession','objects','action-place','past-actions'];
+  const topics=['duration','relative-location','verb-particles','past-actions'];
   for(const activity of ['build','particles'])for(const support of activity==='build'?['supported','independent']:['independent']){
     const result=run({...settings,activity,support,topics});
     for(const size of [2,3,4])assert.ok(result.trace.some(x=>x.size===size),`${activity}/${support} did not reach ${size}`);
@@ -152,7 +152,7 @@ test('successful Auto practice reaches two, three and four concepts, with spaced
 });
 
 test('mixed successes never award isolated-topic mastery; support stays separate; failures remain bounded',()=>{
-  const topics=['possession','objects','action-place','past-actions'],s={...settings,topics,difficulty:'challenge'};
+  const topics=['duration','relative-location','verb-particles','past-actions'],s={...settings,topics,difficulty:'challenge'};
   const pool=E.pool(s),ex=pool.find(x=>x.requiredTopics?.length===2),progress={total:0,items:{}};
   for(let i=0;i<4;i++){
     progress.total=i*3+1;E.record(progress,E.recordKey(ex,s),true,false,1000+i*1000);
@@ -168,7 +168,7 @@ test('mixed successes never award isolated-topic mastery; support stays separate
 });
 
 test('particle combination evidence preserves correct particles after wrong verbs, without duplicate grading',()=>{
-  const ex=mixed.find(x=>x.id==='mix-past-friend-book'),progress={items:{},total:0};
+  const ex=mixed.find(x=>x.id==='mix-past-hour-library-front-wait'),progress={items:{},total:0};
   for(let i=0;i<4;i++){
     progress.total=1+i*3;
     E.record(progress,E.recordKey(ex,settings),false,false,1000+i*1000);
@@ -180,17 +180,17 @@ test('particle combination evidence preserves correct particles after wrong verb
   assert.equal(skill.weak,false);
   assert.equal(skill.successes,4);
   assert.ok(plan.topics.every(x=>!x.structure.ready));
-  for(const role of ['possession','object'])assert.equal(E.roleTopic(ex,role),role==='object'?'objects':'possession');
+  assert.equal(E.roleTopic(ex,'waiting'),'verb-particles');assert.equal(E.roleTopic(ex,'duration'),'duration');
   assert.equal(E.roleTopic(C.sentences.find(x=>x.id==='past-read'),'object'),'past-actions','retain existing single-topic targets');
 });
 
 test('all paces retain filter boundaries and recover progress after saving and switching modes',()=>{
   for(const learningPace of ['gradual','balanced','brisk']){
-    const s={...settings,learningPace,topics:['possession','objects','action-place','past-actions']};
+    const s={...settings,learningPace,topics:['duration','relative-location','verb-particles','past-actions']};
     const learned=run(s,180);
     assert.ok(learned.trace.some(x=>x.size===2),learningPace);
     const resumed=run({...s,activity:'particles'},30,plain(learned.progress));
-    assert.ok(resumed.trace.some(x=>x.size>=2),learningPace);
+    assert.ok([...resumed.plan.combinations.values()].some(x=>x.ready),`${learningPace}: shared combination progress must survive the format switch`);
     const narrowed={...s,topics:['objects','action-place']};
     assert.ok(E.pool(narrowed).every(ex=>E.requirements(ex).every(id=>narrowed.topics.includes(id))));
     assert.ok(!E.pool(narrowed).some(x=>x.requiredTopics),'incompatible selections do not invent combinations');

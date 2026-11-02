@@ -170,9 +170,9 @@ test('Lesson 4 is selectable in every activity with eight new verbs and past for
   assert.ok(C.lessons.some(l=>l.id===4));
   for(const activity of ['build','particles']){
     const pool=E.pool({...config,activity,topics});
-    assert.equal(pool.filter(x=>!x.requiredTopics).length,108);
-    assert.equal(pool.length,132);
-    assert.equal(new Set(pool.map(s=>s.topic)).size,11);
+    assert.equal(pool.filter(x=>!x.requiredTopics).length,179);
+    assert.equal(pool.length,214);
+    assert.equal(new Set(pool.map(s=>s.topic)).size,10);
     assert.ok(pool.every(s=>E.slots(s).length>0));
   }
   const pool=E.pool({...config,activity:'verbs',topics});
@@ -513,12 +513,12 @@ test('familiar roles get occasional checks while newer roles receive most turns'
 });
 
 
-test('each sentence topic has eight to sixteen distinct checked examples',()=>{
-  assert.equal(C.sentences.filter(s=>!s.lesson4Expansion).length,160);
+test('each sentence topic has at least eight distinct checked examples per visible topic',()=>{
+  assert.equal(C.sentences.filter(s=>!s.lesson4Expansion&&!s.familyExpansion).length,160);
   const models=new Set();
-  for(const topic of C.topics.filter(t=>!t.verbGroup)){
+  for(const topic of C.topics.filter(t=>!t.verbGroup&&!t.parentTopic)){
     const family=C.sentences.filter(x=>x.topic===topic.id);
-    assert.ok(family.length>=8 && family.length<=16,`${topic.id}: ${family.length}`);
+    assert.ok(family.length>=8,`${topic.id}: ${family.length}`);
     for(const sentence of family){
       const model=E.normalize(E.model(sentence));
       assert.ok(!models.has(model),`Repeated Japanese sentence: ${sentence.id}`);models.add(model);

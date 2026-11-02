@@ -7,10 +7,10 @@ for(const file of ['features/kana/vocabulary-speaking.js','content/sentences/cou
 const C=c.SENTENCE_COURSE,E=c.SENTENCE_ENGINE,T=c.SENTENCE_COMPOSER;
 const ex=id=>E.sentenceExamples.find(s=>s.id===id);
 const accepts=(id,text)=>E.acceptedSentences(ex(id)).has(E.normalize(text));
-test('Lesson 4 adds five selectable topics and 76 distinct sentences without replacing existing IDs',()=>{
+test('expanded Lesson 4 records keep their IDs while having joins the existence family',()=>{
   assert.equal(C.sentences.filter(s=>s.lesson4Expansion).length,48);
   assert.equal(C.mixedSentences.filter(s=>s.lesson4Expansion).length,28);
-  for(const id of ['existence-uses','also-actions','verb-particles','quantity-frequency','question-words']){
+  for(const id of ['existence','also-actions','verb-particles','quantity-frequency','question-words']){
     const topic=C.topics.find(t=>t.id===id);assert.equal(topic.lesson,4);assert.ok(topic.rule&&topic.examples.length>=2);
     assert.ok(C.sentences.filter(s=>s.topic===id&&s.difficulty==='focused').length>=2,id);
   }

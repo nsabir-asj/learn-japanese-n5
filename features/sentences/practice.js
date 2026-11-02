@@ -12,7 +12,7 @@
       state = { ...state, ...saved, settings:{...state.settings,...saved.settings,scopes:{...state.settings.scopes,...saved.settings?.scopes}} };
       for (const field of ["items","skills","introduced","wordsSeen"]) if (!state[field] || typeof state[field] !== "object" || Array.isArray(state[field])) state[field] = {};
       for (const [key, options] of Object.entries({activity:["build","particles","verbs"],support:["supported","independent"],input:["choice","typing"],buildInput:["tiles","typing"],typingScript:["romaji","japanese"],learningPace:["gradual","balanced","brisk"],difficulty:["auto","focused","challenge"],bankSize:["auto","8","12"],verbChoices:["auto","4","6"],vocabulary:["prefer","introduced","mastered","any"],review:["all","trouble"]})) if (!options.includes(state.settings[key])) state.settings[key] = defaults().settings[key];
-      for (const activity of ["build","particles","verbs"]) state.settings.scopes[activity] = Array.isArray(state.settings.scopes[activity]) ? state.settings.scopes[activity].filter(id => C.topics.some(t => t.id === id)) : defaults().settings.scopes[activity];
+      for (const activity of ["build","particles","verbs"]) state.settings.scopes[activity] = Array.isArray(state.settings.scopes[activity]) ? E.normalizeTopics(state.settings.scopes[activity]).filter(id => C.topics.some(t => t.id === id && !t.parentTopic)) : defaults().settings.scopes[activity];
     }
   } catch { /* A broken saved snapshot should not stop practice. */ }
   let verbOptions = [];
@@ -25,7 +25,7 @@
   const settings = () => globalThis.SENTENCE_COMPOSER.attemptSettings({...state.settings,topics:state.settings.scopes[state.settings.activity]},attemptUsedTiles,attemptUsedVoice);
   const typingBuild = () => state.settings.activity==="build" && state.settings.support==="independent" && state.settings.buildInput==="typing";
   const modeName = () => ({build:state.settings.support === "supported" ? "Supported building" : "Independent building",particles:state.settings.input === "choice" ? "Particle choices" : "Particle recall",verbs:state.settings.input === "choice" ? "Verb choices" : "Verb recall"}[state.settings.activity]);
-  const availableTopics = () => C.topics.filter(t => state.settings.activity === "verbs" ? t.verbGroup : !t.verbGroup);
+  const availableTopics = () => C.topics.filter(t => !t.parentTopic && (state.settings.activity === "verbs" ? t.verbGroup : !t.verbGroup));
   function vocabulary() { try { return JSON.parse(localStorage.getItem("kanaSprintVocabularyV1")) || {}; } catch { return {}; } }
   function save() {
     state.savedAt = Date.now();
@@ -67,7 +67,7 @@
     $("#modeDescription").textContent = s.activity === "build" ? s.support === "supported" ? "Start with useful chunks. Particles stay attached to their words." : typingBuild() ? "Recall words and particles in romaji. Space places each word; switch to word tiles whenever that is easier." : "Choose words and particles separately. Extra particles can remain unused." : s.activity === "particles" ? "The words are in place. Choose what connects them; sometimes no particle is needed." : "Start from the dictionary form. Practise polite affirmative, negative, and past forms.";
     $("#difficultyControl").hidden=s.activity==="verbs";
     document.querySelectorAll("[data-difficulty]").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.difficulty===s.difficulty)));
-    $("#difficultyDescription").textContent=({auto:"Learning pace guides progression from individual patterns to selected topic combinations, then review.",focused:"Shorter examples centred on one main pattern. Keeps your selected lessons and vocabulary filter.",challenge:"Checked sentences combine your selected topics, including across lessons. Vocabulary filters still apply."})[s.difficulty];
+    $("#difficultyDescription").textContent=({auto:"Learning pace guides progression from individual patterns to selected topic combinations, then review.",focused:"Shorter examples centred on one main pattern. Keeps your selected lessons and vocabulary filter.",challenge:"Practise meaningful contrasts and combinations within your selected topics. Earlier grammar can support Lesson 4; vocabulary filters still apply."})[s.difficulty];
     $("#learningPace").value=s.learningPace;
     $("#learningPaceSetting").hidden=s.activity==="verbs" || s.review==="trouble";
     $("#progressionNote").textContent=globalThis.SENTENCE_PROGRESSION.status(pool(),settings(),state);
@@ -94,11 +94,13 @@
   }
   function renderProgress() {
     const s = settings();
+    const coverage=s.activity!=="verbs" ? globalThis.SENTENCE_PROGRESSION.profile(pool(),s,state).topics : [];
     $("#progressBody").innerHTML = `<p class="sp-muted">Supported building, independent building, choices, typing, and voice input have separate records. Independent building and particle practice share scheduling evidence for each particle role. Familiar sentences return less often; activity scores stay separate. Reading a rule or arranging a supported chunk does not establish independent particle recall.</p><div class="sp-progress-grid">${availableTopics().filter(t => s.topics.includes(t.id)).map(topic => {
       const exercises = E.pool({...s,topics:[topic.id],vocabulary:"any",difficulty:"auto"});
+      const family=coverage.find(x=>x.id===topic.id);
       const rows = exercises.map(x => state.items[E.recordKey(x,s)]).filter(Boolean);
       const correct = rows.reduce((a,x) => a + x.correct,0), attempts = rows.reduce((a,x) => a + x.correct + x.wrong,0);
-      return `<div><strong>${esc(topic.title)}</strong><span>${rows.length}/${exercises.length} practised · ${attempts ? `${Math.round(correct/attempts*100)}% unaided` : "No unaided answers yet"}</span></div>`;
+      return `<div><strong>${esc(topic.title)}</strong><span>${rows.length}/${exercises.length} practised${family?.availableSkills ? ` · ${family.checkedSkills}/${family.availableSkills} skills checked unaided` : ""} · ${attempts ? `${Math.round(correct/attempts*100)}% unaided` : "No unaided answers yet"}</span></div>`;
     }).join("")}${(() => {
       const examples=E.pool({...s,vocabulary:"any",difficulty:"auto"}).filter(x=>x.requiredTopics);
       if(!examples.length)return "";
@@ -139,7 +141,7 @@
     const topics=E.requirements(current).map(id=>C.topics.find(t=>t.id===id));
     const lessons=E.lessonIds(current);
     const stage=globalThis.SENTENCE_PROGRESSION.enabled(settings()) && state.lastSelection?.id===current.id ? ({establish:"Pattern practice",distinguish:"Contrast practice",combine:"Mixed application",retry:"Targeted check",retention:"Later review",review:"Maintenance"})[state.lastSelection.reason] : "";
-    $("#questionCard").innerHTML = `<div class="sp-card-top"><span class="sp-eyebrow">${esc(modeName())}${stage ? ` · ${esc(stage)}` : ""}</span><span class="sp-lesson-tag">${lessons.length===1 ? "Lesson" : "Lessons"} ${lessons.join(" + ")}</span></div>${current.requiredTopics ? `<p class="sp-mixed-concepts">Mixed concepts · ${topics.map(t=>esc(t.title)).join(" · ")}</p>` : ""}${s.activity === "verbs" ? `<div class="sp-verb-prompt"><h2 id="exercisePrompt" tabindex="-1" lang="ja">${esc(current.verb.jp)}</h2><p>→ Make the polite <mark>${esc(current.form)}</mark> form</p></div>` : `<p class="sp-task-label">Say this in Japanese</p><h2 id="exercisePrompt" tabindex="-1">${esc(current.meaning)}</h2>`}${current.context ? `<p class="sp-context-note">${esc(current.context)}</p>` : ""}<div id="exerciseBody"></div><div class="sp-answer-feedback" id="answerFeedback" role="status" aria-live="polite"></div><div class="sp-footer"><div class="sp-actions"><button class="sp-primary" type="button" data-action="check" id="checkAnswer" aria-keyshortcuts="Enter">Check answer <kbd>Enter</kbd></button><button class="sp-secondary" type="button" data-action="next" id="nextExercise" aria-keyshortcuts="Enter" hidden>Next sentence →</button><button class="sp-text-button" type="button" data-action="unknown" id="dontKnow">I don’t know</button></div><button class="sp-hint-button ${s.activity === "verbs" ? "" : "sp-particle-help"}" type="button" data-action="hint" id="hintButton" aria-haspopup="dialog" aria-controls="ruleDialog">${globalThis.SENTENCE_HELP.buttonMarkup(s.activity,false)}</button><p class="sp-keyboard" id="keyboardNote"></p></div>`;
+    $("#questionCard").innerHTML = `<div class="sp-card-top"><span class="sp-eyebrow">${esc(modeName())}${stage ? ` · ${esc(stage)}` : ""}</span><span class="sp-lesson-tag">${lessons.length===1 ? "Lesson" : "Lessons"} ${lessons.join(" + ")}</span></div>${current.requiredTopics ? `<p class="sp-mixed-concepts">Mixed concepts · ${topics.map(t=>esc(t.title)).join(" · ")}</p>` : ""}${s.activity === "verbs" ? `<div class="sp-verb-prompt"><h2 id="exercisePrompt" tabindex="-1" lang="ja">${esc(current.verb.jp)}</h2><p>→ Make the polite <mark>${esc(current.form)}</mark> form</p></div>` : `<p class="sp-task-label">Say this in Japanese</p><h2 id="exercisePrompt" tabindex="-1">${esc(current.meaning)}</h2>`}${current.skill ? `<p class="sp-mixed-concepts">Focus · ${esc(C.topics.find(t=>t.id===current.topic)?.skills?.find(skill=>skill.id===current.skill)?.label||current.skill)}</p>` : ""}${current.backgroundTopics?.length ? `<p class="sp-context-note">Earlier grammar · ${current.backgroundTopics.map(id=>esc(C.topics.find(t=>t.id===id)?.title||id)).join(" · ")}</p>` : ""}${current.context ? `<p class="sp-context-note">${esc(current.context)}</p>` : ""}<div id="exerciseBody"></div><div class="sp-answer-feedback" id="answerFeedback" role="status" aria-live="polite"></div><div class="sp-footer"><div class="sp-actions"><button class="sp-primary" type="button" data-action="check" id="checkAnswer" aria-keyshortcuts="Enter">Check answer <kbd>Enter</kbd></button><button class="sp-secondary" type="button" data-action="next" id="nextExercise" aria-keyshortcuts="Enter" hidden>Next sentence →</button><button class="sp-text-button" type="button" data-action="unknown" id="dontKnow">I don’t know</button></div><button class="sp-hint-button ${s.activity === "verbs" ? "" : "sp-particle-help"}" type="button" data-action="hint" id="hintButton" aria-haspopup="dialog" aria-controls="ruleDialog">${globalThis.SENTENCE_HELP.buttonMarkup(s.activity,false)}</button><p class="sp-keyboard" id="keyboardNote"></p></div>`;
     if (s.activity === "build") {
       bank = E.tileBank(current,s.support === "supported",Math.random,{settings:s,vocabulary:vocabulary()});
       $("#exerciseBody").innerHTML = `<div class="sp-answer-zone"><div class="sp-zone-heading"><span>Your sentence</span><button class="sp-text-button" type="button" data-action="clear">Clear</button></div><div id="builtAnswer" class="sp-built-answer" aria-label="Your sentence"></div></div><div class="sp-bank-heading"><span>${s.support === "supported" ? "Sentence chunks" : "Words"} · ${bank.length} choices</span><small>Extra choices can remain. Click an answer tile to remove it.</small></div><div id="wordBank" class="sp-tile-bank"></div>${s.support === "independent" ? `<div class="sp-bank-heading"><span>Particles</span><small>Reusable · extra choices may remain</small></div><div id="particleBank" class="sp-tile-bank sp-particle-bank">${["は","が","を","に","へ","で","の","と","も","か"].map(text => `<button class="sp-tile sp-particle" type="button" data-particle="${text}" lang="ja">${text}</button>`).join("")}</div>` : ""}`;
@@ -341,7 +343,7 @@
     $("#helpTabs").hidden=!view.tabs;
     // Clear question-specific content after submission. The reference remains
     // mounted so its scroll position survives closing and reopening the dialog.
-    $("#ruleBody").innerHTML=view.hint ? `${topics.map(topic=>`<h3>${esc(topic.title)}</h3>${ruleMarkup(topic)}`).join("")}${hint ? `<details class="sp-breakdown"><summary>Show word meanings</summary>${wordGlossary()}</details>` : ""}<p class="sp-muted">Using help marks this attempt as assisted. Accuracy and streak are unchanged.</p>` : "";
+    $("#ruleBody").innerHTML=view.hint ? `${current.contrast ? `<p class="sp-rule-copy">${esc(current.contrast)}</p>` : ""}${topics.map(topic=>`<h3>${esc(topic.title)}</h3>${ruleMarkup(topic)}`).join("")}${hint ? `<details class="sp-breakdown"><summary>Show word meanings</summary>${wordGlossary()}</details>` : ""}<p class="sp-muted">Using help marks this attempt as assisted. Accuracy and streak are unchanged.</p>` : "";
     $("#ruleBody").setAttribute("aria-labelledby",view.tabs?"questionHintTab":"ruleTitle");
     $("#particleGuidePanel").setAttribute("aria-labelledby",view.tabs?"particleGuideTab":"ruleTitle");
     $("#ruleDialog").classList.toggle("sp-help-dialog",view.guide);
@@ -356,7 +358,7 @@
     document.querySelectorAll("[data-scope-view]").forEach(x => x.setAttribute("aria-pressed",String(x.dataset.scopeView === scopeView)));
     const list = availableTopics().filter(t => E.normalize(`${t.title} ${t.subtitle} Lesson ${t.lesson}`).includes(E.normalize(scopeSearch)));
     const summary=globalThis.SENTENCE_SCOPE.describe([...draft],availableTopics().map(t=>t.id),ids=>pool({...settings(),topics:ids}),state.settings.activity==="verbs");
-    const topicRow = t => `<label class="sp-topic-option"><input type="checkbox" data-topic="${t.id}" ${draft.has(t.id) ? "checked" : ""}><span><strong>${esc(t.title)}</strong><small>${scopeView === "topics" ? `Lesson ${t.lesson} · ` : ""}${esc(t.subtitle)}</small></span><span class="sp-topic-count" title="${esc(summary.rows.get(t.id).detail)}">${esc(summary.rows.get(t.id).label)}</span></label>`;
+    const topicRow = t => `<label class="sp-topic-option"><input type="checkbox" data-topic="${t.id}" ${draft.has(t.id) ? "checked" : ""}><span><strong>${esc(t.title)}</strong><small>${scopeView === "topics" ? `Lesson ${t.lesson} · ` : ""}${esc(t.subtitle)}</small>${t.skills ? `<small class="sp-topic-skills">${t.skills.length} skills · ${t.skills.map(skill=>esc(skill.label)).join(" · ")}</small>` : ""}</span><span class="sp-topic-count" title="${esc(summary.rows.get(t.id).detail)}">${esc(summary.rows.get(t.id).label)}</span></label>`;
     $("#scopeOptions").innerHTML = list.length ? scopeView === "topics" ? list.map(topicRow).join("") : C.lessons.map(lesson => {
       const rows = list.filter(t => t.lesson === lesson.id);
       if (!rows.length) return "";
@@ -369,7 +371,7 @@
     const count = summary.total;
     $("#selectionCount").textContent = `${draft.size} topics · ${count} matching exercises`;
     $("#selectionFilters").textContent = `${state.settings.activity==="verbs" ? "Verb practice" : ({auto:"Auto difficulty",focused:"Focused",challenge:"Challenge"})[state.settings.difficulty]} · ${({any:"Any collection words",prefer:"Prefer familiar words",introduced:"Only introduced words",mastered:"Only mastered words"})[state.settings.vocabulary]} · ${state.settings.review==="trouble" ? "Trouble only" : "New + review"}`;
-    $("#selectionHint").textContent = state.settings.activity === "verbs" ? "Lesson 3 and 4 verbs, including past forms in Lesson 4." : `${summary.standalone} standalone + ${summary.mixed} mixed exercises. Row counts reflect this selection if checked; mixed exercises can involve several topics but are counted once in the total.`;
+    $("#selectionHint").textContent = state.settings.activity === "verbs" ? "Lesson 3 and 4 verbs, including past forms in Lesson 4." : `${summary.standalone} standalone + ${summary.mixed} mixed exercises. Row counts reflect this selection if checked; mixed exercises combine selected focus topics and are counted once. Lesson 4 can also use grammar from Lessons 1–3 without selecting them.`;
     $("#applyScope").disabled = !draft.size;
   }
   document.addEventListener("click",event => {
@@ -394,7 +396,7 @@
       state.settings.typingScript=button.dataset.typingScript;save();updateTypingPreview();return;
     }
     if (button.dataset.scopeView) {scopeView=button.dataset.scopeView;renderScope();return;}
-    if (button.dataset.focus) {state.settings.activity="particles";state.settings.scopes.particles=[button.dataset.focus];state.settings.review="all";save();advance();return;}
+    if (button.dataset.focus) {state.settings.activity="particles";state.settings.scopes.particles=E.normalizeTopics([button.dataset.focus]);state.settings.review="all";save();advance();return;}
     if (button.id === "openScope") return openScope();
     if (button.id === "closeScope") return $("#scopeDialog").close();
     if (button.id === "closeRule") {rememberGuideScroll();$("#ruleDialog").close();return;}

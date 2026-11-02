@@ -29,8 +29,8 @@ function run(s,progress,rounds=60,outcome=()=>({correct:true}),pool=E.pool(s,voc
   }
   return trace;
 }
-test('the screenshot’s 22/30 Challenge pool escapes the three-sentence loop after successful answers',()=>{
-  assert.equal(E.pool(base,vocabulary).length,22);assert.equal(E.pool({...base,vocabulary:'any'}).length,30);
+test('the expanded Challenge collection escapes the historical three-sentence loop after successful answers',()=>{
+  assert.ok(E.pool(base,vocabulary).length>=22);assert.ok(E.pool({...base,vocabulary:'any'}).length>=30);
   const progress=prior(base),trace=run(base,progress);
   assert.ok(trace.filter(x=>x.id==='place-library-friend-book').length<=6);
   assert.ok(new Set(trace.slice(-15).map(x=>x.id)).size>=8);

@@ -524,7 +524,135 @@
     ["yomu", "miru", "kiku", "hanasu"], ["taberu", "nomu"], ["iku", "kaeru", "kuru"],
     ["okiru", "neru"], ["suru", "benkyousuru"]
   ];
-  globalThis.SENTENCE_COURSE = { topics, words, verbs, roles, sentences, mixedSentences, wordGroups, lessons: [
+  // Families describe the learning decision, not just a sentence template.
+  const topicAliases={"existence-uses":"existence"};
+  const canonical=id=>topicAliases[id]||id;
+  const familySkills={
+    existence:[["things","Things and living beings"],["absence","Negative existence"],["known","Locate something already mentioned"],["having","Having things or relationships"],["events","Scheduled events"],["ask","Existence questions"],["identity","Existence versus identity"],["relative","Existence at relative positions"]],
+    "relative-location":[["positions","Relative positions"],["between","Between two references"],["perspective","Choose the reference point"],["description","Describe the reference noun"],["activity","Activities at a relative location"],["movement","Move to a relative location"],["ask","Ask and answer where"],["correction","Correct a location claim"]],
+    "past-actions":[["affirmative","Completed actions"],["negative","Actions that did not happen"],["habit","Past habits"],["ask","Questions about past actions"]],
+    "past-nouns":[["identity","Past identity"],["negative","Negative past descriptions"],["belonging","Past noun relationships"],["price","Past prices"]],
+    duration:[["exact","Elapsed time"],["approximate","Approximate duration"],["half","Half hours"],["clock","Clock time versus duration"],["ask","Ask how long"]],
+    "listing-nouns":[["objects","A list as the object"],["subjects","A list of things that exist"],["destinations","A list of destinations"],["companions","A list of companions"]],
+    "also-actions":[["person","Add a person"],["object","Add an object"],["subject","Add something that exists"],["place","Add a location or destination"],["day","Add a day"]],
+    "verb-particles":[["meeting","Meet a person"],["waiting","Wait for a person"],["understood","Understand a language"],["recipient","Write to a recipient"]],
+    "quantity-frequency":[["quantity","Amount"],["frequency","Frequency"],["limited","Not much or not often"],["none","Not at all"]],
+    "question-words":[["place","Where"],["person","Who"],["time","When"],["length","How long"]]
+  };
+  for(const topic of topics)if(familySkills[topic.id])topic.skills=familySkills[topic.id].map(([id,label])=>({id,label}));
+  const existenceTopic=topics.find(t=>t.id==="existence");
+  Object.assign(existenceTopic,{title:"Existence and having: ある・いる",subtitle:"Presence, absence, having, events, and questions",rule:existenceTopic.rule+" あります also describes having things or time, or a scheduled event; います can describe having friends or siblings. A known person or thing can be the topic は, followed by place に + います / あります. Events use venue で. Use です for identity rather than existence."});
+  topics.find(t=>t.id==="existence-uses").parentTopic="existence";
+  topics.find(t=>t.id==="relative-location").rule+=" With a movement verb, use the whole position phrase as the destination with に or へ. Keep the reference object and the object being located distinct.";
+  topics.find(t=>t.id==="past-actions").rule+=" Past habits also use these past endings. こどものとき means when you were a child and may be followed by に.";
+  topics.find(t=>t.id==="past-nouns").rule+=" Prices and affiliations also use noun-sentence endings, rather than the past verb endings.";
+  topics.find(t=>t.id==="duration").rule+=" Add はん after an hour duration to add half an hour, then ぐらい after the full duration for approximately. なんじかん asks how many hours without に.";
+  Object.assign(topics.find(t=>t.id==="relative-location"),{subtitle:"Positions, reference points, activities, destinations, and questions"});
+  for(const row of [["ano","あの","ano","that … over there"],["hito","ひと","hito","person"],["koko","ここ","koko","here"],["asoko","あそこ","asoko","over there"],["nani","なに","nani","what"],["toki","とき","toki","time / when"],["price3000","さんぜんえん","sanzenen","3,000 yen"],["price2000","にせんえん","nisenen","2,000 yen"]])w(...row);
+  words.nani.vocabularyIds=["nan-nani"];
+  for(const id of ["price3000","price2000"])words[id].foundation=true;
+  Object.assign(roles,{
+    knownPlace:{title:"Location of the topic",note:"に locates a person or thing already introduced as the topic は. Here います / あります describes being there; です can also describe a location in the accepted alternative.",choices:["に"]},
+    pastPeriod:{title:"When in your life",note:"こどものとき means when you were a child. に is optional after this noun time phrase. This is different from きのう, which normally takes no に.",choices:["","に"]},
+    alsoDay:{title:"Another day",note:"にも keeps the time に before も. A weekday can also take も without に. Do not add はも.",choices:["にも","も"]}
+  });
+  const familyAdd=(id,topic,skill,meaning,chunks,options={})=>{
+    const {backgroundTopics=[],contrast="",...rest}=options;
+    const order=chunks.map((_,i)=>i);
+    add(`family-${id}`,topic,meaning,chunks,{familyExpansion:true,skill,backgroundTopics,contrast,orders:[order],...rest});
+  };
+  const a=familyAdd;
+  const endq=text=>[{text},p("question")];
+  const identityRef=()=>[word("ano"),word("hito"),p("topic")];
+  const whenChild=()=>[word("kodomo"),p("possession"),word("toki"),p("pastPeriod")];
+  const at=position;
+  a("student-present","existence","identity","There is a student here.",[phrase("koko","existencePlace"),phrase("gakusei","subject"),v("iru")],{contrast:"Introduce someone who is present, rather than identify their occupation.",context:"You notice a student nearby. Report that a student is here."});
+  a("person-student","existence","identity","That person is a student.",[identityRef(),nounEnd("gakusei")],{backgroundTopics:["pointing","identity"],contrast:"Identify a person with です instead of reporting existence.",context:"Someone asks what that person does. Identify them as a student."});
+  a("person-teacher","existence","identity","That person is a teacher.",[identityRef(),nounEnd("sensei")],{backgroundTopics:["pointing","identity"],contrast:"A description of identity uses です, not います.",context:"You are identifying the occupation of the person over there."});
+  a("no-students","existence","absence","There are no students in the library.",[phrase("toshokan","existencePlace"),phrase("gakusei","subject"),v("iru",true)],{contrast:"Choose negative います for people, not negative あります."});
+  a("no-water","existence","absence","There is no water here.",[phrase("koko","existencePlace"),phrase("mizu","subject"),v("aru",true)],{contrast:"Choose negative あります for a thing, not negative います."});
+  for(const [id,thing,place,verb,en]of [["known-cat","neko","uchi","iru","The cat is at home."],["known-book","hon","toshokan","aru","The book is in the library."]]){
+    a(id,"existence","known",en,[phrase(thing,"topic"),[word(place),p("knownPlace"),...v(verb)]],{alternatives:[[phrase(thing,"topic"),[word(place),{text:"です"}]]],contrast:"Locate an already-mentioned topic rather than introduce a new subject.",context:`Someone asks where ${thing==="neko"?"the cat":"the book"} is.`});
+  }
+  a("have-language-book","existence","having","I have a Japanese-language book.",[[word("nihongo"),p("possession"),word("hon"),p("ownedSubject")],v("aru")],{backgroundTopics:["possession"],context:"Talk about a book you own."});
+  a("have-japanese-friend","existence","having","I have a Japanese friend.",[[word("nihonjin"),p("possession"),word("tomodachi"),p("ownedSubject")],v("iru")],{backgroundTopics:["possession"],context:"Talk about a friend who is Japanese.",contrast:"Use います for a personal relationship, rather than ownership of an object."});
+  a("have-time-question","existence","ask","Do you have time tomorrow?",[day("ashita"),phrase("jikan","ownedSubject"),qend("aru")],{backgroundTopics:["questions","time"],contrast:"Ask about available time, not a clock time."});
+  a("any-cat-question","existence","ask","Is there a cat in the park?",[phrase("kouen","existencePlace"),phrase("neko","subject"),qend("iru")],{backgroundTopics:["questions"],contrast:"Ask about a living being with います."});
+  a("what-here","existence","ask","What objects are here?",[phrase("koko","existencePlace"),phrase("nani","subject"),qend("aru")],{backgroundTopics:["questions"],contrast:"Ask what exists, preserving the subject が."});
+  a("who-library","existence","ask","Who is in the library?",[phrase("toshokan","existencePlace"),phrase("dare","subject"),qend("iru")],{backgroundTopics:["questions"],contrast:"Ask who exists at a location; だれ is followed by が."});
+  a("event-monday-venue","existence","events","There is a test at university on Monday.",[day("getsuyoubi"),...evt("daigaku","tesuto")],{backgroundTopics:["time"],contrast:"An event takes venue で rather than physical-existence に."});
+  a("event-tomorrow","existence","events","There is a class at the library tomorrow.",[day("ashita"),...evt("toshokan","kurasu")],{backgroundTopics:["time"],contrast:"Combine an event venue with a relative day without に."});
+  a("between-chair-desk","existence","relative","There is an umbrella between the chair and the desk.",[[word("isu"),p("list"),word("tsukue"),p("possession"),word("aida"),p("existencePlace")],phrase("kasa","subject"),v("aru")],{requiredTopics:["existence","relative-location"],contrast:"Locate a thing between two reference objects."});
+  a("behind-friend-desk","relative-location","description","This bag is behind my friend's desk.",[[word("kono"),word("kaban"),p("topic")],[word("tomodachi"),p("possession"),word("tsukue"),p("possession"),word("ushiro"),{text:"です"}]],{backgroundTopics:["pointing","possession"],contrast:"Use the whole descriptive noun phrase as the reference point."});
+  a("inside-teacher-bag","relative-location","description","The book is inside the teacher's bag.",[phrase("hon","topic"),[word("sensei"),p("possession"),word("kaban"),p("possession"),word("naka"),{text:"です"}]],{backgroundTopics:["possession"],contrast:"Keep the owner attached to the reference object."});
+  a("chair-left-desk","relative-location","perspective","The chair is to the left of the desk.",[phrase("isu","topic"),[word("tsukue"),p("possession"),word("hidari"),{text:"です"}]],{contrast:"The desk is the reference point; locate the chair relative to it."});
+  a("desk-right-chair","relative-location","perspective","The desk is to the right of the chair.",[phrase("tsukue","topic"),[word("isu"),p("possession"),word("migi"),{text:"です"}]],{contrast:"Reverse the reference point and change left to right."});
+  a("study-near-library","relative-location","activity","I study near the library.",[at("toshokan","chikaku","place"),v("benkyousuru")],{backgroundTopics:["action-place"],contrast:"An activity at a relative location uses で, rather than existence に."});
+  a("breakfast-front-university","relative-location","activity","I eat breakfast in front of the university.",[at("daigaku","mae","place"),phrase("asagohan","object"),v("taberu")],{backgroundTopics:["action-place","objects"],contrast:"Follow the whole position phrase with the activity-location particle."});
+  a("go-front-library","relative-location","movement","I go to the area in front of the library.",[at("toshokan","mae","destination"),v("iku")],{backgroundTopics:["destination"],contrast:"This position is a destination, not the place of an activity."});
+  a("go-near-temple","relative-location","movement","I go to the area near the temple.",[at("otera","chikaku","destination"),v("iku")],{backgroundTopics:["destination"],contrast:"A relative location can be a movement destination with に or へ."});
+  a("where-friend-book","relative-location","ask","Where is my friend's book?",[[word("tomodachi"),p("possession"),word("hon"),p("topic")],[word("doko"),...endq("です")]],{backgroundTopics:["possession","questions"],contrast:"Ask about the location of a described noun phrase."});
+  a("where-dog","relative-location","ask","Where is the dog?",[phrase("inu","topic"),[word("doko"),p("knownPlace"),...qend("iru")]],{alternatives:[[phrase("inu","topic"),[word("doko"),...endq("です")]]],backgroundTopics:["questions"],contrast:"A known animal stays the topic while its location is asked for."});
+  a("correct-under","relative-location","correction","The umbrella is under the chair.",[phrase("kasa","topic"),[word("isu"),p("possession"),word("shita"),{text:"です"}]],{context:"Someone says the umbrella is on the chair. Correct the location: it is under the chair.",contrast:"Reject the stated position and supply the correct spatial relationship."});
+  a("correct-behind","relative-location","correction","The supermarket is behind the hospital.",[phrase("suupaa","topic"),[word("byouin"),p("possession"),word("ushiro"),{text:"です"}]],{context:"Someone says the supermarket is in front of the hospital. Correct them: it is behind it.",contrast:"Distinguish front from behind using the same reference building."});
+  a("where-photo-past","past-actions","ask","Did you take photographs yesterday?",[day("kinou"),phrase("shashin","object"),pqend("toru")],{backgroundTopics:["time","objects","questions"],contrast:"Keep the past ending before question か."});
+  a("when-read-past","past-actions","ask","When did you read the report?",[phrase("itsu","questionTime"),phrase("repooto","object"),pqend("yomu")],{backgroundTopics:["questions","objects"],contrast:"Ask when a completed action happened, without adding に to いつ."});
+  a("child-park","past-actions","habit","When I was a child, I often went to the park.",[whenChild(),ad("yoku"),phrase("kouen","destination"),past("iku")],{backgroundTopics:["possession","time","destination"],contrast:"A past habitual action still uses the polite past ending."});
+  a("child-no-coffee","past-actions","habit","When I was a child, I did not drink coffee at all.",[whenChild(),ad("zenzen"),phrase("koohii","object"),past("nomu",true)],{backgroundTopics:["possession","time","negative","objects"],contrast:"Keep a negative adverb with the past-negative ending."});
+  a("book-price","past-nouns","price","This book was 3,000 yen.",[[word("kono"),word("hon"),p("topic")],[word("price3000"),{text:"でした"}]],{backgroundTopics:["pointing"],contrast:"A past price ends with でした, rather than a past action ending."});
+  a("bag-price","past-nouns","price","This bag was not 2,000 yen.",[[word("kono"),word("kaban"),p("topic")],[word("price2000"),{text:"じゃなかったです"}]],{backgroundTopics:["pointing"],contrast:"Negate a past price with a noun-sentence ending."});
+  a("person-not-teacher-past","past-nouns","negative","That person was not a teacher.",[identityRef(),[word("sensei"),{text:"じゃなかったです"}]],{backgroundTopics:["pointing"],contrast:"Past negative identity differs from a past negative verb."});
+  a("clock-duration","duration","clock","I study for one hour at seven.",[phrase("shichiji","time"),phrase("ichijikan","duration"),v("benkyousuru")],{backgroundTopics:["time"],contrast:"The starting clock time takes に; the elapsed hour does not."});
+  a("clock-duration-read","duration","clock","I read for two hours at nine.",[phrase("kuji","time"),phrase("nijikan","duration"),v("yomu")],{backgroundTopics:["time"],contrast:"Distinguish the clock reading from the length of the activity."});
+  a("hours-wait-question","duration","ask","How many hours do you wait?",[phrase("nanjikan","duration"),qend("matsu")],{backgroundTopics:["questions"],contrast:"A question about elapsed time does not take に."});
+  a("about-half-read","duration","half","I read books for about one and a half hours.",[[word("ichijikanhan"),word("suffix-gurai"),p("duration")],phrase("hon","object"),v("yomu")],{backgroundTopics:["objects"],contrast:"Put the approximation after the complete half-hour duration."});
+  a("list-destinations","listing-nouns","destinations","I go to the library and the bookstore.",[[word("toshokan"),p("list"),word("honya"),p("destination")],v("iku")],{backgroundTopics:["destination"],contrast:"The destination particle belongs after the complete noun list."});
+  a("list-other-destinations","listing-nouns","destinations","I go to the park and the supermarket.",[[word("kouen"),p("list"),word("suupaa"),p("destination")],v("iku")],{backgroundTopics:["destination"],contrast:"Distinguish listing と from the destination particle for the whole list."});
+  a("list-companions","listing-nouns","companions","I study with the teacher and a friend.",[[word("sensei"),p("list"),word("tomodachi"),p("companion")],v("benkyousuru")],{backgroundTopics:["companion"],contrast:"The first と joins the people; the final と marks the whole group as companions."});
+  a("list-companions-go","listing-nouns","companions","I go to university with a friend and the teacher.",[[word("tomodachi"),p("list"),word("sensei"),p("companion")],phrase("daigaku","destination"),v("iku")],{backgroundTopics:["companion","destination"],contrast:"Keep the noun list and companion marker together, separately from the destination."});
+  a("also-monday","also-actions","day","I study on Monday too.",[phrase("getsuyoubi","alsoDay"),v("benkyousuru")],{backgroundTopics:["time"],context:"You study on Sunday. Add Monday as another day you study.",contrast:"Keep time に before も, or use weekday も without に."});
+  a("also-thursday","also-actions","day","I go to university on Thursday too.",[phrase("mokuyoubi","alsoDay"),phrase("daigaku","destination"),v("iku")],{backgroundTopics:["time","destination"],context:"You go to university on Monday. Add Thursday as another day you go.",contrast:"The new day takes も; the destination keeps its own particle."});
+  a("wait-where-question","verb-particles","waiting","Where do you wait for the teacher?",[phrase("doko","place"),phrase("sensei","waiting"),qend("matsu")],{backgroundTopics:["action-place","questions"],contrast:"Keep を for the person being waited for and で for the activity location."});
+  a("understand-question","verb-particles","understood","Do you understand English?",[phrase("eigo","understood"),qend("wakaru")],{backgroundTopics:["questions"],contrast:"A question about understanding still takes が, not を."});
+  a("write-at-home","verb-particles","recipient","I write a letter to the teacher at home.",[phrase("uchi","place"),phrase("sensei","recipient"),phrase("tegami","object"),v("kaku")],{backgroundTopics:["action-place","objects"],contrast:"Distinguish location で, recipient に, and object を in one action."});
+  a("who-write-to","question-words","person","Who do you write letters to?",[phrase("dare","recipient"),phrase("tegami","object"),qend("kaku")],{requiredTopics:["question-words","verb-particles"],backgroundTopics:["questions","objects"],contrast:"The question word keeps the recipient に required by the verb."});
+  a("who-meet-question","question-words","person","Who do you meet at the library?",[phrase("toshokan","place"),phrase("dare","meeting"),qend("au")],{requiredTopics:["question-words","verb-particles"],backgroundTopics:["action-place","questions"],contrast:"Ask about the person met while preserving the separate location role."});
+  // Retain old IDs and stored records while folding the old subcollection into
+  // its family. Earlier grammar is supporting material, never a new focus.
+  for(const sentence of [...sentences,...mixedSentences]){
+    const original=sentence.requiredTopics||[sentence.topic];
+    if(!original.some(id=>topics.find(t=>t.id===id)?.lesson===4))continue;
+    const focus=[...new Set(original.filter(id=>topics.find(t=>t.id===id)?.lesson===4).map(canonical))];
+    sentence.backgroundTopics=[...new Set([...(sentence.backgroundTopics||[]),...original.filter(id=>topics.find(t=>t.id===id)?.lesson<4)])];
+    sentence.topic=focus[0];
+    if(focus.length>1)sentence.requiredTopics=focus;else delete sentence.requiredTopics;
+    if(sentence.familyExpansion && sentence.meaning.startsWith("I ")&&!sentence.chunks.flat().some(p=>p.wordId==="watashi"))sentence.optionalTopic="add";
+    if(sentence.familyExpansion && sentence.chunks.some(c=>c.some(p=>p.role==="list"))){
+      const alternate=sentence.chunks.map(c=>c.map(p=>({...p}))),list=alternate.find(c=>c.some(p=>p.role==="list")),i=list.findIndex(p=>p.role==="list");
+      [list[i-1],list[i+1]]=[list[i+1],list[i-1]];sentence.alternatives=[alternate];
+    }
+    for(const piece of sentence.chunks.flat())if(piece.text==="じゃなかったです")piece.acceptedTexts=["じゃなかったです","じゃありませんでした","ではありませんでした","ではなかったです"];
+    const markers=sentence.chunks.flat().filter(p=>p.role),has=r=>markers.some(p=>p.role===r);
+    if(!sentence.skill){
+      const id=sentence.topic;
+      sentence.skill=id==="existence"?(has("eventSubject")?"events":has("ownedSubject")?"having":has("possession")?"relative":sentence.chunks.flat().some(p=>/ません/.test(p.text))?"absence":"things"):
+        id==="relative-location"?(has("list")?"between":"positions"):
+        id==="past-actions"?(sentence.chunks.flat().some(p=>/ません/.test(p.text))?"negative":"affirmative"):
+        id==="past-nouns"?(has("possession")?"belonging":sentence.chunks.flat().some(p=>/じゃなかった/.test(p.text))?"negative":"identity"):
+        id==="duration"?(sentence.chunks.flat().some(p=>p.wordId?.includes("han"))?"half":sentence.chunks.flat().some(p=>p.wordId==="suffix-gurai")?"approximate":"exact"):
+        id==="listing-nouns"?(has("subject")?"subjects":"objects"):
+        id==="also-actions"?(has("alsoTopic")?"person":has("alsoObject")?"object":has("alsoSubject")?"subject":"place"):
+        id==="verb-particles"?(has("recipient")?"recipient":has("waiting")?"waiting":has("understood")?"understood":"meeting"):
+        id==="quantity-frequency"?(sentence.chunks.flat().some(p=>p.wordId==="takusan")?"quantity":sentence.chunks.flat().some(p=>p.wordId==="zenzen")?"none":sentence.chunks.flat().some(p=>p.wordId==="amari")?"limited":"frequency"):
+        id==="question-words"?(sentence.chunks.flat().some(p=>p.wordId==="dare")?"person":sentence.chunks.flat().some(p=>p.wordId==="itsu")?"time":sentence.chunks.flat().some(p=>p.wordId==="nanjikan")?"length":"place"):"";
+    }
+    // Lesson 4 demand comes from semantic contrasts and transfer, not length.
+    const contrast=Boolean(sentence.contrast),transfer=sentence.backgroundTopics.length>0||Boolean(sentence.requiredTopics);
+    const structural=has("eventPlace")||has("alsoPlace")||has("alsoDestination")||has("recipient")||has("list")||has("possession")&&has("existencePlace");
+    sentence.difficulty=contrast||transfer||structural?"challenge":"focused";
+    sentence.difficultyReason=sentence.contrast|| (transfer?"Apply the selected Lesson 4 focus with familiar supporting grammar.":structural?"Distinguish related particle roles or noun relationships.":"Establish one use of this topic family.");
+  }
+  globalThis.SENTENCE_COURSE = { topicAliases, topics, words, verbs, roles, sentences, mixedSentences, wordGroups, lessons: [
     { id: 1, title: "First conversations", description: "Introduce yourself, connect nouns, and ask questions." },
     { id: 2, title: "Things around you", description: "Point out objects and add ‘also’." },
     { id: 3, title: "Everyday actions", description: "Objects, places, time, companions, and polite verbs." },
